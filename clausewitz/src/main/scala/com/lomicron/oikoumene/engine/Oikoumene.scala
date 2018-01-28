@@ -1,14 +1,9 @@
 package com.lomicron.oikoumene.engine
 
-import com.lomicron.utils.io.Identifier
-import com.lomicron.utils.io.Tokenizer
 import com.lomicron.utils.io.IO
-import scala.io.Source
+import com.lomicron.utils.parsing.{Comment, Identifier, Token, Tokenizer}
+
 import scala.collection.SortedSet
-import com.lomicron.utils.io.ProvinceHistoryParser
-import com.lomicron.utils.io.Token
-import com.lomicron.utils.io.Property
-import com.lomicron.utils.io.Comment
 
 object Oikoumene {
   def main(args: Array[String]) {
