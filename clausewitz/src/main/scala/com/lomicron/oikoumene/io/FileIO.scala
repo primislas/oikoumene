@@ -1,10 +1,11 @@
 package com.lomicron.oikoumene.io
 
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileReader
 import java.io.Reader
-
 import javax.imageio.ImageIO
+
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
@@ -29,13 +30,14 @@ object FileIO {
     val bitmap = ImageIO.read(new File(path))
     val height = bitmap.getHeight
     val width = bitmap.getWidth
-    val bmls = for {
+    val bitmapLines = for {
       y <- 0 to height - 1
     } yield bitmap.getSubimage(0, y, width, 1)
-    val bmisiss = bmls.map { x => for { y <- 0 to width - 1 } yield x.getRGB(0, y) }
-    val bmisas = bmisiss.map { _.toArray }
-    bmisas.toArray
+    bitmapLines.map(bitmapLineToRgb(_)).map(_.toArray).toArray
   }
+
+  private def bitmapLineToRgb(bitmap: BufferedImage) =
+    for { y <- 0 to bitmap.getWidth - 1 } yield bitmap.getRGB(0, y)
   
   def readConfig(path: String): Reader = {
     new FileReader(path)

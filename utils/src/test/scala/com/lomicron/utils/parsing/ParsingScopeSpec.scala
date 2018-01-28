@@ -36,30 +36,30 @@ class ParsingScopeSpec extends Specification {
     "translate a Date token to 'events' field and construct an object with a 'date' field" >> {
       val (scope, _) = objectScope.nextScope(dateToken)
       val obj = scope.parsedObject
-      val hasDate = obj.has(DATE_FIELD)
+      val hasDate = obj.has(dateField)
       hasDate must_== true
 
-      val date = obj.get(DATE_FIELD)
-      val year = date.get(YEAR_FIELD).asInt()
-      val month = date.get(MONTH_FIELD).asInt()
-      val day = date.get(DAY_FIELD).asInt()
+      val date = obj.get(dateField)
+      val year = date.get(yearField).asInt()
+      val month = date.get(monthField).asInt()
+      val day = date.get(dayField).asInt()
       year must_== dateTokenYear
       month must_== dateTokenMonth
       day must_== dateTokenDay
 
       val rootObj = scope.rootScope.obj
       val dateParent = rootObj.get(objectKey).asInstanceOf[ObjectNode]
-      val hasEvents = dateParent.has(EVENTS_FIELD)
+      val hasEvents = dateParent.has(eventsField)
       hasEvents must_== true
 
       val isObjectScope = scope.isInstanceOf[ObjectScope]
       isObjectScope must_== true
 
       val scopeKey = scope.key
-      scopeKey must_== EVENTS_FIELD
+      scopeKey must_== eventsField
 
       val path = scope.scopePath
-      path must_== Seq(rootKey, objectKey, EVENTS_FIELD)
+      path must_== Seq(rootKey, objectKey, eventsField)
     }
 
     "move up object scope stack and copy parsing errors if any upon receiving a '}' token" >> {

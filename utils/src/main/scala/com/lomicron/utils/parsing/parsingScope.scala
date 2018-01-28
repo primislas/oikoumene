@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.DecimalNode
 import java.math.BigDecimal
 
 sealed trait ParsingScope { self =>
+
   /**
    *
    *
@@ -44,7 +45,7 @@ sealed trait ParsingScope { self =>
    * I.e. it will return reference to an object node belonging
    * to the closest object scope on scope stack.
    *
-   * @return {@link ObjectNode} that the scope is expected to
+   * @return {ObjectNode} that the scope is expected to
    * be modifying
    */
   def parsedObject: ObjectNode = {
@@ -52,7 +53,7 @@ sealed trait ParsingScope { self =>
       case ObjectScope(_, _, obj, _) => obj
       case _ =>
         if (parent.isDefined) parent.get.obj
-        else throw new ParsingException("No parsed object exists for the scope", null)
+        else throw ParsingException("No parsed object exists for the scope", null)
     }
   }
 
@@ -61,55 +62,28 @@ sealed trait ParsingScope { self =>
     def rec(s: ObjectScope): ObjectScope =
       if (s.parent.isDefined) rec(s.parent.get)
       else s
-    rec(objectScope.getOrElse(throw new ParsingException("No root object scope exists")))
+    rec(objectScope.getOrElse(throw ParsingException("No root object scope exists")))
   }
   
   def rootObject: ObjectNode = rootScope.obj
 
   def addField(field: String, value: JsonNode): ParsingScope = {
 
-    def addField(o: ObjectNode, k: String, v: JsonNode) = {
-      if (!o.has(k)) o.set(k, v)
-      else {
-        val exst = o.get(k)
-        if (exst.isArray())
-          exst.asInstanceOf[ArrayNode].add(v)
-        else {
-          val arr = new ArrayNode(JsonNodeFactory.instance)
-          arr.add(exst)
-          arr.add(v)
-          o.set(k, arr)
-        }
-      }
-      o
+    val (nextParent, nextParsedObject) = value match {
+      case on: ObjectNode => (objectScope, on)
+      case _ => (parent, parsedObject)
     }
 
-    val (nextParent, nextParsedObject) =
-      if (value.isInstanceOf[ObjectNode]) (objectScope, value.asInstanceOf[ObjectNode])
-      else (parent, parsedObject)
+    val nextKey = if (value.isInstanceOf[ObjectNode]) field else key
+    JsonParser.addField(parsedObject, field, value)
 
-    val notEvent = nextParent.map(_.key != JsonParser.EVENTS_FIELD).getOrElse(true)
-
-    val (realKey, remove) = if (notEvent) {
-      val addCommand = "add_"
-      val removeCommand = "remove_"
-      val extractKey = (s: String, prefix: String) => s.drop(prefix.length()) + "s"
-      if (field.startsWith(addCommand)) (extractKey(field, addCommand), false)
-      else if (field.startsWith(removeCommand)) (extractKey(field, removeCommand), true)
-      else (field, false)
-    } else (field, false)
-
-    val nextKey = if (value.isInstanceOf[ObjectNode]) realKey else key
-
-    if (remove) removeField(parsedObject, realKey, value)
-    else addField(parsedObject, realKey, value)
     ObjectScope(nextKey, nextParent, nextParsedObject)
   }
 
   def removeField(o: ObjectNode, key: String, value: JsonNode): ParsingScope = {
     if (o.has(key)) {
       val v = o.get(key)
-      if (v.isArray()) {
+      if (v.isArray) {
         val it = v.asInstanceOf[ArrayNode].iterator()
         var removed = false
         while (it.hasNext && !removed) {
@@ -154,33 +128,23 @@ case class ObjectScope(
   key: String,
   parent: Option[ObjectScope],
   obj: ObjectNode = new ObjectNode(JsonNodeFactory.instance),
-  val errors: Seq[ParsingError] = Nil)
+  errors: Seq[ParsingError] = Nil)
     extends ParsingScope { self =>
 
   override def validTokens = Seq("identifier", "}")
 
   override def nextScope(t: Token): (ParsingScope, ObjectNode) = {
-    def addDateObject(ds: Date) = {
-      import JsonParser._
-      val dateObj = JsonParser.buildDate(ds)
-      val nextObj = new ObjectNode(JsonNodeFactory.instance).set(DATE_FIELD, dateObj)
-      val nextScope = addField(EVENTS_FIELD, nextObj)
-      (nextScope, parsedObject)
-    }
-
     def moveParsingErrors = {
       val nextScope =
         if (parent.isDefined) self match {
-          case ObjectScope(_, _, _, es) => {
+          case ObjectScope(_, _, _, es) =>
             val p = parent.get
-            val curr = self
-            if (es.length > 0) {
+            if (es.nonEmpty) {
               val cp = p.copy(errors = p.errors ++ es)
               println("copying errors to: " + p)
               println("next scope: " + cp)
               cp
-            } else parent.get
-          }
+            } else p
           case _ => parent.get
         }
         else self
@@ -189,23 +153,23 @@ case class ObjectScope(
 
     t match {
       case Identifier(s)    => (FieldScope(Option(self), s), parsedObject)
-      case Date(_, _, _, _) => addDateObject(t.asInstanceOf[Date])
+      //case Date(_, _, _, _) => addDateObject(t.asInstanceOf[Date])
+      case d: Date          => (FieldScope(Option(self), d.toString), parsedObject)
       case CloseBrace       => moveParsingErrors
       case EOF              => (rootScope, rootObject)
       case _                => addParsingError(t)
     }
   }
 
-  override def toString = {
-    val sb = new StringBuilder("ObjectScope: ");
+  override def toString: String = {
+    val sb = new StringBuilder("ObjectScope: ")
 
     @annotation.tailrec
     def rec(ss: Seq[String], sep: String): Unit = ss match {
       case h :: Nil => sb.append(h)
-      case h :: t => {
+      case h :: t =>
         sb.append(h).append(sep)
         rec(t, sep)
-      }
       case _ => ()
     }
 
@@ -226,13 +190,14 @@ case class FieldScope(parent: Option[ObjectScope], key: String) extends ParsingS
 }
 
 case class AssignmentScope(parent: Option[ObjectScope], key: String) extends ParsingScope {
-  val bools = Set("yes", "no")
-  def isBoolean(s: String) = bools.contains(s)
+  val booleans = Set("yes", "no")
+  def isBoolean(s: String): Boolean = booleans.contains(s)
+
   override def validTokens = Seq("{", "identifier", "number", "date")
 
   override def nextScope(t: Token): (ParsingScope, ObjectNode) = {
     val value = t match {
-      case OpenBrace        => Option(new ObjectNode(JsonNodeFactory.instance))
+      case OpenBrace        => Option(JsonParser.objectNode)
       case Bool(_, b)       => Option(BooleanNode.valueOf(b))
       case Identifier(s)    => Option(TextNode.valueOf(s))
       case Number(lex, _)   => Option(DecimalNode.valueOf(new BigDecimal(lex)))
@@ -248,16 +213,15 @@ case class AssignmentScope(parent: Option[ObjectScope], key: String) extends Par
 }
 
 case class ParsingError(path: Seq[String], expected: Seq[String], encountered: Token) {
-  override def toString = {
-    val sb = new StringBuilder("Parsing error at: ");
+  override def toString: String = {
+    val sb = new StringBuilder("Parsing error at: ")
 
     @annotation.tailrec
     def rec(ss: Seq[String], sep: String): Unit = ss match {
       case h :: Nil => sb.append(h)
-      case h :: t => {
+      case h :: t =>
         sb.append(h).append(sep)
         rec(t, sep)
-      }
       case _ => ()
     }
 
@@ -271,4 +235,4 @@ case class ParsingError(path: Seq[String], expected: Seq[String], encountered: T
 
 case class ParsingException(private val message: String = "",
                             private val cause: Throwable = None.orNull)
-    extends Exception(message, cause) 
+    extends Exception(message, cause)

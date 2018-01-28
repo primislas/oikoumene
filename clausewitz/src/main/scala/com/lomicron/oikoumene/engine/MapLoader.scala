@@ -1,19 +1,23 @@
 package com.lomicron.oikoumene.engine
 
 import java.awt.image.BufferedImage
-import java.io.File
+import java.nio.file.{Path, Paths}
 import javax.imageio.ImageIO
 
 import com.lomicron.oikoumene.model.map.{Route, Tile}
 
+import scala.util.Try
+
 object MapLoader {
   type Provinces = Tuple2[Seq[Tile], Seq[Route]]
-  
-  
-  def loadMap(path: String): Provinces = {
-    val provinces = parseBitmap(fetchMap(Configs.MAP_FILE))
-    val tiles = provinces._1.map(new Tile(_)).toSeq
 
+  def loadMap(path: String): Try[Provinces] = loadMap(Paths.get(path))
+
+  def loadMap(path: Path): Try[Provinces] = Try(unsafeLoadMap(path))
+
+  private def unsafeLoadMap(path: Path) = {
+    val provinces = parseBitmap(fetchMap(path))
+    val tiles = provinces._1.map(new Tile(_)).toSeq
     new Tuple2(tiles, Nil)
   }
 
@@ -73,9 +77,11 @@ object MapLoader {
      routes
   }
 
-  def fetchMap(path: String): BufferedImage = {
-    ImageIO.read(new File(path))
-  }
+  def fetchMap(path: String): BufferedImage =
+    fetchMap(Paths.get(path))
+
+  def fetchMap(path: Path): BufferedImage =
+    ImageIO.read(path.toFile)
 
   def fetchTileConfig(path: String): Map[Int, Tile] = {
 

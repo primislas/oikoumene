@@ -82,10 +82,13 @@ object Tokenizer {
   val nextToken = State[Chars, Token] { s =>
     {
       var upds = s.dropWhile(isWhiteSpace)
-      def readBasedOnHead(c: Char) = if (operators.contains(c)) readOperator(upds)
-      else if (brackets.contains(c)) readBracket(upds)
-      else if (comments.keySet.contains(c)) readComment(upds)
-      else readWord(upds)
+
+      def readBasedOnHead(c: Char) =
+        if (operators.contains(c)) readOperator(upds)
+        else if (brackets.contains(c)) readBracket(upds)
+        else if (comments.keySet.contains(c)) readComment(upds)
+        else readWord(upds)
+
       upds match {
         case c #:: cs     => readBasedOnHead(c)
         case Stream.Empty => (upds, EOF)
