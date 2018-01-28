@@ -30,7 +30,7 @@ object JsonParser {
     //states.last
   }
 
-  def addField(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
+  def mergeField(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
     if (!o.has(k)) o.set(k, v)
     else {
       val exst = o.get(k)
@@ -44,6 +44,26 @@ object JsonParser {
       }
     }
     o
+  }
+
+  def removeField(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
+    Option(o.get(k))
+      .map(existingVal => {
+        if (existingVal.isArray) {
+          val it = existingVal.asInstanceOf[ArrayNode].iterator
+          while (it.hasNext) {
+            val e = it.next
+            var removed = false
+            if (v.equals(e) && !removed) {
+              it.remove()
+              removed = true
+            }
+          }
+        } else if (v.equals(existingVal))
+          o.remove(k)
+        o
+      })
+      .getOrElse(o)
   }
 
 }

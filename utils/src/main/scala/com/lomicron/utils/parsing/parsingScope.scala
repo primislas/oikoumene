@@ -75,7 +75,7 @@ sealed trait ParsingScope { self =>
     }
 
     val nextKey = if (value.isInstanceOf[ObjectNode]) field else key
-    JsonParser.addField(parsedObject, field, value)
+    JsonParser.mergeField(parsedObject, field, value)
 
     ObjectScope(nextKey, nextParent, nextParsedObject)
   }

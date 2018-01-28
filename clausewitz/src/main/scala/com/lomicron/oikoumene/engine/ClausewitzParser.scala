@@ -18,11 +18,11 @@ object ClausewitzParser {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
-  def buildDate(d: Date): ObjectNode =
-    JsonParser.objectNode
-      .put(yearField, d.year)
-      .put(monthField, d.month)
-      .put(dayField, d.day)
+//  def dateToObjectNode(d: Date): ObjectNode =
+//    JsonParser.objectNode
+//      .put(yearField, d.year)
+//      .put(monthField, d.month)
+//      .put(dayField, d.day)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     Option(str).map(JsonParser.parse).getOrElse(empty)
@@ -44,7 +44,7 @@ object ClausewitzParser {
           eventsByDate += (date -> v.asInstanceOf[ObjectNode])
           rolledUp
         })
-        .getOrElse(addField(rolledUp, k, v))
+        .getOrElse(mergeField(rolledUp, k, v))
     }
 
     eventsByDate.foldLeft(rolledUp)((acc,kv) => mergeFields(kv._2, acc))
@@ -60,19 +60,20 @@ object ClausewitzParser {
     source.fields().forEachRemaining(e => {
       val k = e.getKey
       val v = e.getValue
-      addField(target, k, v)
+      mergeField(target, k, v)
     })
     target
   }
 
-  private def addField(target: ObjectNode, key: String, value: JsonNode) = {
-    val validatedKey = preprocessKey(key)
-    JsonParser.addField(target, validatedKey, value)
+  private def mergeField(target: ObjectNode, key: String, value: JsonNode) = {
+    if (key.startsWith(addPrefix)) {
+      val commandKey = key.drop(addPrefix.length) + "s"
+      JsonParser.mergeField(target, commandKey, value)
+    } else if (key.startsWith(removePrefix)) {
+      val commandKey = key.drop(removePrefix.length) + "s"
+      JsonParser.removeField(target, commandKey, value)
+    } else
+      target.set(key, value)
   }
-
-  private def preprocessKey(key: String) =
-    if (key.startsWith(addPrefix)) key.drop(addPrefix.length) + "s"
-    else if (key.startsWith(removePrefix)) key.drop(removePrefix.length) + "s"
-    else key
 
 }
