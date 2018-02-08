@@ -1,11 +1,9 @@
 package com.lomicron.utils.io
 
-import org.specs2.mutable.Specification
-import org.specs2.mock.Mockito
-import scala.io.Source
-import java.io.File
 import java.io.FileNotFoundException
-import java.nio.file.Files
+
+import org.specs2.mock.Mockito
+import org.specs2.mutable.Specification
 
 class IOSpec extends Specification with Mockito {
   //val file = mock[File]

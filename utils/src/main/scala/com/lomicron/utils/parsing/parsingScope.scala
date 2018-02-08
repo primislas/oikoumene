@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.databind.node.DecimalNode
 import java.math.BigDecimal
 
+import com.lomicron.utils.json.JsonMapper
+
 sealed trait ParsingScope { self =>
 
   /**
@@ -75,7 +77,7 @@ sealed trait ParsingScope { self =>
     }
 
     val nextKey = if (value.isInstanceOf[ObjectNode]) field else key
-    JsonParser.mergeField(parsedObject, field, value)
+    JsonMapper.mergeFieldValue(parsedObject, field, value)
 
     ObjectScope(nextKey, nextParent, nextParsedObject)
   }

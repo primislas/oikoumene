@@ -10,8 +10,8 @@ class ParserSpec extends Specification {
     "" >> {
       val content = IO.readTextResource(provinceFile)
       val tokens = Tokenizer.tokenize(content.toStream)
-      val node = JsonParser.parse(tokens)
-      val json = node.toString()
+      val node = JsonParser.parse(tokens)._1
+      val json = node.toString
       json.length must be_>(0)
     }
   }

@@ -1,0 +1,10 @@
+{
+  "string": "my string val",
+  "integer": 2345,
+  "decimal": 1235.123,
+  "boolean": true,
+  "nullField": null,
+  "emptyOption": null,
+  "intOption": 45,
+  "unknownField": "unknown val"
+}

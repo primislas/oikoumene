@@ -27,6 +27,5 @@ object Oikoumene {
     val isIdentifier: Token => Boolean = _.isInstanceOf[Identifier]
     println("Bye")
   }
-  
-  
+
 }

@@ -1,7 +1,7 @@
 package com.lomicron.utils.parsing
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
+import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ObjectNode}
 
 object JsonParser {
 
@@ -25,45 +25,40 @@ object JsonParser {
       }
 
     val scope = rec(ObjectScope(rootKey, None), ts.toStream)
-    (scope.parsedObject, scope.errors)
-    //val (scope, states) = t.traverseS(nextState).run(ObjectScope(None))
-    //states.last
+    (camelify(scope.parsedObject), scope.errors)
   }
 
-  def mergeField(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
-    if (!o.has(k)) o.set(k, v)
-    else {
-      val exst = o.get(k)
-      if (exst.isArray)
-        exst.asInstanceOf[ArrayNode].add(v)
-      else {
-        val arr = new ArrayNode(JsonNodeFactory.instance)
-        arr.add(exst)
-        arr.add(v)
-        o.set(k, arr)
+  def camelify(obj: ObjectNode): ObjectNode = {
+    val camelified = objectNode
+    obj.fields.forEachRemaining(e => {
+      val k = e.getKey
+      val v = e.getValue match {
+        case o: ObjectNode => camelify(o)
+        case j: JsonNode => j
       }
-    }
-    o
+      camelified.set(camelCase(k), v)
+    })
+    camelified
   }
 
-  def removeField(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
-    Option(o.get(k))
-      .map(existingVal => {
-        if (existingVal.isArray) {
-          val it = existingVal.asInstanceOf[ArrayNode].iterator
-          while (it.hasNext) {
-            val e = it.next
-            var removed = false
-            if (v.equals(e) && !removed) {
-              it.remove()
-              removed = true
-            }
-          }
-        } else if (v.equals(existingVal))
-          o.remove(k)
-        o
-      })
-      .getOrElse(o)
+  /**
+    * Turns a string of format "foo_bar" into camel case "fooBar"
+    *
+    * Functional code courtesy of Jamie Webb (j@jmawebb.cjb.net) 2006/11/28
+    * @param name the String to CamelCase
+    *
+    * @return the CamelCased string
+    */
+  def camelCase(name : String): String = {
+    def loop(x : List[Char]): List[Char] = (x: @unchecked) match {
+      case '_' :: '_' :: rest => loop('_' :: rest)
+      case '_' :: c :: rest => Character.toUpperCase(c) :: loop(rest)
+      case '_' :: Nil => Nil
+      case c :: rest => c :: loop(rest)
+      case Nil => Nil
+    }
+    if (name == null) ""
+    else loop(name.toList).mkString
   }
 
 }
