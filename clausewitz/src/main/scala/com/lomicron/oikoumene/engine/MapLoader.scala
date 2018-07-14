@@ -9,7 +9,7 @@ import com.lomicron.oikoumene.model.map.{Route, Tile}
 import scala.util.Try
 
 object MapLoader {
-  type Provinces = Tuple2[Seq[Tile], Seq[Route]]
+  type Provinces = (Seq[Tile], Seq[Route])
 
   def loadMap(path: String): Try[Provinces] = loadMap(Paths.get(path))
 
@@ -17,39 +17,28 @@ object MapLoader {
 
   private def unsafeLoadMap(path: Path) = {
     val provinces = parseBitmap(fetchMap(path))
-    val tiles = provinces._1.map(new Tile(_)).toSeq
-    new Tuple2(tiles, Nil)
+    val tiles = provinces._1.map(Tile).toSeq
+    Tuple2(tiles, Nil)
   }
 
   /**
    * Returns a tuple of province colors and routes from the province bitmap.
    *
-   * @param map - {@link BufferedImage} representing a province 
-   * @return
+   * @param map - [[java.awt.image.BufferedImage BufferedImage]] representing a province
+   * @return a tuple of province colors and routes connecting them
    */
-  def parseBitmap(map: BufferedImage): Tuple2[Set[Int], Set[Route]] = {
+  def parseBitmap(map: BufferedImage): (Set[Int], Set[Route]) = {
     var colors = Set[Int]()
     var routes = Set[Route]()
-    val maxX = map.getWidth - 1
-    val maxY = map.getHeight - 1
-    for (x <- 0 to maxX; y <- 0 to maxY) {
+    for (x <- 0 until map.getWidth; y <- 0 until map.getHeight) {
       val source = map.getRGB(x, y)
       colors += source
       if (x != 0 && y != 0) {
         getRoute(source, map.getRGB(x - 1, y - 1)) foreach { route => routes += route }
       }
     }
-    //println("Loaded colors: " + colors)
-    // generates a collection of pixel values - bitmap colors represented as int values
-    //val pixels = for {
-    //  x <- 0 to maxX - 1
-    //  y <- 0 to maxY - 1
-    //} yield map.getRGB(x, y)
 
-    //val colors2 = pixels map (x => Set[Int]() + x) reduce (_ ++ _)
-    //val colors3 = pixels.toSet[Int]
-
-    new Tuple2(colors, routes)
+    (colors, routes)
   }
 
   def getBitmapColors(bitmap: Array[Array[Int]]): Set[Int] = {
@@ -65,16 +54,17 @@ object MapLoader {
   }
 
   def getRoute(source: Int, target: Int): Option[Route] = {
-    if (source != target) Some(new Route(source, target))
+    if (source != target) Some(Route(source, target))
     else None
   }
 
   def getRoutes(bitmap: Array[Array[Int]], x: Int, y: Int): Set[Route] = {
-    var routes = Set[Route]()
-    val width = bitmap(0).size
-    val height = bitmap.size
-    //if (x > 0 && y > 0)
-     routes
+//    var routes = Set[Route]()
+//    val width = bitmap(0).size
+//    val height = bitmap.size
+//    //if (x > 0 && y > 0)
+//     routes
+    Set[Route]()
   }
 
   def fetchMap(path: String): BufferedImage =

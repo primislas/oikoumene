@@ -8,6 +8,9 @@ import com.lomicron.utils.parsing.{Date, JsonParser, ParsingError, Tokenizer}
 import scala.collection.mutable
 
 object ClausewitzParser {
+
+  type JsonEntry = java.util.Map.Entry[String, JsonNode]
+
   val eventsField = "events"
   val dateField = "date"
   val yearField = "year"
@@ -19,11 +22,11 @@ object ClausewitzParser {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
-//  def dateToObjectNode(d: Date): ObjectNode =
-//    JsonParser.objectNode
-//      .put(yearField, d.year)
-//      .put(monthField, d.month)
-//      .put(dayField, d.day)
+  //  def dateToObjectNode(d: Date): ObjectNode =
+  //    JsonParser.objectNode
+  //      .put(yearField, d.year)
+  //      .put(monthField, d.month)
+  //      .put(dayField, d.day)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     Option(str).map(JsonParser.parse).getOrElse(empty)
@@ -38,7 +41,7 @@ object ClausewitzParser {
       val k = e.getKey
       val v = e.getValue
 
-      toDate(k)
+      strToDate(k)
         .filter(_.compare(endDate) <= 0)
         .filter(_ => v.isInstanceOf[ObjectNode])
         .map(date => {
@@ -48,8 +51,8 @@ object ClausewitzParser {
         .getOrElse(mergeField(rolledUp, k, v))
     }
 
-    eventsByDate.foldLeft(rolledUp)((acc,kv) => {
-      val (date,update) = kv
+    eventsByDate.foldLeft(rolledUp)((acc, kv) => {
+      val (date, update) = kv
       val event = JsonParser.objectNode
       event.set(dateField, date2json(date))
       update.fields.forEachRemaining(e => event.set(e.getKey, e.getValue))
@@ -60,34 +63,36 @@ object ClausewitzParser {
   def date2json(date: Date): ObjectNode =
     JsonParser
       .objectNode
-      .put("year", date.year)
-      .put("month", date.month)
-      .put("day", date.day)
+      .put(yearField, date.year)
+      .put(monthField, date.month)
+      .put(dayField, date.day)
 
-  def toDate(key: String): Option[Date] = key match {
+  def strToDate(key: String): Option[Date] = key match {
     case Tokenizer.datePat(year, month, day) =>
-      Option(Date(year.toInt, month.toInt, day.toInt))
+      Option(Date(year, month, day))
     case _ => Option.empty
   }
 
   def mergeFields(source: ObjectNode, target: ObjectNode): ObjectNode = {
-    source.fields().forEachRemaining(e => {
-      val k = e.getKey
-      val v = e.getValue
-      mergeField(target, k, v)
-    })
+    source.fields().forEachRemaining(e => mergeField(target, e))
     target
   }
 
+  def mergeField(target: ObjectNode, kv: JsonEntry): ObjectNode =
+    mergeField(target, kv.getKey, kv.getValue)
+
   def mergeField(target: ObjectNode, key: String, value: JsonNode): ObjectNode = {
     if (key.startsWith(addPrefix)) {
-      val commandKey = key.drop(addPrefix.length) + "s"
-      JsonMapper.mergeFieldValue(target, commandKey, value)
+      val field = fieldWithoutPrefix(key, addPrefix)
+      JsonMapper.mergeFieldValue(target, field, value)
     } else if (key.startsWith(removePrefix)) {
-      val commandKey = key.drop(removePrefix.length) + "s"
-      JsonMapper.removeFieldValue(target, commandKey, value)
+      val field = fieldWithoutPrefix(key, removePrefix)
+      JsonMapper.removeFieldValue(target, field, value)
     } else
       target.set(key, value).asInstanceOf[ObjectNode]
   }
+
+  def fieldWithoutPrefix(field: String, prefix: String) =
+    s"${field.drop(prefix.length)}s"
 
 }

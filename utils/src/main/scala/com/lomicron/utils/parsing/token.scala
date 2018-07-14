@@ -13,9 +13,9 @@ case class Date(lexeme: String, year: Int, month: Int, day: Int) extends Token w
   override def toString: String = Date.toString(year, month, day)
 
   override def compare(that: Date): Int = {
-    val lt = -1;
-    val gt = 1;
-    val eq = 0;
+    val lt = -1
+    val gt = 1
+    val eq = 0
 
     if (year < that.year) lt
     else if (year > that.year) gt
@@ -32,6 +32,9 @@ object Date {
 
   def apply(lexeme: String, year: Int, month: Int, day: Int): Date =
     new Date(lexeme, year, month, day)
+
+  def apply(year: String, month: String, day: String): Date =
+    apply(year.toInt, month.toInt, day.toInt)
 
   def apply(year: Int, month: Int, day: Int): Date = {
     val lexeme = toString(year, month, day)

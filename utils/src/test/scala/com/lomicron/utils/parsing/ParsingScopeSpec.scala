@@ -1,33 +1,33 @@
 package com.lomicron.utils.parsing
 
-import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ObjectNode}
+import com.lomicron.utils.json.JsonMapper.objectNode
 import org.specs2.mutable.Specification
 
 class ParsingScopeSpec extends Specification {
   val rootKey = "ROOT"
   val rootScope = ObjectScope(rootKey, None)
   val objectKey = "obj_field"
-  val objectScope = rootScope.addField(objectKey, new ObjectNode(JsonNodeFactory.instance)).asInstanceOf[ObjectScope]
+  val objectScope: ObjectScope = rootScope.addField(objectKey, objectNode).asInstanceOf[ObjectScope]
 
   val idTokenField = Identifier("owner")
   val idTokenValue = Identifier("BYZ")
-  val fieldScope = objectScope.nextScope(idTokenField)._1
-  val assignmentScope = fieldScope.nextScope(Equals)._1
+  val fieldScope: ParsingScope = objectScope.nextScope(idTokenField)._1
+  val assignmentScope: ParsingScope = fieldScope.nextScope(Equals)._1
 
   val strToken = StringT("a string token")
   val decimalToken = Number("0.5", BigDecimal("0.5"))
-  val boolFalseToken = Bool("no", false)
-  val boolTrueToken = Bool("yes", true)
+  val boolFalseToken = Bool("no", asBoolean = false)
+  val boolTrueToken = Bool("yes", asBoolean = true)
 
   val dateTokenYear = 1732
   val dateTokenMonth = 11
   val dateTokenDay = 2
-  val dateTokenLexeme = s"${dateTokenYear}.${dateTokenMonth}.${dateTokenDay}"
+  val dateTokenLexeme = s"$dateTokenYear.$dateTokenMonth.$dateTokenDay"
   val dateToken = Date(dateTokenLexeme, dateTokenYear, dateTokenMonth, dateTokenDay)
 
   "ObjectScope#nextScope" should {
     "advance to FieldScope with Identifier token" >> {
-      val (scope, obj) = objectScope.nextScope(idTokenField)
+      val (scope, _) = objectScope.nextScope(idTokenField)
       val isFieldScope = scope.isInstanceOf[FieldScope]
       isFieldScope must_== true
     }

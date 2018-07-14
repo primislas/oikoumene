@@ -42,11 +42,11 @@ object JsonMapper {
   def fromJson[T: Manifest](json: String): T =
     mapper.readValue[T](json)
 
-//  def fromJson[T](json: String, typeReference: TypeReference[T]): T =
-//    mapper.readValue(json, typeReference)
+  //  def fromJson[T](json: String, typeReference: TypeReference[T]): T =
+  //    mapper.readValue(json, typeReference)
 
   def toJsonNode(json: String): JsonNode =
-    mapper.readTree(json)
+    mapper.valueToTree(json)
 
   def clone[T <: AnyRef](obj: T): T =
     convert[obj.type](obj)
@@ -60,29 +60,38 @@ object JsonMapper {
   def toObjectNode(obj: AnyRef): Option[ObjectNode] =
     Try(toJsonNode(obj).asInstanceOf[ObjectNode]).toOption
 
+  def objectNode: ObjectNode = new ObjectNode(JsonNodeFactory.instance)
+
+  def arrayNode: ArrayNode = new ArrayNode(JsonNodeFactory.instance)
+
+  def arrayNodeOf(args: Object*): ArrayNode =
+    args.map(JsonMapper.toJsonNode).foldLeft(arrayNode)(_.add(_))
+
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
-    patch(target, update, patch(_, _))
+    patch(target, update, patch)
 
   def patchMerge[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
-    patch(target, update, patchMerge(_, _))
-
+    patch(target, update, patchMerge)
 
   private def patch[T <: AnyRef, P <: AnyRef]
-  (target: T, update: P, f: (ObjectNode, ObjectNode) => ObjectNode): T = {
+  (target: T,
+   update: P,
+   f: (ObjectNode, ObjectNode) => ObjectNode): T = {
+
     val patched = for {
       t <- toObjectNode(target)
       p <- toObjectNode(update)
-    } yield f(t,p)
+    } yield f(t, p)
     patched.map(convert[target.type](_)).getOrElse(target)
   }
 
   def patch(target: ObjectNode, update: ObjectNode): ObjectNode =
-    patchF(target, update, overwriteField(_, _))
+    patchF(target, update, overwriteField)
 
   def patchMerge(target: ObjectNode, update: ObjectNode): ObjectNode =
-    patchF(target, update, mergeField(_, _))
+    patchF(target, update, mergeField)
 
   private def patchF(target: ObjectNode,
                      update: ObjectNode,
@@ -117,23 +126,21 @@ object JsonMapper {
 
   def removeFieldValue(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
     Option(o.get(k))
-      .map(existingVal => {
+      .foreach(existingVal => {
         if (existingVal.isArray) {
           val it = existingVal.asInstanceOf[ArrayNode].iterator
-          while (it.hasNext) {
+          var removed = false
+          while (it.hasNext && !removed) {
             val e = it.next
-            var removed = false
-            if (v.equals(e) && !removed) {
+            if (v.equals(e)) {
               it.remove()
               removed = true
             }
           }
         } else if (v.equals(existingVal))
           o.remove(k)
-        o
       })
-      .getOrElse(o)
+      o
   }
-
 
 }

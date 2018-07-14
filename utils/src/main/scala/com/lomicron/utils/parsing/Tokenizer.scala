@@ -2,48 +2,50 @@ package com.lomicron.utils.parsing
 
 import scalaz.State
 
+import scala.util.matching.Regex
+
 object Tokenizer {
   type Chars = Stream[Char]
   type ParsingState = State[Chars, Token]
-  
+
   val newLine = '\n'
   val comments = Map('#' -> '\n')
-  val commentEnds = comments.values.toSet
+  val commentEnds: Set[Char] = comments.values.toSet
   val whiteSpaces = Set(' ', '\t', '\n', '\r')
   val operators = Set('=')
   val brackets = Set('(', ')', '{', '}')
-  val stringLiterals = ('\'', '\"')
-  val separators = whiteSpaces ++ operators ++ brackets ++ comments.keySet
+  val stringLiterals = Set('\'', '\"')
+  val separators: Set[Char] = whiteSpaces ++ operators ++ brackets ++ comments.keySet
 
-  val stringPat = """"([^\s]*)"""".r
-  val charPat = """'([^\s]*)'""".r
-  val identifierPat = """([a-zA-Z]+[_\da-zA-Z]*)""".r
-  val numberPat = """(-*\d+(?:.\d*)?)""".r
-  val datePat = """(\d+)\.(\d+)\.(\d+)""".r
-  val booleanPat = """(yes|no)""".r
-  
+  val stringPat: Regex = """"([^\s]*)"""".r
+  val charPat: Regex = """'([^\s]*)'""".r
+  val identifierPat: Regex = """([a-zA-Z]+[_\da-zA-Z]*)""".r
+  val numberPat: Regex = """(-*\d+(?:.\d*)?)""".r
+  val datePat: Regex = """(\d+)\.(\d+)\.(\d+)""".r
+  val booleanPat: Regex = """(yes|no)""".r
+
   def tokenize(s: String): Seq[Token] = tokenize(s.toStream)
 
   def tokenize(s: Stream[Char]): Seq[Token] = {
     @annotation.tailrec
-    def parseAll(cs: Chars, ts: Vector[Token]): (Chars, Seq[Token]) = {
-      val (ucs, t) = nextToken(cs)
-      val uts: Vector[Token] = ts :+ t
-      t match {
-        case EOF => (ucs, uts)
-        case _   => parseAll(ucs, uts)
+    def parseAll(chars: Chars, tokens: Vector[Token]): (Chars, Seq[Token]) = {
+      val (nextChars, token) = nextToken(chars)
+      val combinedTokens: Vector[Token] = tokens :+ token
+      token match {
+        case EOF => (nextChars, combinedTokens)
+        case _   => parseAll(nextChars, combinedTokens)
       }
     }
     parseAll(s, Vector())._2
   }
 
-  val isWhiteSpace: Char => Boolean = whiteSpaces.contains(_)
+  val isWhiteSpace: Char => Boolean = whiteSpaces.contains
 
   val isNewLine: Char => Boolean = _ == newLine
 
   val readOperator: Chars => (Chars, Token) = s => s.headOption match {
     case Some('=') => (s.drop(1), Equals)
-    case Some(c)   => throw new RuntimeException(s"Parsing exception: encountered unknown operator ${c}")
+    case Some(c)   => throw new RuntimeException(s"Parsing exception: encountered unknown operator $c")
     case None      => throw new RuntimeException(s"Parsing exception: encountered an empty stream")
   }
 
@@ -52,24 +54,24 @@ object Tokenizer {
     case '}'     => (s.drop(1), CloseBrace)
     case '('     => (s.drop(1), OpenParentheses)
     case ')'     => (s.drop(1), CloseParentheses)
-    case default => throw new RuntimeException(s"Parsing exception: encountered unknown bracket ${default}")
+    case default => throw new RuntimeException(s"Parsing exception: encountered unknown bracket $default")
   }
 
   val readComment: Stream[Char] => (Chars, Token) = s => {
     val notCommentEnd: Char => Boolean = !commentEnds.contains(_)
-    val c = s.takeWhile(notCommentEnd).mkString;
+    val c = s.takeWhile(notCommentEnd).mkString
     (s.drop(c.length), Comment(c.dropWhile(_ == '#').trim))
   }
 
   val readWord: Stream[Char] => (Chars, Token) = s => {
-    val w = s.takeWhile(!separators.contains(_)).mkString;
+    val w = s.takeWhile(!separators.contains(_)).mkString
     (s.drop(w.length), parseWord(w))
   }
 
-  val isTrue = (s: String) => s == "yes"
-  val getBoolean = (s: String) => if (isTrue(s)) Bool(s, true) else Bool(s, false)
+  def isTrue(s: String): Boolean = s == "yes"
+  def getBoolean (s: String): Bool = Bool(s, isTrue(s))
 
-  val parseWord: String => Token = s => s match {
+  def parseWord(s: String): Token = s match {
     case booleanPat(_)             => getBoolean(s)
     case stringPat(i)              => Identifier(i)
     case charPat(i)                => Identifier(i)
@@ -79,9 +81,9 @@ object Tokenizer {
     case _                         => InvalidIdentifier(s)
   }
 
-  val nextToken = State[Chars, Token] { s =>
+  def nextToken: State[Chars, Token] = State[Chars, Token] { s =>
     {
-      var upds = s.dropWhile(isWhiteSpace)
+      val upds = s.dropWhile(isWhiteSpace)
 
       def readBasedOnHead(c: Char) =
         if (operators.contains(c)) readOperator(upds)
@@ -90,7 +92,7 @@ object Tokenizer {
         else readWord(upds)
 
       upds match {
-        case c #:: cs     => readBasedOnHead(c)
+        case c #:: _     => readBasedOnHead(c)
         case Stream.Empty => (upds, EOF)
       }
     }

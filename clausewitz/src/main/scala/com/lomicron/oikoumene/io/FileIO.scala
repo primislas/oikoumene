@@ -31,13 +31,13 @@ object FileIO {
     val height = bitmap.getHeight
     val width = bitmap.getWidth
     val bitmapLines = for {
-      y <- 0 to height - 1
+      y <- 0 until height
     } yield bitmap.getSubimage(0, y, width, 1)
-    bitmapLines.map(bitmapLineToRgb(_)).map(_.toArray).toArray
+    bitmapLines.map(bitmapLineToRgb).map(_.toArray).toArray
   }
 
   private def bitmapLineToRgb(bitmap: BufferedImage) =
-    for { y <- 0 to bitmap.getWidth - 1 } yield bitmap.getRGB(0, y)
+    for { y <- 0 until bitmap.getWidth } yield bitmap.getRGB(0, y)
   
   def readConfig(path: String): Reader = {
     new FileReader(path)

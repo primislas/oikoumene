@@ -9,14 +9,14 @@ object IO {
 
   /**
    *
-   * @param resource
-   * @param cleanup
-   * @param doWork
+   * @param resource resource to be accessed
+   * @param cleanup resource cleanup function
+   * @param doWork resource processing function
    * @return
    */
   def cleanly[A, B](resource: A)(cleanup: A => Unit)(doWork: A => B): B = {
     try {
-      return doWork(resource)
+      doWork(resource)
     } finally {
       cleanup(resource)
     }

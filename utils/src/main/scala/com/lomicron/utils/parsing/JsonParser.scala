@@ -1,13 +1,14 @@
 package com.lomicron.utils.parsing
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ObjectNode}
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.utils.json.JsonMapper
 
 object JsonParser {
 
   val rootKey = "ROOT"
 
-  def objectNode = new ObjectNode(JsonNodeFactory.instance)
+  def objectNode: ObjectNode = JsonMapper.objectNode
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) = {
     val tokens = Tokenizer.tokenize(str)
