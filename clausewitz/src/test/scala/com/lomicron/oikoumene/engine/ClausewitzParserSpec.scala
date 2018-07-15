@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.engine
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.toJsonNode
 import com.lomicron.utils.parsing.Date
@@ -37,7 +38,7 @@ class ClausewitzParserSpec extends Specification {
   }
 
   "ClausewitzParser#fieldWithoutPrefix" should "- remove prefix and convert a field to plural" >> {
-    val str = "add_core"
+    val str = "add_Core"
     val prefix = "add_"
     val unprefixed = ClausewitzParser.fieldWithoutPrefix(str, prefix)
     unprefixed mustEqual "cores"
@@ -59,8 +60,8 @@ class ClausewitzParserSpec extends Specification {
       obj.get(field) mustEqual newOwner
     }
 
-    "- add an item to a key array for a field that starts with add_" >> {
-      val addCore = "add_core"
+    "- add an item to a key array for a field that starts with add" >> {
+      val addCore = "addCore"
       val newCore = toJsonNode("VEN")
       val cores = "cores"
 
@@ -68,8 +69,8 @@ class ClausewitzParserSpec extends Specification {
       obj.get(cores) mustEqual JsonMapper.arrayNodeOf("BYZ", "VEN")
     }
 
-    "- remove a single item from an array for a field that starts with remove_" >> {
-      val removeCore = "remove_core"
+    "- remove a single item from an array for a field that starts with remove" >> {
+      val removeCore = "removeCore"
       val removedCore = toJsonNode("BYZ")
       val cores = "cores"
 
@@ -77,8 +78,8 @@ class ClausewitzParserSpec extends Specification {
       obj.get(cores) mustEqual JsonMapper.arrayNode
     }
 
-    "- do nothing on an empty key when receiving a remove_ command" >> {
-      val removeClaim = "remove_claim"
+    "- do nothing on an empty key when receiving a remove command" >> {
+      val removeClaim = "removeClaim"
       val removedClaim = toJsonNode("BYZ")
       val claims = "claims"
 
@@ -86,6 +87,20 @@ class ClausewitzParserSpec extends Specification {
       obj.get(claims) mustEqual JsonMapper.arrayNode
     }
 
+  }
+
+  "ClausewitzParser#rollUpEvents" should {
+    "- apply events up to provided date and save a history feed" >> {
+      val fileName = "151 - Constantinople.txt"
+      val provinceTxt = IO.readTextResource(fileName)
+      val (province, errors) = ClausewitzParser.parse(provinceTxt)
+      errors must beEmpty
+
+      val date = Date(1700, 1, 1)
+      val parsed = ClausewitzParser.rollUpEvents(province, date)
+      val history = parsed.get(ClausewitzParser.historyField).asInstanceOf[ArrayNode]
+      history.size mustEqual 15
+    }
   }
 
 }

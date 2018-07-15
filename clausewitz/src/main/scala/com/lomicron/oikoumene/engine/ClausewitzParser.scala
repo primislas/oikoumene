@@ -11,22 +11,16 @@ object ClausewitzParser {
 
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
-  val eventsField = "events"
+  val historyField = "history"
   val dateField = "date"
   val yearField = "year"
   val monthField = "month"
   val dayField = "day"
-  val addPrefix = "add_"
-  val removePrefix = "remove_"
+  val addPrefix = "add"
+  val removePrefix = "remove"
 
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
-
-  //  def dateToObjectNode(d: Date): ObjectNode =
-  //    JsonParser.objectNode
-  //      .put(yearField, d.year)
-  //      .put(monthField, d.month)
-  //      .put(dayField, d.day)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     Option(str).map(JsonParser.parse).getOrElse(empty)
@@ -36,27 +30,30 @@ object ClausewitzParser {
     val it = obj.fields
     val eventsByDate: mutable.Map[Date, ObjectNode] = mutable.TreeMap[Date, ObjectNode]()
 
-    while (it.hasNext) {
-      val e = it.next
-      val k = e.getKey
-      val v = e.getValue
+    obj.fields.forEachRemaining(kv => {
+      val (k, v) = (kv.getKey, kv.getValue)
 
       strToDate(k)
-        .filter(_.compare(endDate) <= 0)
-        .filter(_ => v.isInstanceOf[ObjectNode])
         .map(date => {
-          eventsByDate += (date -> v.asInstanceOf[ObjectNode])
+          Option(date)
+            .filter(_.compare(endDate) <= 0)
+            .filter(_ => v.isInstanceOf[ObjectNode])
+            .foreach(validDate => {
+              val events = v.asInstanceOf[ObjectNode]
+              eventsByDate += (validDate -> events)
+              events.fields().forEachRemaining(kv => mergeField(rolledUp, kv))
+            })
           rolledUp
         })
         .getOrElse(mergeField(rolledUp, k, v))
-    }
+    })
 
     eventsByDate.foldLeft(rolledUp)((acc, kv) => {
       val (date, update) = kv
       val event = JsonParser.objectNode
       event.set(dateField, date2json(date))
       update.fields.forEachRemaining(e => event.set(e.getKey, e.getValue))
-      JsonMapper.mergeFieldValue(acc, eventsField, event)
+      JsonMapper.mergeFieldValue(acc, historyField, event)
     })
   }
 
@@ -92,7 +89,12 @@ object ClausewitzParser {
       target.set(key, value).asInstanceOf[ObjectNode]
   }
 
-  def fieldWithoutPrefix(field: String, prefix: String) =
-    s"${field.drop(prefix.length)}s"
+  def fieldWithoutPrefix(field: String, prefix: String): String = {
+    val cs = field.toSeq.drop(prefix.length)
+    cs match {
+      case h+:tail => s"${h.toLower}${tail.mkString}s"
+      case _ => cs.mkString
+    }
+  }
 
 }

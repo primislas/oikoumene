@@ -1,15 +1,11 @@
 package com.lomicron.utils.parsing
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.BooleanNode
-import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.databind.node.DecimalNode
 import java.math.BigDecimal
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node._
 import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.JsonMapper.objectNode
 
 sealed trait ParsingScope {
   self =>
@@ -39,7 +35,7 @@ sealed trait ParsingScope {
   def key: String
 
   def objectScope: Option[ObjectScope] = self match {
-    case ObjectScope(_, _, _, _) => Option(self.asInstanceOf[ObjectScope])
+    case o: ObjectScope => Option(o)
     case _ => parent
   }
 
@@ -132,7 +128,7 @@ sealed trait ParsingScope {
 case class ObjectScope(
                         key: String,
                         parent: Option[ObjectScope],
-                        obj: ObjectNode = new ObjectNode(JsonNodeFactory.instance),
+                        obj: ObjectNode = objectNode,
                         errors: Seq[ParsingError] = Nil)
   extends ParsingScope {
   self =>
@@ -143,10 +139,11 @@ case class ObjectScope(
     def moveParsingErrors = {
       val nextScope =
         if (parent.isDefined) self match {
-          case ObjectScope(_, _, _, es) =>
+          case o: ObjectScope =>
+            val errors = o.errors
             val p = parent.get
-            if (es.nonEmpty) {
-              val cp = p.copy(errors = p.errors ++ es)
+            if (errors.nonEmpty) {
+              val cp = p.copy(errors = p.errors ++ errors)
               println("copying errors to: " + p)
               println("next scope: " + cp)
               cp
@@ -159,10 +156,10 @@ case class ObjectScope(
 
     t match {
       case Identifier(s) => (FieldScope(Option(self), s), parsedObject)
-      //case Date(_, _, _, _) => addDateObject(t.asInstanceOf[Date])
       case d: Date => (FieldScope(Option(self), d.toString), parsedObject)
       case CloseBrace => moveParsingErrors
       case EOF => (rootScope, rootObject)
+      case _: Comment => (self, parsedObject)
       case _ => addParsingError(t)
     }
   }
@@ -186,11 +183,14 @@ case class ObjectScope(
 }
 
 case class FieldScope(parent: Option[ObjectScope], key: String) extends ParsingScope {
+  self =>
+
   override def validTokens = Seq("=")
 
   override def nextScope(t: Token): (ParsingScope, ObjectNode) =
     t match {
       case Equals => (AssignmentScope(parent, key), parsedObject)
+      case _: Comment => (self, parsedObject)
       case _ => addParsingError(t)
     }
 }
