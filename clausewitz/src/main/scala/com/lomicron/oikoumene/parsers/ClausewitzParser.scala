@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.engine
+package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
