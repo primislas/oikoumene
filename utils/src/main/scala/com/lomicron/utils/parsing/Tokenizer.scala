@@ -13,12 +13,13 @@ object Tokenizer {
   val commentEnds: Set[Char] = comments.values.toSet
   val whiteSpaces = Set(' ', '\t', '\n', '\r')
   val operators = Set('=')
-  val brackets = Set('(', ')', '{', '}')
+  val brackets = Set('(', ')', '{', '}', '[', ']')
   val stringLiterals = Set('\'', '\"')
   val separators: Set[Char] = whiteSpaces ++ operators ++ brackets ++ comments.keySet
 
-  val stringPat: Regex = """"([^\s]*)"""".r
-  val charPat: Regex = """'([^\s]*)'""".r
+  // TODO - remove escaped quotation marks from these patterns?
+  val stringPat: Regex = """"(.*)"""".r
+  val charPat: Regex = """'(.*)'""".r
   val identifierPat: Regex = """([a-zA-Z]+[_\da-zA-Z]*)""".r
   val numberPat: Regex = """(-*\d+(?:.\d*)?)""".r
   val datePat: Regex = """(\d+)\.(\d+)\.(\d+)""".r
@@ -64,8 +65,8 @@ object Tokenizer {
   }
 
   val readWord: Stream[Char] => (Chars, Token) = s => {
-    val w = s.takeWhile(!separators.contains(_)).mkString
-    (s.drop(w.length), parseWord(w))
+    val word = StringAccumulator(s).mkString
+    (s.drop(word.length), parseWord(word))
   }
 
   def isTrue(s: String): Boolean = s == "yes"
@@ -95,6 +96,39 @@ object Tokenizer {
         case c #:: _     => readBasedOnHead(c)
         case Stream.Empty => (upds, EOF)
       }
+    }
+  }
+
+  class StringAccumulator(separator: Char) {
+
+    private val cs = scala.collection.mutable.ArrayBuffer[Char]()
+    private var opened = false
+    private var closed = false
+
+    def next(c: Char): Boolean = {
+      if (closed) return false
+
+      if (c == separator) {
+        if (!opened) opened = true
+        else closed = true
+      }
+      cs append c
+
+      true
+    }
+
+    def chars: Chars = cs.toStream
+  }
+
+  object StringAccumulator {
+    def apply(cs: Chars): Chars = {
+      if (cs.head == ''') {
+        val acc = new StringAccumulator(''')
+        cs.takeWhile(acc.next)
+      } else if (cs.head == '"') {
+        val acc = new StringAccumulator('"')
+        cs.takeWhile(acc.next)
+      } else cs.takeWhile(!separators.contains(_))
     }
   }
 

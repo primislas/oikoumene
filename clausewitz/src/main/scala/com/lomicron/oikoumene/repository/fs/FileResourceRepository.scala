@@ -5,6 +5,8 @@ import java.nio.file.{Path, Paths}
 import com.lomicron.utils.io.IO
 import com.lomicron.oikoumene.repository.api.ResourceRepository
 
+import com.lomicron.utils.collection.CollectionUtils._
+
 case class FileResourceRepository(
                                    gameDir: String,
                                    modDir: String)
@@ -20,12 +22,16 @@ case class FileResourceRepository(
 
   override def getCountries(filesByTags: Map[String, String]): Map[String, String] =
     filesByTags
-      .map(kv => (kv._1, fromSource(kv._2)))
-      .map(kv => (kv._1, kv._2.toString))
-      .map(kv => (kv._1, IO.readTextFile(kv._2)))
+      .mapValuesEx(fromSource)
+      .mapValuesEx(_.toString)
+      .mapValuesEx(IO.readTextFile)
 
   override def getCountryHistory: Map[String, String] =
     readSourceDir(countryHistoryDir)
+      .mapKeys(filenameToTag)
+
+  private def filenameToTag(str: String) =
+    str.take(3).mkString
 
   override def getCountryNames: Map[String, String] =
     readSourceFile(countryNamesFile)

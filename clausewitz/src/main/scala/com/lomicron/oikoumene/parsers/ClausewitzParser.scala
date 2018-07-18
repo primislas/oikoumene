@@ -3,7 +3,8 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.parsing.{Date, JsonParser, ParsingError, Tokenizer}
+import com.lomicron.utils.parsing.scopes.ParsingError
+import com.lomicron.utils.parsing.{Date, JsonParser, Tokenizer}
 
 import scala.collection.mutable
 
