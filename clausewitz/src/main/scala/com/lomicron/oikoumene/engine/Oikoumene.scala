@@ -50,9 +50,6 @@ object Oikoumene {
       .map(kv => (kv._1, s"common/${kv._2}"))
       .foldLeft(TreeMap[String, String]())(_ + _)
 
-    def filenameToTag(kv: (String, String)) =
-      (kv._1.take(3).mkString, kv._2)
-
     val countries = files
       .getCountries(filesByTags)
 

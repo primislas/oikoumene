@@ -1,6 +1,7 @@
 package com.lomicron.utils.parsing
 
 import com.lomicron.utils.json.JsonMapper.objectNode
+import com.lomicron.utils.parsing.scopes.{FieldScope, ObjectScope, ParsingScope}
 import org.specs2.mutable.Specification
 
 class ParsingScopeSpec extends Specification {

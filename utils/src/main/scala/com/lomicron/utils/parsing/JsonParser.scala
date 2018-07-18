@@ -3,6 +3,7 @@ package com.lomicron.utils.parsing
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.parsing.scopes.{ObjectScope, ParsingError, ParsingScope}
 
 object JsonParser {
 

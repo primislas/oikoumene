@@ -46,6 +46,8 @@ case object OpenParentheses extends Token { val lexeme = "{" }
 case object CloseParentheses extends Token { val lexeme = "}" }
 case object OpenBrace extends Token { val lexeme = "(" }
 case object CloseBrace extends Token { val lexeme = ")" }
+case object OpenArray extends Token { val lexeme = "[" }
+case object CloseArray extends Token { val lexeme = "]" }
 case object Comma extends Token { val lexeme = "," }
 case class Comment(lexeme: String) extends Token
 case class InvalidToken(lexeme: String, expected: String, encountered: Token) extends Token
