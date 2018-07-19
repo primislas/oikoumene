@@ -78,6 +78,16 @@ trait ParsingScope {
     ObjectScope(nextKey, nextParent, nextParsedObject)
   }
 
+  def setField(field: String, value: JsonNode): ParsingScope = {
+    parsedObject.set(field, value)
+    ObjectScope(key, parent, parsedObject)
+  }
+
+  def setField(value: JsonNode): ParsingScope = {
+    parsedObject.set(key, value)
+    ObjectScope(key, parent, parsedObject)
+  }
+
   def removeField(o: ObjectNode, key: String, value: JsonNode): ParsingScope = {
     if (o.has(key)) {
       val v = o.get(key)

@@ -1,7 +1,7 @@
 package com.lomicron.utils.parsing.scopes
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.utils.json.JsonMapper.objectNode
+import com.lomicron.utils.json.JsonMapper.{objectNode, toJsonNode}
 import com.lomicron.utils.parsing._
 
 case class ObjectScope(
@@ -37,6 +37,7 @@ case class ObjectScope(
       case CloseBrace => moveParsingErrors
       case EOF => (rootScope, rootObject)
       case _: Comment => (self, parsedObject)
+      case n: Number => (ArrayScope(parent, key, toJsonNode(n.asBigDecimal)), parsedObject)
       case _ => addParsingError(t)
     }
   }

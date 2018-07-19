@@ -4,6 +4,7 @@ import java.util.Map.Entry
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
+import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
 import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
@@ -42,12 +43,6 @@ object JsonMapper {
   def fromJson[T: Manifest](json: String): T =
     mapper.readValue[T](json)
 
-  //  def fromJson[T](json: String, typeReference: TypeReference[T]): T =
-  //    mapper.readValue(json, typeReference)
-
-  def toJsonNode(json: String): JsonNode =
-    mapper.valueToTree(json)
-
   def clone[T <: AnyRef](obj: T): T =
     convert[obj.type](obj)
 
@@ -55,7 +50,7 @@ object JsonMapper {
     fromJson[T](toJson(source))
 
   def toJsonNode(obj: AnyRef): JsonNode =
-    toJsonNode(toJson(obj))
+    mapper.convertValue(obj, new TypeReference[JsonNode] {})
 
   def toObjectNode(obj: AnyRef): Option[ObjectNode] =
     Try(toJsonNode(obj).asInstanceOf[ObjectNode]).toOption
