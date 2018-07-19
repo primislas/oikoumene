@@ -8,7 +8,9 @@ case class Identifier(lexeme: String) extends Token
 case class StringT(lexeme: String) extends Token
 case class InvalidIdentifier(lexeme: String) extends Token
 case class Bool(lexeme: String, asBoolean: Boolean) extends Token
-case class Number(lexeme: String, asBigDecimal: BigDecimal) extends Token
+case class Number(lexeme: String, asBigDecimal: BigDecimal) extends Token {
+  override def toString: String = s"Number($lexeme)"
+}
 case class Date(lexeme: String, year: Int, month: Int, day: Int) extends Token with Ordered[Date] {
   override def toString: String = Date.toString(year, month, day)
 
