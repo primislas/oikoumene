@@ -1,4 +1,4 @@
-package com.lomicron.utils.parsing
+package com.lomicron.utils.parsing.tokenizer
 
 import scalaz.State
 
@@ -64,9 +64,9 @@ object Tokenizer {
     (s.drop(c.length), Comment(c.dropWhile(_ == '#').trim))
   }
 
-  val readWord: Stream[Char] => (Chars, Token) = s => {
-    val word = StringAccumulator(s).mkString
-    (s.drop(word.length), parseWord(word))
+  val readWord: Stream[Char] => (Chars, Token) = cs => {
+    val word = StringAccumulator(cs).mkString
+    (cs.drop(word.length), parseWord(word))
   }
 
   def isTrue(s: String): Boolean = s == "yes"
@@ -75,11 +75,12 @@ object Tokenizer {
   def parseWord(s: String): Token = s match {
     case booleanPat(_)             => getBoolean(s)
     case stringPat(i)              => Identifier(i)
-    case charPat(i)                => Identifier(i)
+    //case charPat(i)                => Identifier(i)
     case datePat(year, month, day) => Date(s, year.toInt, month.toInt, day.toInt)
     case numberPat(n)              => Number(s, BigDecimal(n))
-    case identifierPat(i)          => Identifier(i)
-    case _                         => InvalidIdentifier(s)
+//    case identifierPat(i)          => Identifier(i)
+//    case _                         => InvalidIdentifier(s)
+    case _ => Identifier(s)
   }
 
   def nextToken: State[Chars, Token] = State[Chars, Token] { s =>
@@ -122,10 +123,11 @@ object Tokenizer {
 
   object StringAccumulator {
     def apply(cs: Chars): Chars = {
-      if (cs.head == ''') {
-        val acc = new StringAccumulator(''')
-        cs.takeWhile(acc.next)
-      } else if (cs.head == '"') {
+//      if (cs.head == ''') {
+//        val acc = new StringAccumulator(''')
+//        cs.takeWhile(acc.next)
+//      } else
+      if (cs.head == '"') {
         val acc = new StringAccumulator('"')
         cs.takeWhile(acc.next)
       } else cs.takeWhile(!separators.contains(_))

@@ -4,6 +4,7 @@ import java.math.BigDecimal
 
 import com.fasterxml.jackson.databind.node.{BooleanNode, DecimalNode, ObjectNode, TextNode}
 import com.lomicron.utils.parsing._
+import com.lomicron.utils.parsing.tokenizer._
 
 case class AssignmentScope(parent: Option[ObjectScope], key: String) extends ParsingScope {
   val booleans = Set("yes", "no")

@@ -4,6 +4,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.4",
   logLevel := Level.Info,
   libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0" withSources() withJavadoc(),
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3" withSources() withJavadoc(),
   libraryDependencies += "org.specs2" %% "specs2-core" % "3.9.1" % "test" withSources() withJavadoc(),
   libraryDependencies += "org.specs2" %% "specs2-mock" % "3.9.1" % "test" withSources() withJavadoc()
 )

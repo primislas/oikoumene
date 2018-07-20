@@ -1,5 +1,7 @@
 package com.lomicron.utils.collection
 
+import scala.collection.JavaConverters._
+
 object CollectionUtils {
 
   implicit class MapEx[K, V](m: Map[K, V]) {
@@ -22,6 +24,11 @@ object CollectionUtils {
     def filterValues(p: V => Boolean): Map[K, V] =
       m.filter(kv => p(kv._2))
 
+  }
+
+  implicit class IteratorEx[T](it: java.util.Iterator[T]) {
+    def toStream: Stream[T] = it.asScala.toStream
+    def toSeq: Seq[T] = it.asScala.toSeq
   }
 
 }

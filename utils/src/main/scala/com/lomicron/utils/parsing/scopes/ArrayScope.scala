@@ -3,7 +3,8 @@ package com.lomicron.utils.parsing.scopes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper.toJsonNode
-import com.lomicron.utils.parsing.{CloseBrace, Date, Identifier, Number, Token}
+import com.lomicron.utils.parsing._
+import com.lomicron.utils.parsing.tokenizer._
 
 case class ArrayScope(parent: Option[ObjectScope],
                       key: String,
@@ -22,8 +23,12 @@ case class ArrayScope(parent: Option[ObjectScope],
     case id: Identifier => addElement(toJsonNode(id.lexeme))
     case date: Date => addElement(toJsonNode(date.lexeme))
     case Number(_, bd) => addElement(toJsonNode(bd))
-    case CloseBrace => (parent.get.setField(key, toJsonNode(elems)), parsedObject)
-    case _ => addParsingError(t)
+    case CloseBrace =>
+      (parent.get.setField(key, toJsonNode(elems)), parsedObject)
+    case _: Comment => (self, parsedObject)
+    case _ =>
+      addParsingError(t)
+      (self, parsedObject)
   }
 
   override def validTokens: Seq[String] =

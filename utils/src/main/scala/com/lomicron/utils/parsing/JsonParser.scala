@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing.scopes.{ObjectScope, ParsingError, ParsingScope}
+import com.lomicron.utils.parsing.tokenizer.{Token, Tokenizer}
 
 object JsonParser {
 

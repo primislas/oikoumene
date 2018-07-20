@@ -3,7 +3,7 @@ package com.lomicron.utils.parsing.scopes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.parsing.Token
+import com.lomicron.utils.parsing.tokenizer.Token
 
 trait ParsingScope {
   self =>
@@ -66,16 +66,17 @@ trait ParsingScope {
   def rootObject: ObjectNode = rootScope.obj
 
   def addField(field: String, value: JsonNode): ParsingScope = {
-
+    val objScope = objectScope
     val (nextParent, nextParsedObject) = value match {
-      case on: ObjectNode => (objectScope, on)
+      case on: ObjectNode => (objScope, on)
       case _ => (parent, parsedObject)
     }
 
     val nextKey = if (value.isInstanceOf[ObjectNode]) field else key
     JsonMapper.mergeFieldValue(parsedObject, field, value)
 
-    ObjectScope(nextKey, nextParent, nextParsedObject)
+    val errors = objScope.map(_.errors).getOrElse(Seq.empty)
+    ObjectScope(nextKey, nextParent, nextParsedObject, errors)
   }
 
   def setField(field: String, value: JsonNode): ParsingScope = {
@@ -123,7 +124,7 @@ trait ParsingScope {
 
   def addParsingError(t: Token): (ParsingScope, ObjectNode) = {
     val err = ParsingError(scopePath, validTokens, t)
-    println(s"Parsing error: $err")
+    println(err)
     val scope = objectScope.get
     val scopeWithErr = scope.copy(errors = scope.errors :+ err)
     (scopeWithErr, scopeWithErr.parsedObject)

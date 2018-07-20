@@ -6,26 +6,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.map.Tile
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, TagParser}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable.ListBuffer
 
-object Oikoumene {
+object Oikoumene extends LazyLogging {
 
   val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
   val modDir = ""
 
   def main(args: Array[String]) {
-    println("Starting the known world...")
+    logger.info("Starting the known world...")
     //println(System.getProperty("user.dir"))
 
     loadTags(gameDir, modDir)
 
-    println("Bye")
+    logger.info("Bye")
   }
 
   def loadMap(): Seq[Tile] = {
-    println("Loading provinces...")
+    logger.info("Loading provinces...")
     val rootDir = System.getProperty("user.dir")
     val relativeMapPath = "./clausewitz/resources/provinces.bmp"
     val mapPath = Paths.get(rootDir, relativeMapPath)
