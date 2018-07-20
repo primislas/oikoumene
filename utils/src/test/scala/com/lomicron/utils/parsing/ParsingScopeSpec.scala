@@ -2,6 +2,7 @@ package com.lomicron.utils.parsing
 
 import com.lomicron.utils.json.JsonMapper.objectNode
 import com.lomicron.utils.parsing.scopes.{FieldScope, ObjectScope, ParsingScope}
+import com.lomicron.utils.parsing.tokenizer._
 import org.specs2.mutable.Specification
 
 class ParsingScopeSpec extends Specification {
@@ -27,7 +28,7 @@ class ParsingScopeSpec extends Specification {
   val dateToken = Date(dateTokenLexeme, dateTokenYear, dateTokenMonth, dateTokenDay)
 
   "ObjectScope#nextScope" should {
-    "advance to FieldScope with Identifier token" >> {
+    "- advance to FieldScope with Identifier token" >> {
       val (scope, _) = objectScope.nextScope(idTokenField)
       val isFieldScope = scope.isInstanceOf[FieldScope]
       isFieldScope must_== true
@@ -62,7 +63,7 @@ class ParsingScopeSpec extends Specification {
 //      path must_== Seq(rootKey, objectKey, eventsField)
 //    }
 
-    "move up object scope stack and copy parsing errors if any upon receiving a '}' token" >> {
+    "- move up object scope stack and copy parsing errors if any upon receiving a '}' token" >> {
       val tokens = Seq(OpenBrace, Equals)
       def rec(s: ParsingScope, ts: Stream[Token]): ParsingScope = ts match {
         case h #:: t      => rec(s.addParsingError(h)._1, t)
@@ -82,14 +83,14 @@ class ParsingScopeSpec extends Specification {
       rootErrs must_== errseq
     }
 
-    "return root scope and root object upon receiving EOF token" >> {
+    "- return root scope and root object upon receiving EOF token" >> {
       val (scope, obj) = objectScope.nextScope(EOF)
       scope must_== rootScope
 
       obj must_== rootScope.obj
     }
 
-    "generate errors for tokens other than Identifier, Date, EOF, }" >> {
+    "- generate errors for tokens other than Identifier, Date, EOF, }" >> {
       val tokens = Seq(OpenBrace, boolFalseToken, boolTrueToken, strToken)
       def rec(s: ParsingScope, ts: Stream[Token]): ParsingScope = ts match {
         case h #:: t      => rec(s.nextScope(h)._1, t)

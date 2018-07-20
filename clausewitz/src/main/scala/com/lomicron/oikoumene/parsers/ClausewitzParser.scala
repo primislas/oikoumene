@@ -3,8 +3,9 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.ParsingError
-import com.lomicron.utils.parsing.{Date, JsonParser, Tokenizer}
+import com.lomicron.utils.parsing.tokenizer.{Date, Tokenizer}
 
 import scala.collection.mutable
 
@@ -28,7 +29,6 @@ object ClausewitzParser {
 
   def rollUpEvents(obj: ObjectNode, endDate: Date): ObjectNode = {
     val rolledUp = JsonParser.objectNode
-    val it = obj.fields
     val eventsByDate: mutable.Map[Date, ObjectNode] = mutable.TreeMap[Date, ObjectNode]()
 
     obj.fields.forEachRemaining(kv => {

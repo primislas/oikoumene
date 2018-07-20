@@ -1,6 +1,6 @@
 package com.lomicron.utils.parsing.scopes
 
-import com.lomicron.utils.parsing.Token
+import com.lomicron.utils.parsing.tokenizer.Token
 
 case class ParsingError(path: Seq[String], expected: Seq[String], encountered: Token) {
   override def toString: String = {
@@ -15,10 +15,10 @@ case class ParsingError(path: Seq[String], expected: Seq[String], encountered: T
       case _ => ()
     }
 
-    rec(path, " => ")
-    sb.append(". Expected: ")
+    rec(path, " -> ")
+    sb.append(". Expected: [ ")
     rec(expected, ", ")
-    sb.append(". Encountered: ").append(encountered)
+    sb.append(" ]. Encountered: ").append(encountered)
     sb.toString
   }
 }

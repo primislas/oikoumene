@@ -14,11 +14,7 @@ object TagParser extends LazyLogging {
              names: Map[String, String]): Seq[ObjectNode] = {
 
     def tagToCoutry(tag: String) =
-      countries
-        .get(tag)
-        .map(parse)
-//        .map(_._1)
-//        .map(o => o.put("tag", tag))
+      countries.get(tag).map(parse)
 
 
 
@@ -27,7 +23,7 @@ object TagParser extends LazyLogging {
         .filterKeyValue((tag, opt) => {
           if (opt.isEmpty)
             logger.warn(s"Tag $tag has no country configuration")
-          opt.isEmpty
+          opt.nonEmpty
         })
         .mapValuesEx(_.get)
         .mapKVtoValue((tag, t2) => {

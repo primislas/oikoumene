@@ -1,4 +1,4 @@
-package com.lomicron.utils.parsing
+package com.lomicron.utils.parsing.tokenizer
 
 sealed trait Token {
   val lexeme: String

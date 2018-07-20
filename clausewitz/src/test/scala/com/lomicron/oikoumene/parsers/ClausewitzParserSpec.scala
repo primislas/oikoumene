@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.toJsonNode
-import com.lomicron.utils.parsing.Date
+import com.lomicron.utils.parsing.tokenizer.Date
 import org.specs2.mutable.Specification
 
 class ClausewitzParserSpec extends Specification {
