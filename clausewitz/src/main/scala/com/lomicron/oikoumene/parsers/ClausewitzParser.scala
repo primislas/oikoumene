@@ -13,7 +13,7 @@ object ClausewitzParser {
 
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
-  val historyField = "history"
+  val historyField = "events"
   val dateField = "date"
   val yearField = "year"
   val monthField = "month"
@@ -24,8 +24,13 @@ object ClausewitzParser {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
+  private val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
+
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     Option(str).map(JsonParser.parse).getOrElse(empty)
+
+  def rollUpEvents(obj: ObjectNode): ObjectNode =
+    rollUpEvents(obj, endDate)
 
   def rollUpEvents(obj: ObjectNode, endDate: Date): ObjectNode = {
     val rolledUp = JsonParser.objectNode
