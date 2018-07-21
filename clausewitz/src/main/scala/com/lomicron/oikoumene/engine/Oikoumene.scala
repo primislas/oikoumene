@@ -2,14 +2,15 @@ package com.lomicron.oikoumene.engine
 
 import java.nio.file.Paths
 
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.map.Tile
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, TagParser}
+import com.lomicron.oikoumene.repository.api.{ResourceRepository, TagRepository}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryTagRepository
+import com.lomicron.utils.collection.CollectionUtils._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.immutable.TreeMap
-import scala.collection.mutable.ListBuffer
 
 object Oikoumene extends LazyLogging {
 
@@ -19,8 +20,10 @@ object Oikoumene extends LazyLogging {
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
     //println(System.getProperty("user.dir"))
+    val files = FileResourceRepository(gameDir, modDir)
+    val tagRepo: TagRepository = new InMemoryTagRepository
 
-    loadTags(gameDir, modDir)
+    val tags = loadTags(files, tagRepo)
 
     logger.info("Bye")
   }
@@ -33,31 +36,24 @@ object Oikoumene extends LazyLogging {
     val map = MapLoader.loadMap(mapPath).get
     val tiles = map._1
     val routes = map._2
-    println("Loaded " + tiles.size + " tiles, :" + tiles)
+    logger.info("Loaded " + tiles.size + " tiles, :" + tiles)
     val l: List[Int] = Nil
     tiles
   }
 
-  def loadTags(sourceDir: String, modDir: String): Seq[ObjectNode] = {
-    val files = FileResourceRepository(sourceDir, modDir)
+  def loadTags(files: ResourceRepository, tags: TagRepository): TagRepository = {
     val filesByTags = files
       .getCountryTags
       .map(contentsByFile => ClausewitzParser.parse(contentsByFile._2)._1)
-      .flatMap(obj => {
-        var fsByTags = new ListBuffer[(String, String)]()
-        obj.fields().forEachRemaining(e => fsByTags.+=((e.getKey, e.getValue.asText())))
-        fsByTags
-      })
+      .flatMap(obj => obj.fields.toStream.map(e => (e.getKey, e.getValue.asText)))
       .map(kv => (kv._1, s"common/${kv._2}"))
       .foldLeft(TreeMap[String, String]())(_ + _)
-
-    val countries = files
-      .getCountries(filesByTags)
-
+    val countries = files.getCountries(filesByTags)
     val histories = files.getCountryHistory
     val names = files.getCountryNames
-
-    TagParser(filesByTags, countries, histories, names)
+    val parsedTags = TagParser(filesByTags, countries, histories, names)
+    tags.create(parsedTags.values.toSeq)
+    tags
   }
 
 

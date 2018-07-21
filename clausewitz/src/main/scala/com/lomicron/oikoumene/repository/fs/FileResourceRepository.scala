@@ -15,7 +15,13 @@ case class FileResourceRepository(
   val countryTagsDir = "common/country_tags"
   val countriesDir = "common/countries"
   val countryHistoryDir = "history/countries"
-  val countryNamesFile = "localisation/countries_l_english.yml"
+  val countryNamesFiles = Seq(
+    "localisation/countries_l_english.yml",
+    "localisation/text_l_english.yml",
+    "localisation/eldorado_l_english.yml",
+    "localisation/EU4_l_english.yml",
+    "localisation/tags_phase4_l_english.yml"
+  )
 
   override def getCountryTags: Map[String, String] =
     readSourceDir(countryTagsDir)
@@ -34,7 +40,7 @@ case class FileResourceRepository(
     str.take(3).mkString
 
   override def getCountryNames: Map[String, String] =
-    readSourceFile(countryNamesFile)
+    readSourceFiles(countryNamesFiles)
 
   private def fromSource(relPath: String) = Paths.get(gameDir, relPath)
 
@@ -54,11 +60,14 @@ case class FileResourceRepository(
     readAllFilesFromDir(fromSource(relPath))
 
   private def readAllFilesFromDir(p: Path): Map[String, String] = {
-    IO
-      .listFiles(p)
-      .map(readFileKeepFilename)
-      .toMap
+    readFiles(IO.listFiles(p)).toMap
   }
+
+  def readFiles(files: Seq[String]): Seq[(String, String)] =
+    files.map(readFileKeepFilename)
+
+  def readSourceFiles(files: Seq[String]): Map[String, String] =
+    files.map(readSourceFile).flatMap(_.toSeq).toMap
 
   private def readFileKeepFilename(path: String) =
     (Paths.get(path).getFileName.toString, IO.readTextFile(path))

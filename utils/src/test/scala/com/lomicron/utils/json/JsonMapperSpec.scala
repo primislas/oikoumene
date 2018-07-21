@@ -14,7 +14,6 @@ class JsonMapperSpec extends Specification {
       val fields = JsonMapper.fromJson[JsonFields](json)
       val cloned = JsonMapper.clone(fields)
       val reserialized = JsonMapper.toJson(cloned)
-      println(reserialized)
       reserialized must have size 1414
     }
 

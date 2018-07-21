@@ -1,6 +1,7 @@
 package com.lomicron.utils.collection
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 object CollectionUtils {
 
@@ -29,6 +30,11 @@ object CollectionUtils {
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {
     def toStream: Stream[T] = it.asScala.toStream
     def toSeq: Seq[T] = it.asScala.toSeq
+  }
+
+  implicit class SeqEx[T](seq: Seq[T]) {
+    def flatMap[R](f: T => Try[R]): Seq[R] =
+      seq.map(f).filter(_.isSuccess).map(_.get)
   }
 
 }
