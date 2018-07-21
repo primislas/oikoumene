@@ -25,6 +25,13 @@ object CollectionUtils {
     def filterValues(p: V => Boolean): Map[K, V] =
       m.filter(kv => p(kv._2))
 
+    def foreachKV[U](f: (K, V) => U): Map[K, V] = {
+      m.foreach{ case (k, v) => f(k, v)}
+      m
+    }
+    
+
+
   }
 
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {
@@ -33,8 +40,12 @@ object CollectionUtils {
   }
 
   implicit class SeqEx[T](seq: Seq[T]) {
+
     def flatMap[R](f: T => Try[R]): Seq[R] =
       seq.map(f).filter(_.isSuccess).map(_.get)
+
+    def toMapEx[K, V](f: T => (K,V)): Map[K, V] =
+      seq.map(f).toMap
   }
 
 }

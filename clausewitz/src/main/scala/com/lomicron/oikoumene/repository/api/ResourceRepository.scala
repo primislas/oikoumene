@@ -1,5 +1,7 @@
 package com.lomicron.oikoumene.repository.api
 
+import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+
 trait ResourceRepository {
 
   /**
@@ -26,4 +28,16 @@ trait ResourceRepository {
     * @return country
     */
   def getCountryNames: Map[String, String]
+
+  def getLocalisation(): Seq[LocalisationEntry] =
+    getLocalisation(SupportedLanguages.english)
+
+  def getLocalisation(language: String): Seq[LocalisationEntry]
+
+  object SupportedLanguages {
+    val english = "english"
+    val german = "german"
+    val spanish = "spanish"
+    val french = "french"
+  }
 }

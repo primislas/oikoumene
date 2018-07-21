@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.repository.api
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 trait AbstractRepository [Key, Entity] {
 
@@ -13,8 +13,8 @@ trait AbstractRepository [Key, Entity] {
 
   def upsert(entity: Entity): Try[Entity] =
     update(entity) match {
-      case Success(_) => _
-      case Failure(_) => create(entity)
+      case s: Success[Entity] => s
+      case _ => create(entity)
     }
 
   def find(key: Key): Try[Entity]

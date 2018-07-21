@@ -4,9 +4,9 @@ import java.nio.file.Paths
 
 import com.lomicron.oikoumene.model.map.Tile
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, TagParser}
-import com.lomicron.oikoumene.repository.api.{ResourceRepository, TagRepository}
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository, TagRepository}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryTagRepository
+import com.lomicron.oikoumene.repository.inmemory.{InMemoryLocalisationRepository, InMemoryTagRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.typesafe.scalalogging.LazyLogging
 
@@ -21,9 +21,10 @@ object Oikoumene extends LazyLogging {
     logger.info("Starting the known world...")
     //println(System.getProperty("user.dir"))
     val files = FileResourceRepository(gameDir, modDir)
+    val localisation = InMemoryLocalisationRepository(files)
     val tagRepo: TagRepository = new InMemoryTagRepository
 
-    val tags = loadTags(files, tagRepo)
+    val tags = loadTags(files, tagRepo, localisation)
 
     logger.info("Bye")
   }
@@ -41,7 +42,11 @@ object Oikoumene extends LazyLogging {
     tiles
   }
 
-  def loadTags(files: ResourceRepository, tags: TagRepository): TagRepository = {
+  def loadTags
+  (files: ResourceRepository,
+   tags: TagRepository,
+   localisation: LocalisationRepository
+  ) : TagRepository = {
     val filesByTags = files
       .getCountryTags
       .map(contentsByFile => ClausewitzParser.parse(contentsByFile._2)._1)
@@ -50,7 +55,7 @@ object Oikoumene extends LazyLogging {
       .foldLeft(TreeMap[String, String]())(_ + _)
     val countries = files.getCountries(filesByTags)
     val histories = files.getCountryHistory
-    val names = files.getCountryNames
+    val names = localisation.fetchTags
     val parsedTags = TagParser(filesByTags, countries, histories, names)
     tags.create(parsedTags.values.toSeq)
     tags

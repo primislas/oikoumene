@@ -2,9 +2,9 @@ package com.lomicron.oikoumene.repository.fs
 
 import java.nio.file.{Path, Paths}
 
+import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.utils.io.IO
 import com.lomicron.oikoumene.repository.api.ResourceRepository
-
 import com.lomicron.utils.collection.CollectionUtils._
 
 case class FileResourceRepository(
@@ -22,6 +22,8 @@ case class FileResourceRepository(
     "localisation/EU4_l_english.yml",
     "localisation/tags_phase4_l_english.yml"
   )
+
+  val localisationDir = "localisation"
 
   override def getCountryTags: Map[String, String] =
     readSourceDir(countryTagsDir)
@@ -71,6 +73,18 @@ case class FileResourceRepository(
 
   private def readFileKeepFilename(path: String) =
     (Paths.get(path).getFileName.toString, IO.readTextFile(path))
+
+  override def getLocalisation(language: String)
+  : Seq[LocalisationEntry] =
+    IO
+      .listFiles(fromSource(localisationDir))
+      .filter(_.matches(s"^.*_l_$language.yml"))
+      .par
+      .map(IO.readTextFile)
+      .flatMap(_.lines)
+      .flatMap(LocalisationEntry.fromString)
+      .seq
+
 }
 
 object FileResourceRepository {
