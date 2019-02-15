@@ -16,6 +16,9 @@ object CollectionUtils {
     def mapKeys[R](f: K => R): Map[R, V] =
       m.map(kv => (f(kv._1), kv._2))
 
+    def flatMapValues[R](f: V => Option[R]): Map[K, R] =
+      m.mapValuesEx(f).filterValues(_.isDefined).mapValuesEx(_.get)
+
     def mapKeyToValue[R](f: K => R): Map[K, R] =
       m.map(kv => (kv._1, f(kv._1)))
 

@@ -1,18 +1,21 @@
 package com.lomicron.utils.parsing.scopes
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.utils.json.JsonMapper.{objectNode, toJsonNode}
+import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.JsonMapper.objectNode
+import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
 import com.lomicron.utils.parsing.tokenizer.{CloseBrace, Comment, Date, EOF, Identifier, Number, Token}
 
-case class ObjectScope(
-                        key: String,
-                        parent: Option[ObjectScope],
-                        obj: ObjectNode = objectNode,
-                        errors: Seq[ParsingError] = Seq.empty)
+case class ObjectScope(key: String,
+                       parent: Option[ObjectScope],
+                       obj: ObjectNode = objectNode,
+                       errors: Seq[ParsingError] = Seq.empty,
+                       elements: Seq[JsonNode] = Seq.empty)
   extends ParsingScope {
   self =>
 
-  override def validTokens = Seq("identifier", "}")
+  override def validTokens: Seq[String] = Seq("identifier", "}")
 
   override def nextScope(t: Token): (ParsingScope, ObjectNode) =
     t match {
@@ -21,9 +24,7 @@ case class ObjectScope(
       case CloseBrace => moveParsingErrors
       case EOF => (rootScope, rootObject)
       case _: Comment => (self, parsedObject)
-      case n: Number =>
-        if (obj.fieldNames().hasNext) addParsingError(t)
-        else (ArrayScope(parent, key, toJsonNode(n.asBigDecimal)), parsedObject)
+      case n: Number => (ArrayScope(Some(self), elements :+ n.toJsonNode), parsedObject)
       case _ => addParsingError(t)
     }
 
@@ -32,16 +33,13 @@ case class ObjectScope(
       .map(p => self match {
         case o: ObjectScope =>
           val errors = o.errors
-          if (errors.nonEmpty) {
-            val cp = p.copy(errors = p.errors ++ errors)
-            cp
-          } else p
+          if (errors.nonEmpty) p.copy(errors = p.errors ++ errors)
+          else p
         case _ => p
       })
       .getOrElse(self)
     (nextScope, parsedObject)
   }
-
 
   override def toString: String = {
     val sb = new StringBuilder("ObjectScope: ")
@@ -59,4 +57,16 @@ case class ObjectScope(
     sb.append(". Errors: ").append(errors.length).append('.')
     sb.toString()
   }
+
+  def withElements(es: Seq[JsonNode]): ObjectScope = {
+    val array = JsonMapper.arrayNodeOf(es: _*)
+    obj.set(arrayKey, array)
+    // TODO mutable obj is being copied
+    copy(elements = es)
+  }
+
+}
+
+object ObjectScope {
+  val arrayKey = "arrayElements"
 }

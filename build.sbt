@@ -16,7 +16,7 @@ lazy val clausewitz = (project in file("clausewitz"))
   .settings(commonSettings)
   .dependsOn(utils)
 
-lazy val root = (project in file("."))
+lazy val oikoumene = (project in file("."))
   .aggregate(utils, clausewitz)
 
   

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.parsing.tokenizer.Tokenizer
 import org.specs2.mutable.Specification
+import collection.JavaConverters._
 
 class ParserSpec extends Specification {
   val provinceFile = "151 - Constantinople.txt"
@@ -52,7 +53,7 @@ class ParserSpec extends Specification {
                     }"""
       val tokens = Tokenizer.tokenize(content)
       val node = JsonParser.parse(tokens)._1
-      node.get("leaderNames") must beAnInstanceOf[ArrayNode]
+      node.get("leader_names") must beAnInstanceOf[ArrayNode]
     }
 
     "- recognize a single element array" >> {
@@ -61,7 +62,7 @@ class ParserSpec extends Specification {
                     }"""
       val tokens = Tokenizer.tokenize(content)
       val node = JsonParser.parse(tokens)._1
-      val armyNames = node.get("armyNames")
+      val armyNames = node.get("army_names")
       armyNames must beAnInstanceOf[ArrayNode]
       armyNames.asInstanceOf[ArrayNode].size mustEqual 1
     }
@@ -80,7 +81,7 @@ class ParserSpec extends Specification {
                       }"""
       val tokens = Tokenizer.tokenize(content)
       val node = JsonParser.parse(tokens)._1
-      node.get("leaderNames") must beAnInstanceOf[ArrayNode]
+      node.get("leader_names") must beAnInstanceOf[ArrayNode]
     }
 
     "- recognize single quotation marks as identifiers " >> {
@@ -95,11 +96,11 @@ class ParserSpec extends Specification {
       }"""
       val tokens = Tokenizer.tokenize(content)
       val node = JsonParser.parse(tokens)._1
-      node.get("shipNames") must beAnInstanceOf[ArrayNode]
+      node.get("ship_names") must beAnInstanceOf[ArrayNode]
     }
 
-    "- make the best decision about selecting " +
-      "an array or an object based on parsing error counts" >> {
+    "- make the best guess about selecting " +
+      "an array or an object based on field count and array size" >> {
       val content = """monarch_names = {
                         "Filipe #0" = 60
                         "Afonso #4 = 40"
@@ -108,8 +109,59 @@ class ParserSpec extends Specification {
                     	}"""
       val tokens = Tokenizer.tokenize(content)
       val (node, errors) = JsonParser.parse(tokens)
-      node.get("monarchNames") must beAnInstanceOf[ObjectNode]
-      errors.size must_== 3
+      node.get("monarch_names") must beAnInstanceOf[ObjectNode]
+      val nameCount = Option(node.get("monarch_names"))
+          .map(_.asInstanceOf[ObjectNode])
+          .map(_.fieldNames().asScala.toSeq.size)
+          .getOrElse(0)
+      nameCount must_== 3
+      errors.size must_== 1
+    }
+
+    "- properly return scope after single element arrays" >> {
+      // scope sequence in this case ends up as
+      // ROOT -> Field Scope (army_names) -> Field Scope (fleet_names)
+      val content = """
+                      army_names = {
+                      	 "Army of $PROVINCE$"
+                      }
+                      fleet_names = {
+                      	 "Fleet of $PROVINCE$"
+                      }
+                    """
+      val (node, errors) = JsonParser.parse(content)
+      node.asInstanceOf[ObjectNode].fieldNames().asScala.toSeq.size mustEqual 2
+      errors.size mustEqual 0
+    }
+
+    "- properly process arrays of dates" >> {
+      val content = """monsoon = {
+                      		00.06.01
+                      		00.09.30
+                    }"""
+      val (node, errors) = JsonParser.parse(content)
+      val dates = node.get("monsoon")
+      dates.get(0).asText() mustEqual "00.06.01"
+      dates.get(1).asText() mustEqual "00.09.30"
+      errors.size mustEqual 0
+    }
+
+    "- merge two values under the same key into an array" >> {
+      val content = """
+                      monsoon = {
+                        00.11.01
+                        00.12.30
+                      }
+                      monsoon = {
+                        00.01.01
+                        00.04.30
+                      }
+                    """
+      val (node, errors) = JsonParser.parse(content)
+      errors.size mustEqual 0
+
+      val dates = node.get("monsoon")
+      dates.size() mustEqual 4
     }
 
   }

@@ -2,8 +2,12 @@ package com.lomicron.utils.parsing.scopes
 
 import com.lomicron.utils.parsing.tokenizer.Token
 
-case class ParsingError(path: Seq[String], expected: Seq[String], encountered: Token) {
-  override def toString: String = {
+case class ParsingError(message: String) {
+  override def toString: String = message
+}
+
+object ParsingError {
+  def apply(path: Seq[String], expected: Seq[String], encountered: Token): ParsingError  = {
     val sb = new StringBuilder("Parsing error at: ")
 
     @annotation.tailrec
@@ -19,6 +23,8 @@ case class ParsingError(path: Seq[String], expected: Seq[String], encountered: T
     sb.append(". Expected: [ ")
     rec(expected, ", ")
     sb.append(" ]. Encountered: ").append(encountered)
-    sb.toString
+    val msg = sb.toString
+    ParsingError(msg)
   }
+
 }

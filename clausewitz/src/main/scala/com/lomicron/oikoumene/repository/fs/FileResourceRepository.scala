@@ -3,27 +3,33 @@ package com.lomicron.oikoumene.repository.fs
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-import com.lomicron.utils.io.IO
 import com.lomicron.oikoumene.repository.api.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils._
+import com.lomicron.utils.io.IO
+
+import scala.util.matching.Regex
 
 case class FileResourceRepository(
                                    gameDir: String,
                                    modDir: String)
   extends ResourceRepository {
 
+  val localisationDir = "localisation"
+
   val countryTagsDir = "common/country_tags"
   val countriesDir = "common/countries"
   val countryHistoryDir = "history/countries"
-  val countryNamesFiles = Seq(
-    "localisation/countries_l_english.yml",
-    "localisation/text_l_english.yml",
-    "localisation/eldorado_l_english.yml",
-    "localisation/EU4_l_english.yml",
-    "localisation/tags_phase4_l_english.yml"
-  )
 
-  val localisationDir = "localisation"
+  val provinceDefinitionsFile = "map/definition.csv"
+  val provinceTypesFile = "map/default.map"
+  val provincePositionsFile = "map/positions.txt"
+  val areasFile = "map/area.txt"
+  val regionsFile = "map/region.txt"
+  val supperregionsFile = "map/superregion.txt"
+  val continentsFile = "map/continent.txt"
+  val terrainFile = "map/terrain.txt"
+  val climateFile = "map/climate.txt"
+  val provinceHistoryDir = "history/provinces"
 
   override def getCountryTags: Map[String, String] =
     readSourceDir(countryTagsDir)
@@ -41,22 +47,20 @@ case class FileResourceRepository(
   private def filenameToTag(str: String) =
     str.take(3).mkString
 
-  override def getCountryNames: Map[String, String] =
-    readSourceFiles(countryNamesFiles)
+  def getProvinceDefinitions: Option[String] =
+    readSourceFileContent(provinceDefinitionsFile)
 
   private def fromSource(relPath: String) = Paths.get(gameDir, relPath)
 
-  private def readSourceFile(relPath: String): Map[String, String] =
+  private def readSourceFile(relPath: String): Option[(String, String)] =
     readFile(fromSource(relPath))
 
-  private def readFile(p: Path): Map[String, String] =
+  private def readFile(p: Path): Option[(String, String)] =
     Option(p)
       .map(_.toFile)
       .filter(_.exists)
       .map(_.getAbsolutePath)
       .map(readFileKeepFilename)
-      .map(Map(_))
-      .getOrElse(Map.empty)
 
   private def readSourceDir(relPath: String): Map[String, String] =
     readAllFilesFromDir(fromSource(relPath))
@@ -84,6 +88,48 @@ case class FileResourceRepository(
       .flatMap(_.lines)
       .flatMap(LocalisationEntry.fromString)
       .seq
+
+  override def getProvinceTypes: Option[String] =
+    readSourceFileContent(provinceTypesFile)
+
+  override def getAreas: Option[String] =
+    readSourceFileContent(areasFile)
+
+  override def getProvincePositions: Option[String] =
+    readSourceFileContent(provincePositionsFile)
+
+  override def getRegions: Option[String] =
+    readSourceFileContent(regionsFile)
+
+  override def getSuperregions: Option[String] =
+    readSourceFileContent(supperregionsFile)
+
+  override def getContinents: Option[String] =
+    readSourceFileContent(continentsFile)
+
+  override def getTerrain: Option[String] =
+    readSourceFileContent(terrainFile)
+
+  override def getClimate: Option[String] =
+    readSourceFileContent(climateFile)
+
+  val provNamePat: String = """^(?<id>\d+).*\.txt$"""
+  val provNameRegex: Regex = provNamePat.r
+
+  override def getProvinceHistory: Map[Int, String] =
+    readAllFilesFromDir(fromSource(provinceHistoryDir))
+      .mapKeys(idFromProvHistFileName)
+      .filterKeys(_.isDefined)
+      .mapKeys(_.get)
+
+  private def idFromProvHistFileName(filename: String): Option[Int] =
+    filename match {
+      case provNameRegex(id) => Some(id.toInt)
+      case _ => None
+    }
+
+  private def readSourceFileContent(relPath: String) =
+    readSourceFile(relPath).map(_._2)
 
 }
 

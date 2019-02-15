@@ -1,5 +1,10 @@
 package com.lomicron.utils.parsing.tokenizer
 
+import java.math.BigDecimal
+
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.{DecimalNode, IntNode}
+
 sealed trait Token {
   val lexeme: String
 }
@@ -8,8 +13,12 @@ case class Identifier(lexeme: String) extends Token
 case class StringT(lexeme: String) extends Token
 case class InvalidIdentifier(lexeme: String) extends Token
 case class Bool(lexeme: String, asBoolean: Boolean) extends Token
-case class Number(lexeme: String, asBigDecimal: BigDecimal) extends Token {
+case class Number(lexeme: String, asBigDecimal: scala.BigDecimal) extends Token {
   override def toString: String = s"Number($lexeme)"
+  def isInt: Boolean = lexeme.matches("""^(\d+)$""")
+  def toJsonNode: JsonNode =
+    if (isInt) IntNode.valueOf(asBigDecimal.intValue)
+    else DecimalNode.valueOf(new BigDecimal(lexeme))
 }
 case class Date(lexeme: String, year: Int, month: Int, day: Int) extends Token with Ordered[Date] {
   override def toString: String = Date.toString(year, month, day)
@@ -30,7 +39,7 @@ case class Date(lexeme: String, year: Int, month: Int, day: Int) extends Token w
 }
 object Date {
   def toString(year: Int, month: Int, day: Int): String =
-    s"$year.$month.$day"
+    s"${f"$year%02d"}.${f"$month%02d"}.${f"$day%02d"}"
 
   def apply(lexeme: String, year: Int, month: Int, day: Int): Date =
     new Date(lexeme, year, month, day)

@@ -4,6 +4,11 @@ import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 
 trait ResourceRepository {
 
+  def getLocalisation: Seq[LocalisationEntry] =
+    getLocalisation(SupportedLanguages.english)
+
+  def getLocalisation(language: String): Seq[LocalisationEntry]
+
   /**
     *
     * @return country files by country tags
@@ -23,16 +28,26 @@ trait ResourceRepository {
     */
   def getCountryHistory: Map[String, String]
 
-  /**
-    *
-    * @return country
-    */
-  def getCountryNames: Map[String, String]
+  def getProvinceDefinitions: Option[String]
 
-  def getLocalisation(): Seq[LocalisationEntry] =
-    getLocalisation(SupportedLanguages.english)
+  def getProvinceHistory: Map[Int, String]
 
-  def getLocalisation(language: String): Seq[LocalisationEntry]
+  def getProvinceTypes: Option[String]
+
+  def getProvincePositions: Option[String]
+
+  def getAreas: Option[String]
+
+  def getRegions: Option[String]
+
+  def getSuperregions: Option[String]
+
+  def getContinents: Option[String]
+
+  def getTerrain: Option[String]
+
+  def getClimate: Option[String]
+
 
   object SupportedLanguages {
     val english = "english"
@@ -40,4 +55,5 @@ trait ResourceRepository {
     val spanish = "spanish"
     val french = "french"
   }
+
 }

@@ -47,7 +47,7 @@ trait ParsingScope {
     */
   def parsedObject: ObjectNode = {
     self match {
-      case ObjectScope(_, _, obj, _) => obj
+      case ObjectScope(_, _, obj, _, _) => obj
       case _ =>
         if (parent.isDefined) parent.get.obj
         else throw ParsingException("No parsed object exists for the scope", null)
@@ -125,6 +125,10 @@ trait ParsingScope {
   def addParsingError(t: Token): (ParsingScope, ObjectNode) = {
     val err = ParsingError(scopePath, validTokens, t)
     println(err)
+    addParsingError(err)
+  }
+
+  def addParsingError(err: ParsingError): (ObjectScope, ObjectNode) = {
     val scope = objectScope.get
     val scopeWithErr = scope.copy(errors = scope.errors :+ err)
     (scopeWithErr, scopeWithErr.parsedObject)

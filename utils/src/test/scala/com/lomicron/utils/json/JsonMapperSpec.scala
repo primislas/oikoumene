@@ -1,9 +1,8 @@
 package com.lomicron.utils.json
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, TextNode}
-import org.specs2.mutable.Specification
 import com.lomicron.utils.io.IO
+import org.specs2.mutable.Specification
 
 class JsonMapperSpec extends Specification {
 
@@ -13,8 +12,9 @@ class JsonMapperSpec extends Specification {
       val json = IO.readTextResource("json/simple.json")
       val fields = JsonMapper.fromJson[JsonFields](json)
       val cloned = JsonMapper.clone(fields)
-      val reserialized = JsonMapper.toJson(cloned)
-      reserialized must have size 1414
+      val reSerialized = JsonMapper.toJson(cloned)
+      val expected = IO.readTextResource("json/simple-expected-result.json")
+      reSerialized mustEqual expected
     }
 
   }

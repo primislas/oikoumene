@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.ParsingError
+import com.lomicron.utils.parsing.serialization.{DefaultDeserializer, Deserializer}
 import com.lomicron.utils.parsing.tokenizer.{Date, Tokenizer}
 
 import scala.collection.mutable
@@ -18,16 +19,27 @@ object ClausewitzParser {
   val yearField = "year"
   val monthField = "month"
   val dayField = "day"
-  val addPrefix = "add"
-  val removePrefix = "remove"
+  val addPrefix = "add_"
+  val removePrefix = "remove_"
 
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
+  private val startDate = Date(1444, 11, 11)
   private val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
-    Option(str).map(JsonParser.parse).getOrElse(empty)
+    parse(str, DefaultDeserializer)
+
+  def parse(str: String, deserializer: Deserializer): (ObjectNode, Seq[ParsingError]) = {
+    Option(str)
+      .map(JsonParser.parse(_, deserializer))
+      // TODO add at least logging to highlight the case
+      // where returned value is not an object node
+      .filter(_._1.isInstanceOf[ObjectNode])
+      .map(t => (t._1.asInstanceOf[ObjectNode], t._2))
+      .getOrElse(empty)
+  }
 
   def rollUpEvents(obj: ObjectNode): ObjectNode =
     rollUpEvents(obj, endDate)
@@ -87,7 +99,8 @@ object ClausewitzParser {
   def mergeField(target: ObjectNode, key: String, value: JsonNode): ObjectNode = {
     if (key.startsWith(addPrefix)) {
       val field = fieldWithoutPrefix(key, addPrefix)
-      JsonMapper.mergeFieldValue(target, field, value)
+      val vArray = if (value.isArray) value else JsonMapper.arrayNodeOf(value)
+      JsonMapper.mergeFieldValue(target, field, vArray)
     } else if (key.startsWith(removePrefix)) {
       val field = fieldWithoutPrefix(key, removePrefix)
       JsonMapper.removeFieldValue(target, field, value)

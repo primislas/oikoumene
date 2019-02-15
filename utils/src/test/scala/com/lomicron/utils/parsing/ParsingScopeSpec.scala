@@ -1,9 +1,12 @@
 package com.lomicron.utils.parsing
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper.objectNode
 import com.lomicron.utils.parsing.scopes.{FieldScope, ObjectScope, ParsingScope}
 import com.lomicron.utils.parsing.tokenizer._
 import org.specs2.mutable.Specification
+
+import scala.collection.JavaConverters._
 
 class ParsingScopeSpec extends Specification {
   val rootKey = "ROOT"
@@ -28,6 +31,7 @@ class ParsingScopeSpec extends Specification {
   val dateToken = Date(dateTokenLexeme, dateTokenYear, dateTokenMonth, dateTokenDay)
 
   "ObjectScope#nextScope" should {
+
     "- advance to FieldScope with Identifier token" >> {
       val (scope, _) = objectScope.nextScope(idTokenField)
       val isFieldScope = scope.isInstanceOf[FieldScope]
@@ -99,7 +103,7 @@ class ParsingScopeSpec extends Specification {
       val errs = rec(objectScope, tokens.toStream).scopeErrors
       errs.length must_== tokens.length
     }
-  }
 
+  }
 
 }

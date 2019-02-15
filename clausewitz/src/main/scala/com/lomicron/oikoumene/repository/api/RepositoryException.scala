@@ -1,4 +1,3 @@
 package com.lomicron.oikoumene.repository.api
 
-class RepositoryException extends RuntimeException {
-}
+class RepositoryException(message: String) extends RuntimeException {}

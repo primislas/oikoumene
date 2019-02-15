@@ -7,10 +7,11 @@ import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAI
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
 import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, PropertyNamingStrategy}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
+import collection.JavaConverters._
 import scala.util.Try
 
 object JsonMapper {
@@ -21,6 +22,7 @@ object JsonMapper {
     // sometimes JSON fields contain single object where accepting class
     // expects a list; this feature allows jackson to deserialize such fields
     .configure(ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
     // omits 'empty' (null or empty collections/objects) fields from output
     .setSerializationInclusion(NON_EMPTY)
     .registerModule(DefaultScalaModule)
@@ -107,14 +109,14 @@ object JsonMapper {
     if (!target.has(k)) target.set(k, v)
     else {
       val existing = target.get(k)
-      if (existing.isArray)
-        existing.asInstanceOf[ArrayNode].add(v)
-      else {
-        val arr = new ArrayNode(JsonNodeFactory.instance)
-        arr.add(existing)
-        arr.add(v)
-        target.set(k, arr)
-      }
+      val existingArray =
+        if (existing.isArray) existing.asInstanceOf[ArrayNode]
+        else arrayNodeOf(existing)
+
+      if (v.isArray) v.forEach(n => existingArray.add(n))
+      else existingArray.add(v)
+
+      target.set(k, existingArray)
     }
     target
   }
@@ -135,7 +137,38 @@ object JsonMapper {
         } else if (v.equals(existingVal))
           o.remove(k)
       })
-      o
+    o
+  }
+
+  def overwriteField(o: ObjectNode, field: String, value: JsonNode): ObjectNode = {
+    o.set(field, value)
+    o
+  }
+
+  def removeField(o: ObjectNode, field: String): ObjectNode = {
+    o.remove(field)
+    o
+  }
+
+  def renameField(o: ObjectNode, from: String, to: String): ObjectNode = {
+    val withUpdatedTo = Option(o).map(_.get(from)) match {
+      case Some(v) => overwriteField(o, to, v)
+      case None => removeField(o, to)
+    }
+    // cleaning up from field
+    removeField(withUpdatedTo, from)
+  }
+
+  def flatten(a: ArrayNode): ArrayNode = {
+    val flatArray = arrayNode
+    a.elements().asScala
+      .flatMap {
+        case o: ObjectNode => Seq(o)
+        case an: ArrayNode => an.elements().asScala.to[Seq]
+      }
+      .foreach(flatArray.add)
+
+    flatArray
   }
 
 }
