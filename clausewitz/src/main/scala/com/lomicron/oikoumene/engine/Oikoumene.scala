@@ -5,12 +5,11 @@ import java.nio.file.Paths
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.map.Tile
-import com.lomicron.oikoumene.parsers.{ClausewitzParser, ProvinceParser, TagParser}
+import com.lomicron.oikoumene.parsers._
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository, TagRepository}
-import com.lomicron.oikoumene.repository.fs.FileResourceRepository
-import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryGeographyRepository, InMemoryProvinceRepository}
-import com.lomicron.oikoumene.repository.inmemory.{InMemoryLocalisationRepository, InMemoryTagRepository}
+import com.lomicron.oikoumene.repository.api.politics.TagRepository
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{mergeFieldValue, objectNode}
@@ -29,15 +28,15 @@ object Oikoumene extends LazyLogging {
     val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
     val modDir = ""
 
-    val files = FileResourceRepository(gameDir, modDir)
-    val localisation: LocalisationRepository = InMemoryLocalisationRepository(files)
-    val tagRepo: TagRepository = InMemoryTagRepository()
-    val provinceRepo: ProvinceRepository = InMemoryProvinceRepository()
-    val geographyRepo: GeographicRepository = InMemoryGeographyRepository
+    val repos = InMemoryRepositoryFactory(gameDir, modDir)
+    val files = repos.resources
+    val localisation = repos.localisations
 
-    val tags = loadTags(files, tagRepo, localisation)
-    val provinces = loadProvinces(files, localisation, provinceRepo)
-    val geograpy = loadGeographicData(files, localisation, geographyRepo)
+    val tags = loadTags(files, localisation, repos.tags)
+    val provinces = loadProvinces(files, localisation, repos.provinces)
+    val geograpy = loadGeographicData(files, localisation, repos.geography)
+    val religions = ReligionParser(files, localisation, repos.religions)
+    val cultures = CultureParser(files, localisation, repos.cultures)
 
     logger.info("Bye")
   }
@@ -45,22 +44,22 @@ object Oikoumene extends LazyLogging {
   private def loadMap(): Seq[Tile] = {
     logger.info("Loading provinces...")
     val rootDir = System.getProperty("user.dir")
-    val relativeMapPath = "./clausewitz/resources/provinces.bmp"
-    val mapPath = Paths.get(rootDir, relativeMapPath)
-    val map = MapLoader.loadMap(mapPath).get
+    val relativeMapDir = "./clausewitz/resources/"
+    val mapDir = Paths.get(rootDir, relativeMapDir)
+    val map = MapLoader.loadMap(mapDir).get
     val tiles = map._1
     val routes = map._2
     logger.info("Loaded " + tiles.size + " tiles, :" + tiles)
     val l: List[Int] = Nil
     tiles
   }
-  
+
   val idKey = "id"
 
   private def loadTags
   (files: ResourceRepository,
-   tags: TagRepository,
-   localisation: LocalisationRepository
+   localisation: LocalisationRepository,
+   tags: TagRepository
   ): TagRepository = {
 
     val filesByTags = files
@@ -110,7 +109,7 @@ object Oikoumene extends LazyLogging {
 
     geography
   }
-  
+
   val provinceIdsKey = "province_ids"
 
   private def loadAreas
@@ -204,7 +203,7 @@ object Oikoumene extends LazyLogging {
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .foreach(superregions.create)
-    
+
     superregions
   }
 
@@ -288,5 +287,7 @@ object Oikoumene extends LazyLogging {
 
     climates
   }
+
+
 
 }

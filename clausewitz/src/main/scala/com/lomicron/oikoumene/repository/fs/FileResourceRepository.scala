@@ -31,6 +31,9 @@ case class FileResourceRepository(
   val climateFile = "map/climate.txt"
   val provinceHistoryDir = "history/provinces"
 
+  val culturesFile = "common/cultures/00_cultures.txt"
+  val religionsFile = "common/religions/00_religion.txt"
+
   override def getCountryTags: Map[String, String] =
     readSourceDir(countryTagsDir)
 
@@ -131,6 +134,11 @@ case class FileResourceRepository(
   private def readSourceFileContent(relPath: String) =
     readSourceFile(relPath).map(_._2)
 
+  override def getCultures: Option[String] =
+    readSourceFileContent(culturesFile)
+
+  override def getReligions: Option[String] =
+    readSourceFileContent(religionsFile)
 }
 
 object FileResourceRepository {

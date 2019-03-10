@@ -59,7 +59,7 @@ case class ObjectScope(key: String,
   }
 
   def withElements(es: Seq[JsonNode]): ObjectScope = {
-    val array = JsonMapper.arrayNodeOf(es: _*)
+    val array = JsonMapper.arrayNodeOf(es)
     obj.set(arrayKey, array)
     // TODO mutable obj is being copied
     copy(elements = es)

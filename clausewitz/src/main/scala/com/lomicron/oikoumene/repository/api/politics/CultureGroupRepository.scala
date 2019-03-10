@@ -1,0 +1,5 @@
+package com.lomicron.oikoumene.repository.api.politics
+
+import com.lomicron.oikoumene.repository.api.AbstractObjectNodeRepository
+
+trait CultureGroupRepository extends AbstractObjectNodeRepository

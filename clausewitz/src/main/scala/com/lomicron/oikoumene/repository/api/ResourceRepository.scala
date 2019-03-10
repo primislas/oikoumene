@@ -48,6 +48,9 @@ trait ResourceRepository {
 
   def getClimate: Option[String]
 
+  def getCultures: Option[String]
+
+  def getReligions: Option[String]
 
   object SupportedLanguages {
     val english = "english"

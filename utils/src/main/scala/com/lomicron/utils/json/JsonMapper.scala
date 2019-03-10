@@ -61,7 +61,10 @@ object JsonMapper {
 
   def arrayNode: ArrayNode = new ArrayNode(JsonNodeFactory.instance)
 
-  def arrayNodeOf(args: Object*): ArrayNode =
+  def arrayNodeOf(e: AnyRef): ArrayNode =
+    arrayNode.add(toJsonNode(e))
+
+  def arrayNodeOf(args: Seq[AnyRef]): ArrayNode =
     args.map(JsonMapper.toJsonNode).foldLeft(arrayNode)(_.add(_))
 
   def patch[T <: AnyRef, P <: AnyRef]
