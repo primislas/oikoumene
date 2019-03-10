@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
-import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode, TextNode}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, PropertyNamingStrategy}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -66,6 +66,8 @@ object JsonMapper {
 
   def arrayNodeOf(args: Seq[AnyRef]): ArrayNode =
     args.map(JsonMapper.toJsonNode).foldLeft(arrayNode)(_.add(_))
+
+  def textNode(t: String): TextNode = TextNode.valueOf(t)
 
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =

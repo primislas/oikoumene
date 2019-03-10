@@ -1,6 +1,5 @@
 package com.lomicron.oikoumene.parsers
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.engine.Oikoumene.idKey
 import com.lomicron.oikoumene.repository.api.politics.CultureRepository
@@ -47,11 +46,11 @@ object CultureParser extends LazyLogging {
   private def parseCultures(cultureGroup: ObjectNode): (ObjectNode, Seq[ObjectNode]) = {
     val cultures = cultureGroup.fields.toStream
       .map(e => e.getKey -> e.getValue).toMap
-      .filterKeyValue((_, v) => isCulture(v))
+      .filterKeyValue((f, _) => isCultureField(f))
       .mapValues(culture => culture.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, culture) => mergeFieldValue(culture, idKey, TextNode.valueOf(id)))
       .values
-      .map(culture => mergeFieldValue(culture, "culture_group", cultureGroup.get("id")))
+      .map(culture => mergeFieldValue(culture, "culture_group_id", cultureGroup.get("id")))
       .toSeq
     cultures.map(_.get("id")).map(_.asText()).foreach(cultureGroup.remove)
     val idsArray = arrayNodeOf(cultures.map(_.get("id")))
@@ -59,7 +58,10 @@ object CultureParser extends LazyLogging {
     (cultureGroup, cultures)
   }
 
-  private def isCulture(node: JsonNode) =
-    node.isInstanceOf[ObjectNode] && node.has("primary")
+  private val cultureGroupFields = Set("id", "localisation",
+    "culture_ids", "graphical_culture", "male_names",
+    "female_names", "dynasty_names")
+
+  private def isCultureField(field: String) = !cultureGroupFields.contains(field)
 
 }

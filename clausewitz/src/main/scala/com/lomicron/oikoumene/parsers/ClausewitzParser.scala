@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.ParsingError
@@ -111,7 +111,7 @@ object ClausewitzParser {
   def fieldWithoutPrefix(field: String, prefix: String): String = {
     val cs = field.toSeq.drop(prefix.length)
     cs match {
-      case h+:tail => s"${h.toLower}${tail.mkString}s"
+      case h +: tail => s"${h.toLower}${tail.mkString}s"
       case _ => cs.mkString
     }
   }
