@@ -33,6 +33,7 @@ object Oikoumene extends LazyLogging {
     val localisation = repos.localisations
 
     val tags = loadTags(files, localisation, repos.tags)
+    val buildings = BuildingParser(files, localisation, repos.buildings)
     val provinces = loadProvinces(files, localisation, repos.provinces)
     val geograpy = loadGeographicData(files, localisation, repos.geography)
     val religions = ReligionParser(files, localisation, repos.religions)

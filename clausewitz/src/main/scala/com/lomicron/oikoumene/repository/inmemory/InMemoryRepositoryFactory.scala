@@ -1,10 +1,10 @@
 package com.lomicron.oikoumene.repository.inmemory
 
-import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, ProvinceRepository, RegionRepository, SuperRegionRepository}
+import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
-import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryGeographyRepository, InMemoryProvinceRepository, InMemoryRegionRepository, InMemorySuperRegionRepository}
+import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.politics._
 
 case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends RepositoryFactory {
@@ -19,6 +19,7 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   private val religionRepo: ReligionRepository = InMemoryReligionRepository(religionGroupRepo)
 
   private val provinceRepo: ProvinceRepository = InMemoryProvinceRepository()
+  private val buildingRepo: BuildingRepository = InMemoryBuildingRepository
   private val geographyRepo: GeographicRepository = InMemoryGeographyRepository
   private val regionRepo: RegionRepository = InMemoryRegionRepository
   private val superregionRepo: SuperRegionRepository = InMemorySuperRegionRepository
@@ -35,6 +36,8 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   override def religions: ReligionRepository = religionRepo
 
   override def provinces: ProvinceRepository = provinceRepo
+
+  override def buildings: BuildingRepository = buildingRepo
 
   override def geography: GeographicRepository = geographyRepo
 

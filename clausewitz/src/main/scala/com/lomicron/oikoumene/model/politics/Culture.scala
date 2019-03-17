@@ -1,17 +1,22 @@
 package com.lomicron.oikoumene.model.politics
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.lomicron.oikoumene.model.Entity
+import com.lomicron.oikoumene.model.Entity.UNDEFINED
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.utils.json.JsonMapper.JsonMap
 
 case class Culture
-(id: String,
- localisation: Localisation,
- cultureGroupId: String,
- primaryTag: String,
+(id: String = UNDEFINED,
+ localisation: Localisation = Localisation.empty,
+ cultureGroupId: String = UNDEFINED,
+ @JsonProperty("primary") primaryTag: Option[String] = None,
  dynastyNames: Seq[String] = Seq.empty,
  maleNames: Seq[String] = Seq.empty,
  femaleNames: Seq[String] = Seq.empty,
  graphicalCulture: Option[String] = Option.empty,
- country: Map[String, AnyRef] = Map.empty,
- province: Map[String, AnyRef] = Map.empty
-) extends Entity
+ country: JsonMap = Map.empty,
+ province: JsonMap = Map.empty
+) extends Entity {
+  def this() = this(UNDEFINED)
+}

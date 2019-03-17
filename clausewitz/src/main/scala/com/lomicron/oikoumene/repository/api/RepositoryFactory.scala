@@ -14,6 +14,7 @@ trait RepositoryFactory {
   def religions: ReligionRepository
 
   def provinces: ProvinceRepository
+  def buildings: BuildingRepository
   def geography: GeographicRepository
   def regions: RegionRepository
   def superregions: SuperRegionRepository

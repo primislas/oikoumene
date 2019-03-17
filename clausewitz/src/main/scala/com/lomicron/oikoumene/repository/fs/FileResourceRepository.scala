@@ -30,6 +30,7 @@ case class FileResourceRepository(
   val terrainFile = "map/terrain.txt"
   val climateFile = "map/climate.txt"
   val provinceHistoryDir = "history/provinces"
+  val buildingsDir = "common/buildings"
 
   val culturesFile = "common/cultures/00_cultures.txt"
   val religionsFile = "common/religions/00_religion.txt"
@@ -125,6 +126,9 @@ case class FileResourceRepository(
       .filterKeys(_.isDefined)
       .mapKeys(_.get)
 
+  override def getBuildings: Seq[String] =
+    readAllFilesFromDir(fromSource(buildingsDir)).values.toSeq
+
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {
       case provNameRegex(id) => Some(id.toInt)
@@ -139,6 +143,7 @@ case class FileResourceRepository(
 
   override def getReligions: Option[String] =
     readSourceFileContent(religionsFile)
+
 }
 
 object FileResourceRepository {

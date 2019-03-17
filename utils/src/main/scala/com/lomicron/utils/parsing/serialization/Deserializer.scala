@@ -112,7 +112,12 @@ class BaseDeserializer extends Deserializer {
             case (ro, _, errs) =>
               oConf.index match {
                 case Some(id) => o.get(oConf.field).asInstanceOf[ArrayNode].set(id, ro)
-                case _ => o.set(oConf.field, ro)
+                // Omitting empty objects, as empty object is an ambiguity
+                // of type array / object for deserializer and nulls should be replaced
+                // with default values in class definitions.
+                case _ =>
+                  if (!(ro.isInstanceOf[ObjectNode] && !ro.fieldNames().hasNext)) o.set(oConf.field, ro)
+                  else o.remove(oConf.field)
               }
               if (errs.nonEmpty) recErrs = recErrs ++ errs
           })
