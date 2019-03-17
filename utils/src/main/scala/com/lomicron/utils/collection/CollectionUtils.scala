@@ -39,7 +39,7 @@ object CollectionUtils {
 
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {
     def toStream: Stream[T] = it.asScala.toStream
-    def toSeq: Seq[T] = it.asScala.toSeq
+    def toSeq: Seq[T] = it.asScala.toList
   }
 
   implicit class SeqEx[T](seq: Seq[T]) {
@@ -49,6 +49,10 @@ object CollectionUtils {
 
     def toMapEx[K, V](f: T => (K,V)): Map[K, V] =
       seq.map(f).toMap
+  }
+
+  implicit class OptionEx[T](o: Option[T]) {
+    def cast[R: Manifest]: Option[R] = o.filter(_.isInstanceOf[R]).map(_.asInstanceOf[R])
   }
 
 }

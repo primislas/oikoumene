@@ -16,7 +16,7 @@ case class InMemoryReligionRepository(religionGroups: ReligionGroupRepository)
 
   override def findGroup(key: String): Try[ObjectNode] = religionGroups.find(key)
 
-  override def findAllGroups: Try[Seq[ObjectNode]] = religionGroups.findAll
+  override def findAllGroups: Seq[ObjectNode] = religionGroups.findAll
 
   override def removeGroup(key: String): Try[ObjectNode] = religionGroups.remove(key)
 }

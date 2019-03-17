@@ -22,7 +22,7 @@ trait ReligionRepository extends AbstractObjectNodeRepository {
 
   def findGroup(key: String): Try[ObjectNode]
 
-  def findAllGroups: Try[Seq[ObjectNode]]
+  def findAllGroups: Seq[ObjectNode]
 
   def removeGroup(key: String): Try[ObjectNode]
 

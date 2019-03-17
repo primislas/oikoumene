@@ -21,6 +21,10 @@ import com.typesafe.scalalogging.LazyLogging
 object JsonMapper extends LazyLogging {
 
   type JsonMap = Map[String, AnyRef]
+  val nullNode: NullNode = JsonNodeFactory.instance.nullNode
+  val booleanYes: BooleanNode = JsonNodeFactory.instance.booleanNode(true)
+  val booleanNo: BooleanNode = JsonNodeFactory.instance.booleanNode(false)
+
 
   private val nonNullContainers = new SimpleModule("Oikoumene")
     .addDeserializer(classOf[Seq[AnyRef]], SeqDeserializer)
@@ -87,6 +91,9 @@ object JsonMapper extends LazyLogging {
 
   def objectNode: ObjectNode = new ObjectNode(JsonNodeFactory.instance)
 
+  def objectNode(field: String, value: JsonNode): ObjectNode =
+    objectNode.set(field, value).asInstanceOf[ObjectNode]
+
   def arrayNode: ArrayNode = new ArrayNode(JsonNodeFactory.instance)
 
   def arrayNodeOf(e: AnyRef): ArrayNode =
@@ -96,8 +103,6 @@ object JsonMapper extends LazyLogging {
     args.map(JsonMapper.toJsonNode).foldLeft(arrayNode)(_.add(_))
 
   def textNode(t: String): TextNode = TextNode.valueOf(t)
-
-  def nullNode: NullNode = JsonNodeFactory.instance.nullNode
 
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
@@ -140,21 +145,24 @@ object JsonMapper extends LazyLogging {
   private def mergeField(target: ObjectNode, e: Entry[String, JsonNode]): ObjectNode =
     mergeFieldValue(target, e.getKey, e.getValue)
 
-  def mergeFieldValue(target: ObjectNode, k: String, v: JsonNode): ObjectNode = {
-    if (!target.has(k)) target.set(k, v)
+  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = {
+    if (!target.has(k)) target.set(k, update)
     else {
       val existing = target.get(k)
 
       if (existing.isArray) {
         val existingArray = existing.asInstanceOf[ArrayNode]
-        if (v.isArray) v.forEach(n => existingArray.add(n))
-        else existingArray.add(v)
+        if (update.isArray) update.forEach(n => existingArray.add(n))
+        else existingArray.add(update)
 
-      } else if (existing.isObject && v.isObject) {
-        patchMerge(existing.asInstanceOf[ObjectNode], v.asInstanceOf[ObjectNode])
+      } else if (existing.isObject && update.isObject) {
+        patchMerge(existing.asInstanceOf[ObjectNode], update.asInstanceOf[ObjectNode])
 
+      } else if (existing.isNumber && update.isNumber) {
+        // TODO what about subtraction? Does it even happen for numbers, ever?
+        JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
       } else {
-        target.set(k, v)
+        target.set(k, update)
       }
 
     }
@@ -209,6 +217,18 @@ object JsonMapper extends LazyLogging {
       .foreach(flatArray.add)
 
     flatArray
+  }
+
+  implicit class JsonNodeEx(n: JsonNode) {
+
+    def asObject: Option[ObjectNode] = Option(n).cast[ObjectNode]
+
+    def getField(f: String): Option[JsonNode] = Option(n.get(f))
+
+    def getObject(f: String): Option[ObjectNode] = getField(f).cast[ObjectNode]
+
+    def getArray(f: String): Option[ArrayNode] = getField(f).cast[ArrayNode]
+
   }
 
 }

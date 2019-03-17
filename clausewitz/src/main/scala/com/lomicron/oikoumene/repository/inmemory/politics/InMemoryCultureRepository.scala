@@ -16,7 +16,7 @@ case class InMemoryCultureRepository(cultureGroups: CultureGroupRepository)
 
   override def findGroup(key: String): Try[ObjectNode] = cultureGroups.find(key)
 
-  override def findAllGroups: Try[Seq[ObjectNode]] = cultureGroups.findAll
+  override def findAllGroups: Seq[ObjectNode] = cultureGroups.findAll
 
   override def removeGroup(key: String): Try[ObjectNode] = cultureGroups.remove(key)
 

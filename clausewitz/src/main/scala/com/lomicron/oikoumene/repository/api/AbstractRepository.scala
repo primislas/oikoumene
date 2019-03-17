@@ -19,7 +19,10 @@ trait AbstractRepository [Key, Entity] {
 
   def find(key: Key): Try[Entity]
 
-  def findAll: Try[Seq[Entity]]
+  def find(keys: Seq[Key]): Seq[Entity] =
+    keys.flatMap(find(_).toOption)
+
+  def findAll: Seq[Entity]
 
   def remove(key: Key): Try[Entity]
 

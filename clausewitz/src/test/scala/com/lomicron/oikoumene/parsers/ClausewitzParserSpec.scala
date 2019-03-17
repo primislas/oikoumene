@@ -32,15 +32,15 @@ class ClausewitzParserSpec extends Specification {
   "ClausewitzParser#date2json" should "- construct a JSON object from a date" >> {
     val date = Date(year, month, day)
     val obj = ClausewitzParser.date2json(date)
-    obj.get(ClausewitzParser.yearField).asInt() mustEqual year
-    obj.get(ClausewitzParser.monthField).asInt() mustEqual month
-    obj.get(ClausewitzParser.dayField).asInt() mustEqual day
+    obj.get(ClausewitzParser.Fields.year).asInt() mustEqual year
+    obj.get(ClausewitzParser.Fields.month).asInt() mustEqual month
+    obj.get(ClausewitzParser.Fields.day).asInt() mustEqual day
   }
 
   "ClausewitzParser#fieldWithoutPrefix" should "- remove prefix and convert a field to plural" >> {
     val str = "add_Core"
     val prefix = "add_"
-    val unprefixed = ClausewitzParser.fieldWithoutPrefix(str, prefix)
+    val unprefixed = ClausewitzParser.pluralFieldNameFromPrefix(str, prefix)
     unprefixed mustEqual "cores"
   }
 
@@ -98,7 +98,7 @@ class ClausewitzParserSpec extends Specification {
 
       val date = Date(1700, 1, 1)
       val parsed = ClausewitzParser.rollUpEvents(province, date)
-      val history = parsed.get(ClausewitzParser.historyField).asInstanceOf[ArrayNode]
+      val history = parsed.get(ClausewitzParser.Fields.events).asInstanceOf[ArrayNode]
       history.size mustEqual 15
     }
   }

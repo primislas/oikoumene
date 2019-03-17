@@ -34,7 +34,7 @@ object Oikoumene extends LazyLogging {
 
     val tags = loadTags(files, localisation, repos.tags)
     val buildings = BuildingParser(files, localisation, repos.buildings)
-    val provinces = loadProvinces(files, localisation, repos.provinces)
+    val provinces = loadProvinces(files, localisation, repos.provinces, repos.buildings)
     val geograpy = loadGeographicData(files, localisation, repos.geography)
     val religions = ReligionParser(files, localisation, repos.religions)
     val cultures = CultureParser(files, localisation, repos.cultures)
@@ -81,7 +81,8 @@ object Oikoumene extends LazyLogging {
   private def loadProvinces
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   provinces: ProvinceRepository): ProvinceRepository = {
+   provinces: ProvinceRepository,
+   buildings: BuildingRepository): ProvinceRepository = {
 
     val definitions = files.getProvinceDefinitions
     val provinceTypes = files.getProvinceTypes // default.map
@@ -94,6 +95,7 @@ object Oikoumene extends LazyLogging {
       provincePositions,
       history,
       localisation,
+      buildings,
       provinces)
   }
 

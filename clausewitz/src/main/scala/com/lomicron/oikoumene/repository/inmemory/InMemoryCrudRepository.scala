@@ -22,8 +22,8 @@ class InMemoryCrudRepository[K: Ordering, V](f: V => K)
   override def find(key: K): Try[V] =
     toTry(entities.get(key), s"No entity with key $key found.")
 
-  override def findAll: Try[Seq[V]] =
-    Try(entities.values.to[Seq])
+  override def findAll: Seq[V] =
+    entities.values.to[Seq]
 
   override def remove(key: K): Try[V] =
     toTry(entities.remove(key), s"Failed to remove an entity with key $key.")
