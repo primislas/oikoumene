@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, rollUpEvents}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.mergeFieldValue
+import com.lomicron.utils.json.JsonMapper.patchFieldValue
 import com.typesafe.scalalogging.LazyLogging
 
 object TagParser extends LazyLogging {
@@ -26,11 +26,11 @@ object TagParser extends LazyLogging {
     val parsedTags = countryByTag
       .mapKVtoValue((tag, country) => historyByTag
         .get(tag)
-        .map(mergeFieldValue(country, "history", _))
+        .map(patchFieldValue(country, "history", _))
         .getOrElse(country))
       .mapKVtoValue((tag, country) => names
         .get(tag)
-        .map(mergeFieldValue(country, "localisation", _))
+        .map(patchFieldValue(country, "localisation", _))
         .getOrElse(country))
     logger.info(s"Loaded ${parsedTags.size} tags")
 

@@ -143,9 +143,9 @@ object JsonMapper extends LazyLogging {
   }
 
   private def mergeField(target: ObjectNode, e: Entry[String, JsonNode]): ObjectNode =
-    mergeFieldValue(target, e.getKey, e.getValue)
+    patchFieldValue(target, e.getKey, e.getValue)
 
-  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = {
+  def patchFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = {
     if (!target.has(k)) target.set(k, update)
     else {
       val existing = target.get(k)
@@ -163,6 +163,41 @@ object JsonMapper extends LazyLogging {
         JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
       } else {
         target.set(k, update)
+      }
+
+    }
+    target
+  }
+
+  /**
+    * Would merge values rather than overwriting or patching them
+    * using the following approach:
+    * <ul>
+    *   <li> Values existing on the same key will be combined into an array.
+    *   This is useful for configs which can repeat the same field several times
+    *   as a way of describing a collection of values, like 'discoveredBy'.
+    *   <li> Numbers will be added together.
+    * </ul>
+    *
+    *
+    * @param target
+    * @param k
+    * @param update
+    * @return
+    */
+  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = {
+    if (!target.has(k)) target.set(k, update)
+    else {
+      val existing = target.get(k)
+      if (existing.isArray) {
+        val existingArray = existing.asInstanceOf[ArrayNode]
+        if (update.isArray) update.forEach(n => existingArray.add(n))
+        else existingArray.add(update)
+      } else if (existing.isNumber && update.isNumber) {
+        // TODO what about subtraction? Does it even happen for numbers, ever?
+        JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
+      } else {
+        target.set(k, arrayNodeOf(Seq(existing, update)))
       }
 
     }
@@ -227,7 +262,7 @@ object JsonMapper extends LazyLogging {
 
     def getObject(f: String): Option[ObjectNode] = getField(f).cast[ObjectNode]
 
-    def getArray(f: String): Option[ArrayNode] = getField(f).cast[ArrayNode]
+    def getArray(f: String): Option[ArrayNode] = getField(f).filter(_.isInstanceOf[ArrayNode]).cast[ArrayNode]
 
   }
 

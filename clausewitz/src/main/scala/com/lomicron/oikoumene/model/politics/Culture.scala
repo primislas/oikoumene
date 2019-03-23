@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.politics
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.Entity.UNDEFINED
 import com.lomicron.oikoumene.model.localisation.Localisation
@@ -18,5 +18,7 @@ case class Culture
  country: JsonMap = Map.empty,
  province: JsonMap = Map.empty
 ) extends Entity {
-  def this() = this(UNDEFINED)
+
+  @JsonCreator def this() = this(UNDEFINED)
+
 }

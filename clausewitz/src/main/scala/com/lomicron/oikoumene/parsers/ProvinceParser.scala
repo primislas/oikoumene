@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.map.Color
 import com.lomicron.oikoumene.model.provinces.{ProvinceDefinition, ProvinceTypes}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{getEvents, parse, rollUpEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{getEvents, parse, parseEvents, rollUpEvents}
 import com.lomicron.oikoumene.repository.api.LocalisationRepository
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, ProvinceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -110,11 +110,9 @@ object ProvinceParser extends LazyLogging {
         histAndErrors._1
       })
       .map(history => {
-        setBuildings(history, buildings)
-        getEvents(history).map(_._2).foreach(setBuildings(_, buildings))
-        history
+        val events = Seq(history) ++ parseEvents(history).map(setBuildings(_, buildings))
+        JsonMapper.objectNode("events", JsonMapper.arrayNodeOf(events))
       })
-      .map(rollUpEvents)
       .map(province.set("history", _).asInstanceOf[ObjectNode])
       .getOrElse(province)
 

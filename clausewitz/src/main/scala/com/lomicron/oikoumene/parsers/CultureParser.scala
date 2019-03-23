@@ -5,7 +5,7 @@ import com.lomicron.oikoumene.engine.Oikoumene.idKey
 import com.lomicron.oikoumene.repository.api.politics.CultureRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, mergeFieldValue}
+import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging
 
 object CultureParser extends LazyLogging {
@@ -30,7 +30,7 @@ object CultureParser extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, religionGroup) => mergeFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .map(parseCultures)
@@ -48,9 +48,9 @@ object CultureParser extends LazyLogging {
       .map(e => e.getKey -> e.getValue).toMap
       .filterKeyValue((f, _) => isCultureField(f))
       .mapValues(culture => culture.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, culture) => mergeFieldValue(culture, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, culture) => patchFieldValue(culture, idKey, TextNode.valueOf(id)))
       .values
-      .map(culture => mergeFieldValue(culture, "culture_group_id", cultureGroup.get("id")))
+      .map(culture => patchFieldValue(culture, "culture_group_id", cultureGroup.get("id")))
       .toSeq
     cultures.map(_.get("id")).map(_.asText()).foreach(cultureGroup.remove)
     val idsArray = arrayNodeOf(cultures.map(_.get("id")))

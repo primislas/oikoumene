@@ -6,7 +6,7 @@ import com.lomicron.oikoumene.engine.Oikoumene.idKey
 import com.lomicron.oikoumene.repository.api.politics.ReligionRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, mergeFieldValue}
+import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging
 
 object ReligionParser extends LazyLogging {
@@ -31,7 +31,7 @@ object ReligionParser extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, religionGroup) => mergeFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .map(parseReligions)
@@ -49,9 +49,9 @@ object ReligionParser extends LazyLogging {
       .map(e => e.getKey -> e.getValue).toMap
       .filterKeyValue((_, v) => isReligion(v))
       .mapValues(religion => religion.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, religion) => mergeFieldValue(religion, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, religion) => patchFieldValue(religion, idKey, TextNode.valueOf(id)))
       .values
-      .map(religion => mergeFieldValue(religion, "religion_group", religionGroup.get("id")))
+      .map(religion => patchFieldValue(religion, "religion_group", religionGroup.get("id")))
       .toSeq
     religions.map(_.get("id")).map(_.asText()).foreach(religionGroup.remove)
     val idsArray = arrayNodeOf(religions.map(_.get("id")))

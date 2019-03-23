@@ -1,6 +1,7 @@
 package com.lomicron.utils.collection
 
 import scala.collection.JavaConverters._
+import scala.reflect.api.TypeTags
 import scala.util.Try
 
 object CollectionUtils {
@@ -52,7 +53,9 @@ object CollectionUtils {
   }
 
   implicit class OptionEx[T](o: Option[T]) {
+
     def cast[R: Manifest]: Option[R] = o.filter(_.isInstanceOf[R]).map(_.asInstanceOf[R])
+
   }
 
 }

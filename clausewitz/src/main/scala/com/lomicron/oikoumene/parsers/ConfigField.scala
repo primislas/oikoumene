@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ConfigField.ValueTypes
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.ToJson
+import com.lomicron.utils.json.{JsonMapper, ToJson}
+import com.lomicron.utils.parsing.JsonParser
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
@@ -13,7 +14,14 @@ case class ConfigField
 (field: String,
  isOptional: Boolean = true,
  valueType: String = ValueTypes.undefined,
- valueSample: Option[AnyRef] = None) extends ToJson
+ valueSample: Option[AnyRef] = None,
+ hits: Int = 0) extends ToJson with Ordered[ConfigField] {
+
+  override def compare(that: ConfigField): Int =
+    if (hits != that.hits) that.hits.compareTo(hits)
+    else field.compareTo(that.field)
+
+}
 
 object ConfigField extends LazyLogging {
 
@@ -56,25 +64,35 @@ object ConfigField extends LazyLogging {
           }
           else types.head
         }
-        vals.find(_.valueType == valueType)
+        vals.find(_.valueType == valueType).map(_.copy(hits = vals.size))
       })
       .values
       .flatten
       .toSeq
       .map(cf => if (commonFields.contains(cf.field)) cf.copy(isOptional = false) else cf)
+      .sorted
   }
 
   def groupById(entities: Seq[ObjectNode]): mutable.Map[String, ConfigField] =
     apply(entities).foldLeft[mutable.Map[String, ConfigField]](mutable.LinkedHashMap[String, ConfigField]())((acc, e) => acc + (e.field -> e))
 
+  def print(fields: Seq[ConfigField]): Unit = {
+    fields
+      .flatMap(cf => Seq(
+        s"// hits = ${cf.hits}, isOptional = ${cf.isOptional}, sample = ${JsonMapper.toJson(cf.valueSample)}",
+        s"${JsonParser.camelCase(cf.field)}: Option[${cf.valueType}] = None,"
+      ))
+      .foreach(println)
+  }
+
   private val booleans = Set(TextNode.valueOf("yes"), TextNode.valueOf("no"))
 
   def getNodeType(n: JsonNode): String = n match {
-    case _: ObjectNode => "object"
-    case t: TextNode => if (booleans.contains(t)) "boolean" else "string"
-    case _: BooleanNode => "boolean"
-    case _: ArrayNode => "array"
-    case _: NumericNode => "number"
+    case _: ObjectNode => "Object"
+    case t: TextNode => if (booleans.contains(t)) "Boolean" else "String"
+    case _: BooleanNode => "Boolean"
+    case _: ArrayNode => "Seq"
+    case _: NumericNode => "Int"
     case _ => "UNKNOWN"
   }
 

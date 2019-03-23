@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.repository.api
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.mergeFieldValue
+import com.lomicron.utils.json.JsonMapper.patchFieldValue
 
 trait LocalisationRepository {
 
@@ -23,9 +23,9 @@ trait LocalisationRepository {
       .map(TextNode.valueOf)
       .map(name => {
         if (target.has("localisation"))
-          mergeFieldValue(target.get("localisation").asInstanceOf[ObjectNode], "name", name)
+          patchFieldValue(target.get("localisation").asInstanceOf[ObjectNode], "name", name)
         else {
-          val l = mergeFieldValue(JsonMapper.objectNode, "name", name)
+          val l = patchFieldValue(JsonMapper.objectNode, "name", name)
           target.set("localisation", l)
         }
         target

@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
@@ -25,6 +26,7 @@ object ClausewitzParser {
     val day = "day"
     val addPrefix = "add_"
     val removePrefix = "remove_"
+    val tradeGoods = "trade_goods"
   }
 
   val empty: (ObjectNode, Seq[ParsingError]) =
@@ -49,12 +51,19 @@ object ClausewitzParser {
   def parseEvents(obj: ObjectNode): Seq[ObjectNode] = {
     val events = getEvents(obj)
       .map(dm => {
-        val (date, modifiers) = dm
+        val (date, event) = dm
         obj.remove(date.lexeme)
-
-        val event = JsonMapper.objectNode
         event.set(Fields.date, date2json(date))
-        event.set(Fields.update, modifiers)
+
+        // cleaning up
+        if (event.has(tradeGoods)) {
+          // it is a bug, shouldn't be reported twice
+          event.getArray(tradeGoods).foreach(a => {
+            val actualGood = a.get(a.size() - 1)
+            event.set(tradeGoods, actualGood)
+          })
+        }
+
         event
       })
 
@@ -114,10 +123,7 @@ object ClausewitzParser {
     if (key.startsWith(Fields.addPrefix)) {
       target.remove(key)
       val field = fieldNameWithoutPrefix(key, Fields.addPrefix)
-      val nextVal =
-        if (value.isNumber || value.isArray) value
-        else JsonMapper.arrayNodeOf(value)
-      JsonMapper.mergeFieldValue(target, field, nextVal)
+      JsonMapper.mergeFieldValue(target, field, value)
     } else if (key.startsWith(Fields.removePrefix)) {
       target.remove(key)
       val field = fieldNameWithoutPrefix(key, Fields.removePrefix)

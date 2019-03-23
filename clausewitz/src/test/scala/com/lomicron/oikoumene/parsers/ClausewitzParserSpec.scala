@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.parsers
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
@@ -48,9 +49,9 @@ class ClausewitzParserSpec extends Specification {
 
     def validObject = JsonMapper
       .objectNode
-      .set("cores", JsonMapper.arrayNodeOf("BYZ")).asInstanceOf[ObjectNode]
+      .set("core", JsonMapper.arrayNodeOf("BYZ")).asInstanceOf[ObjectNode]
       .set("owner", toJsonNode("BYZ")).asInstanceOf[ObjectNode]
-      .set("claims", JsonMapper.arrayNode).asInstanceOf[ObjectNode]
+      .set("claim", JsonMapper.arrayNode).asInstanceOf[ObjectNode]
 
     "- update an ordinary key" >> {
       val obj = validObject
@@ -61,27 +62,27 @@ class ClausewitzParserSpec extends Specification {
     }
 
     "- add an item to a key array for a field that starts with add" >> {
-      val addCore = "addCore"
+      val addCore = "add_core"
       val newCore = toJsonNode("VEN")
-      val cores = "cores"
+      val cores = "core"
 
       val obj = ClausewitzParser.mergeField(validObject, addCore, newCore)
-      obj.get(cores) mustEqual JsonMapper.arrayNodeOf("BYZ", "VEN")
+      obj.get(cores) mustEqual JsonMapper.arrayNodeOf(Seq("BYZ", "VEN"))
     }
 
     "- remove a single item from an array for a field that starts with remove" >> {
-      val removeCore = "removeCore"
+      val removeCore = "remove_core"
       val removedCore = toJsonNode("BYZ")
-      val cores = "cores"
+      val cores = "core"
 
       val obj = ClausewitzParser.mergeField(validObject, removeCore, removedCore)
       obj.get(cores) mustEqual JsonMapper.arrayNode
     }
 
     "- do nothing on an empty key when receiving a remove command" >> {
-      val removeClaim = "removeClaim"
+      val removeClaim = "remove_claim"
       val removedClaim = toJsonNode("BYZ")
-      val claims = "claims"
+      val claims = "claim"
 
       val obj = ClausewitzParser.mergeField(validObject, removeClaim, removedClaim)
       obj.get(claims) mustEqual JsonMapper.arrayNode
@@ -99,7 +100,7 @@ class ClausewitzParserSpec extends Specification {
       val date = Date(1700, 1, 1)
       val parsed = ClausewitzParser.rollUpEvents(province, date)
       val history = parsed.get(ClausewitzParser.Fields.events).asInstanceOf[ArrayNode]
-      history.size mustEqual 15
+      history.size mustEqual 19
     }
   }
 

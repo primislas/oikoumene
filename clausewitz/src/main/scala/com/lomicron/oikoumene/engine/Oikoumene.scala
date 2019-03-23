@@ -12,7 +12,7 @@ import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRe
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.{mergeFieldValue, objectNode}
+import com.lomicron.utils.json.JsonMapper.{objectNode, patchFieldValue}
 import com.lomicron.utils.parsing.scopes.ObjectScope
 import com.lomicron.utils.parsing.serialization.BaseDeserializer
 import com.typesafe.scalalogging.LazyLogging
@@ -23,7 +23,6 @@ object Oikoumene extends LazyLogging {
 
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
-    //println(System.getProperty("user.dir"))
 
     val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
     val modDir = ""
@@ -143,7 +142,7 @@ object Oikoumene extends LazyLogging {
           logger.warn("Unexpected area definition, omitting: {}", default.toString)
           objectNode
       }
-      .mapKVtoValue((id, area) => mergeFieldValue(area, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, area) => patchFieldValue(area, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .foreach(areaRepo.create)
@@ -171,7 +170,7 @@ object Oikoumene extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, region) => mergeFieldValue(region, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, region) => patchFieldValue(region, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .foreach(regions.create)
@@ -202,7 +201,7 @@ object Oikoumene extends LazyLogging {
       })
       .mapValues(_.asInstanceOf[ArrayNode])
       .mapValues(objectNode.set(regionIdsKey, _).asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, sRegion) => mergeFieldValue(sRegion, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .foreach(superregions.create)
@@ -259,7 +258,7 @@ object Oikoumene extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, terrain) => mergeFieldValue(terrain, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, terrain) => patchFieldValue(terrain, idKey, TextNode.valueOf(id)))
       .mapValues(JsonMapper.renameField(_, terrainProvincesKey, provinceIdsKey))
 
   private def loadClimate
@@ -282,15 +281,14 @@ object Oikoumene extends LazyLogging {
         n.isInstanceOf[ArrayNode]
       })
       .mapValues(_.asInstanceOf[ArrayNode])
-      .mapValues(mergeFieldValue(objectNode, provinceIdsKey, _))
-      .mapKVtoValue((id, region) => mergeFieldValue(region, idKey, TextNode.valueOf(id)))
+      .mapValues(patchFieldValue(objectNode, provinceIdsKey, _))
+      .mapKVtoValue((id, region) => patchFieldValue(region, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values
       .foreach(climates.create)
 
     climates
   }
-
 
 
 }

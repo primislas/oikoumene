@@ -1,5 +1,6 @@
 package com.lomicron.utils.json
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, TextNode}
 import com.lomicron.utils.io.IO
 import org.specs2.mutable.Specification
@@ -17,9 +18,16 @@ class JsonMapperSpec extends Specification {
       reSerialized mustEqual expected
     }
 
+    "- parse JSON setting default case class values" >> {
+      val defVals = JsonMapper.fromJson[DefaultValuesTest]("{}")
+      defVals.int mustEqual 0
+      defVals.str mustEqual ""
+      defVals.seq mustEqual Seq.empty
+    }
+
   }
 
-  "JsonMapper.toJsonNode()" should {
+  "JsonMapper#toJsonNode" should {
 
     "- convert a string to TextNode" >> {
       val arg = "ordinary string"
@@ -48,3 +56,18 @@ case class JsonFields(
   nullField: String,
   emptyOption: Option[Int],
   intOption: Option[Int])
+
+case class DefaultValuesTest
+(int: Int = 0,
+ str: String = "",
+ seq: Seq[String] = Seq.empty) {
+
+  // NOTE! Overriding default constructor with
+  // @JsonCreator annotation is pretty much the only way
+  // to make sure that case class default values are used
+  // due to the way case classes are constructed by scala compiler -
+  // i.e. not setting field values directly but rather
+  // always through generated constructors.
+  @JsonCreator def this() = this(0)
+
+}

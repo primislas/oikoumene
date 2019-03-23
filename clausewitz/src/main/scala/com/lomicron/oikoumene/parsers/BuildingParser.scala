@@ -2,12 +2,11 @@ package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.engine.Oikoumene.idKey
-import com.lomicron.oikoumene.model.map.Building
 import com.lomicron.oikoumene.repository.api.map.BuildingRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.mergeFieldValue
+import com.lomicron.utils.json.JsonMapper.patchFieldValue
 import com.typesafe.scalalogging.LazyLogging
 
 object BuildingParser extends LazyLogging {
@@ -33,7 +32,7 @@ object BuildingParser extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, building) => mergeFieldValue(building, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, building) => patchFieldValue(building, idKey, TextNode.valueOf(id)))
       .mapKVtoValue((id, building) => localisation.findAndSetAsLocName(s"building_$id", building))
       .values
 
@@ -49,7 +48,6 @@ object BuildingParser extends LazyLogging {
       })
     confs.filter(_.has(manufactoryId)).foreach(m => JsonMapper.patchMerge(m, manufactory))
 
-    val classes = buildings.map(b => JsonMapper.convert[Building](b))
     buildings.foreach(buildingsRepo.create)
     buildingsRepo
   }
