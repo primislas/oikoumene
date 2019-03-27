@@ -106,6 +106,8 @@ object Oikoumene extends LazyLogging {
     loadAreas(files, localisation, geography.areas)
     loadRegions(files, localisation, geography.regions)
     loadSuperRegions(files, localisation, geography.superregions)
+    loadContinents(files, localisation, geography.continent)
+    loadColonialRegions(files, localisation, geography.colonies)
     loadTerrain(files, localisation, geography.terrain)
     loadClimate(files, localisation, geography.climate)
 
@@ -144,6 +146,7 @@ object Oikoumene extends LazyLogging {
       }
       .mapKVtoValue((id, area) => patchFieldValue(area, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
+      .mapValues(ClausewitzParser.unwrapColor)
       .values
       .foreach(areaRepo.create)
 
@@ -209,6 +212,68 @@ object Oikoumene extends LazyLogging {
     superregions
   }
 
+  private def loadContinents
+  (files: ResourceRepository,
+   localisation: LocalisationRepository,
+   continents: ContinentRepository) = {
+
+    files
+      .getContinents
+      .map(ClausewitzParser.parse)
+      .map(o => {
+        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing superregions: ${o._2}")
+        o._1.fields.toStream
+      })
+      .getOrElse(Stream.empty)
+      .map(e => e.getKey -> e.getValue).toMap
+      .filterValues(n => {
+        if (!n.isInstanceOf[ArrayNode])
+          logger.warn(s"Expected super-region ArrayNodes but encountered ${n.toString}")
+        n.isInstanceOf[ArrayNode]
+      })
+      .mapValues(_.asInstanceOf[ArrayNode])
+      .mapValues(objectNode.set(provinceIdsKey, _).asInstanceOf[ObjectNode])
+      .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue(localisation.findAndSetAsLocName)
+      .values
+      .foreach(continents.create)
+
+    ConfigField.printCaseClass("Continent", continents.findAll)
+
+    continents
+  }
+
+  private def loadColonialRegions(files: ResourceRepository,
+                                  localisation: LocalisationRepository,
+                                  colonialRegions: ColonialRegionRepository) = {
+    files
+      .getColonialRegions
+      .map(ClausewitzParser.parse)
+      .map(o => {
+        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing terrain: ${o._2}")
+        o._1.fields.toStream
+      })
+      .getOrElse(Stream.empty)
+      .map(e => e.getKey -> e.getValue).toMap
+      .filterValues(n => {
+        if (!n.isInstanceOf[ObjectNode])
+          logger.warn(s"Expected colonial region ObjectNodes but encountered ${n.toString}")
+        n.isInstanceOf[ObjectNode]
+      })
+      .mapValues(_.asInstanceOf[ObjectNode])
+      .mapValues(JsonMapper.renameField(_, "provinces", provinceIdsKey))
+      .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue(localisation.findAndSetAsLocName)
+      .values
+      .map(ClausewitzParser.unwrapColor)
+      .foreach(colonialRegions.create)
+
+    ConfigField.printCaseClass("ColonialRegion", colonialRegions.findAll)
+
+    colonialRegions
+  }
+
+
   private val terrainCategoriesKey = "categories"
   private val terrainProvincesKey = "terrain_override"
 
@@ -260,6 +325,7 @@ object Oikoumene extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, terrain) => patchFieldValue(terrain, idKey, TextNode.valueOf(id)))
       .mapValues(JsonMapper.renameField(_, terrainProvincesKey, provinceIdsKey))
+      .mapValues(ClausewitzParser.unwrapColor)
 
   private def loadClimate
   (files: ResourceRepository,

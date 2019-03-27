@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.provinces
 
-import com.lomicron.oikoumene.model.map.Color
+import com.lomicron.oikoumene.model.Color
 
 case class ProvinceDefinition
 (id: Int,

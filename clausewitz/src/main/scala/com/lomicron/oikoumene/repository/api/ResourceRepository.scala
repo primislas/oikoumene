@@ -46,6 +46,8 @@ trait ResourceRepository {
 
   def getContinents: Option[String]
 
+  def getColonialRegions: Option[String]
+
   def getTerrain: Option[String]
 
   def getClimate: Option[String]

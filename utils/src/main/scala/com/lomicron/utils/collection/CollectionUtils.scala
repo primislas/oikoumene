@@ -1,7 +1,6 @@
 package com.lomicron.utils.collection
 
 import scala.collection.JavaConverters._
-import scala.reflect.api.TypeTags
 import scala.util.Try
 
 object CollectionUtils {
@@ -34,8 +33,6 @@ object CollectionUtils {
       m
     }
     
-
-
   }
 
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {

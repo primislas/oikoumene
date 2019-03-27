@@ -1,9 +1,9 @@
 package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.model.map.Color
+import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{ProvinceDefinition, ProvinceTypes}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{getEvents, parse, parseEvents, rollUpEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
 import com.lomicron.oikoumene.repository.api.LocalisationRepository
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, ProvinceRepository}
 import com.lomicron.utils.collection.CollectionUtils._

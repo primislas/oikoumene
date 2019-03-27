@@ -26,6 +26,7 @@ object ClausewitzParser {
     val day = "day"
     val addPrefix = "add_"
     val removePrefix = "remove_"
+    val color = "color"
     val tradeGoods = "trade_goods"
   }
 
@@ -104,6 +105,27 @@ object ClausewitzParser {
     jsonDate.get(Fields.year).asInt,
     jsonDate.get(Fields.month).asInt,
     jsonDate.get(Fields.day).asInt)
+
+  /**
+    * Replaces Clausewitz color definition -
+    * which is normally an array of 3 int values (RGB),
+    * wit Oikoumene color representation.
+    *
+    * @param o - incoming object that may contain a Clausewitz color field
+    * @return object with the color field in Oikoumene format
+    */
+  def unwrapColor(o: ObjectNode): ObjectNode = {
+    o.getArray(Fields.color).filter(_.size == 3).foreach(a => {
+      val c = objectNode
+      c.set("r", a.get(0))
+      c.set("g", a.get(1))
+      c.set("b", a.get(2))
+
+      o.set(Fields.color, c)
+    })
+
+    o
+  }
 
   def strToDate(key: String): Option[Date] = key match {
     case Tokenizer.datePat(year, month, day) =>

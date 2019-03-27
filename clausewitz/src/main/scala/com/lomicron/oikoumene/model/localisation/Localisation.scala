@@ -5,7 +5,7 @@ case class Localisation(name: Option[String] = None, adjective: Option[String] =
 }
 
 object Localisation {
-  def empty = Localisation()
+  val empty = Localisation()
 }
 
 trait WithLocalisation {

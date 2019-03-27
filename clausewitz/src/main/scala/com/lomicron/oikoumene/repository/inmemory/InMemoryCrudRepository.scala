@@ -14,7 +14,12 @@ class InMemoryCrudRepository[K: Ordering, V](f: V => K)
     o.map(Success(_)).getOrElse(Failure(new RepositoryException(msg)))
 
   override def create(entity: V): Try[V] =
-    Try(f(entity)).map(entities.put(_, entity)).flatMap(toTry(_, "Failed to create the entity."))
+    Try(f(entity))
+      .map(id => {
+        entities.put(id, entity)
+        Option(entity)
+      })
+      .flatMap(toTry(_, "Failed to create the entity."))
 
   override def update(entity: V): Try[V] =
     create(entity)

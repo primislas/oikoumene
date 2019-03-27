@@ -11,9 +11,9 @@ extends GeographicRepository {
 
   override def superregions: SuperRegionRepository = InMemorySuperRegionRepository
 
-  override def continent: ContinentRepository = ???
+  override def continent: ContinentRepository = InMemoryContinentRepository
 
-  override def colonies: ColonialRegionRepository = ???
+  override def colonies: ColonialRegionRepository = InMemoryColonialRegionRepository
 
   override def terrain: TerrainRepository = InMemoryTerrainRepository
 

@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.model.map
+package com.lomicron.oikoumene.model.provinces
 
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.Entity.UNDEFINED

@@ -9,10 +9,10 @@ import com.lomicron.utils.io.IO
 
 import scala.util.matching.Regex
 
-case class FileResourceRepository(
-                                   gameDir: String,
-                                   modDir: String)
-  extends ResourceRepository {
+case class FileResourceRepository
+(gameDir: String,
+ modDir: String
+) extends ResourceRepository {
 
   val localisationDir = "localisation"
 
@@ -27,6 +27,7 @@ case class FileResourceRepository(
   val regionsFile = "map/region.txt"
   val supperregionsFile = "map/superregion.txt"
   val continentsFile = "map/continent.txt"
+  val colonialRegionsFile = "common/colonial_regions/00_colonial_regions.txt"
   val terrainFile = "map/terrain.txt"
   val climateFile = "map/climate.txt"
   val provinceHistoryDir = "history/provinces"
@@ -110,6 +111,9 @@ case class FileResourceRepository(
 
   override def getContinents: Option[String] =
     readSourceFileContent(continentsFile)
+
+  override def getColonialRegions: Option[String] =
+    readSourceFileContent(colonialRegionsFile)
 
   override def getTerrain: Option[String] =
     readSourceFileContent(terrainFile)

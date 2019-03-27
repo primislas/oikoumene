@@ -260,10 +260,14 @@ object JsonMapper extends LazyLogging {
 
     def getField(f: String): Option[JsonNode] = Option(n.get(f))
 
-    def getObject(f: String): Option[ObjectNode] = getField(f).cast[ObjectNode]
+    def getObject(f: String): Option[ObjectNode] = getField(f).filter(_.isInstanceOf[ObjectNode]).cast[ObjectNode]
 
     def getArray(f: String): Option[ArrayNode] = getField(f).filter(_.isInstanceOf[ArrayNode]).cast[ArrayNode]
 
+  }
+
+  implicit class ArrayNodeEx(a: ArrayNode) {
+    def toSeq: Seq[JsonNode] = a.elements().toSeq
   }
 
 }

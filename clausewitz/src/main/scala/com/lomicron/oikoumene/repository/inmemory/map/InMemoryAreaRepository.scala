@@ -1,12 +1,13 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.repository.api.map.AreaRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryObjectNodeRepository
+import com.lomicron.utils.collection.CollectionUtils._
+import com.lomicron.utils.json.JsonMapper._
 
 import scala.collection.mutable
 import scala.util.Try
-import scala.collection.JavaConverters._
 
 object InMemoryAreaRepository
   extends InMemoryObjectNodeRepository
@@ -16,9 +17,8 @@ object InMemoryAreaRepository
 
   override def create(entity: ObjectNode): Try[ObjectNode] = {
     super.create(entity).map(area => {
-      Option(area.get("province_ids"))
-        .filter(_.isInstanceOf[ArrayNode])
-        .map(_.asInstanceOf[ArrayNode].iterator().asScala.to[Seq])
+      area.getArray("province_ids")
+        .map(_.iterator().toSeq)
         .getOrElse(Seq.empty)
         .map(_.asInt())
         .foreach(areasByProvince.put(_, area))
