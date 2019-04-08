@@ -28,6 +28,9 @@ object ClausewitzParser {
     val removePrefix = "remove_"
     val color = "color"
     val tradeGoods = "trade_goods"
+    val provinceIdsKey = "province_ids"
+    val idKey = "id"
+    val regionIdsKey = "region_ids"
   }
 
   val empty: (ObjectNode, Seq[ParsingError]) =

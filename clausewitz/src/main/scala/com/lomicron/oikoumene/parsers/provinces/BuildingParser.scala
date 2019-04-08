@@ -1,9 +1,10 @@
-package com.lomicron.oikoumene.parsers
+package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.engine.Oikoumene.idKey
+import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.repository.api.map.BuildingRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.patchFieldValue
@@ -12,6 +13,9 @@ import com.typesafe.scalalogging.LazyLogging
 object BuildingParser extends LazyLogging {
 
   val manufactoryId = "manufactory"
+
+  def apply(repos: RepositoryFactory): BuildingRepository =
+    apply(repos.resources, repos.localisations, repos.buildings)
 
   def apply
   (files: ResourceRepository,

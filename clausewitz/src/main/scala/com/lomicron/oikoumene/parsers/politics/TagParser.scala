@@ -1,12 +1,43 @@
-package com.lomicron.oikoumene.parsers
+package com.lomicron.oikoumene.parsers.politics
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
+import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, rollUpEvents}
+import com.lomicron.oikoumene.repository.api.politics.TagRepository
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper.patchFieldValue
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.collection.immutable.TreeMap
+
 object TagParser extends LazyLogging {
+
+  def apply(repos: RepositoryFactory): TagRepository =
+    apply(repos.resources, repos.localisations, repos.tags)
+
+  def apply
+  (files: ResourceRepository,
+   localisation: LocalisationRepository,
+   tags: TagRepository
+  ): TagRepository = {
+
+    val filesByTags = files
+      .getCountryTags
+      .map(contentsByFile => ClausewitzParser.parse(contentsByFile._2)._1)
+      .flatMap(obj => obj.fields.toStream.map(e => (e.getKey, e.getValue.asText)))
+      .map(kv => (kv._1, s"common/${kv._2}"))
+      .foldLeft(TreeMap[String, String]())(_ + _)
+    val countries = files.getCountries(filesByTags)
+    val histories = files.getCountryHistory
+    val names = localisation.fetchTags
+    val parsedTags = TagParser(filesByTags, countries, histories, names)
+      .mapKVtoValue((id, tag) => tag.set(idKey, TextNode.valueOf(id)).asInstanceOf[ObjectNode])
+    tags.create(parsedTags.values.to[Seq])
+    tags
+  }
+
 
   def apply
   (tags: Map[String, String],

@@ -1,10 +1,11 @@
-package com.lomicron.oikoumene.parsers
+package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{ProvinceDefinition, ProvinceTypes}
+import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
-import com.lomicron.oikoumene.repository.api.LocalisationRepository
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, ProvinceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
@@ -19,6 +20,30 @@ object ProvinceParser extends LazyLogging {
     "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*)){0,1}".r
   val addBuildingField = "add_building"
   val removeBuildingField = "remove_building"
+
+  def apply(repos: RepositoryFactory): ProvinceRepository =
+    apply(repos.resources, repos.localisations, repos.provinces, repos.buildings)
+
+  def apply
+  (files: ResourceRepository,
+   localisation: LocalisationRepository,
+   provinces: ProvinceRepository,
+   buildings: BuildingRepository): ProvinceRepository = {
+
+    val definitions = files.getProvinceDefinitions
+    val provinceTypes = files.getProvinceTypes // default.map
+    val provincePositions = files.getProvincePositions
+    val history = files.getProvinceHistory
+
+    apply(
+      definitions,
+      provinceTypes,
+      provincePositions,
+      history,
+      localisation,
+      buildings,
+      provinces)
+  }
 
   def apply
   (definitions: Option[String],
