@@ -1,33 +1,26 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.lomicron.oikoumene.model.provinces.Region
 import com.lomicron.oikoumene.repository.api.map.RegionRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryObjectNodeRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.Try
 
 object InMemoryRegionRepository
-  extends InMemoryObjectNodeRepository
+  extends InMemoryEntityRepository[Region]
     with RegionRepository {
 
-  private val regionsByArea = mutable.TreeMap[String, ObjectNode]()
+  private val regionsByArea = mutable.TreeMap[String, Region]()
 
-  override def create(entity: ObjectNode): Try[ObjectNode] = {
+  override def create(entity: Region): Try[Region] = {
     super.create(entity).map(region => {
-      Option(region.get("areas"))
-        .map(_.asInstanceOf[ArrayNode])
-        .map(_.elements().asScala.to[Seq])
-        .getOrElse(Seq.empty)
-        .map(_.asText())
-        .foreach(regionsByArea.put(_, region))
+      region.areas.foreach(regionsByArea.put(_, region))
       region
     })
   }
 
-  override def regionOfArea(areaId: String): Option[ObjectNode] =
+  override def regionOfArea(areaId: String): Option[Region] =
     regionsByArea.get(areaId)
-
 
 }

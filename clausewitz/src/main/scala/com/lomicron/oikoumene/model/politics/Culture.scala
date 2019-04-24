@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.Entity.UNDEFINED
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper.JsonMap
 
 case class Culture
@@ -22,3 +23,5 @@ case class Culture
   @JsonCreator def this() = this(UNDEFINED)
 
 }
+
+object Culture extends FromJson[Culture]

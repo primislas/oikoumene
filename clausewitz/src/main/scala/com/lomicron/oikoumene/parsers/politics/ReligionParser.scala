@@ -2,8 +2,9 @@ package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.politics.{Religion, ReligionGroup}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.ReligionRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -20,7 +21,7 @@ object ReligionParser extends LazyLogging {
    localisation: LocalisationRepository,
    religionsRepo: ReligionRepository): ReligionRepository = {
 
-    files
+    val jsonNodes = files
       .getReligions
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -37,13 +38,19 @@ object ReligionParser extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values
+      .values.toSeq
       .map(parseReligions)
-      .foreach { case (group: ObjectNode, religions: Seq[ObjectNode]) =>
-        religionsRepo.createGroup(group)
-        religions.foreach(r => localisation.findAndSetAsLocName(r.get("id").asText(), r))
-        religionsRepo.create(religions)
-      }
+
+    val groups = jsonNodes.map(_._1)
+    val religions = jsonNodes.flatMap(_._2)
+      .map(r => localisation.findAndSetAsLocName(r.get("id").asText(), r))
+      .map(ClausewitzParser.parseColor)
+
+    ConfigField.printCaseClass("ReligionGroup", groups)
+    ConfigField.printCaseClass("Religion", religions)
+
+    groups.map(ReligionGroup.fromJson).foreach(religionsRepo.createGroup)
+    religions.map(Religion.fromJson).foreach(religionsRepo.create)
 
     religionsRepo
   }

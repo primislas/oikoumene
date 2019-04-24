@@ -2,8 +2,9 @@ package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.provinces.Terrain
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.TerrainRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -26,8 +27,11 @@ object TerrainParser extends LazyLogging {
 
     val terrainById = files.getTerrain.map(parseTerrainConf).getOrElse(Map.empty)
     val preppedTerrainById = processTerrain(terrainById)
-    val withLocalisation = preppedTerrainById.mapKVtoValue(localisation.findAndSetAsLocName)
-    withLocalisation.values.foreach(terrainRepo.create)
+    val withLocalisation = preppedTerrainById.mapKVtoValue(localisation.findAndSetAsLocName).values.toSeq
+
+    ConfigField.printCaseClass("Terrain", withLocalisation)
+
+    withLocalisation.map(Terrain.fromJson).foreach(terrainRepo.create)
 
     terrainRepo
   }
@@ -67,6 +71,6 @@ object TerrainParser extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, terrain) => patchFieldValue(terrain, idKey, TextNode.valueOf(id)))
       .mapValues(JsonMapper.renameField(_, terrainProvincesKey, provinceIdsKey))
-      .mapValues(ClausewitzParser.unwrapColor)
+      .mapValues(ClausewitzParser.parseColor)
 
 }

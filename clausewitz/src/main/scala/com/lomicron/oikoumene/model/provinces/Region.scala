@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.provinces
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.utils.json.FromJson
 
 case class Region
 (// hits = 92, isOptional = false, sample = "american_east_coast_region"
@@ -17,3 +18,5 @@ case class Region
 ) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
 }
+
+object Region extends FromJson[Region]

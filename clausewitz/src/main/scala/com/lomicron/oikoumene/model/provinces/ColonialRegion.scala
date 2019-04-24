@@ -13,6 +13,7 @@ case class ColonialRegion
  color: Color = Color.black,
  // hits = 12, isOptional = true, sample = {"name":"Colonial Cascadia"}
  localisation: Localisation = Localisation.empty,
+ provinceIds: Seq[Int] = Seq.empty,
  // hits = 12, isOptional = true, sample = [{"trigger":{"primary_culture":"russian"},"name":"COLONIAL_ALASKA_Alyeska"},{"trigger":{"OR":{"tag":["SPA","CAS","ARA"]}},"name":"COLONIAL_ALASKA_Pacifico_Norte"},{"name":"COLONIAL_CALIFORNIA_Cascadia"},{"name":"COLONIAL_ALASKA_Alaska"},{"name":"COLONIAL_REGION_New_Root_GetName"},{"name":"COLONIAL_ALASKA_Aleutia"}]
  names: Seq[JsonMap] = Seq.empty,
  // hits = 11, isOptional = true, sample = {"inuit":10,"aleutian":8}

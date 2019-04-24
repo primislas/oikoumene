@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
+import com.lomicron.oikoumene.model.provinces.Building
 import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.repository.api.map.BuildingRepository
@@ -52,7 +53,9 @@ object BuildingParser extends LazyLogging {
       })
     confs.filter(_.has(manufactoryId)).foreach(m => JsonMapper.patchMerge(m, manufactory))
 
-    buildings.foreach(buildingsRepo.create)
+    buildings
+      .map(Building.fromJson)
+      .foreach(buildingsRepo.create)
     buildingsRepo
   }
 

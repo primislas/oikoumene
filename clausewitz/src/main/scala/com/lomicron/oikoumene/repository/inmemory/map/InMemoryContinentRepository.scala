@@ -1,33 +1,27 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.model.provinces.Continent
 import com.lomicron.oikoumene.repository.api.map.ContinentRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryObjectNodeRepository
-import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 import scala.collection.mutable
 import scala.util.Try
 
 object InMemoryContinentRepository
-  extends InMemoryObjectNodeRepository
+  extends InMemoryEntityRepository[Continent]
     with ContinentRepository {
 
-  private val continentByProvince = mutable.TreeMap[String, ObjectNode]()
+  private val continentByArea = mutable.TreeMap[Int, Continent]()
 
-  override def create(entity: ObjectNode): Try[ObjectNode] = {
-    super.create(entity).map(region => {
-      region.getArray("province_ids")
-        .map(_.elements().toSeq)
-        .getOrElse(Seq.empty)
-        .map(_.asText())
-        .foreach(continentByProvince.put(_, region))
-      region
+  override def create(entity: Continent): Try[Continent] = {
+    super.create(entity).map(continent => {
+      continent.provinceIds.foreach(continentByArea.put(_, continent))
+      continent
     })
   }
 
-  override def continentOfSuperRegion(areaId: String): Option[ObjectNode] =
-    continentByProvince.get(areaId)
+  override def continentOfProvince(provinceId: Int): Option[Continent] =
+    continentByArea.get(provinceId)
 
 
 }

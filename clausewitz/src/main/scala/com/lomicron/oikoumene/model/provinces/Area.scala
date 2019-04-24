@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.provinces
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.utils.json.FromJson
 
 case class Area
 (// hits = 831, isOptional = false, sample = "adamawa_plateau_area"
@@ -13,8 +14,10 @@ case class Area
  provinceIds: Seq[Int] = Seq.empty,
  // hits = 46, isOptional = true, sample = [92,200,92]
  color: Option[Color] = None,
-) {
+) extends Entity {
 
   @JsonCreator def this() = this(Entity.UNDEFINED)
 
 }
+
+object Area extends FromJson[Area]

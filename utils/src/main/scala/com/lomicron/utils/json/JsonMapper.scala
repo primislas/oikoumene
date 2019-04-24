@@ -180,10 +180,10 @@ object JsonMapper extends LazyLogging {
     * </ul>
     *
     *
-    * @param target
-    * @param k
-    * @param update
-    * @return
+    * @param target object to which update is applied
+    * @param k field to which update is applied
+    * @param update field update
+    * @return target object with field update merged to provided field
     */
   def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = {
     if (!target.has(k)) target.set(k, update)
@@ -268,6 +268,10 @@ object JsonMapper extends LazyLogging {
 
   implicit class ArrayNodeEx(a: ArrayNode) {
     def toSeq: Seq[JsonNode] = a.elements().toSeq
+  }
+
+  implicit class ObjectNodeEx(o: ObjectNode) {
+    def setEx(field: String, value: JsonNode): ObjectNode = o.set(field, value).asInstanceOf[ObjectNode]
   }
 
 }

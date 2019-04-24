@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.provinces.SuperRegion
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.SuperRegionRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -19,7 +20,7 @@ object SuperRegionParser extends LazyLogging {
    localisation: LocalisationRepository,
    superregions: SuperRegionRepository): SuperRegionRepository = {
 
-    files
+    val jsonNodes = files
       .getSuperregions
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -37,8 +38,11 @@ object SuperRegionParser extends LazyLogging {
       .mapValues(objectNode.set(regionIdsKey, _).asInstanceOf[ObjectNode])
       .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values
-      .foreach(superregions.create)
+      .values.toSeq
+
+    ConfigField.printCaseClass("SuperRegion", jsonNodes)
+
+    jsonNodes.map(SuperRegion.fromJson).foreach(superregions.create)
 
     superregions
   }

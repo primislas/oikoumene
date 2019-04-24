@@ -36,8 +36,8 @@ object ClausewitzParser {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
-  private val startDate = Date(1444, 11, 11)
-  private val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
+  val startDate = Date(1444, 11, 11)
+  val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     parse(str, DefaultDeserializer)
@@ -71,8 +71,7 @@ object ClausewitzParser {
         event
       })
 
-    val origin = JsonMapper.objectNode(Fields.update, obj)
-    origin +: events
+    events
   }
 
   def rollUpEvents(obj: ObjectNode): ObjectNode =
@@ -84,9 +83,9 @@ object ClausewitzParser {
       .flatMap(Option(_).cast[ObjectNode])
       .filter(e => !e.has(Fields.date) || e.getObject(Fields.date).map(json2date).exists(_.compare(endDate) <= 0))
       .flatMap(_.getObject(Fields.update))
-      .foldLeft(JsonMapper.objectNode)(mergeFields)
+      .foldLeft(objectNode)(mergeFields)
 
-    val history = JsonMapper.objectNode
+    val history = objectNode
     history.set(Fields.state, state)
     history.set(Fields.events, JsonMapper.arrayNodeOf(events))
     history
@@ -94,15 +93,18 @@ object ClausewitzParser {
 
   def getEvents(history: ObjectNode): Seq[(Date, ObjectNode)] = history.fields.toSeq
     .flatMap(e => strToDate(e.getKey).map(date => (date, e.getValue)))
-    .filter(de => de._2.isInstanceOf[ObjectNode])
-    .map(de => (de._1, de._2.asInstanceOf[ObjectNode]))
+    .flatMap(de => de._2 match {
+      case node: ObjectNode => Some(de._1, node)
+      case a: ArrayNode => a.toSeq.flatMap(_.asObject).map((de._1, _))
+      case _ => None
+    })
 
   def date2json(date: Date): ObjectNode =
     JsonParser
       .objectNode
-      .put(Fields.year, date.year)
-      .put(Fields.month, date.month)
-      .put(Fields.day, date.day)
+      .setEx(Fields.year, IntNode.valueOf(date.year))
+      .setEx(Fields.month, IntNode.valueOf(date.month))
+      .setEx(Fields.day, IntNode.valueOf(date.day))
 
   def json2date(jsonDate: ObjectNode) = Date(
     jsonDate.get(Fields.year).asInt,
@@ -117,16 +119,26 @@ object ClausewitzParser {
     * @param o - incoming object that may contain a Clausewitz color field
     * @return object with the color field in Oikoumene format
     */
-  def unwrapColor(o: ObjectNode): ObjectNode = {
-    o.getArray(Fields.color).filter(_.size == 3).foreach(a => {
+  def parseColor(o: ObjectNode): ObjectNode = parseColor(o, Fields.color)
+
+  def parseColor(o: ObjectNode, colorField: String): ObjectNode = {
+    o.getArray(colorField).filter(_.size == 3).foreach(a => {
       val c = objectNode
       c.set("r", a.get(0))
       c.set("g", a.get(1))
       c.set("b", a.get(2))
 
-      o.set(Fields.color, c)
+      o.set(colorField, c)
     })
 
+    o
+  }
+
+  def parseDates(o: ObjectNode): ObjectNode = {
+    o.fields().toSeq.filter(_.getKey.endsWith("date"))
+      .filter(_.getValue.isTextual)
+      .flatMap(e => strToDateNode(e.getValue.asText()).map(date => (e.getKey, date)))
+      .foreach{ case (k, date) => o.setEx(k, date) }
     o
   }
 
@@ -135,6 +147,9 @@ object ClausewitzParser {
       Option(Date(year, month, day))
     case _ => Option.empty
   }
+
+  def strToDateNode(key: String): Option[ObjectNode] =
+    strToDate(key).map(date2json)
 
   def mergeFields(target: ObjectNode, update: ObjectNode): ObjectNode = {
     update.fields.toSeq.foreach(e => mergeField(target, e))

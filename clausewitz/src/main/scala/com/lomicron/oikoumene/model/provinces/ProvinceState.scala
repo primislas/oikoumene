@@ -50,6 +50,8 @@ case class ProvinceState
   override def next(update: ProvinceUpdate): ProvinceState =
       updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))
 
+  def development: Int = baseTax + baseProduction + baseManpower
+
   def updateOwner(v: String): ProvinceState = copy(owner = Some(v))
 
   def updateController(v: String): ProvinceState = copy(controller = Some(v))
@@ -198,7 +200,7 @@ object ProvinceState {
                              v: T,
                              f: StateUpdate[T]): ProvinceState = f(s, v)
 
-  private def nextF[T](ov: Option[T], f: StateUpdate[T]) =
+  private def nextF[T](ov: Option[T], f: StateUpdate[T]): Option[ProvinceState => ProvinceState] =
     ov.map(v => updateValue(_: ProvinceState, v, f))
 
 }

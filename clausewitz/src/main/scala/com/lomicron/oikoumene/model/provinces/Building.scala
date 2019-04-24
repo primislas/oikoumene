@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.provinces
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.Entity.UNDEFINED
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper.JsonMap
 
 case class Building
@@ -28,3 +29,5 @@ case class Building
 ) extends Entity {
   def this() = this(UNDEFINED)
 }
+
+object Building extends FromJson[Building]

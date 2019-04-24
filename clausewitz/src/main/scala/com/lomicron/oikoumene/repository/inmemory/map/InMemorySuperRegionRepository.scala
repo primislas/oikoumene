@@ -1,32 +1,26 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.lomicron.oikoumene.model.provinces.SuperRegion
 import com.lomicron.oikoumene.repository.api.map.SuperRegionRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryObjectNodeRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.Try
 
 object InMemorySuperRegionRepository
-  extends InMemoryObjectNodeRepository
+  extends InMemoryEntityRepository[SuperRegion]
     with SuperRegionRepository {
 
-  private val sRegionsByRegion = mutable.TreeMap[String, ObjectNode]()
+  private val sRegionsByRegion = mutable.TreeMap[String, SuperRegion]()
 
-  override def create(entity: ObjectNode): Try[ObjectNode] = {
-    super.create(entity).map(region => {
-      Option(region.get("region_ids"))
-        .map(_.asInstanceOf[ArrayNode])
-        .map(_.elements().asScala.to[Seq])
-        .getOrElse(Seq.empty)
-        .map(_.asText())
-        .foreach(sRegionsByRegion.put(_, region))
-      region
+  override def create(entity: SuperRegion): Try[SuperRegion] = {
+    super.create(entity).map(sr => {
+      sr.regionIds.foreach(sRegionsByRegion.put(_, sr))
+      sr
     })
   }
 
-  override def superRegionOfRegion(areaId: String): Option[ObjectNode] =
+  override def superRegionOfRegion(areaId: String): Option[SuperRegion] =
     sRegionsByRegion.get(areaId)
 
 

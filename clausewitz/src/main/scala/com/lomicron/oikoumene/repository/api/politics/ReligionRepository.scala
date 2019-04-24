@@ -1,32 +1,32 @@
 package com.lomicron.oikoumene.repository.api.politics
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.repository.api.AbstractObjectNodeRepository
+import com.lomicron.oikoumene.model.politics.{Religion, ReligionGroup}
+import com.lomicron.oikoumene.repository.api.AbstractRepository
 
 import scala.util.{Success, Try}
 
-trait ReligionRepository extends AbstractObjectNodeRepository {
+trait ReligionRepository extends AbstractRepository[String, Religion] {
 
-  def createGroup(entity: ObjectNode): Try[ObjectNode]
+  def createGroup(entity: ReligionGroup): Try[ReligionGroup]
 
-  def createGroups(entities: Seq[ObjectNode]): Seq[Try[ObjectNode]] =
+  def createGroups(entities: Seq[ReligionGroup]): Seq[Try[ReligionGroup]] =
     entities.map(createGroup)
 
-  def updateGroup(entity: ObjectNode): Try[ObjectNode]
+  def updateGroup(entity: ReligionGroup): Try[ReligionGroup]
 
-  def upsertGroup(entity: ObjectNode): Try[ObjectNode] =
+  def upsertGroup(entity: ReligionGroup): Try[ReligionGroup] =
     updateGroup(entity) match {
-      case s: Success[ObjectNode] => s
+      case s: Success[ReligionGroup] => s
       case _ => createGroup(entity)
     }
 
-  def findGroup(key: String): Try[ObjectNode]
+  def findGroup(key: String): Try[ReligionGroup]
 
-  def findAllGroups: Seq[ObjectNode]
+  def findAllGroups: Seq[ReligionGroup]
 
-  def removeGroup(key: String): Try[ObjectNode]
+  def removeGroup(key: String): Try[ReligionGroup]
 
-  def removeGroups(keys: Seq[String]): Seq[Try[ObjectNode]] =
+  def removeGroups(keys: Seq[String]): Seq[Try[ReligionGroup]] =
     keys.map(removeGroup)
 
 }

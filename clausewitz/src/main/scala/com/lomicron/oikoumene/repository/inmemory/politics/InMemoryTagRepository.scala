@@ -1,11 +1,11 @@
 package com.lomicron.oikoumene.repository.inmemory.politics
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.repository.api.politics.TagRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 case class InMemoryTagRepository()
-  extends InMemoryCrudRepository[String, ObjectNode](o => o.get("id").asText())
+  extends InMemoryEntityRepository[Tag]
   with TagRepository {
 
 }

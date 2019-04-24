@@ -1,7 +1,8 @@
 package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.politics.{Culture, CultureGroup}
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.repository.api.politics.CultureRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
@@ -19,7 +20,7 @@ object CultureParser extends LazyLogging {
    localisation: LocalisationRepository,
    cultureRepo: CultureRepository): CultureRepository = {
 
-    files
+    val groupCultures = files
       .getCultures
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -36,13 +37,27 @@ object CultureParser extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values
+      .values.toSeq
       .map(parseCultures)
-      .foreach { case (group: ObjectNode, cultures: Seq[ObjectNode]) =>
-        cultureRepo.createGroup(group)
+      .map { case (group: ObjectNode, cultures: Seq[ObjectNode]) =>
         cultures.foreach(c => localisation.findAndSetAsLocName(c.get("id").asText(), c))
-        cultureRepo.create(cultures)
+        (group, cultures)
       }
+
+    val cultures = groupCultures.flatMap(_._2)
+    ConfigField.printCaseClass("Culture", cultures)
+
+    val groups = groupCultures.map(_._1)
+    ConfigField.printCaseClass("CultureGroup", groups)
+
+    groups.map(CultureGroup.fromJson).foreach(cultureRepo.createGroup)
+    cultures.map(Culture.fromJson).foreach(cultureRepo.create)
+
+
+//      .foreach { case (group: ObjectNode, cultures: Seq[ObjectNode]) =>
+//        cultureRepo.createGroup(group)
+//        cultureRepo.create(cultures)
+//      }
 
     cultureRepo
   }

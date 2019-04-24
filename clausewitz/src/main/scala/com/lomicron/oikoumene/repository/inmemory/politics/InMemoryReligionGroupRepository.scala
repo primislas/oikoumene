@@ -1,11 +1,11 @@
 package com.lomicron.oikoumene.repository.inmemory.politics
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.model.politics.ReligionGroup
 import com.lomicron.oikoumene.repository.api.politics.ReligionGroupRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 case class InMemoryReligionGroupRepository()
-  extends InMemoryCrudRepository[String, ObjectNode](o => o.get("id").asText())
+  extends InMemoryEntityRepository[ReligionGroup]
     with ReligionGroupRepository {
 
 }

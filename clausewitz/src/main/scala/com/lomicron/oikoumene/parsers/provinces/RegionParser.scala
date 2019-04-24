@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.provinces.Region
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.RegionRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -20,7 +21,7 @@ object RegionParser extends LazyLogging {
    localisation: LocalisationRepository,
    regions: RegionRepository): RegionRepository = {
 
-    files
+    val jsonNodes = files
       .getRegions
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -37,8 +38,11 @@ object RegionParser extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, region) => patchFieldValue(region, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values
-      .foreach(regions.create)
+      .values.toSeq
+
+    ConfigField.printCaseClass("Region", jsonNodes)
+
+    jsonNodes.map(Region.fromJson).foreach(regions.create)
 
     regions
   }

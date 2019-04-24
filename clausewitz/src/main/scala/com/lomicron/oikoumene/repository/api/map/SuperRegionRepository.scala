@@ -1,10 +1,10 @@
 package com.lomicron.oikoumene.repository.api.map
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.repository.api.AbstractObjectNodeRepository
+import com.lomicron.oikoumene.model.provinces.SuperRegion
+import com.lomicron.oikoumene.repository.api.AbstractRepository
 
-trait SuperRegionRepository extends AbstractObjectNodeRepository {
+trait SuperRegionRepository extends AbstractRepository[String, SuperRegion] {
 
-  def superRegionOfRegion(regionId: String): Option[ObjectNode]
+  def superRegionOfRegion(regionId: String): Option[SuperRegion]
 
 }

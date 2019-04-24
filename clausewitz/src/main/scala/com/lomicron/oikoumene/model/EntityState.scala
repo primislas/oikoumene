@@ -1,13 +1,12 @@
 package com.lomicron.oikoumene.model
 
-// TODO see if you can rewrite it so that next was returning E
-trait EntityState[E, U] {
+trait EntityState[E <: EntityState[E, U], U] {
 
-  def next(update: U): EntityState[E, U]
+  def next(update: U): E
 
-  def next(updates: Seq[U]): EntityState[E, U] =
-    updates.foldLeft(this)(_ + _)
+  def next(updates: Seq[U]): E =
+    updates.foldLeft(this)(_ + _).asInstanceOf[E]
 
-  def +(update: U): EntityState[E, U] = next(update)
+  def +(update: U): E = next(update)
 
 }

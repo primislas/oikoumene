@@ -41,9 +41,16 @@ case class Date(lexeme: String, year: Int = 0, month: Int = 0, day: Int = 0) ext
   }
 }
 object Date {
+  val zero = Date("0.0.0", 0, 0, 0)
+
   def toString(year: Int, month: Int, day: Int): String =
 //    s"${f"$year%02d"}.${f"$month%02d"}.${f"$day%02d"}"
     s"${f"$year"}.${f"$month"}.${f"$day"}"
+
+  @JsonCreator def apply(s: String): Date = s match {
+    case Tokenizer.datePat(year, month, day) => Date(s, year.toInt, month.toInt, day.toInt)
+    case _ => Date.zero
+  }
 
   def apply(lexeme: String, year: Int, month: Int, day: Int): Date =
     new Date(lexeme, year, month, day)

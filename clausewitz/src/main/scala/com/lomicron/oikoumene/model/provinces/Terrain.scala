@@ -1,8 +1,8 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 
 case class Terrain
@@ -12,6 +12,7 @@ case class Terrain
  localisation: Localisation = Localisation.empty,
  // hits = 19, isOptional = true, sample = [255,211,110]
  color: Option[Color] = None,
+ provinceIds: Seq[Int] = Seq.empty,
  // hits = 19, isOptional = true, sample = 1.0
  movementCost: BigDecimal = 1,
  // hits = 19, isOptional = true, sample = "desert"

@@ -1,10 +1,10 @@
 package com.lomicron.oikoumene.repository.api.map
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.repository.api.AbstractObjectNodeRepository
+import com.lomicron.oikoumene.model.provinces.Continent
+import com.lomicron.oikoumene.repository.api.AbstractRepository
 
-trait ContinentRepository extends AbstractObjectNodeRepository {
+trait ContinentRepository extends AbstractRepository[String, Continent] {
 
-  def continentOfSuperRegion(areaId: String): Option[ObjectNode]
+  def continentOfProvince(provinceId: Int): Option[Continent]
 
 }

@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
+import com.lomicron.oikoumene.model.provinces.Continent
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.ContinentRepository
@@ -19,7 +20,7 @@ object ContinentParser extends LazyLogging {
    localisation: LocalisationRepository,
    continents: ContinentRepository): ContinentRepository = {
 
-    files
+    val jsonNodes = files
       .getContinents
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -37,10 +38,11 @@ object ContinentParser extends LazyLogging {
       .mapValues(objectNode.set(provinceIdsKey, _).asInstanceOf[ObjectNode])
       .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values
-      .foreach(continents.create)
+      .values.toSeq
 
-    ConfigField.printCaseClass("Continent", continents.findAll)
+    ConfigField.printCaseClass("Continent", jsonNodes)
+
+    jsonNodes.map(Continent.fromJson).foreach(continents.create)
 
     continents
   }

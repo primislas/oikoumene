@@ -1,22 +1,23 @@
 package com.lomicron.oikoumene.repository.inmemory.politics
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.model.politics.{Religion, ReligionGroup}
 import com.lomicron.oikoumene.repository.api.politics.{ReligionGroupRepository, ReligionRepository}
-import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 import scala.util.Try
 
 case class InMemoryReligionRepository(religionGroups: ReligionGroupRepository)
-  extends InMemoryCrudRepository[String, ObjectNode](o => o.get("id").asText())
+  extends InMemoryEntityRepository[Religion]
     with ReligionRepository {
 
-  override def createGroup(entity: ObjectNode): Try[ObjectNode] = religionGroups.create(entity)
+  override def createGroup(entity: ReligionGroup): Try[ReligionGroup] = religionGroups.create(entity)
 
-  override def updateGroup(entity: ObjectNode): Try[ObjectNode] = religionGroups.update(entity)
+  override def updateGroup(entity: ReligionGroup): Try[ReligionGroup] = religionGroups.update(entity)
 
-  override def findGroup(key: String): Try[ObjectNode] = religionGroups.find(key)
+  override def findGroup(key: String): Try[ReligionGroup] = religionGroups.find(key)
 
-  override def findAllGroups: Seq[ObjectNode] = religionGroups.findAll
+  override def findAllGroups: Seq[ReligionGroup] = religionGroups.findAll
 
-  override def removeGroup(key: String): Try[ObjectNode] = religionGroups.remove(key)
+  override def removeGroup(key: String): Try[ReligionGroup] = religionGroups.remove(key)
+
 }

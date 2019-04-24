@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.repository.api.politics
 
-import com.lomicron.oikoumene.repository.api.AbstractObjectNodeRepository
+import com.lomicron.oikoumene.model.politics.Tag
+import com.lomicron.oikoumene.repository.api.AbstractRepository
 
-trait TagRepository extends AbstractObjectNodeRepository
+trait TagRepository extends AbstractRepository[String, Tag]

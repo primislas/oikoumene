@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
+import com.lomicron.oikoumene.model.provinces.Area
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.AreaRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
@@ -20,7 +21,8 @@ object AreaParser extends LazyLogging {
   (files: ResourceRepository,
    localisation: LocalisationRepository,
    areaRepo: AreaRepository): AreaRepository = {
-    files
+
+    val jsonNodes = files
       .getAreas
       .map(ClausewitzParser.parse(_, BaseDeserializer))
       .map(o => {
@@ -46,9 +48,12 @@ object AreaParser extends LazyLogging {
       }
       .mapKVtoValue((id, area) => patchFieldValue(area, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .mapValues(ClausewitzParser.unwrapColor)
-      .values
-      .foreach(areaRepo.create)
+      .mapValues(ClausewitzParser.parseColor)
+      .values.toSeq
+
+    ConfigField.printCaseClass("Area", jsonNodes)
+
+    jsonNodes.map(Area.fromJson).foreach(areaRepo.create)
 
     areaRepo
   }

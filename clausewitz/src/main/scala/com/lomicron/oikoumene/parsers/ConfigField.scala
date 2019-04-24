@@ -14,41 +14,51 @@ case class ConfigField
 (field: String,
  isOptional: Boolean = true,
  valueType: String = ValueTypes.unknown,
- valueSample: Option[AnyRef] = None,
- hits: Int = 0) extends ToJson with Ordered[ConfigField] {
+ valueSample: Option[JsonNode] = None,
+ hits: Int = 0,
+ defaultValue: Option[String] = None) extends ToJson with Ordered[ConfigField] {
 
   override def compare(that: ConfigField): Int =
     if (hits != that.hits) that.hits.compareTo(hits)
     else field.compareTo(that.field)
 
+  def +(cf: ConfigField): ConfigField = copy(hits = hits + cf.hits)
+
   def caseClassCode: Seq[String] = {
     val metadata = s"// hits = $hits, isOptional = $isOptional, sample = ${JsonMapper.toJson(valueSample)}"
-
     val camelCaseField = JsonParser.camelCase(field)
-    val preciseType =
-      if (field == "localisation") "Localisation"
-      else if (field == "type") "`type`"
-      else if (valueType == ValueTypes.array) ValueTypes.array
-      else if (isOptional) {
-        if (field == "color") "Option[Color]"
-        else s"Option[$valueType]"
-      }
-      else if (field == "color") "Color"
-      else valueType
-    val defaultValue =
-      if (preciseType == "Color") "Color.black"
-      else if (preciseType == ValueTypes.array) "Seq.empty"
-      else if (field == "localisation") "Localisation.empty"
-      else if (isOptional) "None"
-      else ConfigField.getDefaultValue(valueType, field)
-
+    val (preciseType, defaultValue) = getTypeValue
     val classField = caseClassField(camelCaseField, preciseType, defaultValue)
 
     Seq(metadata, classField)
   }
 
+  private def getTypeValue: (String, String) = {
+    val preciseType =
+      if (field == "localisation") "Localisation"
+      else if (ValueTypes.isArray(valueType)) valueType
+      else if (field == "color") "Color"
+      else if (field == "date") "Date"
+      else valueType
+
+    val optType =
+      if (isOptional && !ValueTypes.isArray(preciseType) && defaultValue.isEmpty) s"Option[$preciseType]"
+      else preciseType
+
+    val dv = defaultValue.getOrElse(
+      if (optType == "Color") "Color.black"
+      else if (ValueTypes.isArray(optType)) "Seq.empty"
+      else if (field == "localisation") "Localisation.empty"
+      else if (isOptional) "None"
+      else ConfigField.getDefaultValue(valueType, field)
+    )
+
+    (optType, dv)
+  }
+
   private def caseClassField(field: String, valueType: String, defaultVal: String) =
-    s"$field: $valueType = $defaultVal,"
+    if (field == "type") s"`$field`: $valueType = $defaultVal,"
+    else s"$field: $valueType = $defaultVal,"
 
 }
 
@@ -60,45 +70,26 @@ object ConfigField extends LazyLogging {
     val array = "Seq[]"
     val boolean = "Boolean"
     val number = "Int"
+    val integer = "Int"
+    val decimal = "BigDecimal"
     val string = "String"
+
+    def arrayOf(vt: String): String = s"Seq[$vt]"
+
+    def isArray(vt: String): Boolean = vt.startsWith("Seq[")
   }
 
   def apply(entry: java.util.Map.Entry[String, JsonNode]): ConfigField =
-    ConfigField(entry.getKey, valueType = getNodeType(entry.getValue), valueSample = Option(entry.getValue))
+    ConfigField(entry.getKey.toLowerCase, valueType = getNodeType(entry.getValue), valueSample = Option(entry.getValue))
 
   def apply(entities: Seq[ObjectNode]): Seq[ConfigField] = {
-    val allFields = entities.flatMap(_.fieldNames.toStream).toSet
-    val commonFields = entities.map(_.fieldNames.toSeq.toSet).foldLeft(allFields)(_.intersect(_))
-
     entities
       .flatMap(_.fields.toStream)
       .map(ConfigField(_))
       .groupBy(_.field)
-      .mapKVtoValue((field, vals) => {
-        val types = vals.map(_.valueType).distinct
-        val valueType = if (types.size <= 0) {
-          logger.warn(s"Field $field has no identified value types")
-          "undefined"
-        } else {
-          if (types.size > 1) {
-            logger.warn(s"Field $field was identified as having multiple value types: $types")
-            val countsByType = types.groupBy(identity).mapValues(_.size)
-            countsByType.keys.foldLeft("undefined")((res, k) => {
-              val isGreater = for {
-                curr <- countsByType.get(res)
-                check <- countsByType.get(k)
-              } yield check > curr
-              if (isGreater.contains(true)) k else res
-            })
-          }
-          else types.head
-        }
-        vals.find(_.valueType == valueType).map(_.copy(hits = vals.size))
-      })
-      .values
-      .flatten
-      .toSeq
-      .map(cf => if (commonFields.contains(cf.field)) cf.copy(isOptional = false) else cf)
+      .mapKVtoValue(aggregateFieldMetadata)
+      .values.toSeq
+      .map(cf => if (cf.hits == entities.size) cf.copy(isOptional = false) else cf)
       .sorted
   }
 
@@ -108,7 +99,7 @@ object ConfigField extends LazyLogging {
   def printCaseClass(entities: Seq[ObjectNode]): Unit =
     printCaseClass("ClassName", entities)
 
-  def printCaseClass(name: String, entities: Seq[ObjectNode]) = {
+  def printCaseClass(name: String, entities: Seq[ObjectNode]): Unit = {
     printCaseClassFromConfigs(name, apply(entities))
   }
 
@@ -123,10 +114,11 @@ object ConfigField extends LazyLogging {
     println()
 
     println(s"case class $name")
-    print("(")
+    println("(")
     val id = fields.find(_.field == "id").toSeq
     val fs = id ++ fields.filter(_.field != "id")
     fs.flatMap(_.caseClassCode).foreach(println)
+    // TODO only extend entity if it has id: String and localisation
     println(") extends Entity {\n\t@JsonCreator def this() = this(Entity.UNDEFINED)\n}")
 
     println()
@@ -141,7 +133,10 @@ object ConfigField extends LazyLogging {
     case t: TextNode => if (booleans.contains(t)) ValueTypes.boolean else ValueTypes.string
     case _: BooleanNode => ValueTypes.boolean
     case _: ArrayNode => ValueTypes.array
-    case _: NumericNode => ValueTypes.number
+    case n: NumericNode =>
+      // TODO isFloatingPointNumber returns 'true' for negative values such as -1
+      if (n.isFloatingPointNumber) ValueTypes.decimal
+      else ValueTypes.number
     case _ => ValueTypes.unknown
   }
 
@@ -155,7 +150,63 @@ object ConfigField extends LazyLogging {
     case ValueTypes.boolean => "false"
     case ValueTypes.array => "Seq.empty"
     case ValueTypes.number => "0"
+    case ValueTypes.integer => "0"
+    case ValueTypes.decimal => "BigDecimal(0)"
     case _ => "None"
   }
+
+  private def aggregateFieldMetadata(field: String, vals: Seq[ConfigField]): ConfigField = {
+    val types = vals.map(_.valueType).distinct
+    val valueType: String =
+      if (types.size <= 0) {
+        logger.warn(s"Field $field has no identified value types")
+        "undefined"
+      }
+      else if (types.size == 1) {
+        val t = types.head
+        if (ValueTypes.isArray(t))
+          vals.find(_.valueSample.exists(_.isArray))
+            .flatMap(_.valueSample).map(_.get(0)).map(getNodeType).map(ValueTypes.arrayOf)
+            .getOrElse(ValueTypes.arrayOf(ValueTypes.unknown))
+        else if (ValueTypes.number == t)
+            if (vals.exists(_.valueSample.exists(_.isFloatingPointNumber))) ValueTypes.decimal
+            else ValueTypes.integer
+        else t
+      }
+      else if (types.size == 2 && types.contains(ValueTypes.array))
+        types.find(_ != ValueTypes.array).map(ValueTypes.arrayOf).get
+      else {
+        logger.warn(s"Field $field was identified as having multiple value types: $types")
+        getMostFrequentValueType(vals)
+      }
+
+    val withValueType = vals.head.copy(valueType = valueType, hits = vals.size)
+    val withDefaultValue = setDefaultValueType(withValueType, vals)
+
+    withDefaultValue
+  }
+
+  private def setDefaultValueType(cf: ConfigField, cfs: Seq[ConfigField]): ConfigField =
+    if (cf.valueType == ValueTypes.boolean) {
+      val distinctVals = cfs.flatMap(_.valueSample).distinct
+      if (distinctVals.size == 1) {
+        val v = distinctVals.head
+        if (v == BooleanNode.getFalse) cf.copy(defaultValue = Some("true"))
+        else if (v == BooleanNode.getTrue) cf.copy(defaultValue = Some("false"))
+        else cf
+      } else cf
+    } else cf
+
+  private def getMostFrequentValueType(cfs: Seq[ConfigField]): String = {
+    val countsByType = cfs.map(_.valueType).groupBy(identity).mapValues(_.size)
+    countsByType.keys.foldLeft("undefined")((res, k) => {
+      val isGreater = for {
+        curr <- countsByType.get(res)
+        check <- countsByType.get(k)
+      } yield check > curr
+      if (isGreater.contains(true) || countsByType.get(res).isEmpty) k else res
+    })
+  }
+
 
 }
