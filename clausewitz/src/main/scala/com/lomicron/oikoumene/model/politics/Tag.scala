@@ -70,4 +70,6 @@ case class Tag
 
 }
 
-object Tag extends FromJson[Tag]
+object Tag extends FromJson[Tag] {
+  val undefined = "---"
+}

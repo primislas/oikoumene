@@ -1,10 +1,8 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.provinces.Terrain
 import com.lomicron.oikoumene.repository.api.map.TerrainRepository
-import com.lomicron.oikoumene.repository.inmemory.{InMemoryEntityRepository, InMemoryObjectNodeRepository}
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 import scala.collection.mutable
 import scala.util.Try
@@ -22,4 +20,5 @@ object InMemoryTerrainRepository
     })
   }
 
+  override def setId(entity: Terrain, id: String): Terrain = entity.copy(id = id)
 }

@@ -23,5 +23,5 @@ object InMemorySuperRegionRepository
   override def superRegionOfRegion(areaId: String): Option[SuperRegion] =
     sRegionsByRegion.get(areaId)
 
-
+  override def setId(entity: SuperRegion, id: String): SuperRegion = entity.copy(id = id)
 }

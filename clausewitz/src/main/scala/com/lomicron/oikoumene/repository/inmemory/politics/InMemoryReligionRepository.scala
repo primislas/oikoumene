@@ -20,4 +20,6 @@ case class InMemoryReligionRepository(religionGroups: ReligionGroupRepository)
 
   override def removeGroup(key: String): Try[ReligionGroup] = religionGroups.remove(key)
 
+  override def setId(entity: Religion, id: String): Religion = entity.copy(id = id)
+
 }

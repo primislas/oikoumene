@@ -8,4 +8,6 @@ case class InMemoryCultureGroupRepository()
   extends InMemoryEntityRepository[CultureGroup]
     with CultureGroupRepository {
 
+  override def setId(entity: CultureGroup, id: String): CultureGroup = entity.copy(id = id)
+
 }

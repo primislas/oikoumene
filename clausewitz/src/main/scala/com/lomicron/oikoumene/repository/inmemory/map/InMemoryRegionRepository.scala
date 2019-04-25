@@ -23,4 +23,6 @@ object InMemoryRegionRepository
   override def regionOfArea(areaId: String): Option[Region] =
     regionsByArea.get(areaId)
 
+  override def setId(entity: Region, id: String): Region = entity.copy(id = id)
+
 }

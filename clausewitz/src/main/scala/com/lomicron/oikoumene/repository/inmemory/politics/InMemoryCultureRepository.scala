@@ -20,4 +20,6 @@ case class InMemoryCultureRepository(cultureGroups: CultureGroupRepository)
 
   override def removeGroup(key: String): Try[CultureGroup] = cultureGroups.remove(key)
 
+  override def setId(entity: Culture, id: String): Culture = entity.copy(id = id)
+
 }

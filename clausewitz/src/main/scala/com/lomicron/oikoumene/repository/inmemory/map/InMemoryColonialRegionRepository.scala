@@ -23,5 +23,6 @@ object InMemoryColonialRegionRepository
   override def colonialRegionOfProvince(provinceId: Int): Option[ColonialRegion] =
     cRegionsByProvince.get(provinceId)
 
+  override def setId(entity: ColonialRegion, id: String): ColonialRegion = entity.copy(id = id)
 
 }

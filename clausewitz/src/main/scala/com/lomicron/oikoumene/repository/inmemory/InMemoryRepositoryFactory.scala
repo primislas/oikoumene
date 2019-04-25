@@ -13,6 +13,7 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   private val localisation: LocalisationRepository = InMemoryLocalisationRepository(files)
 
   private val tagRepo: TagRepository = InMemoryTagRepository()
+  private val diplomacyRepo: DiplomacyRepository = InMemoryDiplomacyRepository()
   private val cultureGroupRepo: CultureGroupRepository = InMemoryCultureGroupRepository()
   private val cultureRepo: CultureRepository = InMemoryCultureRepository(cultureGroupRepo)
   private val religionGroupRepo: ReligionGroupRepository = InMemoryReligionGroupRepository()
@@ -34,6 +35,8 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   override def cultures: CultureRepository = cultureRepo
 
   override def religions: ReligionRepository = religionRepo
+
+  override def diplomacy: DiplomacyRepository = diplomacyRepo
 
   override def provinces: ProvinceRepository = provinceRepo
 
