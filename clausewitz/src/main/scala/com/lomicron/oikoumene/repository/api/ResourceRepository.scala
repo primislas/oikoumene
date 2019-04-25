@@ -28,6 +28,8 @@ trait ResourceRepository {
     */
   def getCountryHistory: Map[String, String]
 
+  def getDiplomaticRelations: Map[String, String]
+
   def getProvinceDefinitions: Option[String]
 
   def getProvinceHistory: Map[Int, String]

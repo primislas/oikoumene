@@ -271,7 +271,16 @@ object JsonMapper extends LazyLogging {
   }
 
   implicit class ObjectNodeEx(o: ObjectNode) {
+
     def setEx(field: String, value: JsonNode): ObjectNode = o.set(field, value).asInstanceOf[ObjectNode]
+
+    def setEx(field: String, value: String): ObjectNode = setEx(field, textNode(value))
+
+    def removeEx(field: String): ObjectNode = {
+      o.remove(field)
+      o
+    }
+
   }
 
 }
