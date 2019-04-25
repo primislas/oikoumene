@@ -8,4 +8,6 @@ case class InMemoryTagRepository()
   extends InMemoryEntityRepository[Tag]
   with TagRepository {
 
+  override def setId(entity: Tag, id: String): Tag = entity.copy(id = id)
+
 }

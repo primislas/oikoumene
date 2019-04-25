@@ -8,4 +8,6 @@ object InMemoryClimateRepository
   extends InMemoryEntityRepository[Climate]
     with ClimateRepository {
 
+  override def setId(entity: Climate, id: String): Climate = entity.copy(id = id)
+
 }

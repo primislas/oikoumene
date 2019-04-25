@@ -7,16 +7,16 @@ import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAI
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
-import com.fasterxml.jackson.databind.node._
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.node._
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-
-import collection.JavaConverters._
-import scala.util.Try
 import com.lomicron.utils.collection.CollectionUtils._
 import com.typesafe.scalalogging.LazyLogging
+
+import scala.collection.JavaConverters._
+import scala.util.Try
 
 object JsonMapper extends LazyLogging {
 

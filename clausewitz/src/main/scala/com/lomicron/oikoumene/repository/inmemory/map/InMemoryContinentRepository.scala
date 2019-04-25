@@ -23,5 +23,6 @@ object InMemoryContinentRepository
   override def continentOfProvince(provinceId: Int): Option[Continent] =
     continentByArea.get(provinceId)
 
+  override def setId(entity: Continent, id: String): Continent = entity.copy(id = id)
 
 }

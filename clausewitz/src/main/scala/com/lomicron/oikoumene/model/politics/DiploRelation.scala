@@ -17,11 +17,15 @@ case class DiploRelation
   second: Option[String] = None,
   // relation end date
   endDate: Option[Date] = None,
+  // only tributary_state in vanilla
   subjectType: Option[String] = None,
+  tradeLeague: Option[Int] = None,
   sourceFile: Option[String] = None,
 ) {
 
   @JsonCreator def this() = this(None, DiploRelationType.undefined, Tag.undefined, Date.zero)
+
+  def isActiveAt(date: Date): Boolean = startDate <= date && (endDate.exists(_ > date) || endDate.isEmpty)
 
 }
 
@@ -37,7 +41,7 @@ object DiploRelationType {
   val union = "union"
   val dependency = "dependency"
 
-  val celestialEmperor = "celestialEmperor"
+  val celestialEmperor = "celestial_emperor"
   val hreEmperor = "emperor"
 
   val undefined = "undefined"

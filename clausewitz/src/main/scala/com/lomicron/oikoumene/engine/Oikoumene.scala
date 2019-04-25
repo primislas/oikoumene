@@ -18,12 +18,12 @@ object Oikoumene extends LazyLogging {
 
     val repos = InMemoryRepositoryFactory(gameDir, modDir)
 
-//    val tags = TagParser(repos)
-//    val buildings = BuildingParser(repos)
-//    val provinces = ProvinceParser(repos)
-//    val geograpy = GeographyParser(repos)
-//    val religions = ReligionParser(repos)
-//    val cultures = CultureParser(repos)
+    val tags = TagParser(repos)
+    val buildings = BuildingParser(repos)
+    val provinces = ProvinceParser(repos)
+    val geography = GeographyParser(repos)
+    val religions = ReligionParser(repos)
+    val cultures = CultureParser(repos)
     val diplomacy = DiplomacyParser(repos)
 
     logger.info("Bye")

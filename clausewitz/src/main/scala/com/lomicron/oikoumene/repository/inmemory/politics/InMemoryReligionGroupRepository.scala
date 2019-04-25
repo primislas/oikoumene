@@ -8,4 +8,6 @@ case class InMemoryReligionGroupRepository()
   extends InMemoryEntityRepository[ReligionGroup]
     with ReligionGroupRepository {
 
+  override def setId(entity: ReligionGroup, id: String): ReligionGroup = entity.copy(id = id)
+
 }
