@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.repository.inmemory.politics
 
-import com.lomicron.oikoumene.model.politics.DiploRelation
+import com.lomicron.oikoumene.model.diplomacy.DiploRelation
 import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 

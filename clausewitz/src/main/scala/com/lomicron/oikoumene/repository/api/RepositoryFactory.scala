@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.repository.api
 
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, DiplomacyRepository, ReligionRepository, TagRepository}
+import com.lomicron.oikoumene.repository.api.politics._
 
 trait RepositoryFactory {
 
@@ -12,6 +12,7 @@ trait RepositoryFactory {
   def cultures: CultureRepository
   def religions: ReligionRepository
   def diplomacy: DiplomacyRepository
+  def warHistory: WarHistoryRepository
 
   def provinces: ProvinceRepository
   def buildings: BuildingRepository

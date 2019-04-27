@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.engine
 import java.nio.file.Paths
 
 import com.lomicron.oikoumene.model.map.Tile
-import com.lomicron.oikoumene.parsers.politics.{CultureParser, DiplomacyParser, ReligionParser, TagParser}
+import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -18,13 +18,14 @@ object Oikoumene extends LazyLogging {
 
     val repos = InMemoryRepositoryFactory(gameDir, modDir)
 
-    val tags = TagParser(repos)
-    val buildings = BuildingParser(repos)
-    val provinces = ProvinceParser(repos)
-    val geography = GeographyParser(repos)
-    val religions = ReligionParser(repos)
-    val cultures = CultureParser(repos)
-    val diplomacy = DiplomacyParser(repos)
+//    val tags = TagParser(repos)
+//    val buildings = BuildingParser(repos)
+//    val provinces = ProvinceParser(repos)
+//    val geography = GeographyParser(repos)
+//    val religions = ReligionParser(repos)
+//    val cultures = CultureParser(repos)
+//    val diplomacy = DiplomacyParser(repos)
+    val wars = WarHistoryParser(repos)
 
     logger.info("Bye")
   }

@@ -36,8 +36,6 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
 
   override def religions: ReligionRepository = religionRepo
 
-  override def diplomacy: DiplomacyRepository = diplomacyRepo
-
   override def provinces: ProvinceRepository = provinceRepo
 
   override def buildings: BuildingRepository = buildingRepo
@@ -47,5 +45,9 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   override def regions: RegionRepository = regionRepo
 
   override def superregions: SuperRegionRepository = superregionRepo
+
+  override def diplomacy: DiplomacyRepository = diplomacyRepo
+
+  override def warHistory: WarHistoryRepository = null
 
 }

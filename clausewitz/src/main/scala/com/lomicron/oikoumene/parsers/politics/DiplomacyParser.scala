@@ -1,8 +1,8 @@
 package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
-import com.lomicron.oikoumene.model.politics.DiploRelation
-import com.lomicron.oikoumene.model.politics.DiploRelationType.{celestialEmperor, hreEmperor}
+import com.lomicron.oikoumene.model.diplomacy.DiploRelation
+import com.lomicron.oikoumene.model.diplomacy.DiploRelationType._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
@@ -23,7 +23,7 @@ object DiplomacyParser extends LazyLogging {
       .getDiplomaticRelations
       .mapValues(ClausewitzParser.parse)
       .mapValues(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing religion: ${o._2}")
+        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing diplomatic history: ${o._2}")
         parseRelationConfigFile(o._1)
       })
       .mapKVtoValue((filename, rels) => rels.map(_.setEx("source_file", filename)))
