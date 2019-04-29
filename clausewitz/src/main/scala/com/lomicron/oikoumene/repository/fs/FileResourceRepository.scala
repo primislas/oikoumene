@@ -21,6 +21,7 @@ case class FileResourceRepository
   val countryHistoryDir = "history/countries"
   val diploHistoryDir = "history/diplomacy"
   val warHistoryDir = "history/wars"
+  val warGoalTypesDir = "common/wargoal_types"
 
   val provinceDefinitionsFile = "map/definition.csv"
   val provinceTypesFile = "map/default.map"
@@ -56,6 +57,9 @@ case class FileResourceRepository
 
   override def getWarHistory: Map[String, String] =
     readSourceDir(warHistoryDir)
+
+  override def getWarGoalTypes: Map[String, String] =
+    readSourceDir(warGoalTypesDir)
 
   private def filenameToTag(str: String) =
     str.take(3).mkString

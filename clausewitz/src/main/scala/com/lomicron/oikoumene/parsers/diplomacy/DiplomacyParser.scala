@@ -1,13 +1,13 @@
-package com.lomicron.oikoumene.parsers.politics
+package com.lomicron.oikoumene.parsers.diplomacy
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.oikoumene.model.diplomacy.DiploRelation
-import com.lomicron.oikoumene.model.diplomacy.DiploRelationType._
+import com.lomicron.oikoumene.model.diplomacy.DiploRelationType.{celestialEmperor, hreEmperor}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.utils.json.JsonMapper.{textNode, _}
 import com.typesafe.scalalogging.LazyLogging
 
 object DiplomacyParser extends LazyLogging {

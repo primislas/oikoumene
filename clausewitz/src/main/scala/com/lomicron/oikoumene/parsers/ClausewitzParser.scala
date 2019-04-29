@@ -10,8 +10,11 @@ import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.ParsingError
 import com.lomicron.utils.parsing.serialization.{DefaultDeserializer, Deserializer}
 import com.lomicron.utils.parsing.tokenizer.{Date, Tokenizer}
+import com.typesafe.scalalogging.LazyLogging
 
-object ClausewitzParser {
+import scala.annotation.tailrec
+
+object ClausewitzParser extends LazyLogging {
 
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
@@ -74,6 +77,45 @@ object ClausewitzParser {
     events
   }
 
+  def parseFilesAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
+    parseFiles(filesByName, o => Seq(o))
+
+  def parseFileFieldsAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
+    parseFiles(filesByName, parseValuesAsEntities)
+
+  private def parseFiles
+  (filesByName: Map[String, String],
+   fileParser: ObjectNode => Seq[ObjectNode])
+  : Seq[ObjectNode] =
+    filesByName
+      .mapValues(parse)
+      .mapKVtoValue((filename, o) => {
+        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing $filename: ${o._2}")
+        fileParser(o._1)
+      })
+      .mapKVtoValue((filename, entities) => entities.map(_.setEx("source_file", filename)))
+      .values.toList.flatten
+
+  /**
+    * Treats root object fields as ids of entities configure
+    * at those fields. Returns those entities with root fields
+    * set as 'id' field.
+    *
+    * @param obj object where separate fields are actually separate entities
+    * @return
+    */
+  def parseValuesAsEntities(obj: ObjectNode): Seq[ObjectNode] =
+    parseValuesAsEntities(obj, Some("id"))
+
+  def parseValuesAsEntities(objectNode: ObjectNode, setFieldAs: Option[String]): Seq[ObjectNode] = {
+    objectNode.fields().toSeq.filter(_.getValue.isObject).map(e => {
+      val (field, obj) = (e.getKey, e.getValue.asInstanceOf[ObjectNode])
+      setFieldAs.foreach(obj.setEx(_, field))
+      obj
+    })
+  }
+
+
   def rollUpEvents(obj: ObjectNode): ObjectNode =
     rollUpEvents(obj, endDate)
 
@@ -116,7 +158,7 @@ object ClausewitzParser {
     * which is normally an array of 3 int values (RGB),
     * wit Oikoumene color representation.
     *
-    * @param o - incoming object that may contain a Clausewitz color field
+    * @param o incoming object that may contain a Clausewitz color field
     * @return object with the color field in Oikoumene format
     */
   def parseColor(o: ObjectNode): ObjectNode = parseColor(o, Fields.color)
@@ -138,7 +180,7 @@ object ClausewitzParser {
     o.fields().toSeq.filter(_.getKey.endsWith("date"))
       .filter(_.getValue.isTextual)
       .flatMap(e => strToDateNode(e.getValue.asText()).map(date => (e.getKey, date)))
-      .foreach{ case (k, date) => o.setEx(k, date) }
+      .foreach { case (k, date) => o.setEx(k, date) }
     o
   }
 
@@ -185,4 +227,18 @@ object ClausewitzParser {
   def pluralFieldNameFromPrefix(field: String, prefix: String): String =
     s"${fieldNameWithoutPrefix(field, prefix)}s"
 
+  def parseNestedConditions(triggers: Seq[ObjectNode]): Seq[ObjectNode] = {
+
+    @tailrec def rec(unchecked: Seq[ObjectNode], checked: Seq[ObjectNode]): Seq[ObjectNode] = {
+      val nots = unchecked.flatMap(_.getObject("NOT"))
+      val ors = unchecked.flatMap(_.getObject("OR"))
+      val ands = unchecked.flatMap(_.getObject("AND"))
+      val nestedTriggers = ors ++ ands ++ nots
+
+      if (nestedTriggers.isEmpty) checked ++ unchecked
+      else rec(nestedTriggers, checked ++ unchecked)
+    }
+
+    rec(triggers, Seq.empty)
+  }
 }

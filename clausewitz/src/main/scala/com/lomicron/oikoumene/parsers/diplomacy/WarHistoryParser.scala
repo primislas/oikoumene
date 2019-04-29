@@ -1,12 +1,10 @@
-package com.lomicron.oikoumene.parsers.politics
+package com.lomicron.oikoumene.parsers.diplomacy
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.diplomacy.War
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.WarHistoryRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
-import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 
@@ -19,15 +17,9 @@ object WarHistoryParser extends LazyLogging {
    warRepo: WarHistoryRepository
   ): WarHistoryRepository = {
 
-    val wars = files
-      .getWarHistory
-      .mapValues(ClausewitzParser.parse)
-      .mapValues(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing war history: ${o._2}")
-        parseWarConfigFile(o._1)
-      })
-      .mapKVtoValue((filename, war) => war.setEx("source_file", filename))
-      .values.toList
+    val wars = ClausewitzParser
+      .parseFilesAsEntities(files.getWarGoalTypes)
+      .map(parseWarConfig)
 
     val events = wars.flatMap(_.getArray("events")).flatMap(_.toSeq).flatMap(_.asObject)
     val battles = events.flatMap(_.getObject("battle"))
@@ -44,9 +36,9 @@ object WarHistoryParser extends LazyLogging {
     warRepo
   }
 
-  def parseWarConfigFile(config: ObjectNode): ObjectNode = {
+  def parseWarConfig(config: ObjectNode): ObjectNode = {
     val events = ClausewitzParser.parseEvents(config)
-    config.setEx("events", JsonMapper.arrayNodeOf(events))
+    config.setEx("events", arrayNodeOf(events))
   }
 
 }
