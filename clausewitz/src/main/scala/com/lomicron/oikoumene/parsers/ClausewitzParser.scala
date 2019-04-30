@@ -273,14 +273,14 @@ object ClausewitzParser extends LazyLogging {
   def parseNestedConditions(triggers: Seq[ObjectNode]): Seq[ObjectNode] = {
 
     @tailrec def rec(unchecked: Seq[ObjectNode], checked: Seq[ObjectNode]): Seq[ObjectNode] = {
-      val nots = unchecked.flatMap(_.getObject("NOT"))
-      val ors = unchecked.flatMap(_.getObject("OR"))
-      val ands = unchecked.flatMap(_.getObject("AND"))
+      val nots = unchecked.flatMap(_.getSeqOfObjects("NOT"))
+      val ors = unchecked.flatMap(_.getSeqOfObjects("OR"))
+      val ands = unchecked.flatMap(_.getSeqOfObjects("AND"))
       val froms = unchecked.flatMap(_.getObject("FROM"))
-      val modifArrays = unchecked.flatMap(_.getArray("modifier")).flatMap(_.toSeq).flatMap(_.asObject)
-      val modifObjs = unchecked.flatMap(_.getObject("modifier"))
-      val modifiers = modifArrays ++ modifObjs
-      val nestedTriggers = ors ++ ands ++ nots ++ froms ++ modifiers
+      val modifiers = unchecked.flatMap(_.getSeqOfObjects("modifier"))
+      val owners = unchecked.flatMap(_.getObject("owner"))
+      val controllers = unchecked.flatMap(_.getObject("controller"))
+      val nestedTriggers = ors ++ ands ++ nots ++ froms ++ modifiers ++ owners ++ controllers
 
       if (nestedTriggers.isEmpty) checked ++ unchecked
       else rec(nestedTriggers, checked ++ unchecked)
