@@ -58,10 +58,8 @@ object DiplomacyParser extends LazyLogging {
       .map(parseCelestialEmperor)
 
   def parseRelation(k: String, o: ObjectNode): ObjectNode =
-    ClausewitzParser
-      .strToDateNode(k)
-      .map(d => o.setEx("start_date", d))
-      .getOrElse(o.setEx("type", k))
+    if (ClausewitzParser.isDate(k)) o.setEx("start_date", k)
+    else o.setEx("type", k)
 
   def parseHreEmperor(o: ObjectNode): ObjectNode =
     if (o.has(hreEmperor))

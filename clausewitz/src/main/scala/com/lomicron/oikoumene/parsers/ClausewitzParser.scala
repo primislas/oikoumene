@@ -61,7 +61,7 @@ object ClausewitzParser extends LazyLogging {
       .map(dm => {
         val (date, event) = dm
         obj.remove(date.lexeme)
-        event.set(Fields.date, date2json(date))
+        event.setEx(Fields.date, date.lexeme)
 
         // cleaning up
         if (event.has(tradeGoods)) {
@@ -131,9 +131,9 @@ object ClausewitzParser extends LazyLogging {
     * Looks for localisation entry by id taken from provided
     * objects field, and sets it to "localisation" field if found.
     *
-    * @param o object that might have localisation
+    * @param o     object that might have localisation
     * @param field object's field with localisation id
-    * @param l localisation repository
+    * @param l     localisation repository
     * @return object with localisation field if localisation is found
     */
   def setLocalisationByField(o: ObjectNode, field: String, l: LocalisationRepository): ObjectNode =
@@ -215,6 +215,26 @@ object ClausewitzParser extends LazyLogging {
 
   def strToDateNode(key: String): Option[ObjectNode] =
     strToDate(key).map(date2json)
+
+  def isDate(n: JsonNode): Boolean = n match {
+    case t: TextNode => isDate(t.asText)
+    case o: ObjectNode =>
+      (o.has(Fields.year) && o.get(Fields.year).isInt
+        && o.has(Fields.month) && o.get(Fields.month).isInt
+        && o.has(Fields.day) && o.get(Fields.day).isInt)
+    case _ => false
+  }
+
+  def isDate(s: String): Boolean = s.matches(Tokenizer.datePat.pattern.pattern())
+
+  def isColor(n: JsonNode): Boolean = n match {
+    case a: ArrayNode => a.size() == 3 && a.toSeq.forall(_.isInt)
+    case o: ObjectNode =>
+      (o.has("r") && o.get("r").isInt
+        && o.has("g") && o.get("g").isInt
+        && o.has("b") && o.get("b").isInt)
+    case _ => false
+  }
 
   def mergeFields(target: ObjectNode, update: ObjectNode): ObjectNode = {
     update.fields.toSeq.foreach(e => mergeField(target, e))

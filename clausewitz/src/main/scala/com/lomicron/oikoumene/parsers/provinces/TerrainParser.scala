@@ -71,6 +71,5 @@ object TerrainParser extends LazyLogging {
       .mapValues(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, terrain) => patchFieldValue(terrain, idKey, TextNode.valueOf(id)))
       .mapValues(JsonMapper.renameField(_, terrainProvincesKey, provinceIdsKey))
-      .mapValues(ClausewitzParser.parseColor)
 
 }

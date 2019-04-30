@@ -48,7 +48,6 @@ object AreaParser extends LazyLogging {
       }
       .mapKVtoValue((id, area) => patchFieldValue(area, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
-      .mapValues(ClausewitzParser.parseColor)
       .values.toSeq
 
     ConfigField.printCaseClass("Area", jsonNodes)

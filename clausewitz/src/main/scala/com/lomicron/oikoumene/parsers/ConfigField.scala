@@ -84,13 +84,15 @@ object ConfigField extends LazyLogging {
     val hasId = fields.exists(cf => cf.field == "id" && !cf.isOptional && cf.valueType == ValueTypes.string)
     val hasLocalisation = fields.exists(cf => cf.field == "localisation")
     val isEntity = hasId && hasLocalisation
+    val usesEntityConstant = fields.exists(cf => cf.defaultValue.contains("Entity.UNDEFINED"))
+    val importsEntity = isEntity || usesEntityConstant
     val hasColor = fields.exists(_.field == "color")
 
     println("import com.fasterxml.jackson.annotation.JsonCreator")
 
-    if (hasColor && isEntity)
+    if (hasColor && importsEntity)
       println("import com.lomicron.oikoumene.model.{Color, Entity}")
-    else if (isEntity)
+    else if (importsEntity)
       println("import com.lomicron.oikoumene.model.Entity")
     else if (hasColor)
       println("import com.lomicron.oikoumene.model.Color")
@@ -163,7 +165,7 @@ object ConfigField extends LazyLogging {
             .flatMap(_.valueSample).map(_.get(0)).map(getNodeType).map(ValueTypes.arrayOf)
             .getOrElse(ValueTypes.arrayOf(ValueTypes.unknown))
         else if (ValueTypes.number == t)
-          // TODO isFloatingPointNumber seems to return unexpected result, investigate
+        // TODO isFloatingPointNumber seems to return unexpected result, investigate
           if (vals.exists(_.valueSample.exists(_.isFloatingPointNumber))) ValueTypes.decimal
           else ValueTypes.integer
         else t
@@ -181,12 +183,12 @@ object ConfigField extends LazyLogging {
       }
 
     val withValueType = vals.head.copy(valueType = valueType, hits = vals.size)
-    val withDefaultValue = setDefaultValueType(withValueType, vals)
+    val withDefaultValue = setDefaultValue(withValueType, vals)
 
     withDefaultValue
   }
 
-  private def setDefaultValueType(cf: ConfigField, cfs: Seq[ConfigField]): ConfigField =
+  private def setDefaultValue(cf: ConfigField, cfs: Seq[ConfigField]): ConfigField =
     if (cf.valueType == ValueTypes.boolean) {
       val distinctVals = cfs.flatMap(_.valueSample).distinct
       if (distinctVals.size == 1) {
@@ -196,11 +198,40 @@ object ConfigField extends LazyLogging {
         else cf
       } else cf.copy(valueType = "Option[Boolean]", defaultValue = Some("None"))
     }
-    // TODO parse string fields to Date if all values match date pattern
-    else {
-      val (preciseType, defaultVal) = evalDefaultValue(cf)
-      cf.copy(valueType = preciseType, defaultValue = Option(defaultVal))
+    else if (cf.valueType == ValueTypes.string)
+      asDate(cf, cfs).getOrElse(evalAndSetDefaultValue(cf))
+    else if (cf.valueType == ValueTypes.`object`)
+      asDate(cf, cfs).orElse(asColor(cf, cfs)).getOrElse(evalAndSetDefaultValue(cf))
+    else if (ValueTypes.isArray(cf.valueType))
+      asColor(cf, cfs).getOrElse(evalAndSetDefaultValue(cf))
+    else evalAndSetDefaultValue(cf)
+
+  private def asDate(cf: ConfigField, cfs: Seq[ConfigField]): Option[ConfigField] = {
+    val isDate = cfs.flatMap(_.valueSample).forall(ClausewitzParser.isDate)
+    if (isDate) {
+      val d =
+        if (cf.isOptional) cf.copy(valueType = "Option[Date]", defaultValue = Option("None"))
+        else cf.copy(valueType = "Date", defaultValue = Option("Date.zero"))
+      Some(d)
     }
+    else None
+  }
+
+  private def asColor(cf: ConfigField, cfs: Seq[ConfigField]): Option[ConfigField] = {
+    val isColor = cfs.flatMap(_.valueSample).forall(ClausewitzParser.isColor)
+    if (isColor) {
+      val d =
+        if (cf.isOptional) cf.copy(valueType = "Option[Color]", defaultValue = Option("None"))
+        else cf.copy(valueType = "Color", defaultValue = Option("Color.black"))
+      Some(d)
+    }
+    else None
+  }
+
+  private def evalAndSetDefaultValue(cf: ConfigField): ConfigField = {
+    val (preciseType, defaultVal) = evalDefaultValue(cf)
+    cf.copy(valueType = preciseType, defaultValue = Option(defaultVal))
+  }
 
   private def evalDefaultValue(cf: ConfigField): (String, String) = {
     val preciseType =
@@ -226,7 +257,7 @@ object ConfigField extends LazyLogging {
     (optType, dv)
   }
 
-  private val typesWithEmptyObjects = Set("Localisation", "Date", "Color")
+  private val typesWithEmptyObjects = Set("Localisation", "Color")
 
   private def getMostFrequentValueType(cfs: Seq[ConfigField]): String = {
     val countsByType = cfs.map(_.valueType).groupBy(identity).mapValues(_.size)

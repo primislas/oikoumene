@@ -40,7 +40,6 @@ object ColonialRegionParser extends LazyLogging {
       .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
-      .map(ClausewitzParser.parseColor)
 
     ConfigField.printCaseClass("ColonialRegion", jsonNodes)
 
