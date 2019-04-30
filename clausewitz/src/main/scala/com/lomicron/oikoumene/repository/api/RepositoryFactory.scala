@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.repository.api
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
+import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
 
@@ -12,6 +13,8 @@ trait RepositoryFactory {
   def tags: TagRepository
   def cultures: CultureRepository
   def religions: ReligionRepository
+
+  def ideas: IdeaGroupRepository
 
   def diplomacy: DiplomacyRepository
   def warHistory: WarHistoryRepository

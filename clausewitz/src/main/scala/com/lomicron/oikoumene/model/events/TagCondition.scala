@@ -14,6 +14,13 @@ case class TagCondition
   // hits = 27, isOptional = true, sample = {"government":"monarchy","is_subject":false}
   from: Option[TagCondition] = None,
 
+  // triggers also have factor and modifier fields,
+  // but other than that they appear to be ordinary tag conditions
+  // hits = 72, isOptional = true, sample = 0.45
+  factor: Option[BigDecimal] = None,
+  // hits = 13, isOptional = true, sample = {"factor":0.5,"is_subject":true}
+  modifier: Seq[TagCondition] = Seq.empty,
+
   // hits = 35, isOptional = true, sample = false
   isRevolutionTarget: Option[Boolean] = None,
 
@@ -65,7 +72,7 @@ case class TagCondition
   isTradeLeagueLeader: Option[Boolean] = None,
   // hits = 2, isOptional = true, sample = "FROM"
   juniorUnionWith: Option[String] = None,
-  // hits = 2, isOptional = true, sample = 2
+  // hits = 9, isOptional = true, sample = 2
   numOfCities: Option[Int] = None,
   // hits = 2, isOptional = true, sample = {"trade_league_embargoed_by":"FROM"}
   root: Option[Object] = None,
@@ -135,6 +142,29 @@ case class TagCondition
   successionClaim: Option[String] = None,
   // hits = 1, isOptional = true, sample = ["ENG","GBR"]
   tag: Seq[String] = Seq.empty,
+
+
+  // hits = 6, isOptional = true, sample = 5
+  numOfPorts: Option[Int] = None,
+  // hits = 3, isOptional = true, sample = "humanist_ideas"
+  hasIdeaGroup: Option[String] = None,
+  // hits = 3, isOptional = true, sample = true
+  isTribal: Option[Boolean] = None,
+  // hits = 3, isOptional = true, sample = true
+  primitives: Option[Boolean] = None,
+  // hits = 3, isOptional = true, sample = "high_american"
+  technologyGroup: Seq[String] = Seq.empty,
+  // hits = 3, isOptional = true, sample = 2
+  vassal: Option[Int] = None,
+  // hits = 2, isOptional = true, sample = 5
+  inflation: Option[Int] = None,
+  // hits = 2, isOptional = true, sample = true
+  isColonialNation: Option[Boolean] = None,
+  // hits = 1, isOptional = true, sample = "is_merchant_republic"
+  hasGovernmentAttribute: Option[String] = None,
+  // hits = 1, isOptional = true, sample = 1490
+  isYear: Option[Int] = None,
+
 ) {
   @JsonCreator def this() = this(None)
 }

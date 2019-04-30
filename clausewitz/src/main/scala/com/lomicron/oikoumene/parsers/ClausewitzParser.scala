@@ -277,7 +277,10 @@ object ClausewitzParser extends LazyLogging {
       val ors = unchecked.flatMap(_.getObject("OR"))
       val ands = unchecked.flatMap(_.getObject("AND"))
       val froms = unchecked.flatMap(_.getObject("FROM"))
-      val nestedTriggers = ors ++ ands ++ nots ++ froms
+      val modifArrays = unchecked.flatMap(_.getArray("modifier")).flatMap(_.toSeq).flatMap(_.asObject)
+      val modifObjs = unchecked.flatMap(_.getObject("modifier"))
+      val modifiers = modifArrays ++ modifObjs
+      val nestedTriggers = ors ++ ands ++ nots ++ froms ++ modifiers
 
       if (nestedTriggers.isEmpty) checked ++ unchecked
       else rec(nestedTriggers, checked ++ unchecked)

@@ -64,6 +64,8 @@ trait ResourceRepository {
 
   def getReligions: Option[String]
 
+  def getIdeas: Map[String, String]
+
   object SupportedLanguages {
     val english = "english"
     val german = "german"

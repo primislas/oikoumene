@@ -280,6 +280,8 @@ object JsonMapper extends LazyLogging {
 
     def setEx(field: String, value: String): ObjectNode = setEx(field, textNode(value))
 
+    def setEx(field: String, a: Seq[JsonNode]): ObjectNode = setEx(field, arrayNodeOf(a))
+
     def removeEx(field: String): ObjectNode = {
       o.remove(field)
       o

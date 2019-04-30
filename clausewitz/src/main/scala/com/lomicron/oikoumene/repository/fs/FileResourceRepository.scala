@@ -25,6 +25,8 @@ case class FileResourceRepository
   val warGoalTypesDir = "common/wargoal_types"
   val casusBelliTypesDir = "common/cb_types"
 
+  val ideasDir = "common/ideas"
+
   val provinceDefinitionsFile = "map/definition.csv"
   val provinceTypesFile = "map/default.map"
   val provincePositionsFile = "map/positions.txt"
@@ -164,6 +166,9 @@ case class FileResourceRepository
 
   override def getReligions: Option[String] =
     readSourceFileContent(religionsFile)
+
+  override def getIdeas: Map[String, String] =
+    readSourceDir(ideasDir)
 
 }
 

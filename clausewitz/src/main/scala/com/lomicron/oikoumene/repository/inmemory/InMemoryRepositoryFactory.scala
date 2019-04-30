@@ -1,11 +1,13 @@
 package com.lomicron.oikoumene.repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
+import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
+import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRepository
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.politics._
 
@@ -19,6 +21,8 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   private val cultureRepo: CultureRepository = InMemoryCultureRepository(cultureGroupRepo)
   private val religionGroupRepo: ReligionGroupRepository = InMemoryReligionGroupRepository()
   private val religionRepo: ReligionRepository = InMemoryReligionRepository(religionGroupRepo)
+
+  private val ideasRepo = InMemoryIdeaGroupRepository()
 
   private val diplomacyRepo: DiplomacyRepository = InMemoryDiplomacyRepository()
   private val warHistoryRepo: WarHistoryRepository = InMemoryWarRepository()
@@ -43,6 +47,10 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   override def cultures: CultureRepository = cultureRepo
 
   override def religions: ReligionRepository = religionRepo
+
+
+
+  override def ideas: IdeaGroupRepository = ideasRepo
 
 
 

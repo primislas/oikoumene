@@ -116,4 +116,6 @@ case class TagUpdate
   @JsonCreator def this() = this(None)
 }
 
-object TagUpdate extends FromJson[TagUpdate]
+object TagUpdate extends FromJson[TagUpdate] {
+  def empty: TagUpdate = TagUpdate()
+}
