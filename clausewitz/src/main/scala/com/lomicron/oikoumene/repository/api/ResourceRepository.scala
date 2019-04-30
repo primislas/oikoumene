@@ -30,6 +30,12 @@ trait ResourceRepository {
 
   def getDiplomaticRelations: Map[String, String]
 
+  def getWarHistory: Map[String, String]
+
+  def getCasusBelliTypes: Map[String, String]
+
+  def getWarGoalTypes: Map[String, String]
+
   def getProvinceDefinitions: Option[String]
 
   def getProvinceHistory: Map[Int, String]

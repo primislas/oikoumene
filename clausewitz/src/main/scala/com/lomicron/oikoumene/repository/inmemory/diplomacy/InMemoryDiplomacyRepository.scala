@@ -1,23 +1,17 @@
-package com.lomicron.oikoumene.repository.inmemory.politics
+package com.lomicron.oikoumene.repository.inmemory.diplomacy
 
-import com.lomicron.oikoumene.model.politics.DiploRelation
-import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
-import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.oikoumene.model.diplomacy.DiploRelation
+import com.lomicron.oikoumene.repository.api.diplomacy.DiplomacyRepository
+import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
 
 import scala.collection.mutable
 import scala.util.Try
 
 case class InMemoryDiplomacyRepository()
-  extends InMemoryCrudRepository[Int, DiploRelation](_.id)
+  extends InMemoryIntRepository[DiploRelation](_.id)
     with DiplomacyRepository {
 
   private val relsByTag = new mutable.HashMap[String, mutable.TreeSet[Int]]()
-  private var idsSeq = 0
-
-  override def nextId: Option[Int] = {
-    idsSeq = idsSeq + 1
-    Option(idsSeq)
-  }
 
   override def setId(entity: DiploRelation, id: Int): DiploRelation =
     entity.copy(id = Option(id))
@@ -44,8 +38,8 @@ case class InMemoryDiplomacyRepository()
   }
 
   private def removeRelsFromTag(rel: DiploRelation): DiploRelation = {
-    for { id <- rel.id } removeRelFromTag(id, rel.first)
-    for { id <- rel.id; tag <- rel.second } removeRelFromTag(id, tag)
+    for {id <- rel.id} removeRelFromTag(id, rel.first)
+    for {id <- rel.id; tag <- rel.second} removeRelFromTag(id, tag)
 
     rel
   }

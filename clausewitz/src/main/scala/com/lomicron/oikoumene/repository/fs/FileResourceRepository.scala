@@ -19,7 +19,11 @@ case class FileResourceRepository
   val countryTagsDir = "common/country_tags"
   val countriesDir = "common/countries"
   val countryHistoryDir = "history/countries"
+
   val diploHistoryDir = "history/diplomacy"
+  val warHistoryDir = "history/wars"
+  val warGoalTypesDir = "common/wargoal_types"
+  val casusBelliTypesDir = "common/cb_types"
 
   val provinceDefinitionsFile = "map/definition.csv"
   val provinceTypesFile = "map/default.map"
@@ -52,6 +56,15 @@ case class FileResourceRepository
 
   override def getDiplomaticRelations: Map[String, String] =
     readSourceDir(diploHistoryDir)
+
+  override def getWarHistory: Map[String, String] =
+    readSourceDir(warHistoryDir)
+
+  override def getWarGoalTypes: Map[String, String] =
+    readSourceDir(warGoalTypesDir)
+
+  override def getCasusBelliTypes: Map[String, String] =
+    readSourceDir(casusBelliTypesDir)
 
   private def filenameToTag(str: String) =
     str.take(3).mkString

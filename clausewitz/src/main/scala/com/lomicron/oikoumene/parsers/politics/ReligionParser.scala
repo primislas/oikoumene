@@ -44,7 +44,6 @@ object ReligionParser extends LazyLogging {
     val groups = jsonNodes.map(_._1)
     val religions = jsonNodes.flatMap(_._2)
       .map(r => localisation.findAndSetAsLocName(r.get("id").asText(), r))
-      .map(ClausewitzParser.parseColor)
 
     ConfigField.printCaseClass("ReligionGroup", groups)
     ConfigField.printCaseClass("Religion", religions)

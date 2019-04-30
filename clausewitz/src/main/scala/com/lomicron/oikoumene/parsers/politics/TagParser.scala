@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers.politics
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseDates, parseEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.TagRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
@@ -38,12 +38,10 @@ object TagParser extends LazyLogging {
 
     val tagEvents = parsedTagNodes.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
 
-    def parseLeaderDates(o: ObjectNode): ObjectNode = o.getObject("leader").map(parseDates).getOrElse(o)
-
-    val monarchs = tagEvents.flatMap(_.getObject("monarch")).map(parseDates).map(parseLeaderDates)
-    val queens = tagEvents.flatMap(_.getObject("queen")).map(parseDates)
-    val heirs = tagEvents.flatMap(_.getObject("heir")).map(parseDates).map(parseLeaderDates)
-    val leaders = tagEvents.flatMap(_.getObject("leader")).map(parseDates)
+    val monarchs = tagEvents.flatMap(_.getObject("monarch"))
+    val queens = tagEvents.flatMap(_.getObject("queen"))
+    val heirs = tagEvents.flatMap(_.getObject("heir"))
+    val leaders = tagEvents.flatMap(_.getObject("leader"))
     val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
     val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
     val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
@@ -92,8 +90,6 @@ object TagParser extends LazyLogging {
         .get(tag)
         .map(patchFieldValue(country, "localisation", _))
         .getOrElse(country))
-      .mapValues(ClausewitzParser.parseColor)
-      .mapValues(ClausewitzParser.parseColor(_, "revolutionary_colors"))
       .mapKVtoValue((id, tag) => tag.setEx(idKey, TextNode.valueOf(id)))
       .values.toList
     logger.info(s"Loaded ${parsedTags.size} tags")

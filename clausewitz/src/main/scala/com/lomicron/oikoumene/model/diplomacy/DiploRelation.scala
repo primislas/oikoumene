@@ -1,6 +1,7 @@
-package com.lomicron.oikoumene.model.politics
+package com.lomicron.oikoumene.model.diplomacy
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 

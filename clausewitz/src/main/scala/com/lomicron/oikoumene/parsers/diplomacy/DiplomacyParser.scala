@@ -1,13 +1,13 @@
-package com.lomicron.oikoumene.parsers.politics
+package com.lomicron.oikoumene.parsers.diplomacy
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
-import com.lomicron.oikoumene.model.politics.DiploRelation
-import com.lomicron.oikoumene.model.politics.DiploRelationType.{celestialEmperor, hreEmperor}
+import com.lomicron.oikoumene.model.diplomacy.DiploRelation
+import com.lomicron.oikoumene.model.diplomacy.DiploRelationType.{celestialEmperor, hreEmperor}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
+import com.lomicron.oikoumene.repository.api.diplomacy.DiplomacyRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.utils.json.JsonMapper.{textNode, _}
 import com.typesafe.scalalogging.LazyLogging
 
 object DiplomacyParser extends LazyLogging {
@@ -19,15 +19,13 @@ object DiplomacyParser extends LazyLogging {
    diplomacyRepo: DiplomacyRepository
   ): DiplomacyRepository = {
 
-    val rels = files
-      .getDiplomaticRelations
-      .mapValues(ClausewitzParser.parse)
-      .mapValues(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing religion: ${o._2}")
-        parseRelationConfigFile(o._1)
-      })
-      .mapKVtoValue((filename, rels) => rels.map(_.setEx("source_file", filename)))
-      .values.toList.flatten
+    val relConfigs = files.getDiplomaticRelations
+    val confFiles = ClausewitzParser.parseFilesAsEntities(relConfigs)
+    val rels = confFiles.flatMap(cf => {
+      val filename = Option(cf.get("source_file")).getOrElse(nullNode)
+      cf.remove("source_file")
+      parseRelationConfigFile(cf).map(_.setEx("source_file", filename))
+    })
 
     val hre = rels.filter(_.get("type") == textNode(hreEmperor))
     if (hre.nonEmpty) hre.take(hre.size - 1)
@@ -60,10 +58,8 @@ object DiplomacyParser extends LazyLogging {
       .map(parseCelestialEmperor)
 
   def parseRelation(k: String, o: ObjectNode): ObjectNode =
-    ClausewitzParser
-      .strToDateNode(k)
-      .map(d => o.setEx("start_date", d))
-      .getOrElse(o.setEx("type", k))
+    if (ClausewitzParser.isDate(k)) o.setEx("start_date", k)
+    else o.setEx("type", k)
 
   def parseHreEmperor(o: ObjectNode): ObjectNode =
     if (o.has(hreEmperor))
