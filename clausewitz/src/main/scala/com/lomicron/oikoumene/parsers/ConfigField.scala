@@ -194,8 +194,10 @@ object ConfigField extends LazyLogging {
         if (v == BooleanNode.getFalse) cf.copy(defaultValue = Some("true"))
         else if (v == BooleanNode.getTrue) cf.copy(defaultValue = Some("false"))
         else cf
-      } else cf
-    } else {
+      } else cf.copy(valueType = "Option[Boolean]", defaultValue = Some("None"))
+    }
+    // TODO parse string fields to Date if all values match date pattern
+    else {
       val (preciseType, defaultVal) = evalDefaultValue(cf)
       cf.copy(valueType = preciseType, defaultValue = Option(defaultVal))
     }
@@ -209,7 +211,8 @@ object ConfigField extends LazyLogging {
       else cf.valueType
 
     val optType =
-      if (cf.isOptional && !ValueTypes.isArray(preciseType) && cf.defaultValue.isEmpty) s"Option[$preciseType]"
+      if (cf.isOptional && !ValueTypes.isArray(preciseType)
+        && !typesWithEmptyObjects.contains(preciseType) && cf.defaultValue.isEmpty) s"Option[$preciseType]"
       else preciseType
 
     val dv = cf.defaultValue.getOrElse(
@@ -222,6 +225,8 @@ object ConfigField extends LazyLogging {
 
     (optType, dv)
   }
+
+  private val typesWithEmptyObjects = Set("Localisation", "Date", "Color")
 
   private def getMostFrequentValueType(cfs: Seq[ConfigField]): String = {
     val countsByType = cfs.map(_.valueType).groupBy(identity).mapValues(_.size)

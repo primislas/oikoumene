@@ -32,6 +32,8 @@ trait ResourceRepository {
 
   def getWarHistory: Map[String, String]
 
+  def getCasusBelliTypes: Map[String, String]
+
   def getWarGoalTypes: Map[String, String]
 
   def getProvinceDefinitions: Option[String]

@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
+import com.lomicron.oikoumene.repository.api.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
@@ -115,6 +116,28 @@ object ClausewitzParser extends LazyLogging {
     })
   }
 
+  /**
+    * Looks for localisation entry by default filed "id"
+    * and sets it to "localisation" field if found.
+    *
+    * @param o object that might have localisation
+    * @param l localisation repository
+    * @return object with localisation field if localisation is found
+    */
+  def setLocalisation(o: ObjectNode, l: LocalisationRepository): ObjectNode =
+    setLocalisationByField(o, "id", l)
+
+  /**
+    * Looks for localisation entry by id taken from provided
+    * objects field, and sets it to "localisation" field if found.
+    *
+    * @param o object that might have localisation
+    * @param field object's field with localisation id
+    * @param l localisation repository
+    * @return object with localisation field if localisation is found
+    */
+  def setLocalisationByField(o: ObjectNode, field: String, l: LocalisationRepository): ObjectNode =
+    o.getString(field).map(id => l.findAndSetAsLocName(id, o)).getOrElse(o)
 
   def rollUpEvents(obj: ObjectNode): ObjectNode =
     rollUpEvents(obj, endDate)
@@ -233,7 +256,8 @@ object ClausewitzParser extends LazyLogging {
       val nots = unchecked.flatMap(_.getObject("NOT"))
       val ors = unchecked.flatMap(_.getObject("OR"))
       val ands = unchecked.flatMap(_.getObject("AND"))
-      val nestedTriggers = ors ++ ands ++ nots
+      val froms = unchecked.flatMap(_.getObject("FROM"))
+      val nestedTriggers = ors ++ ands ++ nots ++ froms
 
       if (nestedTriggers.isEmpty) checked ++ unchecked
       else rec(nestedTriggers, checked ++ unchecked)

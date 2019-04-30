@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers.diplomacy
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.diplomacy.War
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.politics.WarHistoryRepository
+import com.lomicron.oikoumene.repository.api.diplomacy.WarHistoryRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
@@ -18,7 +18,7 @@ object WarHistoryParser extends LazyLogging {
   ): WarHistoryRepository = {
 
     val wars = ClausewitzParser
-      .parseFilesAsEntities(files.getWarGoalTypes)
+      .parseFilesAsEntities(files.getWarHistory)
       .map(parseWarConfig)
 
     val events = wars.flatMap(_.getArray("events")).flatMap(_.toSeq).flatMap(_.asObject)
@@ -32,6 +32,7 @@ object WarHistoryParser extends LazyLogging {
     ConfigField.printCaseClass("Army", armies)
 
     val parsedWars = wars.map(War.fromJson)
+    warRepo.create(parsedWars)
 
     warRepo
   }

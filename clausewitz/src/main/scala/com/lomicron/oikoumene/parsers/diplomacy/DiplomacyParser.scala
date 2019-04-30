@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.oikoumene.model.diplomacy.DiploRelation
 import com.lomicron.oikoumene.model.diplomacy.DiploRelationType.{celestialEmperor, hreEmperor}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.politics.DiplomacyRepository
+import com.lomicron.oikoumene.repository.api.diplomacy.DiplomacyRepository
 import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper.{textNode, _}
@@ -19,15 +19,13 @@ object DiplomacyParser extends LazyLogging {
    diplomacyRepo: DiplomacyRepository
   ): DiplomacyRepository = {
 
-    val rels = files
-      .getDiplomaticRelations
-      .mapValues(ClausewitzParser.parse)
-      .mapValues(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing diplomatic history: ${o._2}")
-        parseRelationConfigFile(o._1)
-      })
-      .mapKVtoValue((filename, rels) => rels.map(_.setEx("source_file", filename)))
-      .values.toList.flatten
+    val relConfigs = files.getDiplomaticRelations
+    val confFiles = ClausewitzParser.parseFilesAsEntities(relConfigs)
+    val rels = confFiles.flatMap(cf => {
+      val filename = Option(cf.get("source_file")).getOrElse(nullNode)
+      cf.remove("source_file")
+      parseRelationConfigFile(cf).map(_.setEx("source_file", filename))
+    })
 
     val hre = rels.filter(_.get("type") == textNode(hreEmperor))
     if (hre.nonEmpty) hre.take(hre.size - 1)

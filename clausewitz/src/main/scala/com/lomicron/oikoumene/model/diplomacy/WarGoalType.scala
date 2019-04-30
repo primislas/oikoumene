@@ -3,12 +3,15 @@ package com.lomicron.oikoumene.model.diplomacy
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.events.{ProvinceCondition, TagCondition}
+import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
 case class WarGoalType
 (
   // hits = 57, isOptional = false, sample = "fallback_wargoal"
   id: String = Entity.UNDEFINED,
+  // hits = 49, isOptional = true, sample = {"name":"Revoke Elector"}
+  localisation: Localisation = Localisation.empty,
   // hits = 57, isOptional = false, sample = "00_wargoal_types.txt"
   sourceFile: String = Entity.UNDEFINED,
   // hits = 57, isOptional = false, sample = "superiority"
@@ -45,7 +48,7 @@ case class WarGoalType
   electorRelation: Option[String] = None,
   // hits = 1, isOptional = true, sample = 0.5
   transferTradeCostFactor: Option[BigDecimal] = None,
-) {
+) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
 }
 
