@@ -12,13 +12,16 @@ import com.typesafe.scalalogging.LazyLogging
 
 object ContinentParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): ContinentRepository =
-    apply(repos.resources, repos.localisations, repos.geography.continent)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : ContinentRepository =
+    apply(repos.resources, repos.localisations, repos.geography.continent, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   continents: ContinentRepository): ContinentRepository = {
+   continents: ContinentRepository,
+   evalEntityFields: Boolean): ContinentRepository = {
 
     val jsonNodes = files
       .getContinents
@@ -40,7 +43,8 @@ object ContinentParser extends LazyLogging {
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
 
-    ConfigField.printCaseClass("Continent", jsonNodes)
+    if (evalEntityFields)
+      ConfigField.printCaseClass("Continent", jsonNodes)
 
     jsonNodes.map(Continent.fromJson).foreach(continents.create)
 

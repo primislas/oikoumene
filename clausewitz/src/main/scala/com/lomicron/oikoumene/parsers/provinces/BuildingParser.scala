@@ -21,7 +21,8 @@ object BuildingParser extends LazyLogging {
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   buildingsRepo: BuildingRepository): BuildingRepository = {
+   buildingsRepo: BuildingRepository,
+   evalEntityFields: Boolean = false): BuildingRepository = {
 
     val confs = files
       .getBuildings

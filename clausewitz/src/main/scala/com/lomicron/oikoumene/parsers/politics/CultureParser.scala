@@ -12,13 +12,16 @@ import com.typesafe.scalalogging.LazyLogging
 
 object CultureParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): CultureRepository =
-    apply(repos.resources, repos.localisations, repos.cultures)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : CultureRepository =
+    apply(repos.resources, repos.localisations, repos.cultures, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   cultureRepo: CultureRepository): CultureRepository = {
+   cultureRepo: CultureRepository,
+   evalEntityFields: Boolean): CultureRepository = {
 
     val groupCultures = files
       .getCultures
@@ -45,19 +48,15 @@ object CultureParser extends LazyLogging {
       }
 
     val cultures = groupCultures.flatMap(_._2)
-    ConfigField.printCaseClass("Culture", cultures)
-
     val groups = groupCultures.map(_._1)
-    ConfigField.printCaseClass("CultureGroup", groups)
+
+    if (evalEntityFields) {
+      ConfigField.printCaseClass("Culture", cultures)
+      ConfigField.printCaseClass("CultureGroup", groups)
+    }
 
     groups.map(CultureGroup.fromJson).foreach(cultureRepo.createGroup)
     cultures.map(Culture.fromJson).foreach(cultureRepo.create)
-
-
-//      .foreach { case (group: ObjectNode, cultures: Seq[ObjectNode]) =>
-//        cultureRepo.createGroup(group)
-//        cultureRepo.create(cultures)
-//      }
 
     cultureRepo
   }

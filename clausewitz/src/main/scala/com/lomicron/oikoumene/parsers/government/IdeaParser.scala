@@ -15,13 +15,15 @@ object IdeaParser {
     "source_file", "start", "bonus", "ideas",
     "trigger", "free", "ai_will_do", "category")
 
-  def apply(repos: RepositoryFactory): IdeaGroupRepository =
-    apply(repos.resources, repos.localisations, repos.ideas)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false): IdeaGroupRepository =
+    apply(repos.resources, repos.localisations, repos.ideas, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   ideaRepo: IdeaGroupRepository): IdeaGroupRepository = {
+   ideaRepo: IdeaGroupRepository,
+   evalEntityFields: Boolean): IdeaGroupRepository = {
 
     val configs = files.getIdeas
     val ideaGroups = ClausewitzParser
@@ -33,15 +35,17 @@ object IdeaParser {
       .flatMap(_.toSeq)
       .flatMap(_.asObject)
       .map(setLocalisation(_, localisation))
-    val modifiers = ideas.flatMap(_.getObject("modifiers"))
 
-    val factors = ideaGroups.flatMap(_.getObject("ai_will_do"))
-    val tagConditions = ClausewitzParser.parseNestedConditions(factors)
+    if (evalEntityFields) {
+      val modifiers = ideas.flatMap(_.getObject("modifiers"))
+      val factors = ideaGroups.flatMap(_.getObject("ai_will_do"))
+      val tagConditions = ClausewitzParser.parseNestedConditions(factors)
 
-    ConfigField.printCaseClass("IdeaGroup", ideaGroups)
-    ConfigField.printCaseClass("Idea", ideas)
-    ConfigField.printCaseClass("TagModifier", modifiers)
-    ConfigField.printCaseClass("TagCondition", tagConditions)
+      ConfigField.printCaseClass("IdeaGroup", ideaGroups)
+      ConfigField.printCaseClass("Idea", ideas)
+      ConfigField.printCaseClass("TagModifier", modifiers)
+      ConfigField.printCaseClass("TagCondition", tagConditions)
+    }
 
     ideaGroups.map(IdeaGroup.fromJson).foreach(ideaRepo.create)
     ideaRepo

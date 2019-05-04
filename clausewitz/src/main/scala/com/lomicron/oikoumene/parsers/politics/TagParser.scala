@@ -16,13 +16,16 @@ import scala.collection.immutable.TreeMap
 
 object TagParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): TagRepository =
-    apply(repos.resources, repos.localisations, repos.tags)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : TagRepository =
+    apply(repos.resources, repos.localisations, repos.tags, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   tags: TagRepository
+   tags: TagRepository,
+   evalEntityFields: Boolean
   ): TagRepository = {
 
     val filesByTags = files
@@ -36,24 +39,25 @@ object TagParser extends LazyLogging {
     val names = localisation.fetchTags
     val parsedTagNodes = TagParser(filesByTags, countries, histories, names)
 
-    val tagEvents = parsedTagNodes.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
-
-    val monarchs = tagEvents.flatMap(_.getObject("monarch"))
-    val queens = tagEvents.flatMap(_.getObject("queen"))
-    val heirs = tagEvents.flatMap(_.getObject("heir"))
-    val leaders = tagEvents.flatMap(_.getObject("leader"))
-    val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
-    val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
-    val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
-    ConfigField.printCaseClass("TagUpdate", tagEvents)
-    ConfigField.printCaseClass("Monarch", monarchs)
-    ConfigField.printCaseClass("Queen", queens)
-    ConfigField.printCaseClass("Heir", heirs)
-    ConfigField.printCaseClass("Leader", leaders)
-    ConfigField.printCaseClass("CountryModifier", countryModifiers)
-    ConfigField.printCaseClass("RulerModifier", rulerModifiers)
-    ConfigField.printCaseClass("PriceModifier", priceModifiers)
-    ConfigField.printCaseClass("Tag", parsedTagNodes)
+    if (evalEntityFields) {
+      val tagEvents = parsedTagNodes.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
+      val monarchs = tagEvents.flatMap(_.getObject("monarch"))
+      val queens = tagEvents.flatMap(_.getObject("queen"))
+      val heirs = tagEvents.flatMap(_.getObject("heir"))
+      val leaders = tagEvents.flatMap(_.getObject("leader"))
+      val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
+      val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
+      val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
+      ConfigField.printCaseClass("TagUpdate", tagEvents)
+      ConfigField.printCaseClass("Monarch", monarchs)
+      ConfigField.printCaseClass("Queen", queens)
+      ConfigField.printCaseClass("Heir", heirs)
+      ConfigField.printCaseClass("Leader", leaders)
+      ConfigField.printCaseClass("CountryModifier", countryModifiers)
+      ConfigField.printCaseClass("RulerModifier", rulerModifiers)
+      ConfigField.printCaseClass("PriceModifier", priceModifiers)
+      ConfigField.printCaseClass("Tag", parsedTagNodes)
+    }
 
     parsedTagNodes
       .map(Tag.fromJson)
@@ -71,14 +75,8 @@ object TagParser extends LazyLogging {
    names: Map[String, ObjectNode]):
   Seq[ObjectNode] = {
 
-    logger.info("Loading country tags...")
-
     val countryByTag = parseCountries(tags, countries)
-    logger.info(s"Loaded ${countryByTag.size} tag definitions")
-
     val historyByTag = parseCountryHistories(tags, histories)
-    logger.info(s"Loaded ${historyByTag.size} tag histories")
-
     val parsedTags = countryByTag
       .mapKVtoValue((tag, country) => historyByTag
         .get(tag)
@@ -92,7 +90,6 @@ object TagParser extends LazyLogging {
         .getOrElse(country))
       .mapKVtoValue((id, tag) => tag.setEx(idKey, TextNode.valueOf(id)))
       .values.toList
-    logger.info(s"Loaded ${parsedTags.size} tags")
 
     parsedTags
   }

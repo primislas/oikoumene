@@ -2,11 +2,10 @@ package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
-import com.lomicron.oikoumene.parsers.ClausewitzParser
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents, startDate}
-import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, ProvinceRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
+import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, ProvinceRepository}
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, booleanYes, textNode, toObjectNode}
@@ -21,46 +20,33 @@ object ProvinceParser extends LazyLogging {
   val addBuildingField = "add_building"
   val removeBuildingField = "remove_building"
 
-  def apply(repos: RepositoryFactory): ProvinceRepository =
-    apply(repos.resources, repos.localisations, repos.provinces, repos.buildings)
-
   def apply
-  (files: ResourceRepository,
-   localisation: LocalisationRepository,
-   provinces: ProvinceRepository,
-   buildings: BuildingRepository): ProvinceRepository = {
-
+  (repos: RepositoryFactory, evalEntityFields: Boolean = false)
+  : ProvinceRepository = {
+    val files = repos.resources
     val definitions = files.getProvinceDefinitions
-    val provinceTypes = files.getProvinceTypes // default.map
-    val provincePositions = files.getProvincePositions
     val history = files.getProvinceHistory
 
-    apply(
-      definitions,
-      provinceTypes,
-      provincePositions,
-      history,
-      localisation,
-      buildings,
-      provinces)
+    val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces, evalEntityFields)
+    val withGeography = addGeography(withHistory, repos.geography)
+    val withPolitics = addPolitics(withGeography, repos)
+
+    withPolitics
   }
 
-  def apply
+  def parseProvinces
   (definitions: Option[String],
-   provinceTypes: Option[String],
-   provincePositions: Option[String],
    provinceHistory: Map[Int, String],
    localisation: LocalisationRepository,
    buildings: BuildingRepository,
-   provinces: ProvinceRepository)
+   provinces: ProvinceRepository,
+   evalEntityFields: Boolean)
   : ProvinceRepository = {
 
     val provinceById = parseProvinces(definitions)
     val withLocalisation = addLocalisation(provinceById, localisation)
-    val withType = addProvinceType(withLocalisation, provinceTypes)
-    val withHistory = addHistory(withType, provinceHistory, buildings)
+    val withHistory = addHistory(withLocalisation, provinceHistory, buildings)
 
-    logger.info(s"Parsed ${withHistory.size} province definitions")
     withHistory.values
       .map(Province.fromJson)
       .map(_.atStart())
@@ -97,25 +83,6 @@ object ProvinceParser extends LazyLogging {
       .foreachKV((id, prov) => localById
         .get(id)
         .foreach(loc => prov.set("localisation", loc)))
-  }
-
-  def addProvinceType
-  (provinceById: Map[Int, ObjectNode],
-   provinceTypes: Option[String]
-  ): Map[Int, ObjectNode] = {
-
-    val types = provinceTypes
-      .map(ClausewitzParser.parse)
-      .map(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing province types: ${o._2}")
-        JsonMapper.convert[ProvinceTypes](o._1)
-      })
-      .get
-
-    provinceById
-      .foreach { case (id, prov) => prov.put("type", types.identifyType(id)) }
-
-    provinceById
   }
 
   def addHistory
@@ -156,6 +123,52 @@ object ProvinceParser extends LazyLogging {
       event.remove(f)
     })
     event
+  }
+
+  def addGeography
+  (provinceRepo: ProvinceRepository, geography: GeographicRepository)
+  : ProvinceRepository =
+  {
+    provinceRepo.findAll.map(addGeography(_, geography)).foreach(provinceRepo.update)
+    provinceRepo
+  }
+
+  def addGeography
+  (province: Province, geography: GeographicRepository)
+  : Province =
+  {
+    val id = province.id
+
+    val pType = geography.provinceTypes.map(_.identifyType(id))
+    val terrain = geography.terrain.ofProvince(id)
+    val climate = geography.climate.ofProvince(id)
+
+    val area = geography.areas.areaOfProvince(id).map(_.id)
+    val region = area.flatMap(geography.regions.regionOfArea).map(_.id)
+    val superRegion = region.flatMap(geography.superregions.superRegionOfRegion).map(_.id)
+    val continent = geography.continent.continentOfProvince(id).map(_.id)
+
+    val provinceGeography = ProvinceGeography(pType, terrain, climate, area, region, superRegion, continent)
+
+    province.copy(geography = provinceGeography)
+  }
+
+  def addPolitics
+  (provinceRepo: ProvinceRepository, repos: RepositoryFactory)
+  : ProvinceRepository =
+  {
+    provinceRepo.findAll.map(addPolitics(_, repos)).foreach(provinceRepo.update)
+    provinceRepo
+  }
+
+  def addPolitics
+  (p: Province, repos: RepositoryFactory)
+  : Province =
+  {
+    val cultureGroup = p.state.culture.flatMap(repos.cultures.groupOf).map(_.id)
+    val religionGroup = p.state.religion.flatMap(repos.religions.groupOf).map(_.id)
+    val state = p.state.copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
+    p.copy(state = state)
   }
 
 }

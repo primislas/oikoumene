@@ -15,17 +15,20 @@ object CasusBelliParser {
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   cbRepo: CasusBelliRepository
+   cbRepo: CasusBelliRepository,
+   evalEntityFields: Boolean = false
   ): CasusBelliRepository = {
     val configs = files.getCasusBelliTypes
     val cbs = ClausewitzParser
       .parseFileFieldsAsEntities(configs)
       .map(setLocalisation(_, localisation))
 
-    val prereqs = cbs.flatMap(_.getObject("prerequisites"))
-    val conditions = ClausewitzParser.parseNestedConditions(prereqs)
-    ConfigField.printCaseClass("TagCondition", conditions)
-    ConfigField.printCaseClass("CasusBelli", cbs)
+    if (evalEntityFields) {
+      val prereqs = cbs.flatMap(_.getObject("prerequisites"))
+      val conditions = ClausewitzParser.parseNestedConditions(prereqs)
+      ConfigField.printCaseClass("TagCondition", conditions)
+      ConfigField.printCaseClass("CasusBelli", cbs)
+    }
 
     val parsedCbs = cbs.map(CasusBelli.fromJson)
     parsedCbs.foreach(cbRepo.create)

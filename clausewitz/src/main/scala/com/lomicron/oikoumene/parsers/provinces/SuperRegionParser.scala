@@ -12,13 +12,16 @@ import com.typesafe.scalalogging.LazyLogging
 
 object SuperRegionParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): SuperRegionRepository =
-    apply(repos.resources, repos.localisations, repos.geography.superregions)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : SuperRegionRepository =
+    apply(repos.resources, repos.localisations, repos.geography.superregions, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   superregions: SuperRegionRepository): SuperRegionRepository = {
+   superregions: SuperRegionRepository,
+   evalEntityFields: Boolean): SuperRegionRepository = {
 
     val jsonNodes = files
       .getSuperregions
@@ -40,7 +43,8 @@ object SuperRegionParser extends LazyLogging {
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
 
-    ConfigField.printCaseClass("SuperRegion", jsonNodes)
+    if (evalEntityFields)
+      ConfigField.printCaseClass("SuperRegion", jsonNodes)
 
     jsonNodes.map(SuperRegion.fromJson).foreach(superregions.create)
 

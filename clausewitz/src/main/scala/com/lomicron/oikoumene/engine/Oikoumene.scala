@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyPars
 import com.lomicron.oikoumene.parsers.government.IdeaParser
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
 
@@ -19,20 +20,38 @@ object Oikoumene extends LazyLogging {
     val modDir = ""
 
     val repos = InMemoryRepositoryFactory(gameDir, modDir)
-
-    val tags = TagParser(repos)
-    val buildings = BuildingParser(repos)
-    val provinces = ProvinceParser(repos)
-    val geography = GeographyParser(repos)
-    val religions = ReligionParser(repos)
-    val cultures = CultureParser(repos)
-    val diplomacy = DiplomacyParser(repos)
-    val wars = WarHistoryParser(repos)
-    val warGoalTypes = WarGoalTypeParser(repos)
-    val cbTypes = CasusBelliParser(repos)
-    val ideas = IdeaParser(repos)
+    populateRepos(repos)
 
     logger.info("Bye")
+  }
+
+  def populateRepos(repos: RepositoryFactory): RepositoryFactory = {
+    logger.info("Parsing configs...")
+    val tags = TagParser(repos)
+    logger.info(s"Loaded ${tags.size} tags...")
+    val buildings = BuildingParser(repos)
+    logger.info(s"Loaded ${buildings.size} buildings...")
+    GeographyParser(repos)
+    logger.info(s"Loaded geographical definitions...")
+    val religions = ReligionParser(repos)
+    logger.info(s"Loaded ${religions.size} religions...")
+    val cultures = CultureParser(repos)
+    logger.info(s"Loaded ${cultures.size} cultures...")
+    val diplomacy = DiplomacyParser(repos)
+    logger.info(s"Loaded ${diplomacy.size} historical diplomatic relations...")
+    val wars = WarHistoryParser(repos)
+    logger.info(s"Loaded ${wars.size} historical wars...")
+    val warGoalTypes = WarGoalTypeParser(repos)
+    logger.info(s"Loaded ${warGoalTypes.size} war goal types...")
+    val cbTypes = CasusBelliParser(repos)
+    logger.info(s"Loaded ${cbTypes.size} casus belli configs...")
+    val ideas = IdeaParser(repos)
+    logger.info(s"Loaded ${ideas.size} idea groups...")
+    val provinces = ProvinceParser(repos)
+    logger.info(s"Loaded ${provinces.size} provinces...")
+
+    logger.info(s"Configs loaded")
+    repos
   }
 
   private def loadMap(): Seq[Tile] = {

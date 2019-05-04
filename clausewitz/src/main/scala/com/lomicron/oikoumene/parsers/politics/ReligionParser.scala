@@ -13,13 +13,15 @@ import com.typesafe.scalalogging.LazyLogging
 
 object ReligionParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): ReligionRepository =
-    apply(repos.resources, repos.localisations, repos.religions)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false): ReligionRepository =
+    apply(repos.resources, repos.localisations, repos.religions, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   religionsRepo: ReligionRepository): ReligionRepository = {
+   religionsRepo: ReligionRepository,
+   evalEntityFields: Boolean): ReligionRepository = {
 
     val jsonNodes = files
       .getReligions
@@ -45,8 +47,10 @@ object ReligionParser extends LazyLogging {
     val religions = jsonNodes.flatMap(_._2)
       .map(r => localisation.findAndSetAsLocName(r.get("id").asText(), r))
 
-    ConfigField.printCaseClass("ReligionGroup", groups)
-    ConfigField.printCaseClass("Religion", religions)
+    if (evalEntityFields) {
+      ConfigField.printCaseClass("ReligionGroup", groups)
+      ConfigField.printCaseClass("Religion", religions)
+    }
 
     groups.map(ReligionGroup.fromJson).foreach(religionsRepo.createGroup)
     religions.map(Religion.fromJson).foreach(religionsRepo.create)

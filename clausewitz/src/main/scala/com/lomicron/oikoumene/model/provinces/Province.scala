@@ -12,10 +12,10 @@ case class Province
  color: Color,
  comment: Option[String] = None,
  tag2: Option[String] = None,
- `type`: Option[String] = None,
  localisation: Localisation = Localisation.empty,
  state: ProvinceState = ProvinceState.empty,
  history: Seq[ProvinceUpdate] = Seq.empty,
+ geography: ProvinceGeography = ProvinceGeography.empty,
 ) { self =>
   @JsonCreator def this() = this(0, Color.black)
 
@@ -26,7 +26,7 @@ case class Province
   def at(year: Int, month: Int, day: Int): Province = at(Date(year, month, day))
 
   def at(date: Date): Province = {
-      val eventsByDate = history.filter(e => e.date.isEmpty || e.date.exists(_.compareTo(date) <= 0))
+      val eventsByDate = history.filter(e => e.date.isEmpty || e.date.exists(_ <= date))
       copy(state = state.next(eventsByDate))
   }
 

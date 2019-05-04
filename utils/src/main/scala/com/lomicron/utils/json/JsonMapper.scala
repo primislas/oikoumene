@@ -4,11 +4,9 @@ import java.util.Map.Entry
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node._
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -25,29 +23,7 @@ object JsonMapper extends LazyLogging {
   val booleanYes: BooleanNode = JsonNodeFactory.instance.booleanNode(true)
   val booleanNo: BooleanNode = JsonNodeFactory.instance.booleanNode(false)
 
-
-  private val nonNullContainers = new SimpleModule("Oikoumene")
-    .addDeserializer(classOf[Seq[AnyRef]], SeqDeserializer)
-
-  // Is there any way to make it parameterized? AnyRef doesn't really work.
-  object SeqDeserializer extends JsonDeserializer[Seq[AnyRef]] {
-    override def getEmptyValue(ctxt: DeserializationContext): AnyRef = Seq.empty
-    override def getNullValue(ctxt: DeserializationContext): Seq[AnyRef] = Seq.empty
-    def deserialize(jp: JsonParser, context: DeserializationContext): Seq[AnyRef] = {
-      val node: JsonNode = jp.getCodec.readTree(jp)
-      if (node == null || node.isNull) Seq.empty
-      else if (node.isObject) {
-        if (!node.fields().hasNext) Seq.empty
-        else {
-          logger.warn(s"Expected an array but received ${node.asText}")
-          node.asInstanceOf[ObjectNode].elements().toSeq.map(mapper.treeToValue[AnyRef])
-        }
-      }
-      else node.asInstanceOf[ArrayNode].elements().toSeq.map(mapper.treeToValue[AnyRef])
-    }
-  }
-
-  private val mapper = new ObjectMapper() with ScalaObjectMapper
+  val mapper = new ObjectMapper() with ScalaObjectMapper
   mapper
     .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
     // sometimes JSON fields contain single object where accepting class
@@ -205,7 +181,7 @@ object JsonMapper extends LazyLogging {
   }
 
   def removeFieldValue(o: ObjectNode, k: String, v: JsonNode): ObjectNode = {
-    Option(o.get(k))
+    o.getField(k)
       .foreach(existingVal => {
         if (existingVal.isArray) {
           val it = existingVal.asInstanceOf[ArrayNode].iterator
@@ -234,7 +210,7 @@ object JsonMapper extends LazyLogging {
   }
 
   def renameField(o: ObjectNode, from: String, to: String): ObjectNode = {
-    val withUpdatedTo = Option(o).map(_.get(from)) match {
+    val withUpdatedTo = Option(o).flatMap(_.getField(from)) match {
       case Some(v) => overwriteField(o, to, v)
       case None => removeField(o, to)
     }

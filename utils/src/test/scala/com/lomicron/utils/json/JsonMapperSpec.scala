@@ -1,9 +1,12 @@
 package com.lomicron.utils.json
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, TextNode}
 import com.lomicron.utils.io.IO
 import org.specs2.mutable.Specification
+
+import scala.collection.immutable.SortedSet
 
 class JsonMapperSpec extends Specification {
 
@@ -25,6 +28,14 @@ class JsonMapperSpec extends Specification {
       defVals.seq mustEqual Seq.empty
     }
 
+    "- deserialize a SortedSet field" >> {
+      // NOTE how WithSortedSet is declared below
+      val json = """{"ss":[5,3,4]}"""
+      val withSet = JsonMapper.fromJson[WithSortedSet](json)
+      withSet.ss.size mustEqual 3
+      withSet.ss.head mustEqual 3
+    }
+
   }
 
   "JsonMapper#toJsonNode" should {
@@ -44,6 +55,7 @@ class JsonMapperSpec extends Specification {
       arrayNode.get(2) must beAnInstanceOf[BooleanNode]
       arrayNode.size() mustEqual 3
     }
+
   }
 
 }
@@ -71,3 +83,13 @@ case class DefaultValuesTest
   @JsonCreator def this() = this(0)
 
 }
+
+case class WithSortedSet
+(
+  // NOTE! This annotation with contentAs is pretty much
+  // mandatory for SortedSet and TreeSet.
+  // Use it if you run into any other primitive container
+  // deserialization failures.
+  @JsonDeserialize(contentAs = classOf[java.lang.Integer])
+  ss: SortedSet[Int] = SortedSet.empty
+)

@@ -12,13 +12,17 @@ import com.typesafe.scalalogging.LazyLogging
 
 object ClimateParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): ClimateRepository =
-    apply(repos.resources, repos.localisations, repos.geography.climate)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : ClimateRepository =
+    apply(repos.resources, repos.localisations, repos.geography.climate, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   climates: ClimateRepository): ClimateRepository = {
+   climates: ClimateRepository,
+   evalEntityFields: Boolean)
+  : ClimateRepository = {
 
     val jsonNodes = files
       .getClimate
@@ -40,7 +44,8 @@ object ClimateParser extends LazyLogging {
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
 
-    ConfigField.printCaseClass("Climate", jsonNodes)
+    if (evalEntityFields)
+      ConfigField.printCaseClass("Climate", jsonNodes)
 
     jsonNodes.map(Climate.fromJson).foreach(climates.create)
 

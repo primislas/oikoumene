@@ -29,4 +29,7 @@ trait ReligionRepository extends AbstractRepository[String, Religion] {
   def removeGroups(keys: Seq[String]): Seq[Try[ReligionGroup]] =
     keys.map(removeGroup)
 
+  def groupOf(religionId: String): Option[ReligionGroup] =
+    findAllGroups.find(_.hasReligion(religionId))
+
 }

@@ -17,19 +17,24 @@ object TerrainParser extends LazyLogging {
   private val terrainCategoriesKey = "categories"
   private val terrainProvincesKey = "terrain_override"
 
-  def apply(repos: RepositoryFactory): TerrainRepository =
-    apply(repos.resources, repos.localisations, repos.geography.terrain)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : TerrainRepository =
+    apply(repos.resources, repos.localisations, repos.geography.terrain, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   terrainRepo: TerrainRepository): TerrainRepository = {
+   terrainRepo: TerrainRepository,
+   evalEntityFields: Boolean)
+  : TerrainRepository = {
 
     val terrainById = files.getTerrain.map(parseTerrainConf).getOrElse(Map.empty)
     val preppedTerrainById = processTerrain(terrainById)
     val withLocalisation = preppedTerrainById.mapKVtoValue(localisation.findAndSetAsLocName).values.toSeq
 
-    ConfigField.printCaseClass("Terrain", withLocalisation)
+    if (evalEntityFields)
+      ConfigField.printCaseClass("Terrain", withLocalisation)
 
     withLocalisation.map(Terrain.fromJson).foreach(terrainRepo.create)
 

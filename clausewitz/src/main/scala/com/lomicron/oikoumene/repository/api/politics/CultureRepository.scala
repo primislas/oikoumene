@@ -29,4 +29,7 @@ trait CultureRepository extends AbstractRepository[String, Culture] {
   def removeGroups(keys: Seq[String]): Seq[Try[CultureGroup]] =
     keys.map(removeGroup)
 
+  def groupOf(cultureId: String): Option[CultureGroup] =
+    findAllGroups.find(_.hasCulture(cultureId))
+
 }

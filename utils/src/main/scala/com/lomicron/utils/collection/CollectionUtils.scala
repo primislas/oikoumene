@@ -53,6 +53,8 @@ object CollectionUtils {
 
     def cast[R: Manifest]: Option[R] = o.filter(_.isInstanceOf[R]).map(_.asInstanceOf[R])
 
+    def contentsEqual(o2: Option[T]): Boolean = o.exists(v => o2.contains(v))
+
   }
 
 }

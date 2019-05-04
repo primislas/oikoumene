@@ -16,20 +16,23 @@ object WarGoalTypeParser extends LazyLogging {
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   warGoalTypesRepo: WarGoalTypeRepository
+   warGoalTypesRepo: WarGoalTypeRepository,
+   evalEntityFields: Boolean = false
   ): WarGoalTypeRepository = {
 
     val warGoals = ClausewitzParser
       .parseFileFieldsAsEntities(files.getWarGoalTypes)
       .map(setLocalisation(_, localisation))
 
-    val attackerConfs = warGoals.flatMap(_.getObject("attacker"))
-    val defenderConfs = warGoals.flatMap(_.getObject("defender"))
-    val provinceConditions = warGoals.flatMap(_.getObject("allowed_provinces"))
-    val conditions = ClausewitzParser.parseNestedConditions(provinceConditions)
-    ConfigField.printCaseClass("ProvinceCondition", conditions)
-    ConfigField.printCaseClass("PeaceDealModifiers", attackerConfs ++ defenderConfs)
-    ConfigField.printCaseClass("WarGoalType", warGoals)
+    if (evalEntityFields) {
+      val attackerConfs = warGoals.flatMap(_.getObject("attacker"))
+      val defenderConfs = warGoals.flatMap(_.getObject("defender"))
+      val provinceConditions = warGoals.flatMap(_.getObject("allowed_provinces"))
+      val conditions = ClausewitzParser.parseNestedConditions(provinceConditions)
+      ConfigField.printCaseClass("ProvinceCondition", conditions)
+      ConfigField.printCaseClass("PeaceDealModifiers", attackerConfs ++ defenderConfs)
+      ConfigField.printCaseClass("WarGoalType", warGoals)
+    }
 
     val parsedTypes = warGoals.map(WarGoalType.fromJson)
     parsedTypes.foreach(warGoalTypesRepo.create)

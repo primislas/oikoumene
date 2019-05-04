@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.repository.api.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
+import scala.collection.immutable.ListMap
 import scala.util.matching.Regex
 
 case class FileResourceRepository
@@ -113,8 +114,8 @@ case class FileResourceRepository
       .flatMap(LocalisationEntry.fromString)
       .seq
 
-  override def getProvinceTypes: Option[String] =
-    readSourceFileContent(provinceTypesFile)
+  override def getProvinceTypes: Map[String, String] =
+    readSourceFileMapToName(provinceTypesFile)
 
   override def getAreas: Option[String] =
     readSourceFileContent(areasFile)
@@ -158,8 +159,13 @@ case class FileResourceRepository
       case _ => None
     }
 
-  private def readSourceFileContent(relPath: String) =
+  private def readSourceFileContent(relPath: String): Option[String] =
     readSourceFile(relPath).map(_._2)
+
+  private def readSourceFileMapToName(relPath: String): Map[String, String] =
+    readSourceFile(relPath)
+      .map(nc => ListMap(nc._1 -> nc._2))
+      .getOrElse(Map.empty)
 
   override def getCultures: Option[String] =
     readSourceFileContent(culturesFile)

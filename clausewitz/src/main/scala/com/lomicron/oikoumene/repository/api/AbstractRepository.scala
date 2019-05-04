@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.repository.api
 
 import scala.util.{Success, Try}
+import com.lomicron.utils.collection.CollectionUtils._
 
 trait AbstractRepository [Key, Entity] {
 
@@ -24,9 +25,23 @@ trait AbstractRepository [Key, Entity] {
 
   def findAll: Seq[Entity]
 
+  def search(req: SearchConf): SearchResult[Entity] = {
+    val entities = findAll.slice(req.offset, req.offset + req.size)
+    val totalEntities = size
+    val quotient = totalEntities / req.size
+    val remainder = totalEntities % req.size
+    val totalPages = if (remainder == 0) quotient else quotient + 1
+    SearchResult(req.page, req.size, totalPages, totalEntities, entities)
+  }
+
+  def searchArgMatches[T](arg: Option[T], v: Option[T]): Boolean =
+    arg.isEmpty || arg.contentsEqual(v)
+
   def remove(key: Key): Try[Entity]
 
   def remove(keys: Seq[Key]): Seq[Try[Entity]] =
     keys.map(remove)
+
+  def size: Int
 
 }

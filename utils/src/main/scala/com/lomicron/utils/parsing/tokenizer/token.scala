@@ -4,7 +4,9 @@ import java.math.BigDecimal
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.node.{DecimalNode, IntNode}
+import com.lomicron.utils.parsing.serialization.DateSerializer
 
 sealed trait Token {
   val lexeme: String
@@ -21,6 +23,8 @@ case class Number(lexeme: String, asBigDecimal: scala.BigDecimal) extends Token 
     if (isInt) IntNode.valueOf(asBigDecimal.intValue)
     else DecimalNode.valueOf(new BigDecimal(lexeme))
 }
+
+@JsonSerialize(using = classOf[DateSerializer])
 case class Date(lexeme: String, year: Int = 0, month: Int = 0, day: Int = 0) extends Token with Ordered[Date] {
   @JsonCreator def this() = this("")
 

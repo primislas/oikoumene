@@ -14,7 +14,9 @@ case class ProvinceState
  tradeGood: Option[String] = None,
  capital: Option[String] = None,
  culture: Option[String] = None,
+ cultureGroup: Option[String] = None,
  religion: Option[String] = None,
+ religionGroup: Option[String] = None,
  owner: Option[String] = None,
  controller: Option[String] = None,
  cores: Set[String] = ListSet.empty,
@@ -126,7 +128,7 @@ case class ProvinceState
 
   def updateNativeHostileness(v: Int): ProvinceState = copy(nativeHostileness = v)
 
-  def estate(v: String): ProvinceState = copy(religion = Some(v))
+  def estate(v: String): ProvinceState = copy(estate = Some(v))
 
   def addLocalAutonomy(v: Int): ProvinceState = copy(localAutonomy = localAutonomy + v)
 

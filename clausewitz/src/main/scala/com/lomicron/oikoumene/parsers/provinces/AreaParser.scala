@@ -14,13 +14,16 @@ import com.typesafe.scalalogging.LazyLogging
 
 object AreaParser extends LazyLogging {
 
-  def apply(repos: RepositoryFactory): AreaRepository =
-    apply(repos.resources, repos.localisations, repos.geography.areas)
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : AreaRepository =
+    apply(repos.resources, repos.localisations, repos.geography.areas, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   areaRepo: AreaRepository): AreaRepository = {
+   areaRepo: AreaRepository,
+   evalEntityFields: Boolean): AreaRepository = {
 
     val jsonNodes = files
       .getAreas
@@ -50,7 +53,7 @@ object AreaParser extends LazyLogging {
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
 
-    ConfigField.printCaseClass("Area", jsonNodes)
+    if (evalEntityFields) ConfigField.printCaseClass("Area", jsonNodes)
 
     jsonNodes.map(Area.fromJson).foreach(areaRepo.create)
 

@@ -5,6 +5,8 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 
+import scala.collection.immutable.ListSet
+
 case class Terrain
 (// hits = 20, isOptional = false, sample = "coastal_desert"
  id: String = Entity.UNDEFINED,
@@ -12,7 +14,7 @@ case class Terrain
  localisation: Localisation = Localisation.empty,
  // hits = 19, isOptional = true, sample = [255,211,110]
  color: Option[Color] = None,
- provinceIds: Seq[Int] = Seq.empty,
+ provinceIds: ListSet[Int] = ListSet.empty,
  // hits = 19, isOptional = true, sample = 1.0
  movementCost: BigDecimal = 1,
  // hits = 19, isOptional = true, sample = "desert"
@@ -37,6 +39,8 @@ case class Terrain
  inlandSea: Boolean = false,
 ) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
+
+  def hasProvince(provinceId: Int): Boolean = provinceIds.contains(provinceId)
 }
 
 object Terrain extends FromJson[Terrain]

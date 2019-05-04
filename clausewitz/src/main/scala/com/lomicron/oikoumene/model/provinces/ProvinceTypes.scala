@@ -1,14 +1,19 @@
 package com.lomicron.oikoumene.model.provinces
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.utils.json.FromJson
+
 case class ProvinceTypes
-(width: Int,
- height: Int,
- maxProvinces: Int,
+(width: Int = 0,
+ height: Int = 0,
+ maxProvinces: Int = 0,
  seaStarts: Set[Int] = Set.empty,
  onlyUsedForRandom: Set[Int] = Set.empty,
  lakes: Set[Int] = Set.empty,
  forceCoastal: Set[Int] = Set.empty,
  canalDefinition: Seq[CanalDefinition] = Seq.empty) {
+
+  @JsonCreator def this() = this(0)
 
   def identifyType(provinceId: Int): String =
     if (seaStarts.contains(provinceId)) ProvinceTypes.sea
@@ -19,9 +24,11 @@ case class ProvinceTypes
 
 case class CanalDefinition(name: String, x: Int, y: Int)
 
-object ProvinceTypes {
+object ProvinceTypes extends FromJson[ProvinceTypes] {
   val province = "province"
   val sea = "sea"
   val lake = "lake"
   val random = "random"
+
+  val empty = ProvinceTypes()
 }

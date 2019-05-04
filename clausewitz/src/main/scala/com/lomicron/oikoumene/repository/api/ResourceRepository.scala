@@ -42,7 +42,7 @@ trait ResourceRepository {
 
   def getBuildings: Seq[String]
 
-  def getProvinceTypes: Option[String]
+  def getProvinceTypes: Map[String, String]
 
   def getProvincePositions: Option[String]
 

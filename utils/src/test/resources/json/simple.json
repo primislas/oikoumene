@@ -5,6 +5,6 @@
   "boolean": true,
   "nullField": null,
   "emptyOption": null,
-  "intOption": 45,
+  "int_option": 45,
   "unknownField": "unknown val"
 }

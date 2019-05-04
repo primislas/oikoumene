@@ -16,7 +16,8 @@ object DiplomacyParser extends LazyLogging {
 
   def apply
   (files: ResourceRepository,
-   diplomacyRepo: DiplomacyRepository
+   diplomacyRepo: DiplomacyRepository,
+   evalEntityFields: Boolean = false
   ): DiplomacyRepository = {
 
     val relConfigs = files.getDiplomaticRelations
@@ -35,7 +36,8 @@ object DiplomacyParser extends LazyLogging {
     if (celestial.nonEmpty) celestial.take(celestial.size - 1)
       .foldRight(celestial.last)((prev, last) => prev.setEx("end_date", last.get("start_date")))
 
-    ConfigField.printCaseClass("DiploRelation", rels)
+    if (evalEntityFields)
+      ConfigField.printCaseClass("DiploRelation", rels)
     rels.map(DiploRelation.fromJson).foreach(diplomacyRepo.create)
 
     diplomacyRepo
