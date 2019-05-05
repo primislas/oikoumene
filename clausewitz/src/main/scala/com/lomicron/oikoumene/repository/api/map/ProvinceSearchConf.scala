@@ -10,14 +10,20 @@ case class ProvinceSearchConf
   owner: Option[String] = None,
   controller: Option[String] = None,
   core: Option[String] = None,
+
   religion: Option[String] = None,
   religionGroup: Option[String] = None,
   culture: Option[String] = None,
   cultureGroup: Option[String] = None,
+
   area: Option[String] = None,
   region: Option[String] = None,
   superRegion: Option[String] = None,
   continent: Option[String] = None,
+
+  tradeGood: Option[String] = None,
+  tradeNode: Option[String] = None,
+
   /**
     * If set, only province fields listed here
     * will be included in returned provinces.

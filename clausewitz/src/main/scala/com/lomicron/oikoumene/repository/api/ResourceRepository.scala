@@ -66,6 +66,12 @@ trait ResourceRepository {
 
   def getIdeas: Map[String, String]
 
+  def getTradeGoods: Map[String, String]
+
+  def getPrices: Map[String, String]
+
+  def getTradeNodes: Map[String, String]
+
   object SupportedLanguages {
     val english = "english"
     val german = "german"

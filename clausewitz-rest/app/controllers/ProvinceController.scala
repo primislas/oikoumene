@@ -27,14 +27,21 @@ class ProvinceController @Inject()
     owner: Option[String] = None,
     controller: Option[String] = None,
     core: Option[String] = None,
+
     religion: Option[String] = None,
     culture: Option[String] = None,
+
     religion_group: Option[String],
     culture_group: Option[String],
+
     area: Option[String],
     region: Option[String],
     superregion: Option[String],
     continent: Option[String],
+
+    trade_good: Option[String],
+    trade_node: Option[String],
+
     include_fields: Seq[String],
     exclude_fields: Seq[String],
     group_by: Option[String],
@@ -43,9 +50,11 @@ class ProvinceController @Inject()
     val p = page.getOrElse(0)
     val s = size.getOrElse(10)
 
-    val conf = ProvinceSearchConf(p, s, owner, controller, core, religion,
-      religion_group, culture, culture_group, area, region, superregion,
-      continent, include_fields.toSet, exclude_fields.toSet)
+    val conf = ProvinceSearchConf(p, s, owner, controller, core,
+      religion, religion_group, culture, culture_group,
+      area, region, superregion, continent,
+      trade_good, trade_node,
+      include_fields.toSet, exclude_fields.toSet)
     val res = group_by match {
       case Some(group) => provinceService.groupProvinces(conf, group)
       case _ => provinceService.findProvinces(conf)

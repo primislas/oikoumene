@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing.tokenizer.Token
+import com.typesafe.scalalogging.LazyLogging
 
-trait ParsingScope {
+trait ParsingScope extends LazyLogging {
   self =>
 
   /**
@@ -124,7 +125,7 @@ trait ParsingScope {
 
   def addParsingError(t: Token): (ParsingScope, ObjectNode) = {
     val err = ParsingError(scopePath, validTokens, t)
-    println(err)
+    logger.warn(err.message)
     addParsingError(err)
   }
 

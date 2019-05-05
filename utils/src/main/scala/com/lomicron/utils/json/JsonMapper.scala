@@ -62,6 +62,9 @@ object JsonMapper extends LazyLogging {
   def toJsonNode(obj: AnyRef): JsonNode =
     mapper.convertValue(obj, new TypeReference[JsonNode] {})
 
+  def toJsonNodeFromVal(obj: AnyVal): JsonNode =
+    mapper.convertValue(obj, new TypeReference[JsonNode] {})
+
   def toObjectNode(obj: AnyRef): Option[ObjectNode] =
     Try(toJsonNode(obj).asInstanceOf[ObjectNode]).toOption
 
@@ -77,6 +80,9 @@ object JsonMapper extends LazyLogging {
 
   def arrayNodeOf(args: Seq[AnyRef]): ArrayNode =
     args.map(JsonMapper.toJsonNode).foldLeft(arrayNode)(_.add(_))
+
+  def arrayNodeOfVals(args: Seq[AnyVal]): ArrayNode =
+    args.map(JsonMapper.toJsonNodeFromVal).foldLeft(arrayNode)(_.add(_))
 
   def textNode(t: String): TextNode = TextNode.valueOf(t)
 

@@ -4,12 +4,14 @@ import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, Di
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
+import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
 import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRepository
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.politics._
+import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 
 case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends RepositoryFactory {
 
@@ -34,6 +36,9 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
   private val geographyRepo: GeographicRepository = InMemoryGeographyRepository
   private val regionRepo: RegionRepository = InMemoryRegionRepository
   private val superregionRepo: SuperRegionRepository = InMemorySuperRegionRepository
+
+  private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository()
+  private val tradeNodeRepository: TradeNodeRepository = InMemoryTradeNodeRepository()
 
 
   override def resources: ResourceRepository = files
@@ -74,4 +79,7 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
 
   override def warGoalTypes: WarGoalTypeRepository = warGoalTypesRepo
 
+  override def tradeGoods: TradeGoodRepository = tradeGoodRepository
+
+  override def tradeNodes: TradeNodeRepository = tradeNodeRepository
 }

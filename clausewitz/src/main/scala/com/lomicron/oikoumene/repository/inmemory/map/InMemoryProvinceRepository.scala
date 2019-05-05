@@ -24,14 +24,20 @@ case class InMemoryProvinceRepository()
     val allMatching = findAll
       .filter(p => searchArgMatches(req.owner, p.state.owner))
       .filter(p => searchArgMatches(req.controller, p.state.controller))
+
       .filter(p => searchArgMatches(req.religion, p.state.religion))
       .filter(p => searchArgMatches(req.religionGroup, p.state.religionGroup))
       .filter(p => searchArgMatches(req.culture, p.state.culture))
       .filter(p => searchArgMatches(req.cultureGroup, p.state.cultureGroup))
+
       .filter(p => searchArgMatches(req.area, p.geography.area))
       .filter(p => searchArgMatches(req.region, p.geography.region))
       .filter(p => searchArgMatches(req.superRegion, p.geography.superRegion))
       .filter(p => searchArgMatches(req.continent, p.geography.continent))
+
+      .filter(p => searchArgMatches(req.tradeGood, p.state.tradeGood))
+      .filter(p => searchArgMatches(req.tradeNode, p.geography.tradeNode))
+
       .filter(p => req.core.isEmpty || req.core.exists(p.state.cores.contains))
 
     val quotient = allMatching.size / req.size
@@ -67,6 +73,10 @@ case class InMemoryProvinceRepository()
       case ProvinceFields.region => closedGroupBy(ProvinceFields.regionOf)
       case ProvinceFields.superregion => closedGroupBy(ProvinceFields.superregionOf)
       case ProvinceFields.continent => closedGroupBy(ProvinceFields.continentOf)
+
+      case ProvinceFields.tradeGood => closedGroupBy(ProvinceFields.tradeGoodOf)
+      case ProvinceFields.tradeNode => closedGroupBy(ProvinceFields.tradeNodeOf)
+
       case _ => SearchResult(page, size, 0, 0, Seq(ProvinceGroup("UNDEFINED")))
     }
 

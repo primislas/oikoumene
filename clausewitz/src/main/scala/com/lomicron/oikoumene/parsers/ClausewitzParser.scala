@@ -199,6 +199,11 @@ object ClausewitzParser extends LazyLogging {
     o
   }
 
+  def decimalColorToInt(a: ArrayNode): ArrayNode = {
+    val ints = a.toSeq.map(_.asDouble(0) * 255).map(_.toInt)
+    arrayNodeOfVals(ints)
+  }
+
   def parseDates(o: ObjectNode): ObjectNode = {
     o.fields().toSeq.filter(_.getKey.endsWith("date"))
       .filter(_.getValue.isTextual)

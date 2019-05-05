@@ -14,7 +14,8 @@ superRegion: Option[String] = None,
 continent: Option[String] = None,
 adjacencies: Set[Int] = Set.empty,
 crossings: Set[Int] = Set.empty,
-landlocked: Boolean = true
+landlocked: Boolean = true,
+tradeNode: Option[String] = None,
 ) {
   @JsonCreator def this() = this(None)
 }

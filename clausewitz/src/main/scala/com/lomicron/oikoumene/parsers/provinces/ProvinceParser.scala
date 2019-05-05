@@ -30,8 +30,9 @@ object ProvinceParser extends LazyLogging {
     val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces, evalEntityFields)
     val withGeography = addGeography(withHistory, repos.geography)
     val withPolitics = addPolitics(withGeography, repos)
+    val withTrade = addTrade(withPolitics, repos)
 
-    withPolitics
+    withTrade
   }
 
   def parseProvinces
@@ -169,6 +170,17 @@ object ProvinceParser extends LazyLogging {
     val religionGroup = p.state.religion.flatMap(repos.religions.groupOf).map(_.id)
     val state = p.state.copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
     p.copy(state = state)
+  }
+
+  def addTrade(provinces: ProvinceRepository, factory: RepositoryFactory): ProvinceRepository = {
+    factory.tradeNodes.findAll.flatMap(tn =>
+      tn.members.flatMap(provId => provinces.find(provId).toOption.map(_.withTradeNode(tn.id))))
+      .foreach(provinces.update)
+
+    // TODO add province modifiers from goods?
+
+
+    provinces
   }
 
 }

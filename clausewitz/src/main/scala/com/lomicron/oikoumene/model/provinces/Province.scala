@@ -30,9 +30,14 @@ case class Province
       copy(state = state.next(eventsByDate))
   }
 
+  def withTradeNode(tnId: String): Province =
+    copy(geography = geography.copy(tradeNode = Option(tnId)))
+
 }
 
 object Province extends FromJson[Province] {
+  def apply(id: Int, color: Color): Province = Province(id, color)
+
   def apply(id: Int, color: Color, comment: String):
   Province = Province(id, color, Option(comment).filter(_.nonEmpty))
 

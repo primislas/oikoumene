@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, Di
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, TagRepository}
+import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 
 case class InMemoryRepos() extends RepositoryFactory {
@@ -38,6 +39,10 @@ case class InMemoryRepos() extends RepositoryFactory {
   override def regions: RegionRepository = repos.regions
 
   override def superregions: SuperRegionRepository = repos.superregions
+
+  override def tradeGoods: TradeGoodRepository = repos.tradeGoods
+
+  override def tradeNodes: TradeNodeRepository = repos.tradeNodes
 }
 
 object InMemoryReposSingleton {
