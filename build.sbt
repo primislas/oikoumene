@@ -27,4 +27,6 @@ lazy val clausewitzRest = (project in file("clausewitz-rest"))
 
 lazy val oikoumene = (project in file("."))
   .settings(commonSettings)
-  .aggregate(utils, clausewitz, clausewitzRest)
+  .enablePlugins(PlayScala)
+  .dependsOn(clausewitzRest)
+  .aggregate(clausewitzRest)

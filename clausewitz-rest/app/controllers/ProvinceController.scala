@@ -5,6 +5,7 @@ import com.lomicron.utils.json.JsonMapper
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.ProvinceService
+import utils.CCaseJSON
 
 import scala.util.Try
 
@@ -31,26 +32,30 @@ class ProvinceController @Inject()
     religion: Option[String] = None,
     culture: Option[String] = None,
 
-    religion_group: Option[String],
-    culture_group: Option[String],
+    religion_group: Option[String] = None,
+    culture_group: Option[String] = None,
 
-    area: Option[String],
-    region: Option[String],
-    superregion: Option[String],
-    continent: Option[String],
+    area: Option[String] = None,
+    region: Option[String] = None,
+    superregion: Option[String] = None,
+    continent: Option[String] = None,
 
-    trade_good: Option[String],
-    trade_node: Option[String],
+    trade_good: Option[String] = None,
+    trade_node: Option[String] = None,
 
-    include_fields: Seq[String],
-    exclude_fields: Seq[String],
-    group_by: Option[String],
+    include_fields: Seq[String] = Seq.empty,
+    exclude_fields: Seq[String] = Seq.empty,
+    group_by: Option[String] = None,
+
+    with_dictionary: Option[Boolean] = None,
+
   ): Action[AnyContent] = Action {
 
     val p = page.getOrElse(0)
     val s = size.getOrElse(10)
 
-    val conf = ProvinceSearchConf(p, s, owner, controller, core,
+    val withDict = with_dictionary.getOrElse(false)
+    val conf = ProvinceSearchConf(p, s, withDict, owner, controller, core,
       religion, religion_group, culture, culture_group,
       area, region, superregion, continent,
       trade_good, trade_node,
@@ -59,13 +64,13 @@ class ProvinceController @Inject()
       case Some(group) => provinceService.groupProvinces(conf, group)
       case _ => provinceService.findProvinces(conf)
     }
-    Ok(JsonMapper.toJson(res))
+    Ok(CCaseJSON.toJson(res))
   }
 
   def getProvince(id: String): Action[AnyContent] = Action {
     Try(id.toInt).toOption
       .map(provinceService.getProvince)
-      .map(JsonMapper.toJson)
+      .map(CCaseJSON.toJson)
       .map(Ok(_)).getOrElse(NotFound)
   }
 

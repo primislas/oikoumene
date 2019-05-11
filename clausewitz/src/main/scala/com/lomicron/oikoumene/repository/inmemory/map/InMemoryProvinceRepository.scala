@@ -1,13 +1,13 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
 import com.lomicron.oikoumene.model.provinces.Province
-import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
+import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
 import com.lomicron.utils.collection.CollectionUtils._
 
 case class InMemoryProvinceRepository()
-  extends InMemoryCrudRepository[Int, Province](p => Option(p.id))
+  extends InMemoryIntRepository[Province](p => Option(p.id))
     with ProvinceRepository {
 
   override def setId(entity: Province, id: Int): Province =
@@ -43,8 +43,10 @@ case class InMemoryProvinceRepository()
     val quotient = allMatching.size / req.size
     val rem = allMatching.size % req.size
     val matchingPages = if (rem > 0) quotient + 1 else quotient
+    val page = if (req.offset < allMatching.size) req.page else 1
+    val offset = (page - 1) * req.size
     val provinces = allMatching
-      .slice(req.offset, req.offset + req.size)
+      .slice(offset, offset + req.size)
       .map(p => if (req.excludeFields.nonEmpty) excludeFields(p, req.excludeFields) else p)
 
     SearchResult(req.page, req.size, matchingPages, allMatching.size, provinces)

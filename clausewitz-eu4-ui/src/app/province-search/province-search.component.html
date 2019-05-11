@@ -1,0 +1,81 @@
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-sm-2">
+            <h5>Filters</h5>
+            <div class="mt-sm-1" *ngFor="let f of filters">
+                <button class="btn btn-sm btn-secondary col-sm" (click)="f.addValue()" style="text-align: left">
+                    <i class="fa fa-plus"></i>
+                    {{f.name}}
+                </button>
+                <div class="row" *ngFor="let v of f.values; let iv = index">
+                    <div class="col-sm-1">
+                        <button class="btn btn-sm btn-danger" (click)="f.removeValue(iv)">
+                            <i class="fa fa-remove"></i>
+                        </button>
+                    </div>
+                    <div class="col-sm-10">
+                        <!--suppress HtmlFormInputWithoutLabel, HtmlUnknownAttribute -->
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="v.id" (keyup.enter)="searchProvinces()">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-10">
+            <div class="row">
+                <div class="col-sm-4">
+                    <button class="btn btn-sm btn-info" (click)="searchProvinces()">
+                        <i class="fa fa-refresh"></i>
+                        Refresh
+                    </button>
+                </div>
+                <div class="col-sm-4">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Pagination">
+                        <button type="button" class="btn  btn-secondary" (click)="first()">1</button>
+                        <button type="button" class="btn  btn-secondary" (click)="prev()">&lt;</button>
+                        <button type="button" class="btn  btn-secondary" disabled>{{pagination.page}}</button>
+                        <button type="button" class="btn  btn-secondary" (click)="next()">&gt;</button>
+                        <button type="button" class="btn  btn-secondary" (click)="last()">{{pagination.totalPages}} ({{pagination.totalEntities}})</button>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group row">
+                        <label id="pageSize" for="pageSizeSelect">Page Size&nbsp;</label>
+                        <select class="form-control-sm" id="pageSizeSelect" [(ngModel)]="pagination.size" [value]="10" (change)="searchProvinces()">
+                            <option *ngFor="let ps of pageSizes">{{ps}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-sm table-striped table-hover" [mfData]="provinces" #mf="mfDataTable"
+                   [mfRowsOnPage]="pagination.size">
+                <thead class="thead-dark">
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Owner</th>
+                    <th>Development</th>
+                    <th>Religion</th>
+                    <th>Culture</th>
+                    <th>Trade Good</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let p of mf.data">
+                    <td>
+                        <button class="btn btn-sm btn-outline-dark" (click)="editProvince(p)">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                    </td>
+                    <td title="Province id: {{p.id}}">{{p.name}}</td>
+                    <td [title]="p.owner">{{dict.tag[p.owner]}}</td>
+                    <td>{{p.development}}</td>
+                    <td [title]="p.religion">{{dict.religion[p.religion]}}</td>
+                    <td [title]="p.culture">{{dict.culture[p.culture]}}</td>
+                    <td [title]="p.tradeGood">{{dict.tradeGood[p.tradeGood]}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

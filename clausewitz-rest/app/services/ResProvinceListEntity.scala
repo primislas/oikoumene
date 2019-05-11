@@ -21,7 +21,7 @@ object ResProvinceListEntity {
   def apply(p: Province): ResProvinceListEntity = {
     val name = ProvinceService.nameOf(p)
     ResProvinceListEntity(p.id, name, p.state.owner, p.state.cores,
-      p.state.religion, p.state.cultureGroup, p.state.development,
+      p.state.religion, p.state.culture, p.state.development,
       p.state.tradeGood, p.geography.tradeNode)
   }
 }

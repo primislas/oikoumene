@@ -1,7 +1,9 @@
 package com.lomicron.oikoumene.repository.api
 
-import scala.util.{Success, Try}
 import com.lomicron.utils.collection.CollectionUtils._
+
+import scala.collection.immutable.SortedMap
+import scala.util.{Success, Try}
 
 trait AbstractRepository [Key, Entity] {
 
@@ -24,6 +26,8 @@ trait AbstractRepository [Key, Entity] {
     keys.flatMap(find(_).toOption)
 
   def findAll: Seq[Entity]
+
+  def findNames(keys: Seq[Key]): SortedMap[Key, String]
 
   def search(req: SearchConf): SearchResult[Entity] = {
     val entities = findAll.slice(req.offset, req.offset + req.size)

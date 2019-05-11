@@ -5,7 +5,7 @@ import com.lomicron.oikoumene.repository.api.{AbstractRepository, RepositoryExce
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
-abstract class InMemoryCrudRepository[K: Ordering, V](f: V => Option[K])
+abstract class InMemoryCrudRepository[K: Ordering, V](val keyOf: V => Option[K])
   extends AbstractRepository[K, V] {
 
   private val entities: mutable.Map[K, V] = mutable.TreeMap[K, V]()
@@ -18,10 +18,10 @@ abstract class InMemoryCrudRepository[K: Ordering, V](f: V => Option[K])
   def setId(entity: V, id: K): V
 
   override def create(entity: V): Try[V] =
-    Try(f(entity))
+    Try(keyOf(entity))
       .map(id => {
         val withId = if (id.isEmpty) nextId.map(setId(entity, _)) else Option(entity)
-        for { entity <- withId; id <- withId.flatMap(f) } entities.put(id, entity)
+        for { entity <- withId; id <- withId.flatMap(keyOf) } entities.put(id, entity)
         withId
       })
       .flatMap(toTry(_, "Failed to create the entity."))

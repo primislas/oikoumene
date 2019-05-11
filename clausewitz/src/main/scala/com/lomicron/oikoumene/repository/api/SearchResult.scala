@@ -2,11 +2,12 @@ package com.lomicron.oikoumene.repository.api
 
 case class SearchResult[T]
 (
-  page: Int,
-  size: Int,
-  totalPages: Int,
-  totalEntities: Int,
-  entities: Seq[T]
+  page: Int = 1,
+  size: Int = 0,
+  totalPages: Int = 1,
+  totalEntities: Int = 0,
+  entities: Seq[T] = Seq.empty,
+  dictionary: SearchDictionary = SearchDictionary.empty
 )
 
 object SearchResult {

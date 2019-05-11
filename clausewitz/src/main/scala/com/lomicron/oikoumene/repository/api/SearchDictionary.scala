@@ -9,7 +9,7 @@ case class SearchDictionary
 (
   tag: SortedMap[String, String] = SortedMap.empty,
   province: SortedMap[String, String] = SortedMap.empty,
-  tradeGoods: SortedMap[String, String] = SortedMap.empty,
+  tradeGood: SortedMap[String, String] = SortedMap.empty,
 
   religion: SortedMap[String, String] = SortedMap.empty,
   religionGroup: SortedMap[String, String] = SortedMap.empty,
@@ -26,4 +26,6 @@ case class SearchDictionary
   @JsonCreator def this() = this(SortedMap.empty)
 }
 
-object SearchDictionary extends FromJson[SearchDictionary]
+object SearchDictionary extends FromJson[SearchDictionary] {
+  val empty = SearchDictionary()
+}

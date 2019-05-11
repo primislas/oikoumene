@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.repository.fs
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
@@ -48,6 +49,9 @@ case class FileResourceRepository
   val pricesDir = "common/prices"
   val tradeNodesDir = "common/tradenodes"
 
+  private def readFile(path: String): String =
+    IO.readTextFile(path, StandardCharsets.ISO_8859_1)
+
   override def getCountryTags: Map[String, String] =
     readSourceDir(countryTagsDir)
 
@@ -55,7 +59,7 @@ case class FileResourceRepository
     filesByTags
       .mapValuesEx(fromSource)
       .mapValuesEx(_.toString)
-      .mapValuesEx(IO.readTextFile)
+      .mapValuesEx(readFile)
 
   override def getCountryHistory: Map[String, String] =
     readSourceDir(countryHistoryDir)
@@ -105,7 +109,7 @@ case class FileResourceRepository
     files.map(readSourceFile).flatMap(_.toSeq).toMap
 
   private def readFileKeepFilename(path: String) =
-    (Paths.get(path).getFileName.toString, IO.readTextFile(path))
+    (Paths.get(path).getFileName.toString, readFile(path))
 
   override def getLocalisation(language: String)
   : Seq[LocalisationEntry] =
@@ -113,7 +117,7 @@ case class FileResourceRepository
       .listFiles(fromSource(localisationDir))
       .filter(_.matches(s"^.*_l_$language.yml"))
       .par
-      .map(IO.readTextFile)
+      .map(IO.readTextFile(_, StandardCharsets.UTF_8))
       .flatMap(_.lines)
       .flatMap(LocalisationEntry.fromString)
       .seq

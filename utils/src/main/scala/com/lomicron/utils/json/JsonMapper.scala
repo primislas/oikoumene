@@ -11,34 +11,21 @@ import com.fasterxml.jackson.databind.node._
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.lomicron.utils.collection.CollectionUtils._
+import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-object JsonMapper extends LazyLogging {
-
-  type JsonMap = Map[String, AnyRef]
-  val nullNode: NullNode = JsonNodeFactory.instance.nullNode
-  val booleanYes: BooleanNode = JsonNodeFactory.instance.booleanNode(true)
-  val booleanNo: BooleanNode = JsonNodeFactory.instance.booleanNode(false)
-
-  val mapper = new ObjectMapper() with ScalaObjectMapper
-  mapper
-    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-    // sometimes JSON fields contain single object where accepting class
-    // expects a list; this feature allows jackson to deserialize such fields
-    .configure(ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-    // omits 'empty' (null or empty collections/objects) fields from output
-    .setSerializationInclusion(NON_EMPTY)
-    .registerModule(DefaultScalaModule)
+case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyLogging {
 
   private val writer = defaultWriter(mapper)
   private val prettyPrinter = defaultWriter(mapper).withDefaultPrettyPrinter
 
   private def defaultWriter(mapper: ObjectMapper) =
     mapper.writer.`with`(WRITE_BIGDECIMAL_AS_PLAIN)
+
+  def configure(mapper: ObjectMapper with ScalaObjectMapper) = JsonMapper(mapper)
 
   def toJson(obj: AnyRef): String = obj match {
     case s: String => s
@@ -235,6 +222,100 @@ object JsonMapper extends LazyLogging {
 
     flatArray
   }
+
+}
+
+object JsonMapper {
+
+  type JsonMap = Map[String, AnyRef]
+  val nullNode: NullNode = JsonNodeFactory.instance.nullNode
+  val booleanYes: BooleanNode = JsonNodeFactory.instance.booleanNode(true)
+  val booleanNo: BooleanNode = JsonNodeFactory.instance.booleanNode(false)
+
+  def defaultObjectMapper(): ObjectMapper with ScalaObjectMapper = {
+    val m = new ObjectMapper() with ScalaObjectMapper
+    m
+      .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+      // sometimes JSON fields contain single object where accepting class
+      // expects a list; this feature allows jackson to deserialize such fields
+      .configure(ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+      .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+      // omits 'empty' (null or empty collections/objects) fields from output
+      .setSerializationInclusion(NON_EMPTY)
+      .registerModule(DefaultScalaModule)
+    m
+  }
+
+  def apply(): JsonMapper = new JsonMapper(defaultObjectMapper())
+
+  private val defaultMapper = JsonMapper()
+
+  def toJson(obj: AnyRef): String = defaultMapper.toJson(obj)
+
+  def prettyPrint(obj: AnyRef): String = defaultMapper.prettyPrint(obj)
+
+  def fromJson[T: Manifest](json: String): T = defaultMapper.fromJson[T](json)
+
+  def clone[T <: AnyRef](obj: T): T = defaultMapper.clone(obj)
+
+  def convert[T: Manifest](source: AnyRef): T = defaultMapper.convert[T](source)
+
+  def toJsonNode(obj: AnyRef): JsonNode = defaultMapper.toJsonNode(obj)
+
+  def toJsonNodeFromVal(obj: AnyVal): JsonNode = defaultMapper.toJsonNodeFromVal(obj)
+
+  def toObjectNode(obj: AnyRef): Option[ObjectNode] = defaultMapper.toObjectNode(obj)
+
+  def objectNode: ObjectNode = defaultMapper.objectNode
+
+  def objectNode(field: String, value: JsonNode): ObjectNode = defaultMapper.objectNode(field, value)
+
+  def arrayNode: ArrayNode = defaultMapper.arrayNode
+
+  def arrayNodeOf(e: AnyRef): ArrayNode = defaultMapper.arrayNodeOf(e)
+
+  def arrayNodeOf(args: Seq[AnyRef]): ArrayNode = defaultMapper.arrayNodeOf(args)
+
+  def arrayNodeOfVals(args: Seq[AnyVal]): ArrayNode = defaultMapper.arrayNodeOfVals(args)
+
+  def textNode(t: String): TextNode = defaultMapper.textNode(t)
+
+  def patch[T <: AnyRef, P <: AnyRef](target: T, update: P): T = defaultMapper.patch(target, update)
+
+  def patchMerge[T <: AnyRef, P <: AnyRef](target: T, update: P): T = defaultMapper.patchMerge(target, update)
+
+  def patch(target: ObjectNode, update: ObjectNode): ObjectNode = defaultMapper.patch(target, update)
+
+  def patchMerge(target: ObjectNode, update: ObjectNode): ObjectNode = defaultMapper.patchMerge(target, update)
+
+  def patchFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = defaultMapper.patchFieldValue(target, k, update)
+
+  /**
+    * Would merge values rather than overwriting or patching them
+    * using the following approach:
+    * <ul>
+    * <li> Values existing on the same key will be combined into an array.
+    * This is useful for configs which can repeat the same field several times
+    * as a way of describing a collection of values, like 'discoveredBy'.
+    * <li> Numbers will be added together.
+    * </ul>
+    *
+    * @param target object to which update is applied
+    * @param k      field to which update is applied
+    * @param update field update
+    * @return target object with field update merged to provided field
+    */
+  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = defaultMapper.mergeFieldValue(target, k, update)
+
+  def removeFieldValue(o: ObjectNode, k: String, v: JsonNode): ObjectNode = defaultMapper.removeFieldValue(o, k, v)
+
+  def overwriteField(o: ObjectNode, field: String, value: JsonNode): ObjectNode = defaultMapper.overwriteField(o, field, value)
+
+  def removeField(o: ObjectNode, field: String): ObjectNode = defaultMapper.removeField(o, field)
+
+  def renameField(o: ObjectNode, from: String, to: String): ObjectNode = defaultMapper.renameField(o, from, to)
+
+  def flatten(a: ArrayNode): ArrayNode = defaultMapper.flatten(a)
 
   implicit class JsonNodeEx(n: JsonNode) {
 

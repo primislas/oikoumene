@@ -1,6 +1,6 @@
 package com.lomicron.utils.io
 
-import java.nio.charset.StandardCharsets
+import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.{Path, Paths}
 
 import scala.io.{Codec, Source}
@@ -31,7 +31,10 @@ object IO {
     }
 
   def readTextFile(path: String): String =
-    cleanly(Source.fromFile(path)(Codec.apply(StandardCharsets.ISO_8859_1)))(_.close())(_.mkString)
+    readTextFile(path, StandardCharsets.ISO_8859_1)
+
+  def readTextFile(path: String, charset: Charset): String =
+    cleanly(Source.fromFile(path)(Codec.apply(charset)))(_.close())(_.mkString)
 
   //using(Source.fromFile(path))(_.mkString)
 

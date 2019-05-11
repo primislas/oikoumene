@@ -9,7 +9,11 @@ trait SearchConf {
     * Search page size.
     */
   val size: Int = 10
+  /**
+    * Configure if dictionary should be included.
+    */
+  val withDictionary: Boolean = false
 
-  def offset: Int = page * size
+  def offset: Int = (page - 1) * size
 
 }
