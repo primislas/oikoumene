@@ -8,12 +8,12 @@
                     {{f.name}}
                 </button>
                 <div class="row" *ngFor="let v of f.values; let iv = index">
-                    <div class="col-sm-1">
-                        <button class="btn btn-sm btn-danger" (click)="f.removeValue(iv)">
-                            <i class="fa fa-remove"></i>
-                        </button>
-                    </div>
-                    <div class="col-sm-10">
+                    <div class="input-group col-sm-12">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-sm btn-danger" (click)="f.removeValue(iv)">
+                                <i class="fa fa-remove"></i>
+                            </button>
+                        </div>
                         <!--suppress HtmlFormInputWithoutLabel, HtmlUnknownAttribute -->
                         <input type="text" class="form-control form-control-sm" [(ngModel)]="v.id" (keyup.enter)="searchProvinces()">
                     </div>
@@ -54,9 +54,10 @@
                     <th></th>
                     <th>Name</th>
                     <th>Owner</th>
+                    <th>Cores</th>
                     <th>Development</th>
-                    <th>Religion</th>
                     <th>Culture</th>
+                    <th>Religion</th>
                     <th>Trade Good</th>
                 </tr>
                 </thead>
@@ -68,11 +69,12 @@
                         </button>
                     </td>
                     <td title="Province id: {{p.id}}">{{p.name}}</td>
-                    <td [title]="p.owner">{{dict.tag[p.owner]}}</td>
+                    <td [title]="p.owner"><img *ngIf="p.owner" class="border border-secondary" width="32" height="32" src="/clausewitz/eu4/gfx/flags/{{p.owner}}">&nbsp;{{(dict.tag || {})[p.owner]}}</td>
+                    <td><img *ngFor="let c of p.cores" class="border border-secondary" width="32" height="32" src="/clausewitz/eu4/gfx/flags/{{c}}" title="{{(dict.tag || {})[c]}} ({{c}})">&nbsp;</td>
                     <td>{{p.development}}</td>
-                    <td [title]="p.religion">{{dict.religion[p.religion]}}</td>
                     <td [title]="p.culture">{{dict.culture[p.culture]}}</td>
-                    <td [title]="p.tradeGood">{{dict.tradeGood[p.tradeGood]}}</td>
+                    <td title="{{dict.religion[p.religion]}} ({{p.religion}})"><img *ngIf="p.religion" width="32" height="32" src="/clausewitz/eu4/gfx/religions/{{p.religion}}"></td>
+                    <td title="{{dict.tradeGood[p.tradeGood]}} ({{p.tradeGood}})"><img *ngIf="p.tradeGood" width="32" height="32" src="/clausewitz/eu4/gfx/trade_goods/{{p.tradeGood}}"></td>
                 </tr>
                 </tbody>
             </table>

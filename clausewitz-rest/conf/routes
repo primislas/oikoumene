@@ -10,5 +10,9 @@ GET     /                           controllers.HomeController.appSummary()
 # Serve static assets under public directory
 # GET     /*file                      controllers.FrontendController.assetOrDefault(file)
 
-GET     /clausewitz/eu4/provinces         controllers.ProvinceController.findProvinces(page: Option[Int], size: Option[Int], owner: Option[String], controller: Option[String], core: Option[String], religion: Option[String], culture: Option[String], religion_group: Option[String], culture_group: Option[String], area: Option[String], region: Option[String], superregion: Option[String], continent: Option[String], trade_good: Option[String], trade_node: Option[String], include_field: Seq[String], exclude_field: Seq[String], group_by: Option[String], with_dictionary: Option[Boolean])
-GET     /clausewitz/eu4/provinces/:id     controllers.ProvinceController.getProvince(id)
+GET     /clausewitz/eu4/provinces               controllers.ProvinceController.findProvinces(page: Option[Int], size: Option[Int], owner: Option[String], controller: Option[String], core: Option[String], religion: Option[String], culture: Option[String], religion_group: Option[String], culture_group: Option[String], area: Option[String], region: Option[String], superregion: Option[String], continent: Option[String], trade_good: Option[String], trade_node: Option[String], include_field: Seq[String], exclude_field: Seq[String], group_by: Option[String], with_dictionary: Option[Boolean])
+GET     /clausewitz/eu4/provinces/:id           controllers.ProvinceController.getProvince(id)
+
+GET     /clausewitz/eu4/gfx/flags/:tag          controllers.GfxController.getFlag(tag: String)
+GET     /clausewitz/eu4/gfx/trade_goods/:id     controllers.GfxController.getTradeGood(id: String)
+GET     /clausewitz/eu4/gfx/religions/:id       controllers.GfxController.getReligion(id: String)

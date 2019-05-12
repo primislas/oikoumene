@@ -1,7 +1,6 @@
 package controllers
 
 import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
-import com.lomicron.utils.json.JsonMapper
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.ProvinceService

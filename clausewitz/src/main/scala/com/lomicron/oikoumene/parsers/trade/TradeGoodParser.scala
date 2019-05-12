@@ -22,14 +22,15 @@ object TradeGoodParser {
       .parseFileFieldsAsEntities(tgFiles)
       .map(setLocalisation(_, localisation))
       .map(parseTradeGood)
+    val withIndex = ClausewitzParser.setIndex(goods)
 
     if (evalEntityFields)
-      ConfigField.printCaseClass("TradeGood", goods)
+      ConfigField.printCaseClass("TradeGood", withIndex)
 
     val prices = ClausewitzParser
       .parseFileFieldsAsEntities(priceFiles)
       .map(Price.fromJson)
-    goods
+    withIndex
       .map(TradeGood.fromJson)
       .map(g => prices.find(_.id == g.id).map(_.basePrice).map(g.withPrice).getOrElse(g))
       .foreach(repos.tradeGoods.create)

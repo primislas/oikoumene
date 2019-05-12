@@ -1,11 +1,13 @@
 package repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
+import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, TagRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.fs.FSGFXRepository
 
 case class InMemoryRepos() extends RepositoryFactory {
   val repos: RepositoryFactory = InMemoryReposSingleton.getRepos
@@ -43,6 +45,8 @@ case class InMemoryRepos() extends RepositoryFactory {
   override def tradeGoods: TradeGoodRepository = repos.tradeGoods
 
   override def tradeNodes: TradeNodeRepository = repos.tradeNodes
+
+  override def gfx: GFXRepository = repos.gfx
 }
 
 object InMemoryReposSingleton {

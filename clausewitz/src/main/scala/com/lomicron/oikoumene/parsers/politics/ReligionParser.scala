@@ -1,15 +1,18 @@
 package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.politics.{Religion, ReligionGroup}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
+import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.ReligionRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, patchFieldValue}
+import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
+
+import scala.collection.immutable.ListMap
 
 object ReligionParser extends LazyLogging {
 
@@ -23,29 +26,12 @@ object ReligionParser extends LazyLogging {
    religionsRepo: ReligionRepository,
    evalEntityFields: Boolean): ReligionRepository = {
 
-    val jsonNodes = files
-      .getReligions
-      .map(ClausewitzParser.parse)
-      .map(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing religion: ${o._2}")
-        o._1.fields.toStream
-      })
-      .getOrElse(Stream.empty)
-      .map(e => e.getKey -> e.getValue).toMap
-      .filterKeyValue((id, n) => {
-        if (!n.isInstanceOf[ObjectNode])
-          logger.warn(s"Expected religion group ObjectNode but at '$id' encountered ${n.toString}")
-        n.isInstanceOf[ObjectNode]
-      })
-      .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
-      .mapKVtoValue(localisation.findAndSetAsLocName)
-      .values.toSeq
+    val relFiles = files.getReligions
+    val groupsAndRels = ClausewitzParser
+      .parseFileFieldsAsEntities(relFiles)
       .map(parseReligions)
-
-    val groups = jsonNodes.map(_._1)
-    val religions = jsonNodes.flatMap(_._2)
-      .map(r => localisation.findAndSetAsLocName(r.get("id").asText(), r))
+    val groups = groupsAndRels.map(_._1).map(setLocalisation(_, localisation))
+    val religions = groupsAndRels.flatMap(_._2).map(setLocalisation(_, localisation))
 
     if (evalEntityFields) {
       ConfigField.printCaseClass("ReligionGroup", groups)
@@ -60,12 +46,12 @@ object ReligionParser extends LazyLogging {
 
   private def parseReligions(religionGroup: ObjectNode): (ObjectNode, Seq[ObjectNode]) = {
     val religions = religionGroup.fields.toStream
-      .map(e => e.getKey -> e.getValue).toMap
+      .map(e => e.getKey -> e.getValue).foldLeft(ListMap[String, JsonNode]())(_ + _)
       .filterKeyValue((_, v) => isReligion(v))
       .mapValues(religion => religion.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, religion) => patchFieldValue(religion, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, religion) => religion.setEx(idKey, id))
       .values
-      .map(religion => patchFieldValue(religion, "religion_group", religionGroup.get("id")))
+      .map(religion => religion.setEx("religion_group", religionGroup.get("id")))
       .toSeq
     religions.map(_.get("id")).map(_.asText()).foreach(religionGroup.remove)
     val idsArray = arrayNodeOf(religions.map(_.get("id")))

@@ -73,6 +73,8 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
 
   def textNode(t: String): TextNode = TextNode.valueOf(t)
 
+  def numericNode(int: Int): NumericNode = IntNode.valueOf(int)
+
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
     patch(target, update, patch)
@@ -280,6 +282,8 @@ object JsonMapper {
 
   def textNode(t: String): TextNode = defaultMapper.textNode(t)
 
+  def numericNode(i: Int): NumericNode = defaultMapper.numericNode(i)
+
   def patch[T <: AnyRef, P <: AnyRef](target: T, update: P): T = defaultMapper.patch(target, update)
 
   def patchMerge[T <: AnyRef, P <: AnyRef](target: T, update: P): T = defaultMapper.patchMerge(target, update)
@@ -350,6 +354,8 @@ object JsonMapper {
     def setEx(field: String, value: JsonNode): ObjectNode = o.set(field, value).asInstanceOf[ObjectNode]
 
     def setEx(field: String, value: String): ObjectNode = setEx(field, textNode(value))
+
+    def setEx(field: String, value: Int): ObjectNode = setEx(field, numericNode(value))
 
     def setEx(field: String, a: Seq[JsonNode]): ObjectNode = setEx(field, arrayNodeOf(a))
 

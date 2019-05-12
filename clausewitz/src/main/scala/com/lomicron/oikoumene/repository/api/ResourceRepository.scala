@@ -62,7 +62,7 @@ trait ResourceRepository {
 
   def getCultures: Option[String]
 
-  def getReligions: Option[String]
+  def getReligions: Map[String, String]
 
   def getIdeas: Map[String, String]
 

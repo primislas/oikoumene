@@ -9,6 +9,10 @@ import com.lomicron.utils.json.JsonMapper.JsonMap
 case class Religion
 (// hits = 26, isOptional = false, sample = "anglican"
  id: String = Entity.UNDEFINED,
+ // hits = 26, isOptional = false, sample = {"name":"Anglican"}
+ localisation: Localisation = Localisation.empty,
+ // hits = 26, isOptional = false, sample = "christian"
+ religionGroup: String = Entity.UNDEFINED,
  // hits = 26, isOptional = false, sample = [135,77,255]
  color: Color = Color.black,
  // hits = 26, isOptional = false, sample = {"development_cost":-0.1,"innovativeness_gain":0.5}
@@ -17,10 +21,6 @@ case class Religion
  heretic: Seq[String] = Seq.empty,
  // hits = 26, isOptional = false, sample = 28
  icon: Int = 0,
- // hits = 26, isOptional = false, sample = {"name":"Anglican"}
- localisation: Localisation = Localisation.empty,
- // hits = 26, isOptional = false, sample = "christian"
- religionGroup: String = Entity.UNDEFINED,
  // hits = 25, isOptional = true, sample = {"idea_cost":-0.1}
  countryAsSecondary: Option[JsonMap] = None,
  // hits = 16, isOptional = true, sample = {"local_missionary_strength":0.02}

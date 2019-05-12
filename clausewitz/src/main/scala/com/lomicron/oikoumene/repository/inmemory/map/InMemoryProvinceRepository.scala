@@ -49,7 +49,7 @@ case class InMemoryProvinceRepository()
       .slice(offset, offset + req.size)
       .map(p => if (req.excludeFields.nonEmpty) excludeFields(p, req.excludeFields) else p)
 
-    SearchResult(req.page, req.size, matchingPages, allMatching.size, provinces)
+    SearchResult(page, req.size, matchingPages, allMatching.size, provinces)
   }
 
   override def groupBy(searchConf: ProvinceSearchConf, group: String)

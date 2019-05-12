@@ -1,1 +1,7 @@
 name := "clausewitz"
+
+libraryDependencies += "com.twelvemonkeys.imageio" % "imageio-core" % "3.4.1"
+libraryDependencies += "com.twelvemonkeys.imageio" % "imageio-tga" % "3.4.1"
+libraryDependencies += "net.nikr" % "dds" % "1.0.0"
+
+resolvers += "maven.nikr.net" at "http://maven.nikr.net/"

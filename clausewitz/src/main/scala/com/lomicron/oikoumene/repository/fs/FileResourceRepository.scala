@@ -43,7 +43,7 @@ case class FileResourceRepository
   val buildingsDir = "common/buildings"
 
   val culturesFile = "common/cultures/00_cultures.txt"
-  val religionsFile = "common/religions/00_religion.txt"
+  val religionsDir = "common/religions"
 
   val tradeGoodsDir = "common/tradegoods"
   val pricesDir = "common/prices"
@@ -178,8 +178,8 @@ case class FileResourceRepository
   override def getCultures: Option[String] =
     readSourceFileContent(culturesFile)
 
-  override def getReligions: Option[String] =
-    readSourceFileContent(religionsFile)
+  override def getReligions: Map[String, String] =
+    readSourceDir(religionsDir)
 
   override def getIdeas: Map[String, String] =
     readSourceDir(ideasDir)

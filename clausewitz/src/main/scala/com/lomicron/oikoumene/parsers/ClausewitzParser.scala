@@ -139,6 +139,9 @@ object ClausewitzParser extends LazyLogging {
   def setLocalisationByField(o: ObjectNode, field: String, l: LocalisationRepository): ObjectNode =
     o.getString(field).map(id => l.findAndSetAsLocName(id, o)).getOrElse(o)
 
+  def setIndex(jsons: Seq[ObjectNode]): Seq[ObjectNode] =
+    jsons.zipWithIndex.map(oi => oi._1.setEx("index", oi._2))
+
   def rollUpEvents(obj: ObjectNode): ObjectNode =
     rollUpEvents(obj, endDate)
 
