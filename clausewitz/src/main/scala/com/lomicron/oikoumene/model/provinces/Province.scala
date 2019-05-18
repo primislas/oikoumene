@@ -33,6 +33,9 @@ case class Province
   def withTradeNode(tnId: String): Province =
     copy(geography = geography.copy(tradeNode = Option(tnId)))
 
+  def withTerrain(t: String): Province =
+    copy(geography = geography.copy(terrain = Option(t)))
+
 }
 
 object Province extends FromJson[Province] {

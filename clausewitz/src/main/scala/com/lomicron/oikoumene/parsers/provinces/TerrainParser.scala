@@ -1,80 +1,72 @@
 package com.lomicron.oikoumene.parsers.provinces
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.model.map.TerrainMapColorConf
 import com.lomicron.oikoumene.model.provinces.Terrain
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
-import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.map.TerrainRepository
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities, setLocalisation}
+import com.lomicron.oikoumene.parsers.ConfigField
+import com.lomicron.oikoumene.repository.api.map.GeographicRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
-import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.patchFieldValue
+import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 
 object TerrainParser extends LazyLogging {
 
-  private val terrainCategoriesKey = "categories"
-  private val terrainProvincesKey = "terrain_override"
-
   def apply(repos: RepositoryFactory,
             evalEntityFields: Boolean = false)
-  : TerrainRepository =
-    apply(repos.resources, repos.localisations, repos.geography.terrain, evalEntityFields)
+  : GeographicRepository =
+    apply(repos.resources, repos.localisations, repos.geography, evalEntityFields)
 
   def apply
   (files: ResourceRepository,
    localisation: LocalisationRepository,
-   terrainRepo: TerrainRepository,
+   geography: GeographicRepository,
    evalEntityFields: Boolean)
-  : TerrainRepository = {
+  : GeographicRepository = {
 
-    val terrainById = files.getTerrain.map(parseTerrainConf).getOrElse(Map.empty)
-    val preppedTerrainById = processTerrain(terrainById)
-    val withLocalisation = preppedTerrainById.mapKVtoValue(localisation.findAndSetAsLocName).values.toSeq
+    val confs = files.getTerrain
+    val cs = parseFilesAsEntities(confs)
+
+    val terrainColorConfs = cs
+      .flatMap(_.getObject(terrainKey))
+      .flatMap(parseTerrainMapConf)
+
+    val terrainCategories = cs
+      .filter(hasTerrainCategories)
+      .flatMap(_.getObject(terrainCategoriesKey))
+      .flatMap(fieldsToObjects(_, idKey))
+      .map(renameField(_, terrainProvincesKey, provinceIdsKey))
+      .map(setLocalisation(_, localisation))
 
     if (evalEntityFields)
-      ConfigField.printCaseClass("Terrain", withLocalisation)
+      ConfigField.printCaseClass("Terrain", terrainCategories)
 
-    withLocalisation.map(Terrain.fromJson).foreach(terrainRepo.create)
+    terrainCategories.map(Terrain.fromJson).foreach(geography.terrain.create)
+    val colorConfs = terrainColorConfs.map(TerrainMapColorConf.fromJson)
+    geography.map.setTerrainMapColorConf(colorConfs)
 
-    terrainRepo
+    geography
   }
 
-  /**
-    * Extracts terrain definitions from config file
-    *
-    * @param conf terrain.txt as string
-    * @return terrains mapped to their ids
-    */
-  private def parseTerrainConf(conf: String) =
-    Option(conf)
-      .map(ClausewitzParser.parse)
-      .map(o => {
-        if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing terrain: ${o._2}")
-        o._1
-      })
-      .filter(o => if (!o.has(terrainCategoriesKey)) {
-        logger.warn("Found no terrain categories")
-        false
-      } else if (!o.get(terrainCategoriesKey).isObject) {
-        logger.warn(s"Expected terrain categories to be declared as JSON object, instead encountered: ${o.get(terrainCategoriesKey).toString}")
-        false
-      } else true)
-      .map(_.get(terrainCategoriesKey).asInstanceOf[ObjectNode])
-      .map(_.fields().toStream)
-      .getOrElse(Stream.empty)
-      .map(e => e.getKey -> e.getValue).toMap
+  private def hasTerrainCategories(o: ObjectNode): Boolean =
+    if (!o.has(terrainCategoriesKey)) {
+      logger.warn("Found no terrain categories")
+      false
+    } else if (!o.get(terrainCategoriesKey).isObject) {
+      logger.warn(s"Expected terrain categories to be declared as JSON object, instead encountered: ${o.get(terrainCategoriesKey).toString}")
+      false
+    } else true
 
-  private def processTerrain(terrainById: Map[String, JsonNode]) =
-    terrainById
-      .filterValues(n => {
-        if (!n.isInstanceOf[ObjectNode])
-          logger.warn(s"Expected terrain ObjectNode but encountered ${n.toString}")
-        n.isInstanceOf[ObjectNode]
-      })
-      .mapValues(_.asInstanceOf[ObjectNode])
-      .mapKVtoValue((id, terrain) => patchFieldValue(terrain, idKey, TextNode.valueOf(id)))
-      .mapValues(JsonMapper.renameField(_, terrainProvincesKey, provinceIdsKey))
+  private def parseTerrainMapConf(o: ObjectNode): Seq[ObjectNode] =
+    fieldsToObjects(o, idKey).map(parseTerrainMapConfColor)
+
+  private def parseTerrainMapConfColor(conf: ObjectNode): ObjectNode =
+    conf
+      .getArray("color")
+      .map(_.toSeq)
+      .flatMap(_.headOption)
+      .map(c => conf.setEx("color", c))
+      .getOrElse(conf)
 
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
-import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, ProvinceRepository}
+import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
@@ -141,7 +141,9 @@ object ProvinceParser extends LazyLogging {
     val id = province.id
 
     val pType = geography.provinceTypes.map(_.identifyType(id))
-    val terrain = geography.terrain.ofProvince(id)
+    val mapTerrain = terrainMapTypeOf(province, geography.map)
+    val terrainOverride = geography.terrain.ofProvince(id)
+    val terrain = terrainOverride.orElse(mapTerrain)
     val climate = geography.climate.ofProvince(id)
 
     val area = geography.areas.areaOfProvince(id).map(_.id)
@@ -153,6 +155,9 @@ object ProvinceParser extends LazyLogging {
 
     province.copy(geography = provinceGeography)
   }
+
+  def terrainMapTypeOf(p: Province, m: MapRepository): Option[String] =
+    m.find(p.color).toOption.flatMap(_.terrainColor).flatMap(m.terrainMapType)
 
   def addPolitics
   (provinceRepo: ProvinceRepository, repos: RepositoryFactory)

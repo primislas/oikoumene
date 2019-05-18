@@ -1,10 +1,8 @@
 package com.lomicron.oikoumene.engine
 
-import java.nio.file.Paths
-
-import com.lomicron.oikoumene.model.map.Tile
 import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyParser, WarGoalTypeParser, WarHistoryParser}
 import com.lomicron.oikoumene.parsers.government.IdeaParser
+import com.lomicron.oikoumene.parsers.map.MapParser
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
 import com.lomicron.oikoumene.parsers.trade.{TradeGoodParser, TradeNodeParser}
@@ -21,12 +19,12 @@ object Oikoumene extends LazyLogging {
     val modDir = ""
 
     val repos = InMemoryRepositoryFactory(gameDir, modDir)
-    populateRepos(repos)
+    parseConfigs(repos)
 
     logger.info("Bye")
   }
 
-  def populateRepos(repos: RepositoryFactory): RepositoryFactory = {
+  def parseConfigs(repos: RepositoryFactory): RepositoryFactory = {
     logger.info("Parsing configs")
 
     val tags = TagParser(repos)
@@ -58,27 +56,16 @@ object Oikoumene extends LazyLogging {
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
 
+    logger.info("Loading map...")
+    val geography = MapParser(repos)
+    logger.info(s"Loaded ${geography.map.size} tiles")
+
+    logger.info("Loading provinces...")
     val provinces = ProvinceParser(repos)
     logger.info(s"Loaded ${provinces.size} provinces")
 
     logger.info(s"Configs loaded")
     repos
   }
-
-  private def loadMap(): Seq[Tile] = {
-    logger.info("Loading provinces...")
-    val rootDir = System.getProperty("user.dir")
-    val relativeMapDir = "./clausewitz/resources/"
-    val mapDir = Paths.get(rootDir, relativeMapDir)
-    val map = MapLoader.loadMap(mapDir).get
-    val tiles = map._1
-    val routes = map._2
-    logger.info("Loaded " + tiles.size + " tiles, :" + tiles)
-    val l: List[Int] = Nil
-    tiles
-  }
-
-
-
 
 }

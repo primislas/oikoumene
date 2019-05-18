@@ -20,4 +20,6 @@ trait GeographicRepository { self =>
   def terrain: TerrainRepository
   def climate: ClimateRepository
 
+  def map: MapRepository
+
 }

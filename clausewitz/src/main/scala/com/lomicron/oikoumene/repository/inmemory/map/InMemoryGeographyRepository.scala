@@ -5,6 +5,8 @@ import com.lomicron.oikoumene.repository.api.map._
 object InMemoryGeographyRepository
 extends GeographicRepository {
 
+  private val mapRepo = InMemoryMapRepository()
+
   override def areas: AreaRepository = InMemoryAreaRepository
 
   override def regions: RegionRepository = InMemoryRegionRepository
@@ -18,4 +20,7 @@ extends GeographicRepository {
   override def terrain: TerrainRepository = InMemoryTerrainRepository
 
   override def climate: ClimateRepository = InMemoryClimateRepository
+
+  override def map: MapRepository = mapRepo
+
 }

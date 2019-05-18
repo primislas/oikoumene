@@ -42,6 +42,10 @@ case class FileResourceRepository
   val provinceHistoryDir = "history/provinces"
   val buildingsDir = "common/buildings"
 
+  val provinceMap = "map/provinces.bmp"
+  val terrainMap = "map/terrain.bmp"
+  val heightMap = "map/heightmap.bmp"
+
   val culturesFile = "common/cultures/00_cultures.txt"
   val religionsDir = "common/religions"
 
@@ -143,11 +147,18 @@ case class FileResourceRepository
   override def getColonialRegions: Option[String] =
     readSourceFileContent(colonialRegionsFile)
 
-  override def getTerrain: Option[String] =
-    readSourceFileContent(terrainFile)
+  override def getTerrain: Map[String, String] =
+    readSourceFileMapToName(terrainFile)
 
   override def getClimate: Option[String] =
     readSourceFileContent(climateFile)
+
+  override def getProvinceMap: Option[Path] = Option(fromSource(provinceMap))
+
+  override def getTerrainMap: Option[Path] = Option(fromSource(terrainMap))
+
+  override def getHeightMap: Option[Path] = Option(fromSource(heightMap))
+
 
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
   val provNameRegex: Regex = provNamePat.r

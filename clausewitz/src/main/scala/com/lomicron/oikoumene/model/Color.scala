@@ -9,9 +9,15 @@ import com.lomicron.utils.json.JsonMapper._
 case class Color
 (r: Int = 0,
  g: Int = 0,
- b: Int = 0) {
+ b: Int = 0)
+extends Ordered[Color]
+{
 
   @JsonCreator def this() = this(0)
+
+  override def compare(that: Color): Int = toInt - that.toInt
+
+  private def toInt: Int = r * 1000000 +  g * 1000 + b
 
 }
 
@@ -22,6 +28,13 @@ object Color extends FromJson[Color] {
   @JsonCreator def apply(n: JsonNode): Color = n match {
     case a: ArrayNode => apply(a)
     case o: ObjectNode => apply(o)
+  }
+
+  def apply(argb: Int): Color = {
+    val r = (argb >> 16) & 0xFF
+    val g = (argb >> 8) & 0xFF
+    val b = (argb >> 0) & 0xFF
+    Color(r, g, b)
   }
 
   def apply(a: ArrayNode): Color = {

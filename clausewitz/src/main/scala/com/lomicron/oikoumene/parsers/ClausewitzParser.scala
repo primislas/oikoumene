@@ -35,6 +35,9 @@ object ClausewitzParser extends LazyLogging {
     val provinceIdsKey = "province_ids"
     val idKey = "id"
     val regionIdsKey = "region_ids"
+    val terrainCategoriesKey = "categories"
+    val terrainProvincesKey = "terrain_override"
+    val terrainKey = "terrain"
   }
 
   val empty: (ObjectNode, Seq[ParsingError]) =
@@ -55,6 +58,31 @@ object ClausewitzParser extends LazyLogging {
       .map(t => (t._1.asInstanceOf[ObjectNode], t._2))
       .getOrElse(empty)
   }
+
+  /**
+    * Returns a seq of object fields. Optionally
+    * sets field names as idKey in thos objects.
+    *
+    * @param o source JSON object
+    * @param idKey field names will be set to idKey fields
+    *              of resulting objects, if idKey is provided
+    * @return object fields
+    */
+  def fieldsToObjects(o: ObjectNode, idKey: Option[String] = None): Seq[ObjectNode] = {
+    o.fieldNames().toSeq.flatMap(id => o.getObject(id).map(v => idKey.map(v.setEx(_, id)).getOrElse(v)))
+  }
+
+  /**
+    * Returns a seq of object fields. Optionally
+    * sets field names as idKey in thos objects.
+    *
+    * @param o source JSON object
+    * @param idKey field names will be set to idKey fields
+    *              of resulting objects, if idKey is provided
+    * @return object fields
+    */
+  def fieldsToObjects(o: ObjectNode, idKey: String): Seq[ObjectNode] =
+    fieldsToObjects(o, Option(idKey))
 
   def parseEvents(obj: ObjectNode): Seq[ObjectNode] = {
     val events = getEvents(obj)

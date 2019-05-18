@@ -22,7 +22,7 @@ object GeographyParser extends LazyLogging {
     SuperRegionParser(files, localisation, geography.superregions, evalEntityFields)
     ContinentParser(files, localisation, geography.continent, evalEntityFields)
     ColonialRegionParser(files, localisation, geography.colonies, evalEntityFields)
-    TerrainParser(files, localisation, geography.terrain, evalEntityFields)
+    TerrainParser(files, localisation, geography, evalEntityFields)
     ClimateParser(files, localisation, geography.climate, evalEntityFields)
     ProvinceTypeParser(files, geography, evalEntityFields)
 

@@ -1,5 +1,7 @@
 package com.lomicron.oikoumene.repository.api
 
+import java.nio.file.Path
+
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 
 trait ResourceRepository {
@@ -56,9 +58,15 @@ trait ResourceRepository {
 
   def getColonialRegions: Option[String]
 
-  def getTerrain: Option[String]
+  def getTerrain: Map[String, String]
 
   def getClimate: Option[String]
+
+  def getProvinceMap: Option[Path]
+
+  def getTerrainMap: Option[Path]
+
+  def getHeightMap: Option[Path]
 
   def getCultures: Option[String]
 
