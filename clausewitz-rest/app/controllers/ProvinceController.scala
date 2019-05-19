@@ -24,6 +24,8 @@ class ProvinceController @Inject()
   (
     page: Option[Int] = None,
     size: Option[Int] = None,
+
+    name: Option[String] = None,
     owner: Option[String] = None,
     controller: Option[String] = None,
     core: Option[String] = None,
@@ -54,7 +56,7 @@ class ProvinceController @Inject()
     val s = size.getOrElse(10)
 
     val withDict = with_dictionary.getOrElse(false)
-    val conf = ProvinceSearchConf(p, s, withDict, owner, controller, core,
+    val conf = ProvinceSearchConf(p, s, withDict, name, owner, controller, core,
       religion, religion_group, culture, culture_group,
       area, region, superregion, continent,
       trade_good, trade_node,

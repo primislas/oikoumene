@@ -56,9 +56,9 @@ object Oikoumene extends LazyLogging {
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
 
-    logger.info("Loading map...")
-    val geography = MapParser(repos)
-    logger.info(s"Loaded ${geography.map.size} tiles")
+//    logger.info("Loading map...")
+//    val geography = MapParser(repos)
+//    logger.info(s"Loaded ${geography.map.size} tiles")
 
     logger.info("Loading provinces...")
     val provinces = ProvinceParser(repos)

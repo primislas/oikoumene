@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
+import com.lomicron.oikoumene.service.NamingService
 import com.lomicron.utils.collection.CollectionUtils._
 
 case class InMemoryProvinceRepository()
@@ -21,7 +22,7 @@ case class InMemoryProvinceRepository()
   }
 
   def search(req: ProvinceSearchConf): SearchResult[Province] = {
-    val allMatching = findAll
+    val withoutName = findAll
       .filter(p => searchArgMatches(req.owner, p.state.owner))
       .filter(p => searchArgMatches(req.controller, p.state.controller))
 
@@ -39,6 +40,10 @@ case class InMemoryProvinceRepository()
       .filter(p => searchArgMatches(req.tradeNode, p.geography.tradeNode))
 
       .filter(p => req.core.isEmpty || req.core.exists(p.state.cores.contains))
+
+    val allMatching = req.name.map(n => NamingService.makeAliases(n))
+      .map(ns => withoutName.filter(p => ns.exists(n => p.localisation.matches(n))))
+      .getOrElse(withoutName)
 
     val quotient = allMatching.size / req.size
     val rem = allMatching.size % req.size

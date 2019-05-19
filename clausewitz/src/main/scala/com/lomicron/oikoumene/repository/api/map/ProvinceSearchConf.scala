@@ -9,6 +9,8 @@ case class ProvinceSearchConf
   override val size: Int = 10,
   override val withDictionary: Boolean = false,
 
+  name: Option[String] = None,
+
   owner: Option[String] = None,
   controller: Option[String] = None,
   core: Option[String] = None,

@@ -17,6 +17,8 @@ export class ProvinceService {
     private noSelect: () => Entity = () => undefined;
 
     searchFilters: ProvinceSearchFilter[] = [
+        new ProvinceSearchFilter('name', 'Name'),
+
         new ProvinceSearchFilter('owner', 'Owner'),
         new ProvinceSearchFilter('controller', 'Controller'),
         new ProvinceSearchFilter('core', 'Core'),
