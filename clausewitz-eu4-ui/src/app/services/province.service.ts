@@ -1,20 +1,16 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RestConstantsService} from './rest-constants.service';
-import {Observable, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {SearchResult} from '../model/search.result';
 import {ProvinceListEntity} from '../model/province/province.list.entity';
-import {catchError, map} from 'rxjs/operators';
 import {ProvinceSearchFilter} from '../province-search/province.search.filter';
-import {Entity} from 'src/app/model/entity';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProvinceService {
-
-    private noSelect: () => Entity = () => undefined;
 
     searchFilters: ProvinceSearchFilter[] = [
         new ProvinceSearchFilter('name', 'Name'),
@@ -53,22 +49,6 @@ export class ProvinceService {
 
         return this.http
             .get<SearchResult<ProvinceListEntity>>(endpoint)
-            .pipe(
-                catchError(ProvinceService.handleError)
-            );
-    }
-
-    addFilterValue(filter: ProvinceSearchFilter) {
-        filter.addValue();
-    }
-
-    removeFilterValue(filter: ProvinceSearchFilter, index: number) {
-        filter.removeValue(index);
-    }
-
-    static handleError(error): Observable<never> {
-        // console.log(`Search error: ${JSON.stringify(error)}`);
-        return throwError(error);
     }
 
 }

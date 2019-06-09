@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class RestConstantsService {
   readonly eu4Service = "/clausewitz/eu4";
   readonly provinceSearchEndpoint = `${this.eu4Service}/provinces`;
+  readonly tagSearchEndpoint = `${this.eu4Service}/tags`;
 
   constructor() { }
 }

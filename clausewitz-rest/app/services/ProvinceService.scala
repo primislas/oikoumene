@@ -40,8 +40,6 @@ class ProvinceService @Inject
     val tradeGoods = (conf.tradeGood.toSeq ++ entities.flatMap(_.tradeGood)).distinct
     val trGoodNames = repos.tradeGoods.findNames(tradeGoods)
 
-
-
     SearchDictionary.empty.copy(
       tag = tagNames,
       religion = religionNames,

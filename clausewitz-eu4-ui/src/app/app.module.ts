@@ -9,11 +9,13 @@ import {DataTableModule} from 'angular-6-datatable';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { ProvinceSearchComponent } from './province-search/province-search.component';
+import { TagSearchComponent } from './tag-search/tag-search.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProvinceSearchComponent
+    ProvinceSearchComponent,
+    TagSearchComponent
   ],
   imports: [
     BrowserModule,
