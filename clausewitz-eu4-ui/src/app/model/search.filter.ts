@@ -1,19 +1,18 @@
-import {Entity} from '../model/entity';
+import {Entity} from './entity';
 
-export class ProvinceSearchFilter {
+export class SearchFilter {
     id: string;
     name: string;
+    value: any;
     values: Entity[] = [];
-    // TODO: display select if options are available
     options: Entity[] = [];
-    select: () => Entity;
 
     constructor(id: string, name: string) {
         this.id = id;
         this.name = name;
     }
 
-    addValue(v: Entity = new Entity()): ProvinceSearchFilter {
+    addValue(v: Entity = new Entity()): SearchFilter {
         if (this.values.length > 0) return;
         // const e = this.select();
         // if (e) this.values.push(e);
@@ -21,7 +20,7 @@ export class ProvinceSearchFilter {
         return this;
     }
 
-    removeValue(index): ProvinceSearchFilter {
+    removeValue(index): SearchFilter {
         this.values.splice(index, 1);
         return this;
     }

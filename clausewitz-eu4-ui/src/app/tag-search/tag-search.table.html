@@ -1,0 +1,38 @@
+<table class="table  table-sm table-striped table-hover" [mfData]="tags"  #mf="mfDataTable">
+    <thead class="thead-dark">
+    <tr>
+        <td>Select</td>
+        <td *ngFor="let f of filters">{{f.name}}</td>
+        <td>Provinces</td>
+        <td>Development</td>
+    </tr>
+    <tr>
+        <td *ngIf="select"></td>
+        <td *ngFor="let f of filters">
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" class="form-control" [(ngModel)]="f.value" (keyup.enter)="search()">
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let t of mf.data">
+        <td *ngIf="select">
+            <button class="btn btn-sm" (click)="select(t)" title="Select {{t.name}}">
+                <i class="fa fa-hand-pointer-o"></i>
+            </button>
+        </td>
+
+        <ng-container *ngFor="let f of filters">
+            <td *ngIf="f.id === 'name'" title="{{t.id}}"><img *ngIf="t.id" class="border border-secondary" width="32" height="32" src="/clausewitz/eu4/gfx/flags/{{t.id}}">&nbsp;{{t.name}}</td>
+            <td *ngIf="f.id === 'religion'" title="{{dict.religion[t.religion]}} ({{t.religion}})"><img *ngIf="t.religion" width="32" height="32" src="/clausewitz/eu4/gfx/religions/{{t.religion}}">&nbsp;{{dict.religion[t.religion]}}</td>
+            <td *ngIf="f.id === 'primaryCulture'" title="{{t.primaryCulture}}">{{dict.culture[t.primaryCulture]}}</td>
+            <!-- TODO: else condition            -->
+        </ng-container>
+
+        <td>{{t.provinces}}</td>
+        <td>{{t.development}}</td>
+    </tr>
+    </tbody>
+</table>

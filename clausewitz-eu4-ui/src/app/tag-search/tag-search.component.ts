@@ -1,22 +1,31 @@
 import {Component, OnInit} from '@angular/core';
 import {SearchResult} from '../model/search.result';
-import {TagSearchFilter} from './tag.search.filter';
+import {SearchFilter} from '../model/search.filter';
 import {Entity} from '../model/entity';
 import {SearchDictionary} from '../model/search.dictionary';
 import {TagService} from '../services/tag.service';
+import {TagListEntity} from '../model/politics/tag.list.entity';
+import {Paginateable} from '../pagination/paginateable';
+import {PaginationConf} from '../pagination/pagination.conf';
 
 @Component({
-  selector: 'app-tag-search',
+  selector: 'tag-search',
   templateUrl: './tag-search.component.html',
   styleUrls: ['./tag-search.component.scss']
 })
-export class TagSearchComponent implements OnInit {
+export class TagSearchComponent implements OnInit, Paginateable {
 
-  pagination: SearchResult<any>;
-  filters: TagSearchFilter[] = [];
+  self() {
+    return this;
+  }
+
   pageSizes: number[] = [5,10,25];
-  tags: any[] = [];
-  dict: SearchDictionary;
+  searchResult: SearchResult<TagListEntity> = new SearchResult();
+  pagination: PaginationConf = new PaginationConf(this.searchTags, this.first, this.next, this.prev, this.last);
+
+  filters: SearchFilter[] = [];
+  tags: TagListEntity[] = [];
+  dict: SearchDictionary = new SearchDictionary();
 
 
   constructor(
@@ -24,16 +33,17 @@ export class TagSearchComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.filters = this.tagService.searchFilters;
+    this.searchTags();
   }
 
+  searchTags(page = this.searchResult.page, withDictionary = true) {
+    if (page >= 1 && page <= this.searchResult.totalPages)
+      this.searchResult.page = page;
 
-  searchTags(page = this.pagination.page, withDictionary = true) {
-    if (page >= 1 && page <= this.pagination.totalPages)
-      this.pagination.page = page;
-
-    const pageFilter = new TagSearchFilter("page", "Page").addValue(new Entity(this.pagination.page));
-    const pageSizeFilter = new TagSearchFilter("size", "Page Size").addValue(new Entity(this.pagination.size));
-    const dictFilter = new TagSearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
+    const pageFilter = new SearchFilter("page", "Page").addValue(new Entity(page - 1));
+    const pageSizeFilter = new SearchFilter("size", "Page Size").addValue(new Entity(this.searchResult.size));
+    const dictFilter = new SearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
 
     const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters);
 
@@ -41,9 +51,29 @@ export class TagSearchComponent implements OnInit {
         .searchTags(allFilters)
         .subscribe(res => {
           this.tags = res.entities;
-          this.pagination = res;
+          this.searchResult = res;
           this.dict = res.dictionary;
         });
+  }
+
+  search() {
+    this.searchTags();
+  }
+
+  first() {
+    this.searchTags(1);
+  }
+
+  prev() {
+    this.searchTags(this.searchResult.page - 1);
+  }
+
+  next() {
+    this.searchTags(this.searchResult.page + 1);
+  }
+
+  last() {
+    this.searchTags(this.searchResult.totalPages);
   }
 
 }
