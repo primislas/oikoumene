@@ -22,6 +22,7 @@ case class InMemoryTagRepository()
   def search(req: TagSearchConf): SearchResult[Tag] = {
     val withoutName = findAll
       .filter(p => searchArgMatches(req.primaryCulture, p.state.primaryCulture))
+      .filter(p => searchArgMatches(req.religion, p.state.religion))
       .filter(p => req.id.forall(reqId => p.id.contains(reqId.toUpperCase)))
 
     val allMatching = req.name.map(n => NamingService.makeAliases(n))

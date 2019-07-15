@@ -13,9 +13,7 @@ export class SearchFilter {
     }
 
     addValue(v: Entity = new Entity()): SearchFilter {
-        if (this.values.length > 0) return;
-        // const e = this.select();
-        // if (e) this.values.push(e);
+        if (this.values.length > 0) return this;
         this.values.push(v);
         return this;
     }
@@ -27,6 +25,13 @@ export class SearchFilter {
 
     setOptions(options: Entity[]) {
         this.options = options;
+    }
+
+    fromValue(): SearchFilter {
+        if (this.value && this.value !== "") this.values = [new Entity(this.value)];
+        else this.values = [];
+
+        return this;
     }
 
 }

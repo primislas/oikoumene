@@ -38,14 +38,16 @@ export class TagSearchComponent implements OnInit, Paginateable {
   }
 
   searchTags(page = this.searchResult.page, withDictionary = true) {
-    if (page >= 1 && page <= this.searchResult.totalPages)
-      this.searchResult.page = page;
+    const sr = this.searchResult;
+    if (page < 1) sr.page = 1;
+    else if (page > sr.totalPages) sr.page = sr.totalPages;
+    else sr.page = page;
 
-    const pageFilter = new SearchFilter("page", "Page").addValue(new Entity(page - 1));
-    const pageSizeFilter = new SearchFilter("size", "Page Size").addValue(new Entity(this.searchResult.size));
+    const pageFilter = new SearchFilter("page", "Page").addValue(new Entity(sr.page));
+    const pageSizeFilter = new SearchFilter("size", "Page Size").addValue(new Entity(sr.size));
     const dictFilter = new SearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
 
-    const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters);
+    const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters.map(f => f.fromValue()));
 
     this.tagService
         .searchTags(allFilters)

@@ -12,7 +12,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <tag-search-table [filters]="filters" [tags]="tags" [dict]="dict" [select]="select" [search]="searchTags"></tag-search-table>
+            <tag-search-table [page]="self()" [filters]="filters" [selector]="self()"></tag-search-table>
         </div>
     </div>
 </div>

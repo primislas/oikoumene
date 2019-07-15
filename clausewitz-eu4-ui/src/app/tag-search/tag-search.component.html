@@ -1,8 +1,8 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <pagination [conf]="self"></pagination>
-            <tag-search-table [filters]="filters" [tags]="tags" [dict]="dict"></tag-search-table>
+            <pagination [conf]="self()"></pagination>
+            <tag-search-table [filters]="filters" [page]="self()"></tag-search-table>
         </div>
     </div>
 </div>

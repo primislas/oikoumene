@@ -1,8 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {SearchFilter} from '../model/search.filter';
-import {TagListEntity} from '../model/politics/tag.list.entity';
-import {SearchDictionary} from '../model/search.dictionary';
-import {noop} from 'rxjs';
+import {Paginateable} from '../pagination/paginateable';
+import {Selector} from '../utils/selector';
 
 @Component({
   selector: 'tag-search-table',
@@ -11,10 +10,8 @@ import {noop} from 'rxjs';
 })
 export class TagSearchTableComponent {
 
+  @Input() page: Paginateable;
   @Input() filters: SearchFilter[] = [];
-  @Input() tags: TagListEntity[] = [];
-  @Input() dict: SearchDictionary = new SearchDictionary();
-  @Input() select: Function = noop;
-  @Input() search: Function = noop;
+  @Input() selector: Selector;
 
 }

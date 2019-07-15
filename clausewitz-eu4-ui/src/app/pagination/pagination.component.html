@@ -9,17 +9,17 @@
         <div class="btn-group btn-group-sm" role="group" aria-label="Pagination">
             <button type="button" class="btn  btn-secondary" (click)="first()">1</button>
             <button type="button" class="btn  btn-secondary" (click)="prev()">&lt;</button>
-            <button type="button" class="btn  btn-secondary" disabled>{{vm.searchResult.page}}</button>
+            <button type="button" class="btn  btn-secondary" disabled>{{conf.searchResult.page}}</button>
             <button type="button" class="btn  btn-secondary" (click)="next()">&gt;</button>
-            <button type="button" class="btn  btn-secondary" (click)="last()">{{vm.searchResult.totalPages}}
-                ({{vm.searchResult.totalEntities}})
+            <button type="button" class="btn  btn-secondary" (click)="last()">{{conf.searchResult.totalPages}}
+                ({{conf.searchResult.totalEntities}})
             </button>
         </div>
     </div>
     <div class="col-sm-4">
         <div class="form-group row">
             <label id="pageSize" for="pageSizeSelect">Page Size&nbsp;</label>
-            <select class="form-control-sm" id="pageSizeSelect" [(ngModel)]="vm.searchResult.size" [value]="10"
+            <select class="form-control-sm" id="pageSizeSelect" [(ngModel)]="conf.searchResult.size" [value]="10"
                     (change)="search()">
                 <option *ngFor="let ps of pageSizes">{{ps}}</option>
             </select>

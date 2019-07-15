@@ -17,12 +17,13 @@ export class TagService {
 
     searchFilters = [
         new SearchFilter('name', 'Name'),
-        new SearchFilter('primaryCulture', 'Primary Culture'),
+        new SearchFilter('primary_culture', 'Primary Culture'),
         new SearchFilter('religion', 'Religion'),
     ];
 
     searchTags(filters: SearchFilter[] = []): Observable<SearchResult<TagListEntity>> {
-        const params = filters.filter(f => f.values.length > 0)
+        const params = filters
+            .filter(f => f.values.length > 0)
             .map(f => f.values.map(v => `${f.id}=${v.id}`))
             .reduce((acc, a) => acc.concat(a), [])
             .join('&');

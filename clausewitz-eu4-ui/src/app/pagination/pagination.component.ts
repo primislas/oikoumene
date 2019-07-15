@@ -14,7 +14,6 @@ export class PaginationComponent implements OnInit, Paginateable {
     }
 
     @Input() conf: Paginateable = this;
-    vm = this;
 
     pagination: PaginationConf = new PaginationConf();
     searchResult: SearchResult<any> = new SearchResult();
