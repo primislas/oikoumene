@@ -25,6 +25,7 @@
         </td>
 
         <ng-container *ngFor="let f of filters">
+            <td *ngIf="f.id === 'id'" title="{{t.name}}">{{t.id}}</td>
             <td *ngIf="f.id === 'name'" title="{{t.id}}"><img *ngIf="t.id" class="border border-secondary" width="32" height="32" src="/clausewitz/eu4/gfx/flags/{{t.id}}">&nbsp;{{t.name}}</td>
             <td *ngIf="f.id === 'religion'" title="{{page.searchResult.dictionary.religion[t.religion]}} ({{t.religion}})"><img *ngIf="t.religion" width="32" height="32" src="/clausewitz/eu4/gfx/religions/{{t.religion}}">&nbsp;{{page.searchResult.dictionary.religion[t.religion]}}</td>
             <td *ngIf="f.id === 'primary_culture'" title="{{t.primaryCulture}}">{{page.searchResult.dictionary.culture[t.primaryCulture]}}</td>

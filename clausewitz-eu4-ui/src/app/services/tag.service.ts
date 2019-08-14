@@ -16,6 +16,7 @@ export class TagService {
     }
 
     searchFilters = [
+        new SearchFilter('id', 'Tag'),
         new SearchFilter('name', 'Name'),
         new SearchFilter('primary_culture', 'Primary Culture'),
         new SearchFilter('religion', 'Religion'),
