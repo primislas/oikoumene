@@ -1,40 +1,37 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {RestConstantsService} from './rest-constants.service';
-import {Observable, throwError} from 'rxjs';
-import {SearchResult} from '../model/search.result';
+import {Observable} from 'rxjs';
+import {SearchResult} from '../model/search/search.result';
 import {ProvinceListEntity} from '../model/province/province.list.entity';
-import {catchError, map} from 'rxjs/operators';
-import {ProvinceSearchFilter} from '../province-search/province.search.filter';
-import {Entity} from 'src/app/model/entity';
+import {SearchFilter} from '../model/search/filters/search.filter';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TextSearchFilter} from '../model/search/filters/text.search.filter';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProvinceService {
 
-    private noSelect: () => Entity = () => undefined;
+    searchFilters: SearchFilter<any>[] = [
+        new TextSearchFilter('name', 'Name'),
 
-    searchFilters: ProvinceSearchFilter[] = [
-        new ProvinceSearchFilter('name', 'Name'),
+        new TextSearchFilter('owner', 'Owner'),
+        new TextSearchFilter('controller', 'Controller'),
+        new TextSearchFilter('core', 'Core'),
 
-        new ProvinceSearchFilter('owner', 'Owner'),
-        new ProvinceSearchFilter('controller', 'Controller'),
-        new ProvinceSearchFilter('core', 'Core'),
+        new TextSearchFilter('religion', 'Religion'),
+        new TextSearchFilter('religion_group', 'Religion Group'),
+        new TextSearchFilter('culture', 'Culture'),
+        new TextSearchFilter('culture_group', 'Culture Group'),
 
-        new ProvinceSearchFilter('religion', 'Religion'),
-        new ProvinceSearchFilter('religion_group', 'Religion Group'),
-        new ProvinceSearchFilter('culture', 'Culture'),
-        new ProvinceSearchFilter('culture_group', 'Culture Group'),
+        new TextSearchFilter('area', 'Area'),
+        new TextSearchFilter('region', 'Region'),
+        new TextSearchFilter('superregion', 'Super-region'),
+        new TextSearchFilter('continent', 'Continent'),
 
-        new ProvinceSearchFilter('area', 'Area'),
-        new ProvinceSearchFilter('region', 'Region'),
-        new ProvinceSearchFilter('superregion', 'Super-region'),
-        new ProvinceSearchFilter('continent', 'Continent'),
-
-        new ProvinceSearchFilter('trade_good', 'Trade Good'),
-        new ProvinceSearchFilter('trade_node', 'Trade Node'),
+        new TextSearchFilter('trade_good', 'Trade Good'),
+        new TextSearchFilter('trade_node', 'Trade Node'),
     ];
 
     constructor(private http: HttpClient,
@@ -42,33 +39,12 @@ export class ProvinceService {
                 private modalService: NgbModal) {
     }
 
-    searchProvinces(filters: ProvinceSearchFilter[] = []): Observable<SearchResult<ProvinceListEntity>> {
-        const params = filters.filter(f => f.values.length > 0)
-            .map(f => f.values.map(v => `${f.id}=${v.id}`))
-            .reduce((acc, a) => acc.concat(a), [])
-            .join('&');
-        const endpoint = (params.length > 0)
-            ? `${this.constants.provinceSearchEndpoint}?${params}`
-            : this.constants.provinceSearchEndpoint;
-
+    searchProvinces(filters: SearchFilter<any>[] = []): Observable<SearchResult<ProvinceListEntity>> {
+        const params = SearchFilter.toQueryParams(filters);
         return this.http
-            .get<SearchResult<ProvinceListEntity>>(endpoint)
-            .pipe(
-                catchError(ProvinceService.handleError)
+            .get<SearchResult<ProvinceListEntity>>(
+                `${this.constants.provinceSearchEndpoint}?${params}`
             );
-    }
-
-    addFilterValue(filter: ProvinceSearchFilter) {
-        filter.addValue();
-    }
-
-    removeFilterValue(filter: ProvinceSearchFilter, index: number) {
-        filter.removeValue(index);
-    }
-
-    static handleError(error): Observable<never> {
-        // console.log(`Search error: ${JSON.stringify(error)}`);
-        return throwError(error);
     }
 
 }

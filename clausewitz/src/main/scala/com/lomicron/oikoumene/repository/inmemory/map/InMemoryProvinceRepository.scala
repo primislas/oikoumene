@@ -45,16 +45,7 @@ case class InMemoryProvinceRepository()
       .map(ns => withoutName.filter(p => ns.exists(n => p.localisation.matches(n))))
       .getOrElse(withoutName)
 
-    val quotient = allMatching.size / req.size
-    val rem = allMatching.size % req.size
-    val matchingPages = if (rem > 0) quotient + 1 else quotient
-    val page = if (req.offset < allMatching.size) req.page else 1
-    val offset = (page - 1) * req.size
-    val provinces = allMatching
-      .slice(offset, offset + req.size)
-      .map(p => if (req.excludeFields.nonEmpty) excludeFields(p, req.excludeFields) else p)
-
-    SearchResult(page, req.size, matchingPages, allMatching.size, provinces)
+    SearchResult(req, allMatching)
   }
 
   override def groupBy(searchConf: ProvinceSearchConf, group: String)

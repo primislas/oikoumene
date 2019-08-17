@@ -31,11 +31,7 @@ trait AbstractRepository [Key, Entity] {
 
   def search(req: SearchConf): SearchResult[Entity] = {
     val entities = findAll.slice(req.offset, req.offset + req.size)
-    val totalEntities = size
-    val quotient = totalEntities / req.size
-    val remainder = totalEntities % req.size
-    val totalPages = if (remainder == 0) quotient else quotient + 1
-    SearchResult(req.page, req.size, totalPages, totalEntities, entities)
+    SearchResult(req, entities)
   }
 
   def searchArgMatches[T](arg: Option[T], v: Option[T]): Boolean =
