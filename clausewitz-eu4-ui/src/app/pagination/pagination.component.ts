@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {PaginationConf} from './pagination.conf';
-import {SearchResult} from '../model/search.result';
+import {SearchResult} from '../model/search/search.result';
 import {Paginateable} from './paginateable';
 
 @Component({

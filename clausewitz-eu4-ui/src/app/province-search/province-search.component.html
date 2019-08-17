@@ -15,7 +15,8 @@
                             </button>
                         </div>
                         <!--suppress HtmlFormInputWithoutLabel, HtmlUnknownAttribute -->
-                        <input type="text" class="form-control form-control-sm" [(ngModel)]="v.id" (keyup.enter)="searchProvinces()">
+                        <input *ngIf="f.isEntity()" type="text" class="form-control form-control-sm" [(ngModel)]="v.id" (keyup.enter)="searchProvinces()">
+                        <input *ngIf="f.isField()" type="text" class="form-control form-control-sm" [(ngModel)]="v.value" (keyup.enter)="searchProvinces()">
                     </div>
                 </div>
             </div>

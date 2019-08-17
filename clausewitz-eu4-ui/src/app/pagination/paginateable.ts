@@ -1,4 +1,4 @@
-import {SearchResult} from '../model/search.result';
+import {SearchResult} from '../model/search/search.result';
 import {PaginationConf} from './pagination.conf';
 
 export interface Paginateable {

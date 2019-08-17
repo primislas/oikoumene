@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RestConstantsService} from './rest-constants.service';
-import {SearchFilter} from '../model/search.filter';
+import {SearchFilter} from '../model/search/filters/search.filter';
 import {Observable} from 'rxjs';
-import {SearchResult} from '../model/search.result';
+import {SearchResult} from '../model/search/search.result';
 import {TagListEntity} from '../model/politics/tag.list.entity';
+import {TextSearchFilter} from '../model/search/filters/text.search.filter';
 
 @Injectable({
     providedIn: 'root'
@@ -16,24 +17,18 @@ export class TagService {
     }
 
     searchFilters = [
-        new SearchFilter('id', 'Tag'),
-        new SearchFilter('name', 'Name'),
-        new SearchFilter('primary_culture', 'Primary Culture'),
-        new SearchFilter('religion', 'Religion'),
+        new TextSearchFilter('id', 'Tag'),
+        new TextSearchFilter('name', 'Name'),
+        new TextSearchFilter('primary_culture', 'Primary Culture'),
+        new TextSearchFilter('religion', 'Religion'),
     ];
 
-    searchTags(filters: SearchFilter[] = []): Observable<SearchResult<TagListEntity>> {
-        const params = filters
-            .filter(f => f.values.length > 0)
-            .map(f => f.values.map(v => `${f.id}=${v.id}`))
-            .reduce((acc, a) => acc.concat(a), [])
-            .join('&');
-        const endpoint = (params.length > 0)
-            ? `${this.constants.tagSearchEndpoint}?${params}`
-            : this.constants.tagSearchEndpoint;
-
+    searchTags(filters: SearchFilter<any>[] = []): Observable<SearchResult<TagListEntity>> {
+        const params = SearchFilter.toQueryParams(filters);
         return this.http
-            .get<SearchResult<TagListEntity>>(endpoint)
+            .get<SearchResult<TagListEntity>>(
+                `${this.constants.tagSearchEndpoint}?${params}`
+            );
     }
 
 }

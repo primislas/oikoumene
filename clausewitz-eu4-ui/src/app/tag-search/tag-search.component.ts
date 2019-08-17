@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {SearchResult} from '../model/search.result';
-import {SearchFilter} from '../model/search.filter';
+import {SearchResult} from '../model/search/search.result';
+import {SearchFilter} from '../model/search/filters/search.filter';
 import {Entity} from '../model/entity';
-import {SearchDictionary} from '../model/search.dictionary';
+import {SearchDictionary} from '../model/search/search.dictionary';
 import {TagService} from '../services/tag.service';
 import {TagListEntity} from '../model/politics/tag.list.entity';
 import {Paginateable} from '../pagination/paginateable';
 import {PaginationConf} from '../pagination/pagination.conf';
+import {EntitySearchFilter} from '../model/search/filters/entity.search.filter';
 
 @Component({
   selector: 'tag-search',
@@ -23,7 +24,7 @@ export class TagSearchComponent implements OnInit, Paginateable {
   searchResult: SearchResult<TagListEntity> = new SearchResult();
   pagination: PaginationConf = new PaginationConf(this.searchTags, this.first, this.next, this.prev, this.last);
 
-  filters: SearchFilter[] = [];
+  filters: SearchFilter<any>[] = [];
   tags: TagListEntity[] = [];
   dict: SearchDictionary = new SearchDictionary();
 
@@ -43,11 +44,11 @@ export class TagSearchComponent implements OnInit, Paginateable {
     else if (page > sr.totalPages) sr.page = sr.totalPages;
     else sr.page = page;
 
-    const pageFilter = new SearchFilter("page", "Page").addValue(new Entity(sr.page));
-    const pageSizeFilter = new SearchFilter("size", "Page Size").addValue(new Entity(sr.size));
-    const dictFilter = new SearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
+    const pageFilter = new EntitySearchFilter("page", "Page").addValue(new Entity(sr.page));
+    const pageSizeFilter = new EntitySearchFilter("size", "Page Size").addValue(new Entity(sr.size));
+    const dictFilter = new EntitySearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
 
-    const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters.map(f => f.fromValue()));
+    const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters);
 
     this.tagService
         .searchTags(allFilters)

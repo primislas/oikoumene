@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {SearchFilter} from '../model/search.filter';
+import {SearchFilter} from '../model/search/filters/search.filter';
 import {Paginateable} from '../pagination/paginateable';
 import {Selector} from '../utils/selector';
 
@@ -11,7 +11,7 @@ import {Selector} from '../utils/selector';
 export class TagSearchTableComponent {
 
   @Input() page: Paginateable;
-  @Input() filters: SearchFilter[] = [];
+  @Input() filters: SearchFilter<any>[] = [];
   @Input() selector: Selector;
 
 }

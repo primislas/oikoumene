@@ -2,12 +2,13 @@ import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {ProvinceService} from '../services/province.service';
 import {ProvinceListEntity} from '../model/province/province.list.entity';
 import {ProvinceGroupEntity} from '../model/province/province.group.entity';
-import {SearchResult} from '../model/search.result';
-import {SearchDictionary} from '../model/search.dictionary';
-import {SearchFilter} from '../model/search.filter';
+import {SearchResult} from '../model/search/search.result';
+import {SearchDictionary} from '../model/search/search.dictionary';
+import {SearchFilter} from '../model/search/filters/search.filter';
 import {Entity} from '../model/entity';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TagSearchModalComponent} from '../tag-search/tag-search.modal.component';
+import {EntitySearchFilter} from '../model/search/filters/entity.search.filter';
 
 @Component({
   selector: 'app-province-search',
@@ -20,7 +21,7 @@ export class ProvinceSearchComponent implements OnInit {
   provinces: ProvinceListEntity[];
   groups: ProvinceGroupEntity[];
   dict: SearchDictionary = new SearchDictionary();
-  filters: SearchFilter[] = [];
+  filters: SearchFilter<any>[] = [];
   pageSizes: number[] = [5,10,25,50,100,200,500,1000];
 
   @ViewChild('tagSearchModal')
@@ -42,9 +43,9 @@ export class ProvinceSearchComponent implements OnInit {
     if (page >= 1 && page <= this.pagination.totalPages)
       this.pagination.page = page;
 
-    const pageFilter = new SearchFilter("page", "Page").addValue(new Entity(page));
-    const pageSizeFilter = new SearchFilter("size", "Page Size").addValue(new Entity(this.pagination.size));
-    const dictFilter = new SearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
+    const pageFilter = new EntitySearchFilter("page", "Page").addValue(new Entity(page));
+    const pageSizeFilter = new EntitySearchFilter("size", "Page Size").addValue(new Entity(this.pagination.size));
+    const dictFilter = new EntitySearchFilter("with_dictionary", "Include Dictionary").addValue(new Entity(withDictionary));
 
     const allFilters = [pageFilter, pageSizeFilter, dictFilter].concat(this.filters);
 
@@ -61,7 +62,7 @@ export class ProvinceSearchComponent implements OnInit {
 
   }
 
-  removeFilterValue(f: SearchFilter, index: number) {
+  removeFilterValue(f: SearchFilter<any>, index: number) {
     f.removeValue(index);
     this.searchProvinces();
   }
