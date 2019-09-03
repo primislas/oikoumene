@@ -171,10 +171,10 @@ object ProvinceParser extends LazyLogging {
   (p: Province, repos: RepositoryFactory)
   : Province =
   {
-    val cultureGroup = p.state.culture.flatMap(repos.cultures.groupOf).map(_.id)
-    val religionGroup = p.state.religion.flatMap(repos.religions.groupOf).map(_.id)
-    val state = p.state.copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
-    p.copy(state = state)
+    val cultureGroup = p.state().culture.flatMap(repos.cultures.groupOf).map(_.id)
+    val religionGroup = p.state().religion.flatMap(repos.religions.groupOf).map(_.id)
+    val state = p.state().copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
+    p.withState(state)
   }
 
   def addTrade(provinces: ProvinceRepository, factory: RepositoryFactory): ProvinceRepository = {

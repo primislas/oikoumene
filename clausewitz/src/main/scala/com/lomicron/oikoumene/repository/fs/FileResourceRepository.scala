@@ -3,10 +3,13 @@ package com.lomicron.oikoumene.repository.fs
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.oikoumene.repository.api.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
+import com.lomicron.utils.json.JsonMapper
 
 import scala.collection.immutable.ListMap
 import scala.util.matching.Regex
@@ -163,11 +166,17 @@ case class FileResourceRepository
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
   val provNameRegex: Regex = provNamePat.r
 
-  override def getProvinceHistory: Map[Int, String] =
-    readAllFilesFromDir(fromSource(provinceHistoryDir))
+  override def getProvinceHistory: Map[Int, String] = {
+    val histFiles = readAllFilesFromDir(fromSource(provinceHistoryDir))
+    ClausewitzParser
+      .filesWithPrependedNames(histFiles)
       .mapKeys(idFromProvHistFileName)
       .filterKeys(_.isDefined)
       .mapKeys(_.get)
+  }
+
+
+//    readAllFilesFromDir(fromSource(provinceHistoryDir))
 
   override def getBuildings: Seq[String] =
     readAllFilesFromDir(fromSource(buildingsDir)).values.toSeq

@@ -96,3 +96,7 @@ case class ProvinceUpdate
   @JsonCreator def this() = this(controller = None)
 
 }
+
+object ProvinceUpdate {
+  def empty: ProvinceUpdate = ProvinceUpdate()
+}

@@ -23,23 +23,23 @@ case class InMemoryProvinceRepository()
 
   def search(req: ProvinceSearchConf): SearchResult[Province] = {
     val withoutName = findAll
-      .filter(p => searchArgMatches(req.owner, p.state.owner))
-      .filter(p => searchArgMatches(req.controller, p.state.controller))
+      .filter(p => searchArgMatches(req.owner, p.state().owner))
+      .filter(p => searchArgMatches(req.controller, p.state().controller))
 
-      .filter(p => searchArgMatches(req.religion, p.state.religion))
-      .filter(p => searchArgMatches(req.religionGroup, p.state.religionGroup))
-      .filter(p => searchArgMatches(req.culture, p.state.culture))
-      .filter(p => searchArgMatches(req.cultureGroup, p.state.cultureGroup))
+      .filter(p => searchArgMatches(req.religion, p.state().religion))
+      .filter(p => searchArgMatches(req.religionGroup, p.state().religionGroup))
+      .filter(p => searchArgMatches(req.culture, p.state().culture))
+      .filter(p => searchArgMatches(req.cultureGroup, p.state().cultureGroup))
 
       .filter(p => searchArgMatches(req.area, p.geography.area))
       .filter(p => searchArgMatches(req.region, p.geography.region))
       .filter(p => searchArgMatches(req.superRegion, p.geography.superRegion))
       .filter(p => searchArgMatches(req.continent, p.geography.continent))
 
-      .filter(p => searchArgMatches(req.tradeGood, p.state.tradeGood))
+      .filter(p => searchArgMatches(req.tradeGood, p.state().tradeGood))
       .filter(p => searchArgMatches(req.tradeNode, p.geography.tradeNode))
 
-      .filter(p => req.core.isEmpty || req.core.exists(p.state.cores.contains))
+      .filter(p => req.core.isEmpty || req.core.exists(p.state().cores.contains))
 
     val allMatching = req.name.map(n => NamingService.makeAliases(n))
       .map(ns => withoutName.filter(p => ns.exists(n => p.localisation.matches(n))))
@@ -105,7 +105,7 @@ case class InMemoryProvinceRepository()
   }
 
   private def groupProvinces(v: AnyRef, ps: Seq[Province]): ProvinceGroup = {
-    val development = ps.foldLeft(0)(_ + _.state.development)
+    val development = ps.foldLeft(0)(_ + _.state().development)
     ProvinceGroup(v, ps, development)
   }
 

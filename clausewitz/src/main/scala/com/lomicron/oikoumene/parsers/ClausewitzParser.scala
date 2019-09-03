@@ -20,6 +20,7 @@ object ClausewitzParser extends LazyLogging {
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
   object Fields {
+    val sourceFile = "source_file"
     val history = "history"
     val state = "state"
     val events = "events"
@@ -63,7 +64,7 @@ object ClausewitzParser extends LazyLogging {
     * Returns a seq of object fields. Optionally
     * sets field names as idKey in thos objects.
     *
-    * @param o source JSON object
+    * @param o     source JSON object
     * @param idKey field names will be set to idKey fields
     *              of resulting objects, if idKey is provided
     * @return object fields
@@ -76,7 +77,7 @@ object ClausewitzParser extends LazyLogging {
     * Returns a seq of object fields. Optionally
     * sets field names as idKey in thos objects.
     *
-    * @param o source JSON object
+    * @param o     source JSON object
     * @param idKey field names will be set to idKey fields
     *              of resulting objects, if idKey is provided
     * @return object fields
@@ -106,6 +107,17 @@ object ClausewitzParser extends LazyLogging {
     events
   }
 
+  def filesWithPrependedNames(filesByName: Map[String, String]): Map[String, String] =
+    filesByName
+      .mapValuesEx(_.split("\n"))
+      .mapKVtoValue((name, lines) => s"${Fields.sourceFile} = $name" +: lines)
+      .mapValuesEx(_.mkString("\n"))
+
+  def mapEntityFilesToFileNames(filesByName: Map[String, String]): Map[String, ObjectNode] =
+    parseFilesByFileNames(filesByName, o => Seq(o))
+      .filterValues(_.nonEmpty)
+      .mapValues(_.head)
+
   def parseFilesAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, o => Seq(o))
 
@@ -115,15 +127,19 @@ object ClausewitzParser extends LazyLogging {
   private def parseFiles
   (filesByName: Map[String, String],
    fileParser: ObjectNode => Seq[ObjectNode])
-  : Seq[ObjectNode] =
+  : Seq[ObjectNode] = parseFilesByFileNames(filesByName, fileParser).values.toList.flatten
+
+  private def parseFilesByFileNames
+  (filesByName: Map[String, String],
+   fileParser: ObjectNode => Seq[ObjectNode])
+  : Map[String, Seq[ObjectNode]] =
     filesByName
       .mapValues(parse)
       .mapKVtoValue((filename, o) => {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing $filename: ${o._2}")
         fileParser(o._1)
       })
-      .mapKVtoValue((filename, entities) => entities.map(_.setEx("source_file", filename)))
-      .values.toList.flatten
+      .mapKVtoValue((filename, entities) => entities.map(_.setEx(Fields.sourceFile, filename)))
 
   /**
     * Treats root object fields as ids of entities configure

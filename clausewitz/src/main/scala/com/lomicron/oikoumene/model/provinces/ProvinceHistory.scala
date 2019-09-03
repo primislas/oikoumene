@@ -1,26 +1,35 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
 case class ProvinceHistory
-(state: ProvinceState = ProvinceState.empty,
- events: Seq[ProvinceUpdate] = Seq.empty) {
+(
+  init: ProvinceUpdate = ProvinceUpdate.empty,
+  events: Seq[ProvinceUpdate] = Seq.empty,
+  state: ProvinceState = ProvinceState.empty,
+  sourceFile: Option[String] = None,
+) {
 
-  @JsonCreator def this() = this(ProvinceState.empty)
+  @JsonCreator def this() = this(ProvinceUpdate.empty)
 
-  def atTheEnd(): ProvinceState =
-    state.next(events)
+  def withState(state: ProvinceState): ProvinceHistory = copy(state = state)
 
-  def at(year: Int, month: Int, day: Int): ProvinceState = at(Date(year, month, day))
+  def atStart(): ProvinceHistory = at(startDate)
 
-  def at(date: Date): ProvinceState = {
-    val eventsByDate = events
-      .filter(e => e.date.isEmpty || e.date.exists(_.compareTo(date) <= 0))
-    state.next(eventsByDate)
+  def atTheEnd(): ProvinceHistory = withState(state.next(events))
+
+  def at(year: Int, month: Int, day: Int): ProvinceHistory = at(Date(year, month, day))
+
+  def at(date: Date): ProvinceHistory = {
+    val eventsByDate = Seq(init) ++ events.filter(e => e.date.exists(_ <= date))
+    withState(state.next(eventsByDate))
   }
 
 }
 
-object ProvinceHistory extends FromJson[ProvinceHistory]
+object ProvinceHistory extends FromJson[ProvinceHistory] {
+  val empty: ProvinceHistory = ProvinceHistory()
+}
