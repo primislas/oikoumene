@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.repository.api.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.repository.api.SearchConf
-import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
 
 case class TagSearchConf
 (
@@ -19,6 +18,6 @@ case class TagSearchConf
   @JsonCreator def this() = this(0)
 }
 
-object ProvinceSearchConf {
-  def empty: ProvinceSearchConf = new ProvinceSearchConf()
+object TagSearchConf {
+  def empty: TagSearchConf = new TagSearchConf()
 }

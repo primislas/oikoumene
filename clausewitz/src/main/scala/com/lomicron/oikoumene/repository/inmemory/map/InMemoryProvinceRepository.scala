@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.lomicron.oikoumene.model.provinces.Province
+import com.lomicron.oikoumene.model.provinces.{Province, ProvinceHistory}
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
@@ -112,7 +112,7 @@ case class InMemoryProvinceRepository()
   private def excludeFields(p: Province, fs: Set[String]): Province = {
     if (fs.isEmpty) p
     else {
-      if (fs.contains(ProvinceFields.history)) p.copy(history = Seq.empty)
+      if (fs.contains(ProvinceFields.history)) p.copy(history = ProvinceHistory.empty)
       else p
     }
   }

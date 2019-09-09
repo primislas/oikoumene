@@ -1,6 +1,7 @@
 package com.lomicron.utils.collection
 
 import scala.collection.JavaConverters._
+import scala.reflect.ClassTag
 import scala.util.Try
 
 object CollectionUtils {
@@ -29,14 +30,15 @@ object CollectionUtils {
       m.filter(kv => p(kv._2))
 
     def foreachKV[U](f: (K, V) => U): Map[K, V] = {
-      m.foreach{ case (k, v) => f(k, v)}
+      m.foreach { case (k, v) => f(k, v) }
       m
     }
-    
+
   }
 
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {
     def toStream: Stream[T] = it.asScala.toStream
+
     def toSeq: Seq[T] = it.asScala.toList
   }
 
@@ -45,13 +47,18 @@ object CollectionUtils {
     def flatMap[R](f: T => Try[R]): Seq[R] =
       seq.map(f).filter(_.isSuccess).map(_.get)
 
-    def toMapEx[K, V](f: T => (K,V)): Map[K, V] =
+    def toMapEx[K, V](f: T => (K, V)): Map[K, V] =
       seq.map(f).toMap
   }
 
   implicit class OptionEx[T](o: Option[T]) {
 
-    def cast[R: Manifest]: Option[R] = o.filter(_.isInstanceOf[R]).map(_.asInstanceOf[R])
+    def cast[R: Manifest]: Option[R] = o
+      .filter {
+        case _: R => true
+        case _ => false
+      }
+      .map(_.asInstanceOf[R])
 
     def contentsEqual(o2: Option[T]): Boolean = o.exists(v => o2.contains(v))
 
