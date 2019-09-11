@@ -1,7 +1,6 @@
 package com.lomicron.utils.collection
 
 import scala.collection.JavaConverters._
-import scala.reflect.ClassTag
 import scala.util.Try
 
 object CollectionUtils {
