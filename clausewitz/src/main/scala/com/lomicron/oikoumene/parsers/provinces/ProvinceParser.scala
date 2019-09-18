@@ -128,16 +128,14 @@ object ProvinceParser extends LazyLogging {
 
   def addGeography
   (provinceRepo: ProvinceRepository, geography: GeographicRepository)
-  : ProvinceRepository =
-  {
+  : ProvinceRepository = {
     provinceRepo.findAll.map(addGeography(_, geography)).foreach(provinceRepo.update)
     provinceRepo
   }
 
   def addGeography
   (province: Province, geography: GeographicRepository)
-  : Province =
-  {
+  : Province = {
     val id = province.id
 
     val pType = geography.provinceTypes.map(_.identifyType(id))
@@ -161,16 +159,14 @@ object ProvinceParser extends LazyLogging {
 
   def addPolitics
   (provinceRepo: ProvinceRepository, repos: RepositoryFactory)
-  : ProvinceRepository =
-  {
+  : ProvinceRepository = {
     provinceRepo.findAll.map(addPolitics(_, repos)).foreach(provinceRepo.update)
     provinceRepo
   }
 
   def addPolitics
   (p: Province, repos: RepositoryFactory)
-  : Province =
-  {
+  : Province = {
     val cultureGroup = p.state().culture.flatMap(repos.cultures.groupOf).map(_.id)
     val religionGroup = p.state().religion.flatMap(repos.religions.groupOf).map(_.id)
     val state = p.state().copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
@@ -186,6 +182,23 @@ object ProvinceParser extends LazyLogging {
 
 
     provinces
+  }
+
+  def serializeProvinceHistory(p: Province): String = {
+    val h = p.history
+    val json = JsonMapper.toObjectNode(h.init)
+    h.events
+      .filter(_.date.nonEmpty)
+      .foreach(e => {
+        val date = e.date.get
+        val eNode = JsonMapper.toJsonNode(e.copy(date = Option.empty))
+        json.foreach(_.set(date.toString, eNode))
+      })
+
+
+
+
+    ""
   }
 
 }

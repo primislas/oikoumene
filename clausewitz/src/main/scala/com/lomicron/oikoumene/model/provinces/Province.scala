@@ -15,7 +15,8 @@ case class Province
  localisation: Localisation = Localisation.empty,
  history: ProvinceHistory = ProvinceHistory.empty,
  geography: ProvinceGeography = ProvinceGeography.empty,
-) { self =>
+) {
+  self =>
   @JsonCreator def this() = this(0, Color.black)
 
   def state(): ProvinceState = history.state
@@ -37,6 +38,15 @@ case class Province
 
   def withTerrain(t: String): Province =
     copy(geography = geography.copy(terrain = Option(t)))
+
+  def updateInitState(f: ProvinceUpdate => ProvinceUpdate): Province = {
+    val initState = f(history.init)
+    val withoutDate =
+      if (initState.date.isEmpty) initState
+      else initState.copy(date = Option.empty)
+    val h = history.copy(init = withoutDate)
+    copy(history = h)
+  }
 
 }
 
