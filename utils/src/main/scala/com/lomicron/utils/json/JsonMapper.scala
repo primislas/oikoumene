@@ -364,6 +364,9 @@ object JsonMapper {
       o
     }
 
+    def entries(): Seq[(String, JsonNode)] =
+      o.fields().toSeq.map(e => (e.getKey, e.getValue))
+
   }
 
 }
