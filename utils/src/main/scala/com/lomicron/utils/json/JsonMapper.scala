@@ -325,6 +325,8 @@ object JsonMapper {
 
     def asObject: Option[ObjectNode] = Option(n).cast[ObjectNode]
 
+    def asArray: Option[ArrayNode] = Option(n).cast[ArrayNode]
+
     def getField(f: String): Option[JsonNode] = Option(n.get(f))
 
     def getObject(f: String): Option[ObjectNode] = getField(f).cast[ObjectNode]

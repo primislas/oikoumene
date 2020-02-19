@@ -3,9 +3,9 @@ package com.lomicron.oikoumene.parsers.provinces
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseEvents}
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory}
+import com.lomicron.oikoumene.repository.api.{FileNameAndContent, LocalisationRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, booleanYes, textNode, toObjectNode}
@@ -21,13 +21,13 @@ object ProvinceParser extends LazyLogging {
   val removeBuildingField = "remove_building"
 
   def apply
-  (repos: RepositoryFactory, evalEntityFields: Boolean = false)
+  (repos: RepositoryFactory)
   : ProvinceRepository = {
     val files = repos.resources
     val definitions = files.getProvinceDefinitions
     val history = files.getProvinceHistory
 
-    val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces, evalEntityFields)
+    val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces)
     val withGeography = addGeography(withHistory, repos.geography)
     val withPolitics = addPolitics(withGeography, repos)
     val withTrade = addTrade(withPolitics, repos)
@@ -37,14 +37,13 @@ object ProvinceParser extends LazyLogging {
 
   def parseProvinces
   (definitions: Option[String],
-   provinceHistory: Map[Int, String],
+   provinceHistory: Map[Int, FileNameAndContent],
    localisation: LocalisationRepository,
    buildings: BuildingRepository,
-   provinces: ProvinceRepository,
-   evalEntityFields: Boolean)
+   provinces: ProvinceRepository)
   : ProvinceRepository = {
 
-    val provinceById = parseProvinces(definitions)
+    val provinceById = parseProvinceDefinitions(definitions)
     val withLocalisation = addLocalisation(provinceById, localisation)
     val withHistory = addHistory(withLocalisation, provinceHistory, buildings)
 
@@ -56,7 +55,7 @@ object ProvinceParser extends LazyLogging {
     provinces
   }
 
-  def parseProvinces(definitions: Option[String]): Map[Int, ObjectNode] =
+  def parseProvinceDefinitions(definitions: Option[String]): Map[Int, ObjectNode] =
     definitions
       .map(_.lines)
       .getOrElse(Seq.empty)
@@ -88,7 +87,7 @@ object ProvinceParser extends LazyLogging {
 
   def addHistory
   (provincesById: Map[Int, ObjectNode],
-   histories: Map[Int, String],
+   histories: Map[Int, FileNameAndContent],
    buildings: BuildingRepository
   ): Map[Int, ObjectNode] = {
 
@@ -98,10 +97,11 @@ object ProvinceParser extends LazyLogging {
 
   private def addHistory
   (province: ObjectNode,
-   history: Option[String],
+   history: Option[FileNameAndContent],
    buildings: BuildingRepository
   ): ObjectNode =
     history
+      .map(_.content)
       .map(parse)
       .map(histAndErrors => {
         val errors = histAndErrors._2
@@ -109,11 +109,19 @@ object ProvinceParser extends LazyLogging {
           logger.warn(s"Encountered errors parsing country history for province '${province.get("id")}': $errors")
         histAndErrors._1
       })
-      .map(history => {
-        val events = Seq(history) ++ parseEvents(history).map(setBuildings(_, buildings))
-        JsonMapper.arrayNodeOf(events)
+      .map(parsedHistory => {
+        val events = parseEvents(parsedHistory).map(setBuildings(_, buildings))
+        val init = setBuildings(parsedHistory, buildings)
+        val provHist = JsonMapper
+          .objectNode
+          .setEx("init", init)
+          .setEx(Fields.events, JsonMapper.arrayNodeOf(events))
+        history
+          .map(_.name)
+          .map(provHist.setEx(Fields.sourceFile, _))
+          .getOrElse(provHist)
       })
-      .map(province.setEx("history", _))
+      .map(province.setEx(Fields.history, _))
       .getOrElse(province)
 
   private def setBuildings(event: ObjectNode, buildings: BuildingRepository) = {
@@ -194,8 +202,6 @@ object ProvinceParser extends LazyLogging {
         val eNode = JsonMapper.toJsonNode(e.copy(date = Option.empty))
         json.foreach(_.set(date.toString, eNode))
       })
-
-
 
 
     ""

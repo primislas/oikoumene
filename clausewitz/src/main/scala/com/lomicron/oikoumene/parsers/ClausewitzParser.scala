@@ -23,6 +23,7 @@ object ClausewitzParser extends LazyLogging {
     val sourceFile = "source_file"
     val history = "history"
     val state = "state"
+    val init = "init"
     val events = "events"
     val date = "date"
     val update = "update"
@@ -44,8 +45,8 @@ object ClausewitzParser extends LazyLogging {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
-  val startDate = Date(1444, 11, 11)
-  val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
+  val startDate: Date = Date(1444, 11, 11)
+  val endDate: Date = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     parse(str, DefaultDeserializer)
@@ -218,7 +219,7 @@ object ClausewitzParser extends LazyLogging {
       .setEx(Fields.month, IntNode.valueOf(date.month))
       .setEx(Fields.day, IntNode.valueOf(date.day))
 
-  def json2date(jsonDate: ObjectNode) = Date(
+  def json2date(jsonDate: ObjectNode): Date = Date(
     jsonDate.get(Fields.year).asInt,
     jsonDate.get(Fields.month).asInt,
     jsonDate.get(Fields.day).asInt)

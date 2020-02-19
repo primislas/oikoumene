@@ -5,29 +5,39 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, ObjectNode}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.utils.json.JsonMapper._
 
-
 object ClausewitzSerializer {
 
-  def serialize[T <: AnyRef](entity: T): String =
+  def serialize[T <: AnyRef](entity: T, options: Set[SerializationOption] = Set.empty): String =
     Option(entity)
       .flatMap(toObjectNode)
-      .map(serializeJsonObj)
+      .map(recSerialize(_, 0 , options))
+      .map(_.mkString("\n"))
       .getOrElse("")
 
-  def serializeJsonObj(node: ObjectNode): String = {
-    val events = node.getArray(Fields.history)
+  def serializeHistory[T <: AnyRef](entity: T): String =
+    Option(entity)
+      .flatMap(toObjectNode)
+      .map(serializeHistoryObj)
+      .getOrElse("")
+
+  def serializeHistoryObj(node: ObjectNode): String = {
+    val init = node
+      .getObject(Fields.init)
+      .getOrElse(objectNode)
+
+    val events = node
+      .getArray(Fields.events)
       .map(_.toSeq)
       .getOrElse(Seq.empty)
       .flatMap(_.asObject)
-    node.remove(Fields.history)
 
-    val initState = recSerialize(node)
-    val history = events.flatMap(recSerialize(_))
+    val initState = recSerialize(init, 0 , Set(ArraysToIndividualRecords))
+    val history = events.flatMap(recSerialize(_, 0 , Set(ArraysToIndividualRecords)))
     val lines = initState ++ history
     lines.mkString("\n")
   }
 
-  def recSerialize(node: ObjectNode, depth: Int = 0): Seq[String] = {
+  def recSerialize(node: ObjectNode, depth: Int = 0, options: Set[SerializationOption] = Set.empty): Seq[String] = {
     val offset = "\t" * depth
 
     node.entries().flatMap(e => {
@@ -37,8 +47,12 @@ object ClausewitzSerializer {
           val serializedObj = recSerialize(o, depth + 1)
           wrapAsObject(k, serializedObj, depth)
         case a: ArrayNode =>
-          val serializedArray = serializeArray(a, depth + 1)
-          wrapAsObject(k, serializedArray, depth)
+          if (options.contains(ArraysToIndividualRecords)) {
+            a.toSeq.map(objectNode(k, _)).flatMap(recSerialize(_, depth, options))
+          } else {
+            val serializedArray = serializeArray(a, depth + 1)
+            wrapAsObject(k, serializedArray, depth)
+          }
         case _ =>
           nodeToText(v)
             .filter(_.nonEmpty)
@@ -105,3 +119,6 @@ object ClausewitzSerializer {
   def strWithOffset(s: String, offset: String) = s"$offset$s"
 
 }
+
+trait SerializationOption
+object ArraysToIndividualRecords extends SerializationOption

@@ -40,7 +40,7 @@ trait ResourceRepository {
 
   def getProvinceDefinitions: Option[String]
 
-  def getProvinceHistory: Map[Int, String]
+  def getProvinceHistory: Map[Int, FileNameAndContent]
 
   def getBuildings: Seq[String]
 

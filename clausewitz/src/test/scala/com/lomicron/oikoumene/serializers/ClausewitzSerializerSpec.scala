@@ -5,7 +5,7 @@ import com.lomicron.oikoumene.model.provinces.{ProvinceHistory, ProvinceUpdate}
 import com.lomicron.utils.parsing.tokenizer.Date
 import org.specs2.mutable.Specification
 
-class ClausewitzSerializerTest extends Specification {
+class ClausewitzSerializerSpec extends Specification {
 
   "ClausewitzSerializer" should {
 
@@ -16,7 +16,7 @@ class ClausewitzSerializerTest extends Specification {
       val events = Seq(ProvinceUpdate(owner = Some("KYI"), date = Some(Date(1490, 1, 1))))
       val provHistory = ProvinceHistory(init, events, sourceFile = Some(filename))
 
-      val strs = ClausewitzSerializer.serialize(provHistory)
+      val strs = ClausewitzSerializer.serializeHistory(provHistory)
       val bracketParity = strs.foldLeft(0)((acc, c) => if (c == '{') acc + 1 else if (c == '}') acc - 1 else acc)
 
       strs must not be empty
