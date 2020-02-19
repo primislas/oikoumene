@@ -3,9 +3,9 @@ package com.lomicron.oikoumene.model.history
 import com.lomicron.utils.parsing.tokenizer.Date
 
 trait History[D <: History[D, S, E], S <: HistState[S, E], E <: HistEvent] {
-  val init: E
+  def init: E
+  def state: S
   val events: Seq[E] = Seq.empty
-  val state: S
   val sourceFile: Option[String] = Option.empty
 
   def withState(state: S): D

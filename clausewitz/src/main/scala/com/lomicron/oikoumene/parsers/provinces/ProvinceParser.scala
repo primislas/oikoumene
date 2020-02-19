@@ -182,29 +182,10 @@ object ProvinceParser extends LazyLogging {
   }
 
   def addTrade(provinces: ProvinceRepository, factory: RepositoryFactory): ProvinceRepository = {
-    factory.tradeNodes.findAll.flatMap(tn =>
-      tn.members.flatMap(provId => provinces.find(provId).toOption.map(_.withTradeNode(tn.id))))
+    factory.tradeNodes.findAll
+      .flatMap(tn => tn.members.flatMap(provId => provinces.find(provId).toOption.map(_.withTradeNode(tn.id))))
       .foreach(provinces.update)
-
-    // TODO add province modifiers from goods?
-
-
     provinces
-  }
-
-  def serializeProvinceHistory(p: Province): String = {
-    val h = p.history
-    val json = JsonMapper.toObjectNode(h.init)
-    h.events
-      .filter(_.date.nonEmpty)
-      .foreach(e => {
-        val date = e.date.get
-        val eNode = JsonMapper.toJsonNode(e.copy(date = Option.empty))
-        json.foreach(_.set(date.toString, eNode))
-      })
-
-
-    ""
   }
 
 }

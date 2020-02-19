@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.EntityState
+import com.lomicron.oikoumene.model.history.HistState
 import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 
 import scala.collection.immutable.ListSet
@@ -44,7 +44,7 @@ case class ProvinceState
  seatInParliament: Boolean = false,
  tradeCompany: Option[String] = None,
  tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
-) extends EntityState[ProvinceState, ProvinceUpdate] {
+) extends HistState[ProvinceState, ProvinceUpdate] {
   self =>
 
   @JsonCreator def this() = this(0)

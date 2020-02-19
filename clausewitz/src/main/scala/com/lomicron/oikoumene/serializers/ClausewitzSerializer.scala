@@ -2,7 +2,8 @@ package com.lomicron.oikoumene.serializers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, ObjectNode}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.model.history.{HistEvent, HistState, History}
+import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.utils.json.JsonMapper._
 
 object ClausewitzSerializer {
@@ -14,25 +15,17 @@ object ClausewitzSerializer {
       .map(_.mkString("\n"))
       .getOrElse("")
 
-  def serializeHistory[T <: AnyRef](entity: T): String =
-    Option(entity)
-      .flatMap(toObjectNode)
-      .map(serializeHistoryObj)
-      .getOrElse("")
-
-  def serializeHistoryObj(node: ObjectNode): String = {
-    val init = node
-      .getObject(Fields.init)
-      .getOrElse(objectNode)
-
-    val events = node
-      .getArray(Fields.events)
-      .map(_.toSeq)
-      .getOrElse(Seq.empty)
-      .flatMap(_.asObject)
+  def serializeHistory[H <: History[H, S, E], S <: HistState[S, E], E <: HistEvent](a: History[H, S, E]): String = {
+    val init = Option(a.init).flatMap(toObjectNode).getOrElse(objectNode)
+    val events = a.events
+      .flatMap(e => for {
+        json <- toObjectNode(e)
+        date <- e.date
+      } yield (date, json))
+      .foldLeft(objectNode)((acc, t) => acc.setEx(t._1.toString, t._2))
 
     val initState = recSerialize(init, 0 , Set(ArraysToIndividualRecords))
-    val history = events.flatMap(recSerialize(_, 0 , Set(ArraysToIndividualRecords)))
+    val history = recSerialize(events, 0 , Set(ArraysToIndividualRecords))
     val lines = initState ++ history
     lines.mkString("\n")
   }

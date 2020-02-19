@@ -1,11 +1,12 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.model.history.HistEvent
 import com.lomicron.utils.parsing.tokenizer.Date
 
 case class ProvinceUpdate
 (
-  date: Option[Date] = None,
+  override val date: Option[Date] = None,
   // hits = 13305, isOptional = true, sample = "SWE"
   controller: Option[String] = None,
   // hits = 9400, isOptional = true, sample = "SWE"
@@ -91,7 +92,7 @@ case class ProvinceUpdate
   addVaisyasOrBurghersEffect: Option[Boolean] = None,
   // hits = 8, isOptional = true, sample = true
   addJainsOrBurghersEffect: Option[Boolean] = None,
-) {
+) extends HistEvent {
 
   @JsonCreator def this() = this(controller = None)
 
