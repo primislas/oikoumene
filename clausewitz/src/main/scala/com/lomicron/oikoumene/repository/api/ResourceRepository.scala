@@ -28,7 +28,7 @@ trait ResourceRepository {
     *
     * @return country history by country tag
     */
-  def getCountryHistory: Map[String, String]
+  def getCountryHistory: Map[String, ResourceNameAndContent]
 
   def getDiplomaticRelations: Map[String, String]
 
@@ -40,7 +40,7 @@ trait ResourceRepository {
 
   def getProvinceDefinitions: Option[String]
 
-  def getProvinceHistory: Map[Int, FileNameAndContent]
+  def getProvinceHistory: Map[Int, ResourceNameAndContent]
 
   def getBuildings: Seq[String]
 

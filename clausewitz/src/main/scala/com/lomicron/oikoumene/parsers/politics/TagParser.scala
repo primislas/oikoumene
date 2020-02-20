@@ -3,10 +3,10 @@ package com.lomicron.oikoumene.parsers.politics
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseEvents}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.TagRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceNameAndContent, ResourceNameAndEntity, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, patchFieldValue}
@@ -61,7 +61,7 @@ object TagParser extends LazyLogging {
 
     parsedTagNodes
       .map(Tag.fromJson)
-      .map(_.atStart())
+      .map(_.atStart)
       .foreach(tags.create)
 
     tags
@@ -71,7 +71,7 @@ object TagParser extends LazyLogging {
   def apply
   (tags: Map[String, String],
    countries: Map[String, String],
-   histories: Map[String, String],
+   histories: Map[String, ResourceNameAndContent],
    names: Map[String, ObjectNode]):
   Seq[ObjectNode] = {
 
@@ -80,9 +80,16 @@ object TagParser extends LazyLogging {
     val parsedTags = countryByTag
       .mapKVtoValue((tag, country) => historyByTag
         .get(tag)
-        .map(history => Seq(history) ++ parseEvents(history))
-        .map(JsonMapper.arrayNodeOf)
-        .map(patchFieldValue(country, "history", _))
+        .map(parsedHistory => {
+          val history = JsonMapper
+            .objectNode
+            .setEx(Fields.init, parsedHistory)
+            .setEx(Fields.events, parseEvents(parsedHistory))
+          Option(parsedHistory.remove(Fields.sourceFile))
+            .foreach(history.setEx(Fields.sourceFile, _))
+          history
+        })
+        .map(patchFieldValue(country, Fields.history, _))
         .getOrElse(country))
       .mapKVtoValue((tag, country) => names
         .get(tag)
@@ -121,10 +128,10 @@ object TagParser extends LazyLogging {
 
   def parseCountryHistories
   (tags: Map[String, String],
-   histories: Map[String, String]
+   histories: Map[String, ResourceNameAndContent]
   ): Map[String, ObjectNode]
   = tags
-    .mapKeyToValue(histories.get(_).map(parse))
+    .mapKeyToValue(tag => histories.get(tag).map(nh => ResourceNameAndEntity(nh.name, ClausewitzParser.parse(nh.content))))
     .filterKeyValue((tag, hist) => {
       if (hist.isEmpty)
         logger.warn(s"Tag $tag has no history configuration")
@@ -132,10 +139,10 @@ object TagParser extends LazyLogging {
     })
     .mapValuesEx(_.get)
     .mapKVtoValue((tag, histAndErrors) => {
-      val errors = histAndErrors._2
+      val errors = histAndErrors.entity._2
       if (errors.nonEmpty)
         logger.warn(s"Encountered errors parsing country history for tag '$tag': $errors")
-      histAndErrors._1
+      histAndErrors.entity._1.setEx(Fields.sourceFile, histAndErrors.name)
     })
 
 }

@@ -141,12 +141,13 @@ class ParserSpec extends Specification {
                     }"""
       val (node, errors) = JsonParser.parse(content)
       val dates = node.get("monsoon")
-      dates.get(0).asText() mustEqual "00.06.01"
+      dates.get(0).asText() mustEqual "0.6.1"
       dates.get(1).asText() mustEqual "00.09.30"
       errors.size mustEqual 0
     }
 
     "- merge two values under the same key into an array" >> {
+      // TODO don't forget about these nonsense monsoon declarations when serializing
       val content = """
                       monsoon = {
                         00.11.01

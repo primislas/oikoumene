@@ -1,13 +1,14 @@
 package com.lomicron.oikoumene.model.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.model.history.HistEvent
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
 case class TagUpdate
 (
   // hits = 13270, isOptional = true, sample = {"year":1730,"month":1,"day":1}
-  date: Option[Date] = None,
+  override val date: Option[Date] = None,
 
   // hits = 796, isOptional = true, sample = "east_african"
   technologyGroup: Option[String] = None,
@@ -112,10 +113,10 @@ case class TagUpdate
   hideAmbientObject: Option[String] = None,
   // hits = 1, isOptional = true, sample = "hagia_sophia_minarets"
   showAmbientObject: Option[String] = None,
-) {
+) extends HistEvent {
   @JsonCreator def this() = this(None)
 }
 
 object TagUpdate extends FromJson[TagUpdate] {
-  def empty: TagUpdate = TagUpdate()
+  val empty: TagUpdate = TagUpdate()
 }

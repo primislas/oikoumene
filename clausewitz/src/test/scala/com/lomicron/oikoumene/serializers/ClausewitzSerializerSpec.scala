@@ -20,9 +20,9 @@ class ClausewitzSerializerSpec extends Specification {
       val bracketParity = strs.foldLeft(0)((acc, c) => if (c == '{') acc + 1 else if (c == '}') acc - 1 else acc)
 
       strs must not be empty
-      strs must contain("init = {")
-      strs must contain("events = {")
-      strs must contain(s"""source_file = "$filename"""")
+      strs must contain("owner = LIT")
+      strs must contain("1490.1.1 = {")
+      strs must contain("\towner = KYI")
       bracketParity mustEqual 0
     }
 

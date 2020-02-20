@@ -100,7 +100,7 @@ class ClausewitzParserSpec extends Specification {
       val date = Date(1700, 1, 1)
       val parsed = ClausewitzParser.rollUpEvents(province, date)
       val history = parsed.get(ClausewitzParser.Fields.events).asInstanceOf[ArrayNode]
-      history.size mustEqual 19
+      history.size mustEqual 18
     }
   }
 

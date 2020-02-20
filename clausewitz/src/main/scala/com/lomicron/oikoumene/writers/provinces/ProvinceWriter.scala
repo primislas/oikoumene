@@ -1,16 +1,16 @@
 package com.lomicron.oikoumene.writers.provinces
 
 import com.lomicron.oikoumene.model.provinces.Province
-import com.lomicron.oikoumene.repository.api.FileNameAndContent
+import com.lomicron.oikoumene.repository.api.ResourceNameAndContent
 import com.lomicron.oikoumene.serializers.ClausewitzSerializer
 
 object ProvinceWriter {
 
-  def serialize(province: Province): FileNameAndContent = {
+  def serialize(province: Province): ResourceNameAndContent = {
     val filename = province.history.sourceFile.getOrElse(defaultFileName(province))
     val content = ClausewitzSerializer.serializeHistory(province.history)
 
-    FileNameAndContent(filename, content)
+    ResourceNameAndContent(filename, content)
   }
 
   def defaultFileName(province: Province): String =

@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-import com.lomicron.oikoumene.repository.api.{FileNameAndContent, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.{ResourceNameAndContent, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
@@ -65,8 +65,9 @@ case class FileResourceRepository
       .mapValuesEx(_.toString)
       .mapValuesEx(readFile)
 
-  override def getCountryHistory: Map[String, String] =
+  override def getCountryHistory: Map[String, ResourceNameAndContent] =
     readSourceDir(countryHistoryDir)
+      .mapKVtoValue(ResourceNameAndContent)
       .mapKeys(filenameToTag)
 
   override def getDiplomaticRelations: Map[String, String] =
@@ -163,16 +164,12 @@ case class FileResourceRepository
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
   val provNameRegex: Regex = provNamePat.r
 
-  override def getProvinceHistory: Map[Int, FileNameAndContent] = {
-//    val histFiles = readAllFilesFromDir(fromSource(provinceHistoryDir))
-      readAllFilesFromDir(fromSource(provinceHistoryDir))
-        .mapKVtoValue(FileNameAndContent)
-//    ClausewitzParser
-//      .filesWithPrependedNames(histFiles)
+  override def getProvinceHistory: Map[Int, ResourceNameAndContent] =
+    readSourceDir(provinceHistoryDir)
+      .mapKVtoValue(ResourceNameAndContent)
       .mapKeys(idFromProvHistFileName)
       .filterKeys(_.isDefined)
       .mapKeys(_.get)
-  }
 
   override def getBuildings: Seq[String] =
     readAllFilesFromDir(fromSource(buildingsDir)).values.toSeq

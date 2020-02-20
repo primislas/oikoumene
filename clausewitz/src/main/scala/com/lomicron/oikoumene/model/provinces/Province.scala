@@ -19,13 +19,13 @@ case class Province
   self =>
   @JsonCreator def this() = this(0, Color.black)
 
-  def state(): ProvinceState = history.state
+  def state: ProvinceState = history.state
 
   def withState(state: ProvinceState): Province = copy(history = history.withState(state))
 
-  def atStart(): Province = at(startDate)
+  def atStart: Province = at(startDate)
 
-  def atTheEnd(): Province = copy(history = history.atTheEnd())
+  def atTheEnd: Province = copy(history = history.atTheEnd())
 
   def at(year: Int, month: Int, day: Int): Province = at(Date(year, month, day))
 

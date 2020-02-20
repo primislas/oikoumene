@@ -5,7 +5,7 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseEvents}
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
-import com.lomicron.oikoumene.repository.api.{FileNameAndContent, LocalisationRepository, RepositoryFactory}
+import com.lomicron.oikoumene.repository.api.{ResourceNameAndContent, LocalisationRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, booleanYes, textNode, toObjectNode}
@@ -37,7 +37,7 @@ object ProvinceParser extends LazyLogging {
 
   def parseProvinces
   (definitions: Option[String],
-   provinceHistory: Map[Int, FileNameAndContent],
+   provinceHistory: Map[Int, ResourceNameAndContent],
    localisation: LocalisationRepository,
    buildings: BuildingRepository,
    provinces: ProvinceRepository)
@@ -49,7 +49,7 @@ object ProvinceParser extends LazyLogging {
 
     withHistory.values
       .map(Province.fromJson)
-      .map(_.atStart())
+      .map(_.atStart)
       .foreach(provinces.create)
 
     provinces
@@ -87,7 +87,7 @@ object ProvinceParser extends LazyLogging {
 
   def addHistory
   (provincesById: Map[Int, ObjectNode],
-   histories: Map[Int, FileNameAndContent],
+   histories: Map[Int, ResourceNameAndContent],
    buildings: BuildingRepository
   ): Map[Int, ObjectNode] = {
 
@@ -97,7 +97,7 @@ object ProvinceParser extends LazyLogging {
 
   private def addHistory
   (province: ObjectNode,
-   history: Option[FileNameAndContent],
+   history: Option[ResourceNameAndContent],
    buildings: BuildingRepository
   ): ObjectNode =
     history
@@ -114,7 +114,7 @@ object ProvinceParser extends LazyLogging {
         val init = setBuildings(parsedHistory, buildings)
         val provHist = JsonMapper
           .objectNode
-          .setEx("init", init)
+          .setEx(Fields.init, init)
           .setEx(Fields.events, JsonMapper.arrayNodeOf(events))
         history
           .map(_.name)
@@ -175,9 +175,9 @@ object ProvinceParser extends LazyLogging {
   def addPolitics
   (p: Province, repos: RepositoryFactory)
   : Province = {
-    val cultureGroup = p.state().culture.flatMap(repos.cultures.groupOf).map(_.id)
-    val religionGroup = p.state().religion.flatMap(repos.religions.groupOf).map(_.id)
-    val state = p.state().copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
+    val cultureGroup = p.state.culture.flatMap(repos.cultures.groupOf).map(_.id)
+    val religionGroup = p.state.religion.flatMap(repos.religions.groupOf).map(_.id)
+    val state = p.state.copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
     p.withState(state)
   }
 
