@@ -3,9 +3,9 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
-import com.lomicron.oikoumene.repository.api.LocalisationRepository
+import com.lomicron.oikoumene.repository.api.{LocalisationRepository, ResourceNameAndContent}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.{FromJson, JsonMapper}
 import com.lomicron.utils.json.JsonMapper._
 import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.ParsingError
@@ -51,6 +51,15 @@ object ClausewitzParser extends LazyLogging {
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     parse(str, DefaultDeserializer)
 
+  def parseAndLogErrors(resource: ResourceNameAndContent): ObjectNode =
+    parseAndLogErrors(resource.content, resource.name)
+
+  def parseAndLogErrors(str: String, filename: String): ObjectNode = {
+    val (obj, errors) = parse(str)
+    if (errors.nonEmpty) logger.warn(s"Encountered errors while parsing '{}': {}", filename, errors)
+    obj
+  }
+
   def parse(str: String, deserializer: Deserializer): (ObjectNode, Seq[ParsingError]) = {
     Option(str)
       .map(JsonParser.parse(_, deserializer))
@@ -85,28 +94,6 @@ object ClausewitzParser extends LazyLogging {
     */
   def fieldsToObjects(o: ObjectNode, idKey: String): Seq[ObjectNode] =
     fieldsToObjects(o, Option(idKey))
-
-  def parseEvents(obj: ObjectNode): Seq[ObjectNode] = {
-    val events = getEvents(obj)
-      .map(dm => {
-        val (date, event) = dm
-        obj.remove(date.lexeme)
-        event.setEx(Fields.date, date.lexeme)
-
-        // cleaning up
-        if (event.has(tradeGoods)) {
-          // it is a bug, shouldn't be reported twice
-          event.getArray(tradeGoods).foreach(a => {
-            val actualGood = a.get(a.size() - 1)
-            event.set(tradeGoods, actualGood)
-          })
-        }
-
-        event
-      })
-
-    events
-  }
 
   def filesWithPrependedNames(filesByName: Map[String, String]): Map[String, String] =
     filesByName
@@ -341,4 +328,53 @@ object ClausewitzParser extends LazyLogging {
 
     rec(triggers, Seq.empty)
   }
+
+  def parseToClass[T]
+  (resource: ResourceNameAndContent, deserializer: FromJson[T])
+  (implicit m: Manifest[T])
+  : Option[T] =
+    Option(resource)
+      .map(ClausewitzParser.parseAndLogErrors)
+      .map(deserializer.fromJson)
+
+  def parseHistory(resource: ResourceNameAndContent): Option[ObjectNode] =
+    Option(resource)
+      .map(ClausewitzParser.parseAndLogErrors)
+      .map(ClausewitzParser.historyJsonToClass)
+
+  def parseHistory[T](resource: ResourceNameAndContent, deserializer: FromJson[T])(implicit m: Manifest[T]): Option[T] =
+    parseHistory(resource).map(deserializer.fromJson)
+
+  def historyJsonToClass(parsedHistory: ObjectNode): ObjectNode = {
+    val history = JsonMapper
+      .objectNode
+      .setEx(Fields.init, parsedHistory)
+      .setEx(Fields.events, parseEvents(parsedHistory))
+    Option(parsedHistory.remove(Fields.sourceFile))
+      .foreach(history.setEx(Fields.sourceFile, _))
+    history
+  }
+
+  def parseEvents(obj: ObjectNode): Seq[ObjectNode] = {
+    val events = getEvents(obj)
+      .map(dm => {
+        val (date, event) = dm
+        obj.remove(date.lexeme)
+        event.setEx(Fields.date, date.lexeme)
+
+        // cleaning up
+        if (event.has(tradeGoods)) {
+          // it is a bug, shouldn't be reported twice
+          event.getArray(tradeGoods).foreach(a => {
+            val actualGood = a.get(a.size() - 1)
+            event.set(tradeGoods, actualGood)
+          })
+        }
+
+        event
+      })
+
+    events
+  }
+
 }

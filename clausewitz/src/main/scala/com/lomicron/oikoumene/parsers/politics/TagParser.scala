@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.model.politics.Tag
+import com.lomicron.oikoumene.model.politics.{Tag, TagHistory}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseEvents}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
@@ -80,15 +80,7 @@ object TagParser extends LazyLogging {
     val parsedTags = countryByTag
       .mapKVtoValue((tag, country) => historyByTag
         .get(tag)
-        .map(parsedHistory => {
-          val history = JsonMapper
-            .objectNode
-            .setEx(Fields.init, parsedHistory)
-            .setEx(Fields.events, parseEvents(parsedHistory))
-          Option(parsedHistory.remove(Fields.sourceFile))
-            .foreach(history.setEx(Fields.sourceFile, _))
-          history
-        })
+        .map(ClausewitzParser.historyJsonToClass)
         .map(patchFieldValue(country, Fields.history, _))
         .getOrElse(country))
       .mapKVtoValue((tag, country) => names
@@ -104,26 +96,18 @@ object TagParser extends LazyLogging {
   def parseCountries
   (tags: Map[String, String],
    countries: Map[String, String]):
-  Map[String, ObjectNode] = {
+  Map[String, Tag] = {
 
-    def tagToCoutry(tag: String) = {
-      countries.get(tag).map(parse)
-    }
+    def tagToCoutry(tag: String) =
+      countries.get(tag)
 
     tags
       .mapKeyToValue(tagToCoutry)
-      .filterKeyValue((tag, opt) => {
-        if (opt.isEmpty)
-          logger.warn(s"Tag $tag has no country configuration")
-        opt.nonEmpty
+      .flatMapKVtoValue((tag, opt) => {
+        if (opt.isEmpty) logger.warn(s"Tag $tag has no country configuration")
+        opt
       })
-      .mapValuesEx(_.get)
-      .mapKVtoValue((tag, t2) => {
-        val errors = t2._2
-        if (errors.nonEmpty)
-          logger.warn(s"Encountered errors parsing country configuration for tag '$tag': $errors")
-        t2._1
-      })
+      .flatMapKVtoValue(parseCountry)
   }
 
   def parseCountryHistories
@@ -144,5 +128,14 @@ object TagParser extends LazyLogging {
         logger.warn(s"Encountered errors parsing country history for tag '$tag': $errors")
       histAndErrors.entity._1.setEx(Fields.sourceFile, histAndErrors.name)
     })
+
+  def parseCountry(id: String, content: String): Option[Tag] =
+    parseCountry(ResourceNameAndContent(id, content))
+
+  def parseCountry(resource: ResourceNameAndContent): Option[Tag] =
+    ClausewitzParser.parseToClass(resource, Tag)
+
+  def parseCountryHistory(resource: ResourceNameAndContent): Option[TagHistory] =
+    ClausewitzParser.parseHistory(resource, TagHistory)
 
 }

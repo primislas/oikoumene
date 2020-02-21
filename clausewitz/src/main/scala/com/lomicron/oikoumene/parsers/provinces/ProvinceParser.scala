@@ -16,7 +16,7 @@ import scala.util.matching.Regex
 object ProvinceParser extends LazyLogging {
 
   val provinceDefinitionPat: Regex =
-    "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*)){0,1}".r
+    "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*))?".r
   val addBuildingField = "add_building"
   val removeBuildingField = "remove_building"
 
