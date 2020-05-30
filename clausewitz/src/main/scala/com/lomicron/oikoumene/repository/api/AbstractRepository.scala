@@ -14,6 +14,9 @@ trait AbstractRepository [Key, Entity] {
 
   def update(entity: Entity): Try[Entity]
 
+  def update(es: Seq[Entity]): Seq[Try[Entity]] =
+    es.map(update)
+
   def upsert(entity: Entity): Try[Entity] =
     update(entity) match {
       case s: Success[Entity] => s

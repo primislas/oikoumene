@@ -13,7 +13,10 @@ class IOSpec extends Specification with Mockito {
   "IO#readTextResource" should {
     "read resource if available" >> {
       val content = IO.readTextResource(validPath)
-      content must have size 1719
+
+      content must not beEmpty
+
+      content must startWith("#151 - Constantinople")
     }
   }
 

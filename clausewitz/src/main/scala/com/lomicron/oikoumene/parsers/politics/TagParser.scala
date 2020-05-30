@@ -1,14 +1,14 @@
 package com.lomicron.oikoumene.parsers.politics
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
+import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.politics.TagRepository
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging
 
@@ -61,7 +61,7 @@ object TagParser extends LazyLogging {
 
     parsedTagNodes
       .map(Tag.fromJson)
-      .map(_.atStart())
+      .map(_.atStart)
       .foreach(tags.create)
 
     tags
@@ -71,7 +71,7 @@ object TagParser extends LazyLogging {
   def apply
   (tags: Map[String, String],
    countries: Map[String, String],
-   histories: Map[String, String],
+   histories: Map[String, FileNameAndContent],
    names: Map[String, ObjectNode]):
   Seq[ObjectNode] = {
 
@@ -80,9 +80,10 @@ object TagParser extends LazyLogging {
     val parsedTags = countryByTag
       .mapKVtoValue((tag, country) => historyByTag
         .get(tag)
-        .map(history => Seq(history) ++ parseEvents(history))
-        .map(JsonMapper.arrayNodeOf)
-        .map(patchFieldValue(country, "history", _))
+        .map(country.setEx(Fields.history, _))
+//        .map(history => Seq(history) ++ parseEvents(history))
+//        .map(JsonMapper.arrayNodeOf)
+//        .map(patchFieldValue(country, "history", _))
         .getOrElse(country))
       .mapKVtoValue((tag, country) => names
         .get(tag)
@@ -121,21 +122,23 @@ object TagParser extends LazyLogging {
 
   def parseCountryHistories
   (tags: Map[String, String],
-   histories: Map[String, String]
+   histories: Map[String, FileNameAndContent]
   ): Map[String, ObjectNode]
   = tags
-    .mapKeyToValue(histories.get(_).map(parse))
+    .mapKeyToValue(histories.get(_).map(parseHistory))
     .filterKeyValue((tag, hist) => {
       if (hist.isEmpty)
         logger.warn(s"Tag $tag has no history configuration")
       hist.nonEmpty
     })
     .mapValuesEx(_.get)
-    .mapKVtoValue((tag, histAndErrors) => {
-      val errors = histAndErrors._2
-      if (errors.nonEmpty)
-        logger.warn(s"Encountered errors parsing country history for tag '$tag': $errors")
-      histAndErrors._1
-    })
+
+  def parseHistory(fc: FileNameAndContent): ObjectNode = {
+    val fname = fc.name
+    val (unparsedHist, errors) = parse(fc.content)
+    if (errors.nonEmpty)
+      logger.warn(s"Encountered errors parsing country history '$fname': $errors")
+    ClausewitzParser.parseHistory(unparsedHist, fname)
+  }
 
 }

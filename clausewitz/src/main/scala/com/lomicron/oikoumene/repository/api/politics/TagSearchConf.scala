@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.repository.api.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.repository.api.SearchConf
-import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
 
 case class TagSearchConf
 (
@@ -17,8 +16,13 @@ case class TagSearchConf
 
 ) extends SearchConf {
   @JsonCreator def this() = this(0)
+  def ofTag(tag: String): TagSearchConf = copy(id = Some(tag))
+  def ofName(name: String): TagSearchConf = copy(name = Option(name))
 }
 
-object ProvinceSearchConf {
-  def empty: ProvinceSearchConf = new ProvinceSearchConf()
+object TagSearchConf {
+  private val EMPTY = new TagSearchConf()
+  def empty: TagSearchConf = EMPTY
+  def ofTag(tag: String): TagSearchConf = EMPTY.ofTag(tag)
+  def ofName(name: String): TagSearchConf = EMPTY.ofName(name)
 }

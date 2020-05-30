@@ -13,10 +13,11 @@ import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRe
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
+import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
-case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends RepositoryFactory {
+case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends RepositoryFactory { self =>
 
-  private val files = FileResourceRepository(gameDir, modDir)
+  private val files = FileResourceRepository(gameDir, modDir).asInstanceOf[FileResourceRepository]
   private val localisation: LocalisationRepository = InMemoryLocalisationRepository(files)
 
   private val tagRepo: TagRepository = InMemoryTagRepository()
@@ -87,5 +88,15 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends Re
 
 
   override def gfx: GFXRepository = FSGFXRepository(gameDir, modDir, this)
+
+  override def modWriters(mod: String): WriterFactory =
+    modWriters(Option(mod))
+
+  private def modWriters(mod: Option[String]): WriterFactory = {
+    val settings = ModSettings(eu4ModDir = Option(modDir), modDir = mod)
+    FileWriterFactory(settings, files)
+  }
+
+
 
 }

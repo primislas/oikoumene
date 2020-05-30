@@ -23,10 +23,11 @@ public class DateSerializer extends StdSerializer<Date> {
             Date value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException {
 
-        jgen.writeStartObject();
-        jgen.writeNumberField("year", value.year());
-        jgen.writeNumberField("month", value.month());
-        jgen.writeNumberField("day", value.day());
-        jgen.writeEndObject();
+        jgen.writeString(value.toString());
+//        jgen.writeStartObject();
+//        jgen.writeNumberField("year", value.year());
+//        jgen.writeNumberField("month", value.month());
+//        jgen.writeNumberField("day", value.day());
+//        jgen.writeEndObject();
     }
 }

@@ -2,10 +2,12 @@ package com.lomicron.utils.parsing.serialization
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing.JsonParser.rootKey
 import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
 import com.lomicron.utils.parsing.scopes.ParsingError
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConverters._
 
@@ -13,10 +15,6 @@ trait Deserializer {
   def run(obj: ObjectNode): (JsonNode, Seq[ParsingError])
 }
 
-/**
-  *
-  *
-  */
 object DefaultDeserializer extends BaseDeserializer {
   override def run(obj: ObjectNode): (JsonNode, Seq[ParsingError]) = {
     val (deserializedObj, _, deserializationErrors) = rec(obj, List(rootKey), Seq.empty)
@@ -31,7 +29,7 @@ object DefaultDeserializer extends BaseDeserializer {
     if (array.isDefined) {
       if (o.fieldNames().asScala.length == 1) return getArray(o, path, errors)
       else {
-        // A conflicting situation where we array was mixed with an object.
+        // A conflicting situation where an array was mixed with an object.
         // More often than not it is a result of an error. Thus, attempting
         // to address it by a best guess of a type based on the amount of elements.
         val errPath = path.mkString(" -> ")
@@ -57,7 +55,10 @@ object DefaultDeserializer extends BaseDeserializer {
 
 }
 
-class BaseDeserializer extends Deserializer {
+class BaseDeserializer(settings: SerializationSettings = DefaultSettings.settings)
+  extends Deserializer
+    with LazyLogging {
+
   override def run(obj: ObjectNode): (JsonNode, Seq[ParsingError]) = {
     val (deserializedObj, _, deserializationErrors) = rec(obj, List(rootKey), Seq.empty)
     (deserializedObj, deserializationErrors)
@@ -108,19 +109,26 @@ class BaseDeserializer extends Deserializer {
       var recErrs = Seq.empty[ParsingError]
 
       objsToDeserialize
-          .foreach(oConf => rec(oConf.obj, oConf.path) match {
-            case (ro, _, errs) =>
-              oConf.index match {
-                case Some(id) => o.get(oConf.field).asInstanceOf[ArrayNode].set(id, ro)
-                // Omitting empty objects, as empty object is an ambiguity
-                // of type array / object for deserializer and nulls should be replaced
-                // with default values in class definitions.
-                case _ =>
-                  if (!(ro.isInstanceOf[ObjectNode] && !ro.fieldNames().hasNext)) o.set(oConf.field, ro)
-                  else o.remove(oConf.field)
-              }
-              if (errs.nonEmpty) recErrs = recErrs ++ errs
-          })
+        .foreach(oConf => rec(oConf.obj, oConf.path) match {
+          case (ro, _, errs) =>
+            oConf.index match {
+              case Some(id) => o.get(oConf.field).asInstanceOf[ArrayNode].set(id, ro)
+              // Empty objects present an ambiguity, as in Clausewitz terms
+              // such declaration could mean an empty array. Unfortunately,
+              // there's no easy way to single out such arrays, so we have to
+              // rely on settings to identify them.
+              case _ =>
+                if (!(ro.isInstanceOf[ObjectNode] && !ro.fieldNames().hasNext)) o.set(oConf.field, ro)
+                else {
+                  settings.fields
+                    .find(_.matches(oConf.field))
+                    .filter(_.isArray)
+                    .map(_ => o.set(oConf.field, JsonMapper.arrayNode))
+                    .getOrElse(o.set(oConf.field, ro))
+                }
+            }
+            if (errs.nonEmpty) recErrs = recErrs ++ errs
+        })
 
       deserializedArrays.foreach(field => {
         val flatArray = JsonMapper.flatten(o.get(field).asInstanceOf[ArrayNode])
@@ -143,9 +151,19 @@ class BaseDeserializer extends Deserializer {
   }
 }
 
-object BaseDeserializer extends BaseDeserializer
+object BaseDeserializer extends BaseDeserializer(SerializationSettings.empty)
 
-case class DeserializedObject(field: String,
-                              obj: ObjectNode,
-                              path: List[String] = List.empty,
-                              index: Option[Int] = None)
+case class DeserializedObject
+(
+  field: String,
+  obj: ObjectNode,
+  path: List[String] = List.empty,
+  index: Option[Int] = None
+)
+
+object DefaultSettings {
+  val settingsJson: String =
+    IO.readTextResource("com/lomicron/utils/parsing/serialization/serialization_settings.json")
+  val settings: SerializationSettings =
+    JsonMapper.fromJson[SerializationSettings](settingsJson)
+}

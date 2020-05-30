@@ -7,7 +7,8 @@ import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, TagRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
-import com.lomicron.oikoumene.repository.fs.FSGFXRepository
+import com.lomicron.oikoumene.repository.fs.FileResourceRepository
+import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
 case class InMemoryRepos() extends RepositoryFactory {
   val repos: RepositoryFactory = InMemoryReposSingleton.getRepos
@@ -47,6 +48,12 @@ case class InMemoryRepos() extends RepositoryFactory {
   override def tradeNodes: TradeNodeRepository = repos.tradeNodes
 
   override def gfx: GFXRepository = repos.gfx
+
+  override def modWriters(mod: String): WriterFactory = {
+    val fileRes = resources.asInstanceOf[FileResourceRepository]
+    val settings = ModSettings(eu4ModDir = Option(fileRes.modDir), modDir = Option(mod))
+    FileWriterFactory(settings, fileRes)
+  }
 }
 
 object InMemoryReposSingleton {

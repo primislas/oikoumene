@@ -13,21 +13,24 @@ case class Province
  comment: Option[String] = None,
  tag2: Option[String] = None,
  localisation: Localisation = Localisation.empty,
- state: ProvinceState = ProvinceState.empty,
- history: Seq[ProvinceUpdate] = Seq.empty,
+ history: ProvinceHistory = ProvinceHistory.empty,
  geography: ProvinceGeography = ProvinceGeography.empty,
-) { self =>
+) {
+  self =>
   @JsonCreator def this() = this(0, Color.black)
 
-  def atStart(): Province = at(startDate)
+  def state: ProvinceState = history.state
 
-  def atTheEnd(): Province = copy(state = state.next(history))
+  def withState(state: ProvinceState): Province = copy(history = history.withState(state))
+
+  def atStart: Province = at(startDate)
+
+  def atTheEnd: Province = copy(history = history.atTheEnd())
 
   def at(year: Int, month: Int, day: Int): Province = at(Date(year, month, day))
 
   def at(date: Date): Province = {
-      val eventsByDate = history.filter(e => e.date.isEmpty || e.date.exists(_ <= date))
-      copy(state = state.next(eventsByDate))
+    copy(history = history.at(date))
   }
 
   def withTradeNode(tnId: String): Province =
@@ -36,13 +39,20 @@ case class Province
   def withTerrain(t: String): Province =
     copy(geography = geography.copy(terrain = Option(t)))
 
+  def updateInitState(f: ProvinceUpdate => ProvinceUpdate): Province = {
+    val initState = f(history.init)
+    val withoutDate =
+      if (initState.date.isEmpty) initState
+      else initState.copy(date = Option.empty)
+    val h = history.copy(init = withoutDate)
+    copy(history = h)
+  }
+
 }
 
 object Province extends FromJson[Province] {
-  def apply(id: Int, color: Color): Province = Province(id, color)
-
-  def apply(id: Int, color: Color, comment: String):
-  Province = Province(id, color, Option(comment).filter(_.nonEmpty))
+  def apply(id: Int, color: Color, comment: String): Province =
+    Province(id, color, Option(comment).filter(_.nonEmpty))
 
   def apply(id: Int, color: Color, comment: String, tag2: String): Province =
     Province(

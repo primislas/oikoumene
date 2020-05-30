@@ -25,7 +25,8 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
   private def defaultWriter(mapper: ObjectMapper) =
     mapper.writer.`with`(WRITE_BIGDECIMAL_AS_PLAIN)
 
-  def configure(mapper: ObjectMapper with ScalaObjectMapper) = JsonMapper(mapper)
+  def configure(mapper: ObjectMapper with ScalaObjectMapper): JsonMapper =
+    JsonMapper(mapper)
 
   def toJson(obj: AnyRef): String = obj match {
     case s: String => s
@@ -325,15 +326,19 @@ object JsonMapper {
 
     def asObject: Option[ObjectNode] = Option(n).cast[ObjectNode]
 
+    def asArray: Option[ArrayNode] = Option(n).cast[ArrayNode]
+
+    def asString: Option[String] = Option(n).filter(_.isTextual).map(_.asText())
+
     def getField(f: String): Option[JsonNode] = Option(n.get(f))
 
-    def getObject(f: String): Option[ObjectNode] = getField(f).filter(_.isInstanceOf[ObjectNode]).cast[ObjectNode]
+    def getObject(f: String): Option[ObjectNode] = getField(f).cast[ObjectNode]
 
-    def getArray(f: String): Option[ArrayNode] = getField(f).filter(_.isInstanceOf[ArrayNode]).cast[ArrayNode]
+    def getArray(f: String): Option[ArrayNode] = getField(f).cast[ArrayNode]
 
     def getString(f: String): Option[String] = getField(f).cast[TextNode].map(_.asText)
 
-    def getInt(f: String): Option[Int] = getField(f).filter(_.isInstanceOf[IntNode]).map(_.asInt)
+    def getInt(f: String): Option[Int] = getField(f).map(_.asInt)
 
     def getSeqOfObjects(f: String): Seq[ObjectNode] =
       if (!n.has(f)) Seq.empty
@@ -363,6 +368,17 @@ object JsonMapper {
       o.remove(field)
       o
     }
+
+    def entries(): Seq[(String, JsonNode)] =
+      o.fields().toSeq.map(e => (e.getKey, e.getValue))
+
+    def getObject(f: String): Option[ObjectNode] = Option(o.get(f)).cast[ObjectNode]
+
+    def getArray(f: String): Option[ArrayNode] = Option(o.get(f)).cast[ArrayNode]
+
+    def getString(f: String): Option[String] = Option(o.get(f)).cast[TextNode].map(_.asText)
+
+    def getInt(f: String): Option[Int] = Option(o.get(f)).map(_.asInt)
 
   }
 

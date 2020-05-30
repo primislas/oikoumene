@@ -1,14 +1,15 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{parse, parseEvents}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, booleanYes, textNode, toObjectNode}
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, booleanYes, toObjectNode}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.matching.Regex
@@ -16,18 +17,18 @@ import scala.util.matching.Regex
 object ProvinceParser extends LazyLogging {
 
   val provinceDefinitionPat: Regex =
-    "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*)){0,1}".r
+    "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*))?".r
   val addBuildingField = "add_building"
   val removeBuildingField = "remove_building"
 
   def apply
-  (repos: RepositoryFactory, evalEntityFields: Boolean = false)
+  (repos: RepositoryFactory)
   : ProvinceRepository = {
     val files = repos.resources
     val definitions = files.getProvinceDefinitions
     val history = files.getProvinceHistory
 
-    val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces, evalEntityFields)
+    val withHistory = parseProvinces(definitions, history, repos.localisations, repos.buildings, repos.provinces)
     val withGeography = addGeography(withHistory, repos.geography)
     val withPolitics = addPolitics(withGeography, repos)
     val withTrade = addTrade(withPolitics, repos)
@@ -37,28 +38,27 @@ object ProvinceParser extends LazyLogging {
 
   def parseProvinces
   (definitions: Option[String],
-   provinceHistory: Map[Int, String],
+   provinceHistory: Map[Int, FileNameAndContent],
    localisation: LocalisationRepository,
    buildings: BuildingRepository,
-   provinces: ProvinceRepository,
-   evalEntityFields: Boolean)
+   provinces: ProvinceRepository)
   : ProvinceRepository = {
 
-    val provinceById = parseProvinces(definitions)
+    val provinceById = parseProvinceDefinitions(definitions)
     val withLocalisation = addLocalisation(provinceById, localisation)
     val withHistory = addHistory(withLocalisation, provinceHistory, buildings)
 
     withHistory.values
       .map(Province.fromJson)
-      .map(_.atStart())
+      .map(_.atStart)
       .foreach(provinces.create)
 
     provinces
   }
 
-  def parseProvinces(definitions: Option[String]): Map[Int, ObjectNode] =
+  def parseProvinceDefinitions(definitions: Option[String]): Map[Int, ObjectNode] =
     definitions
-      .map(_.lines)
+      .map(_.lines.toSeq)
       .getOrElse(Seq.empty)
       .flatMap(parseDefinition)
       .map(p => p.id -> p)
@@ -88,7 +88,7 @@ object ProvinceParser extends LazyLogging {
 
   def addHistory
   (provincesById: Map[Int, ObjectNode],
-   histories: Map[Int, String],
+   histories: Map[Int, FileNameAndContent],
    buildings: BuildingRepository
   ): Map[Int, ObjectNode] = {
 
@@ -98,10 +98,11 @@ object ProvinceParser extends LazyLogging {
 
   private def addHistory
   (province: ObjectNode,
-   history: Option[String],
+   history: Option[FileNameAndContent],
    buildings: BuildingRepository
   ): ObjectNode =
     history
+      .map(_.content)
       .map(parse)
       .map(histAndErrors => {
         val errors = histAndErrors._2
@@ -109,35 +110,50 @@ object ProvinceParser extends LazyLogging {
           logger.warn(s"Encountered errors parsing country history for province '${province.get("id")}': $errors")
         histAndErrors._1
       })
-      .map(history => {
-        val events = Seq(history) ++ parseEvents(history).map(setBuildings(_, buildings))
-        JsonMapper.arrayNodeOf(events)
-      })
-      .map(province.setEx("history", _))
+      .map(parseHistory)
+      .map(setHistBuildings(_, buildings))
+      .map(setHistSourceFile(_, history))
+      .map(province.setEx(Fields.history, _))
       .getOrElse(province)
+
+  def setHistBuildings(h: ObjectNode, buildings: BuildingRepository): ObjectNode = {
+    h.getObject(Fields.init).foreach(setBuildings(_, buildings))
+    h.getArray(Fields.events)
+      .map(es => es.toSeq).getOrElse(Seq.empty).flatMap(_.asObject)
+      .foreach(setBuildings(_, buildings))
+    h
+  }
+
+  def setHistSourceFile(provHist: ObjectNode, history: Option[FileNameAndContent]): ObjectNode =
+    history
+      .map(_.name)
+      .map(provHist.setEx(Fields.sourceFile, _))
+      .getOrElse(provHist)
 
   private def setBuildings(event: ObjectNode, buildings: BuildingRepository) = {
     val buildingFields = event.fieldNames.toSeq.filter(buildings.find(_).isSuccess).toList
-    buildingFields.foreach(f => {
-      val buildingField = if (event.get(f) == booleanYes) addBuildingField else removeBuildingField
-      event.set(buildingField, textNode(f))
-      event.remove(f)
-    })
+    buildingFields
+      .groupBy(event.get(_) == booleanYes)
+      .foreachKV { case (k, v) =>
+        val buildings = JsonMapper.arrayNodeOf(v)
+        val buildingField = if (k) addBuildingField else removeBuildingField
+        event.set(buildingField, buildings)
+      }
+    buildingFields.foreach(event.remove)
+
     event
   }
 
   def addGeography
   (provinceRepo: ProvinceRepository, geography: GeographicRepository)
-  : ProvinceRepository =
-  {
+  : ProvinceRepository = {
     provinceRepo.findAll.map(addGeography(_, geography)).foreach(provinceRepo.update)
     provinceRepo
   }
 
   def addGeography
   (province: Province, geography: GeographicRepository)
-  : Province =
-  {
+  : Province = {
     val id = province.id
 
     val pType = geography.provinceTypes.map(_.identifyType(id))
@@ -161,30 +177,24 @@ object ProvinceParser extends LazyLogging {
 
   def addPolitics
   (provinceRepo: ProvinceRepository, repos: RepositoryFactory)
-  : ProvinceRepository =
-  {
+  : ProvinceRepository = {
     provinceRepo.findAll.map(addPolitics(_, repos)).foreach(provinceRepo.update)
     provinceRepo
   }
 
   def addPolitics
   (p: Province, repos: RepositoryFactory)
-  : Province =
-  {
+  : Province = {
     val cultureGroup = p.state.culture.flatMap(repos.cultures.groupOf).map(_.id)
     val religionGroup = p.state.religion.flatMap(repos.religions.groupOf).map(_.id)
     val state = p.state.copy(cultureGroup = cultureGroup, religionGroup = religionGroup)
-    p.copy(state = state)
+    p.withState(state)
   }
 
   def addTrade(provinces: ProvinceRepository, factory: RepositoryFactory): ProvinceRepository = {
-    factory.tradeNodes.findAll.flatMap(tn =>
-      tn.members.flatMap(provId => provinces.find(provId).toOption.map(_.withTradeNode(tn.id))))
+    factory.tradeNodes.findAll
+      .flatMap(tn => tn.members.flatMap(provId => provinces.find(provId).toOption.map(_.withTradeNode(tn.id))))
       .foreach(provinces.update)
-
-    // TODO add province modifiers from goods?
-
-
     provinces
   }
 

@@ -18,9 +18,7 @@ case class Tag
   // hits = 793, isOptional = false, sample = "muslimgfx"
   graphicalCulture: String = Entity.UNDEFINED,
   // hits = 793, isOptional = false
-  state: TagState = TagState.empty,
-  // hits = 793, isOptional = false, sample = [{"government":"monarchy","add_government_reform":"iqta","technology_group":"east_african","unit_type":"sub_saharan","religion":"sunni","primary_culture":"somali","capital":2776,"religious_school":"shafii_school"},{"monarch":{"name":"Yusuf","dynasty":"Jaladi","dip":3,"mil":1,"adm":2},"date":{"year":1730,"month":1,"day":1}},{"monarch":{"name":"Muhamed","dynasty":"Jaladi","dip":3,"mil":1,"adm":2},"date":{"year":1750,"month":1,"day":1}},{"monarch":{"name":"Ahmed","dynasty":"Jaladi","dip":3,"mil":1,"adm":2},"date":{"year":1770,"month":1,"day":1}},{"monarch":{"name":"Uthman","dynasty":"Jaladi","dip":3,"mil":1,"adm":2},"date":{"year":1790,"month":1,"day":1}},{"monarch":{"name":"Ali","dynasty":"Jaladi","dip":3,"mil":1,"adm":2},"date":{"year":1810,"month":1,"day":1}}]
-  history: Seq[TagUpdate] = Seq.empty,
+  history: TagHistory = TagHistory.empty,
   // hits = 793, isOptional = false, sample = ["Abdallah","Abdikarim","Abubakar","Ahmad","Ayub","Dalmar","Ghedi","Hassan","Khalid","Liban","Mahad","Mosa","Muhammad","Omar","Rahim","Saad","Sadiq","Sharif"]
   leaderNames: Seq[String] = Seq.empty,
   // hits = 793, isOptional = false, sample = {"name":"Geledi","nameAdj":"Geledi"}
@@ -57,16 +55,15 @@ case class Tag
 
   @JsonCreator def this() = this(Entity.UNDEFINED)
 
-  def atStart(): Tag = at(startDate)
+  def state: TagState = history.state
 
-  def atTheEnd(): Tag = copy(state = state.next(history))
+  def atStart: Tag = at(startDate)
+
+  def atTheEnd: Tag = copy(history = history.atTheEnd())
 
   def at(year: Int, month: Int, day: Int): Tag = at(Date(year, month, day))
 
-  def at(date: Date): Tag = {
-    val eventsByDate = history.filter(e => e.date.isEmpty || e.date.exists(_.compareTo(date) <= 0))
-    copy(state = state.next(eventsByDate))
-  }
+  def at(date: Date): Tag = copy(history = history.at(date))
 
 }
 

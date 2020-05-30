@@ -20,8 +20,10 @@ object ClausewitzParser extends LazyLogging {
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
   object Fields {
+    val sourceFile = "source_file"
     val history = "history"
     val state = "state"
+    val init = "init"
     val events = "events"
     val date = "date"
     val update = "update"
@@ -43,8 +45,8 @@ object ClausewitzParser extends LazyLogging {
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
 
-  val startDate = Date(1444, 11, 11)
-  val endDate = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
+  val startDate: Date = Date(1444, 11, 11)
+  val endDate: Date = Date(Int.MaxValue, Int.MaxValue, Int.MaxValue)
 
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     parse(str, DefaultDeserializer)
@@ -63,7 +65,7 @@ object ClausewitzParser extends LazyLogging {
     * Returns a seq of object fields. Optionally
     * sets field names as idKey in thos objects.
     *
-    * @param o source JSON object
+    * @param o     source JSON object
     * @param idKey field names will be set to idKey fields
     *              of resulting objects, if idKey is provided
     * @return object fields
@@ -76,7 +78,7 @@ object ClausewitzParser extends LazyLogging {
     * Returns a seq of object fields. Optionally
     * sets field names as idKey in thos objects.
     *
-    * @param o source JSON object
+    * @param o     source JSON object
     * @param idKey field names will be set to idKey fields
     *              of resulting objects, if idKey is provided
     * @return object fields
@@ -106,6 +108,26 @@ object ClausewitzParser extends LazyLogging {
     events
   }
 
+  def parseHistory(obj: ObjectNode): ObjectNode = {
+    val events = parseEvents(obj)
+    objectNode(Fields.init, obj)
+      .setEx(Fields.events, events)
+  }
+
+  def parseHistory(obj: ObjectNode, sourceFile: String): ObjectNode =
+    parseHistory(obj).setEx(Fields.sourceFile, sourceFile)
+
+  def filesWithPrependedNames(filesByName: Map[String, String]): Map[String, String] =
+    filesByName
+      .mapValuesEx(_.split("\n"))
+      .mapKVtoValue((name, lines) => s"${Fields.sourceFile} = $name" +: lines)
+      .mapValuesEx(_.mkString("\n"))
+
+  def mapEntityFilesToFileNames(filesByName: Map[String, String]): Map[String, ObjectNode] =
+    parseFilesByFileNames(filesByName, o => Seq(o))
+      .filterValues(_.nonEmpty)
+      .mapValues(_.head)
+
   def parseFilesAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, o => Seq(o))
 
@@ -115,15 +137,19 @@ object ClausewitzParser extends LazyLogging {
   private def parseFiles
   (filesByName: Map[String, String],
    fileParser: ObjectNode => Seq[ObjectNode])
-  : Seq[ObjectNode] =
+  : Seq[ObjectNode] = parseFilesByFileNames(filesByName, fileParser).values.toList.flatten
+
+  private def parseFilesByFileNames
+  (filesByName: Map[String, String],
+   fileParser: ObjectNode => Seq[ObjectNode])
+  : Map[String, Seq[ObjectNode]] =
     filesByName
       .mapValues(parse)
       .mapKVtoValue((filename, o) => {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing $filename: ${o._2}")
         fileParser(o._1)
       })
-      .mapKVtoValue((filename, entities) => entities.map(_.setEx("source_file", filename)))
-      .values.toList.flatten
+      .mapKVtoValue((filename, entities) => entities.map(_.setEx(Fields.sourceFile, filename)))
 
   /**
     * Treats root object fields as ids of entities configure
@@ -202,7 +228,7 @@ object ClausewitzParser extends LazyLogging {
       .setEx(Fields.month, IntNode.valueOf(date.month))
       .setEx(Fields.day, IntNode.valueOf(date.day))
 
-  def json2date(jsonDate: ObjectNode) = Date(
+  def json2date(jsonDate: ObjectNode): Date = Date(
     jsonDate.get(Fields.year).asInt,
     jsonDate.get(Fields.month).asInt,
     jsonDate.get(Fields.day).asInt)

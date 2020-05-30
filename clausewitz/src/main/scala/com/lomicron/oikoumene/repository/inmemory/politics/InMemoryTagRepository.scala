@@ -32,4 +32,9 @@ case class InMemoryTagRepository()
     SearchResult(req, allMatching)
   }
 
+  override def findByName(name: String): Option[Tag] =
+    search(TagSearchConf.ofName(name))
+      .entities
+      .find(_.localisation.name.contains(name))
+
 }

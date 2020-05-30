@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.EntityState
+import com.lomicron.oikoumene.model.history.HistState
 import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 
 import scala.collection.immutable.ListSet
@@ -44,7 +44,7 @@ case class ProvinceState
  seatInParliament: Boolean = false,
  tradeCompany: Option[String] = None,
  tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
-) extends EntityState[ProvinceState, ProvinceUpdate] {
+) extends HistState[ProvinceState, ProvinceUpdate] {
   self =>
 
   @JsonCreator def this() = this(0)
@@ -90,7 +90,11 @@ case class ProvinceState
 
   def addBuilding(v: String): ProvinceState = copy(buildings = buildings + v)
 
+  def addBuildings(v: Seq[String]): ProvinceState = copy(buildings = buildings ++ v)
+
   def removeBuilding(v: String): ProvinceState = copy(buildings = buildings - v)
+
+  def removeBuildings(v: Seq[String]): ProvinceState = copy(buildings = buildings -- v)
 
   def extraCost(v: Int): ProvinceState = copy(extraCost = v)
 
@@ -174,8 +178,8 @@ object ProvinceState {
       nextF(update.addClaim, (s, v: String) => s.addClaim(v)),
       nextF(update.removeClaim, (s, v: String) => s.removeClaim(v)),
       nextF(update.isCity, (s, v: Boolean) => s.isCity(v)),
-      nextF(update.addBuilding, (s, v: String) => s.addBuilding(v)),
-      nextF(update.removeBuilding, (s, v: String) => s.removeBuilding(v)),
+      nextF(update.addBuilding, (s, v: Seq[String]) => s.addBuildings(v)),
+      nextF(update.removeBuilding, (s, v: Seq[String]) => s.removeBuildings(v)),
       nextF(update.extraCost, (s, v: Int) => s.extraCost(v)),
       nextF(update.centerOfTrade, (s, v: Int) => s.centerOfTrade(v)),
       nextF(update.hre, (s, v: Boolean) => s.hre(v)),

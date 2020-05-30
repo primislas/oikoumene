@@ -1,0 +1,12 @@
+{
+  "fields": [
+    {
+      "field_type": "ClzArray",
+      "field_suffix": "_area"
+    },
+    {
+      "field_type": "ClzArray",
+      "field_suffix": "_names"
+    }
+  ]
+}

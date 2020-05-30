@@ -1,7 +1,8 @@
 package com.lomicron.oikoumene.model.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.{Entity, EntityState}
+import com.lomicron.oikoumene.model.Entity
+import com.lomicron.oikoumene.model.history.HistState
 import com.lomicron.utils.json.FromJson
 
 case class TagState
@@ -87,7 +88,7 @@ case class TagState
   ambientObjects: Seq[String] = Seq.empty,
 
 
-) extends EntityState[TagState, TagUpdate] { self =>
+) extends HistState[TagState, TagUpdate] { self =>
 
   @JsonCreator def this() = this(Entity.UNDEFINED)
 

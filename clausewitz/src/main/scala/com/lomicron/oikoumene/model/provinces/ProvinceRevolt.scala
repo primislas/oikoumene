@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.provinces
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonIgnore}
 
 case class ProvinceRevolt
 (`type`: Option[String] = None,
@@ -11,6 +11,6 @@ case class ProvinceRevolt
 
   @JsonCreator def this() = this(None)
 
-  def isEmpty: Boolean = `type`.isEmpty
+  @JsonIgnore def isEmpty: Boolean = `type`.isEmpty
 
 }

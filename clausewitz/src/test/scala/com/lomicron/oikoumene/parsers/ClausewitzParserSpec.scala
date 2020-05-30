@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.parsers
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.lomicron.oikoumene.model.provinces.ProvinceHistory
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.toJsonNode
@@ -100,8 +100,21 @@ class ClausewitzParserSpec extends Specification {
       val date = Date(1700, 1, 1)
       val parsed = ClausewitzParser.rollUpEvents(province, date)
       val history = parsed.get(ClausewitzParser.Fields.events).asInstanceOf[ArrayNode]
-      history.size mustEqual 19
+      history.size mustEqual 18
     }
+  }
+
+  "ClausewitzParser#parseHistory" should {
+
+    "- parse and preserve empty events" >> {
+      val histFile = "revolt = {}"
+      val jsonHist = ClausewitzParser.parse(histFile)._1
+      val jsonProv = ClausewitzParser.parseHistory(jsonHist)
+      val p = ProvinceHistory.fromJson(jsonProv)
+      p.init.revolt must not be empty
+    }
+
+
   }
 
 }

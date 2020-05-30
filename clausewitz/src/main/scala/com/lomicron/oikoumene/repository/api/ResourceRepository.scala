@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.repository.api
 
 import java.nio.file.Path
 
+import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 
 trait ResourceRepository {
@@ -28,7 +29,7 @@ trait ResourceRepository {
     *
     * @return country history by country tag
     */
-  def getCountryHistory: Map[String, String]
+  def getCountryHistory: Map[String, FileNameAndContent]
 
   def getDiplomaticRelations: Map[String, String]
 
@@ -40,7 +41,7 @@ trait ResourceRepository {
 
   def getProvinceDefinitions: Option[String]
 
-  def getProvinceHistory: Map[Int, String]
+  def getProvinceHistory: Map[Int, FileNameAndContent]
 
   def getBuildings: Seq[String]
 

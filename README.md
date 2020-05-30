@@ -8,6 +8,8 @@ Under the Roman Empire, it came to refer to civilization
 as well as the secular and religious imperial administration.
 
 # TIL
+### Scala
+- Things they don't tell you about in books - [optics](https://scalac.io/scala-optics-lenses-with-monocle/). See [quicklens](https://github.com/softwaremill/quicklens).
 ### Scala-Jackson
 - Having run into problems with deserializing SortedSets and TreeSets,
 it appears to be a [known issue](https://github.com/FasterXML/jackson-module-scala/wiki/FAQ#deserializing-optionint-and-other-primitive-challenges).

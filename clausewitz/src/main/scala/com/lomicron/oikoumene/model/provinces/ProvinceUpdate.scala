@@ -1,15 +1,16 @@
 package com.lomicron.oikoumene.model.provinces
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonIgnore}
+import com.lomicron.oikoumene.model.history.HistEvent
 import com.lomicron.utils.parsing.tokenizer.Date
 
 case class ProvinceUpdate
 (
-  date: Option[Date] = None,
-  // hits = 13305, isOptional = true, sample = "SWE"
-  controller: Option[String] = None,
+  override val date: Option[Date] = None,
   // hits = 9400, isOptional = true, sample = "SWE"
   owner: Option[String] = None,
+  // hits = 13305, isOptional = true, sample = "SWE"
+  controller: Option[String] = None,
   // hits = 7771, isOptional = true, sample = "SWE"
   addCore: Option[Seq[String]] = None,
   // hits = 2939, isOptional = true, sample = "DAN"
@@ -38,9 +39,9 @@ case class ProvinceUpdate
   // hits = 2924, isOptional = true, sample = true
   isCity: Option[Boolean] = None,
   // hits = 486, isOptional = true, sample = "fort_15th"
-  addBuilding: Option[String] = None,
+  addBuilding: Option[Seq[String]] = None,
   // hits = 177, isOptional = true, sample = "fort_15th"
-  removeBuilding: Option[String] = None,
+  removeBuilding: Option[Seq[String]] = None,
   // hits = 376, isOptional = true, sample = 16
   extraCost: Option[Int] = None,
   // hits = 331, isOptional = true, sample = 2
@@ -91,8 +92,28 @@ case class ProvinceUpdate
   addVaisyasOrBurghersEffect: Option[Boolean] = None,
   // hits = 8, isOptional = true, sample = true
   addJainsOrBurghersEffect: Option[Boolean] = None,
-) {
+) extends HistEvent {
 
   @JsonCreator def this() = this(controller = None)
 
+  def addCoreCp(core: String): ProvinceUpdate = {
+    val cores = addCore.map(_ :+ core).map(_.distinct).orElse(Some(Seq(core)))
+    copy(addCore = cores)
+  }
+
+  @JsonIgnore def isEmpty: Boolean = !isNotEmpty
+
+  @JsonIgnore def isNotEmpty: Boolean = fields().exists(_.isDefined)
+
+  private def fields(): Seq[Option[Any]] = Seq(controller, owner, addCore, removeCore, discoveredBy, religion, culture,
+    tradeGoods, capital, baseTax, baseProduction, baseManpower, addClaim, removeClaim, isCity, addBuilding, removeBuilding,
+    extraCost, centerOfTrade, hre, reformationCenter, seatInParliament, addProvinceTriggeredModifier, removeProvinceModifier,
+    unrest, revolt, revoltRisk, nativeSize, nativeFerocity, nativeHostileness, estate,
+    addLocalAutonomy, addPermanentProvinceModifier, latentTradeGoods, addTradeCompanyInvestment, addToTradeCompany,
+    addRajputsOrMarathasOrNoblesEffect, addBrahminsOrChurchEffect, addVaisyasOrBurghersEffect, addJainsOrBurghersEffect)
+
+}
+
+object ProvinceUpdate {
+  def empty: ProvinceUpdate = ProvinceUpdate()
 }

@@ -40,8 +40,24 @@ case class ProvinceSearchConf
   excludeFields: Set[String] = Set.empty,
 ) extends SearchConf {
   @JsonCreator def this() = this(0)
+  def ofName(name: String): ProvinceSearchConf = copy(name = Option(name))
+  def ofOwner(tag: String): ProvinceSearchConf = copy(owner = Option(tag))
+  def ofCulture(culture: String): ProvinceSearchConf = copy(culture = Option(culture))
+  def ofCultureGroup(cultureGroup: String): ProvinceSearchConf = copy(cultureGroup = Option(cultureGroup))
+  def ofArea(area: String): ProvinceSearchConf = copy(area = Option(area))
+  def ofRegion(region: String): ProvinceSearchConf = copy(region = Option(region))
+  def withSize(size: Int): ProvinceSearchConf = copy(size = size)
+  def all: ProvinceSearchConf = withSize(Int.MaxValue)
 }
 
 object ProvinceSearchConf {
-  def empty: ProvinceSearchConf = ProvinceSearchConf()
+  private val EMPTY = ProvinceSearchConf()
+  def empty: ProvinceSearchConf = EMPTY
+  def ofName(name: String): ProvinceSearchConf = EMPTY.ofName(name)
+  def ofOwner(tag: String): ProvinceSearchConf = EMPTY.ofOwner(tag)
+  def ofCulture(culture: String): ProvinceSearchConf = EMPTY.ofCulture(culture)
+  def ofCultureGroup(cultureGroup: String): ProvinceSearchConf = EMPTY.ofCultureGroup(cultureGroup)
+  def ofArea(area: String): ProvinceSearchConf = EMPTY.ofArea(area)
+  def ofRegion(region: String): ProvinceSearchConf = EMPTY.ofRegion(region)
+
 }

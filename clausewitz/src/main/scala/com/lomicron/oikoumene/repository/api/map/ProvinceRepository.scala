@@ -6,5 +6,7 @@ import com.lomicron.oikoumene.repository.api.{AbstractRepository, SearchResult}
 trait ProvinceRepository extends AbstractRepository[Int, Province] {
 
   def groupBy(searchConf: ProvinceSearchConf, groupBy: String): SearchResult[ProvinceGroup]
+  def findByName(name: String): Option[Province]
+  def findByName(names: Seq[String]): Seq[Province]
 
 }
