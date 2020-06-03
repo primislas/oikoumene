@@ -67,7 +67,7 @@ object MapParser {
     ParsedMap(tiles, routes, terrainColors)
   }
 
-  private def getRGB(img: BufferedImage, x: Int, y: Int) =
+  def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =
     Try(img.getRGB(x, y)).toOption
 
   def getRoute(source: Option[Int], target: Option[Int]): Option[Route] = for {

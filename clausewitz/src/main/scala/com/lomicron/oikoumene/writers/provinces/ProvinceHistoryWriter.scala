@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.writers.map
+package com.lomicron.oikoumene.writers.provinces
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.io.FileNameAndContent

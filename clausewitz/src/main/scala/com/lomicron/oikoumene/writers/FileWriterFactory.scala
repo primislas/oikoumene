@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.writers
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
-import com.lomicron.oikoumene.writers.map.ProvinceHistoryWriter
+import com.lomicron.oikoumene.writers.provinces.ProvinceHistoryWriter
 import com.lomicron.oikoumene.writers.politics.TagHistoryWriter
 
 case class FileWriterFactory(settings: ModSettings, repo: FileResourceRepository) extends WriterFactory {

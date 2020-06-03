@@ -13,6 +13,7 @@ import {TagSearchComponent} from './tag-search/tag-search.component';
 import {TagSearchModalComponent} from './tag-search/tag-search.modal.component';
 import {TagSearchTableComponent} from './tag-search/tag-search.table.component';
 import { PaginationComponent } from './pagination/pagination.component';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
     declarations: [
@@ -22,6 +23,7 @@ import { PaginationComponent } from './pagination/pagination.component';
         TagSearchComponent,
         TagSearchModalComponent,
         PaginationComponent,
+        MapComponent,
     ],
     imports: [
         BrowserModule,
