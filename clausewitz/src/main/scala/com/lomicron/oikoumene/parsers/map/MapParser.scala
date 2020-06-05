@@ -1,15 +1,17 @@
 package com.lomicron.oikoumene.parsers.map
 
+import java.awt.Point
 import java.awt.image.{BufferedImage, IndexColorModel}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map.{Pixel, Route, Tile}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.oikoumene.repository.api.map.GeographicRepository
+import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
 import javax.imageio.ImageIO
 
 import scala.Function.tupled
+import scala.math.BigDecimal.RoundingMode
 import scala.util.Try
 
 object MapParser {
@@ -23,9 +25,10 @@ object MapParser {
       provinces <- r.getProvinceMap.map(fetchMap)
       terrain <- r.getTerrainMap.map(fetchMap)
       height <- r.getHeightMap.map(fetchMap)
-    } yield parseMap(provinces, terrain, height)
+    } yield parseMapTiles(provinces, terrain, height)
 
     val g = repos.geography
+
     map.foreach(m => {
       g.map.create(m.tiles)
       g.map.rebuildTerrainColors(m.terrainColors.map(Color(_)))
@@ -40,9 +43,9 @@ object MapParser {
     * @param provinces - [[java.awt.image.BufferedImage BufferedImage]] representing a province
     * @return a tuple of province colors and routes connecting them
     */
-  def parseMap(provinces: BufferedImage,
-               terrain: BufferedImage,
-               height: BufferedImage)
+  def parseMapTiles(provinces: BufferedImage,
+                    terrain: BufferedImage,
+                    height: BufferedImage)
   : ParsedMap = {
 
     val cm = terrain.getColorModel.asInstanceOf[IndexColorModel]
@@ -65,6 +68,24 @@ object MapParser {
       .toSeq
 
     ParsedMap(tiles, routes, terrainColors)
+  }
+
+  def parseWorldMap(img: BufferedImage, mapRepo: MapRepository): MapRepository = {
+    val (polygons, sphere) = parseWorldMap(img)
+    mapRepo.setMercator(polygons).setSphericalMap(sphere)
+  }
+
+  def parseWorldMap(img: BufferedImage): (Seq[Polygon], SphericalMap) = {
+    val polygons = Tracer.trace(img)
+
+    val circumference = if (img.getWidth > img.getHeight) img.getWidth else img.getHeight
+    val radius = BigDecimal(circumference) / (2 * Math.PI)
+    val radiusInt = radius.setScale(0, RoundingMode.CEILING).toInt
+    val center = new Point(radiusInt, radiusInt)
+    val offset = new Point(radiusInt - img.getWidth / 2, radiusInt - img.getHeight / 2)
+    val sphere = Geometry.toSpherical(polygons, center, radius.toDouble, offset)
+
+    (polygons, sphere)
   }
 
   def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =

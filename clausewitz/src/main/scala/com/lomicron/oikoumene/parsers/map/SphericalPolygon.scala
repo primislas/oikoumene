@@ -7,8 +7,8 @@ case class SphericalPolygon
   provinceId: Option[Int] = None
 ) {
 
-  def isEmpty: Boolean = points.isEmpty
-  def nonEmpty: Boolean = points.nonEmpty
+  def isEmpty: Boolean = points.size < 2
+  def nonEmpty: Boolean = !isEmpty
 
   def rotate(rotation: SphericalCoord): SphericalPolygon =
     rotate(rotation.polar, rotation.azimuth)

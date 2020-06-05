@@ -7,16 +7,18 @@ object Geometry {
   val twoPI: Double = PI * 2
   implicit def toDouble(bd: BigDecimal): Double = bd.toDouble
 
-  def mercatorToSphere
+  def projectMercatorAsSphere
   (
     polygons: Seq[Polygon],
     center: Point2D,
     radius: Double,
     offset: Point2D = Point2D(0, 0),
     rotation: Option[SphericalCoord] = None
-  ): Seq[Polygon] =
-    project(toSpherical(polygons, center, radius, offset, rotation), center)
-
+  ): Seq[Polygon] = {
+    val sphere = toSpherical(polygons, center, radius, offset)
+    val rotated = rotation.map(sphere.rotate).getOrElse(sphere)
+    rotated.project
+  }
 
   def toSpherical
   (
@@ -24,12 +26,13 @@ object Geometry {
     center: Point2D,
     radius: Double,
     offset: Point2D = Point2D(0, 0),
-    rotation: Option[SphericalCoord] = None
-  ): Seq[SphericalPolygon] =
-    polygons
+  ): SphericalMap = {
+    val sps = polygons
       .map(_.offset(offset))
       .map(_.toSpherical(center, radius))
-      .map(p => rotation.map(p.rotate).getOrElse(p))
+    SphericalMap(center, sps)
+  }
+
 
   def project(polygons: Seq[SphericalPolygon], center: Point2D): Seq[Polygon] =
     polygons

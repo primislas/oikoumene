@@ -7,7 +7,7 @@ case class ProvinceGeography
 (
 `type`: Option[String] = None,
 terrain: Option[String] = None,
-climate: Option[String] = None,
+climate: Seq[String] = Seq.empty,
 area: Option[String] = None,
 region: Option[String] = None,
 superRegion: Option[String] = None,
@@ -18,8 +18,9 @@ landlocked: Boolean = true,
 tradeNode: Option[String] = None,
 ) {
   @JsonCreator def this() = this(None)
+  def isImpassable: Boolean = climate.contains("impassable")
 }
 
 object ProvinceGeography extends FromJson[ProvinceGeography] {
-  val empty = ProvinceGeography()
+  val empty: ProvinceGeography = ProvinceGeography()
 }

@@ -30,5 +30,5 @@ object ProvinceTypes extends FromJson[ProvinceTypes] {
   val lake = "lake"
   val random = "random"
 
-  val empty = ProvinceTypes()
+  val empty: ProvinceTypes = ProvinceTypes()
 }

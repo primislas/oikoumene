@@ -2,28 +2,114 @@ package com.lomicron.oikoumene.parsers.map
 
 import java.awt.Point
 import java.awt.image.BufferedImage
+
+import com.lomicron.oikoumene.parsers.map.MapParser.getRGB
 import com.lomicron.utils.collection.CollectionUtils.OptionEx
+
 
 object Tracer {
 
   def trace(img: BufferedImage): Seq[Polygon] = {
-    var traced = Set[Point]()
     var polygons = Seq[Polygon]()
-    var skipColor = Option(0)
+    val groups = toGroups(img)
+    var tracedGroups = Set[Int]()
     for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
-      val p = new Point(x, y)
-      val color = MapParser.getRGB(img, p.x, p.y)
-      if (!skipColor.contentsEqual(color)) {
-        if (!traced.contains(p)) {
-          val poly = Tracer(img, p).trace()
-          traced = traced ++ poly.borderPoints
-          polygons = polygons :+ poly
-        }
-        skipColor = color
+      val group = groups(x)(y)
+      if (!tracedGroups.contains(group)) {
+        val poly = Tracer(img, new Point(x, y)).trace()
+        polygons = polygons :+ poly
+        tracedGroups = tracedGroups + group
       }
     }
 
     polygons
+  }
+
+  def toGroups(img: BufferedImage): Array[Array[Int]] = {
+    val groups = Array.ofDim[Int](img.getWidth(), img.getHeight())
+    def leftNeighborGroup(x: Int, y: Int): Option[Int] =
+      if (x > 0 && y >= 0) Some(groups(x-1)(y))
+      else None
+    def topNeighborGroup(x: Int, y: Int) : Option[Int] =
+      if (x >= 0 && y > 0) Some(groups(x)(y-1))
+      else None
+    def leftNeighborColorMatches(x: Int, y: Int, c: Int): Boolean =
+      getRGB(img, x-1, y).contains(c)
+    def topNeighborColorMatches(x: Int, y: Int, c: Int): Boolean =
+      getRGB(img, x, y-1).contains(c)
+    var groupIds = 0
+    def nextId(): Int = {
+      groupIds = groupIds + 1
+      groupIds
+    }
+
+    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
+      val color = getRGB(img, x, y).get
+
+      val isLeftGroup = leftNeighborColorMatches(x, y, color)
+      val isTopGroup = topNeighborColorMatches(x, y, color)
+      def setGroup(id: Int): Unit =
+        groups(x)(y) = id
+
+      if (y == 36 && x == 26)
+        println()
+
+      if (isLeftGroup) {
+        if (isTopGroup) {
+          val leftGroup = leftNeighborGroup(x, y)
+          val topGroup = topNeighborGroup(x, y)
+          if (!leftGroup.contentsEqual(topGroup)) {
+            // replace all with lowest
+            val id = for {
+              lg <- leftGroup
+              tg <- topGroup
+            } yield mergeGroups(groups, x, y, lg, tg)
+            id.foreach(setGroup)
+          } else
+            leftNeighborGroup(x, y).foreach(setGroup)
+        } else
+          leftNeighborGroup(x, y).foreach(setGroup)
+      } else if (isTopGroup)
+        topNeighborGroup(x, y).foreach(setGroup)
+      else
+        groups(x)(y) = nextId()
+    }
+
+    groups
+  }
+
+  def mergeGroups(gs: Array[Array[Int]], x: Int, y: Int, lg: Int, tg: Int): Int = {
+    if (lg < tg) replaceGroup(gs, x, y-1, tg, lg)
+    else replaceGroup(gs, x-1, y, lg, tg)
+  }
+
+  def replaceGroup(gs: Array[Array[Int]], x: Int, y: Int, from: Int, to: Int): Int = {
+
+    @scala.annotation.tailrec
+    def go(start: Int, by: Int => Int): Int =
+      if (start < 0) 0
+      else if (start >= gs.length) gs.length - 1
+      else if (gs(start)(y) == from) {
+        gs(start)(y) = to
+        val next = by(start)
+        if (next < 0 || next >= gs.length) start
+        else go(by(start), by)
+      } else start
+
+    val xFrom = go(x, _ - 1) + 1
+    val xTo = go(x + 1, _ + 1) - 1
+
+    if (y == 0) to
+    else {
+      for (i <- xFrom to xTo)
+        // TODO tailrec?
+        // Actually there doesn't appear to do a lot of redundancy -
+        // after the first pass gs(i + 1) != from, so the only
+        // downside of this approach is not having tailrec calls
+        if (gs(i)(y - 1) == from) replaceGroup(gs, i, y - 1, from ,to)
+      to
+    }
+
   }
 
 }
@@ -39,14 +125,14 @@ case class Tracer(i: BufferedImage, p: Point, d: Direction = Right) {
     var outline = Seq(startingPoint)
     var borderPoints = Set(startingPoint)
     var (nextPoint, tracedBorder) = next()
+    borderPoints = borderPoints ++ tracedBorder
 
     while (startingPoint != nextPoint) {
       outline = outline :+ nextPoint
-      borderPoints = borderPoints ++ tracedBorder
       val pb = next()
-      // TODO check length and add extra points to split long lines if necessary
       nextPoint = pb._1
       tracedBorder = pb._2
+      borderPoints = borderPoints ++ tracedBorder
     }
 
     val outline2D = outline.map(Point2D(_))
@@ -87,11 +173,12 @@ case class Tracer(i: BufferedImage, p: Point, d: Direction = Right) {
     case _ => None
   }
 
-  def colorOf(p: Point): Int = MapParser.getRGB(i, p.x, p.y).get
+  def colorOf(p: Point): Int = getRGB(i, p.x, p.y).get
 
 }
 
-sealed trait Direction { self =>
+sealed trait Direction {
+  self =>
 
   def isReverse(d: Direction): Boolean = self match {
     case Right => d == Left
@@ -122,6 +209,7 @@ sealed trait Direction { self =>
   }
 
 }
+
 object Right extends Direction
 object Down extends Direction
 object Left extends Direction

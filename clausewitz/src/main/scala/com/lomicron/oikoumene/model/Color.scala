@@ -17,7 +17,7 @@ extends Ordered[Color]
 
   override def compare(that: Color): Int = toInt - that.toInt
 
-  private def toInt: Int = r * 1000000 +  g * 1000 + b
+  def toInt: Int = ((r << 16) | (g << 8) | b) | 0xFF000000
 
 }
 
