@@ -31,6 +31,7 @@ case class FileResourceRepository
   val ideasDir = "common/ideas"
 
   val provinceDefinitionsFile = "map/definition.csv"
+  val adjacenciesFile = "map/adjacencies.csv"
   val provinceTypesFile = "map/default.map"
   val provincePositionsFile = "map/positions.txt"
   val areasFile = "map/area.txt"
@@ -88,6 +89,9 @@ case class FileResourceRepository
 
   def getProvinceDefinitions: Option[String] =
     readSourceFileContent(provinceDefinitionsFile)
+
+  override def getAdjacencies: Option[String] =
+    readSourceFileContent(adjacenciesFile)
 
   private def fromSource(relPath: String) = Paths.get(gameDir, relPath)
 

@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.repository.inmemory.map
 
+import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceHistory}
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
@@ -7,9 +8,18 @@ import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
 import com.lomicron.oikoumene.service.NamingService
 import com.lomicron.utils.collection.CollectionUtils._
 
+import scala.util.Try
+
 case class InMemoryProvinceRepository()
   extends InMemoryIntRepository[Province](p => Option(p.id))
     with ProvinceRepository {
+
+  private var byColor: Map[Int, Province] = Map.empty
+
+  override def create(entity: Province): Try[Province] = {
+    byColor = byColor + (entity.color.toInt -> entity)
+    super.create(entity)
+  }
 
   override def setId(entity: Province, id: Int): Province =
     entity.copy(id = id)
@@ -124,4 +134,9 @@ case class InMemoryProvinceRepository()
 
   override def findByName(names: Seq[String]): Seq[Province] =
     names.flatMap(findByName(_))
+
+  override def findByColor(c: Color): Option[Province] = findByColor(c.toInt)
+
+  override def findByColor(c: Int): Option[Province] = byColor.get(c)
+
 }

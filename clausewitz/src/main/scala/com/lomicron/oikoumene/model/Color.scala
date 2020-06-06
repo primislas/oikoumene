@@ -19,6 +19,11 @@ extends Ordered[Color]
 
   def toInt: Int = ((r << 16) | (g << 8) | b) | 0xFF000000
 
+  override def hashCode(): Int = toInt
+
+  override def equals(obj: Any): Boolean =
+    obj != null && obj.isInstanceOf[Color] && toInt == obj.hashCode()
+
 }
 
 object Color extends FromJson[Color] {

@@ -41,6 +41,8 @@ trait ResourceRepository {
 
   def getProvinceDefinitions: Option[String]
 
+  def getAdjacencies: Option[String]
+
   def getProvinceHistory: Map[Int, FileNameAndContent]
 
   def getBuildings: Seq[String]

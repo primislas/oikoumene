@@ -19,6 +19,7 @@ tradeNode: Option[String] = None,
 ) {
   @JsonCreator def this() = this(None)
   def isImpassable: Boolean = climate.contains("impassable")
+  def provinceType: String = `type`.getOrElse(ProvinceTypes.wasteland)
 }
 
 object ProvinceGeography extends FromJson[ProvinceGeography] {

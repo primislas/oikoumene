@@ -1,57 +1,30 @@
 package com.lomicron.oikoumene.repository.api.map
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.{TerrainMapColorConf, Tile}
-import com.lomicron.oikoumene.parsers.map.{Point2D, Polygon, SphericalMap}
+import com.lomicron.oikoumene.model.map._
+import com.lomicron.oikoumene.parsers.map.{Polygon, SphericalMap}
 import com.lomicron.oikoumene.repository.api.AbstractRepository
-
-import scala.util.Try
 
 trait MapRepository extends AbstractRepository[Color, Tile] {
 
-  private var terrainById: Map[String, TerrainMapColorConf] = Map.empty
-  private var terrainByColor: Map[Color, TerrainMapColorConf] = Map.empty
-  private var terrainColors: Array[Color] = Array.empty
-  private var _mercator: Seq[Polygon] = Seq.empty
-  private var _sphere: SphericalMap = SphericalMap(Point2D())
+  def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository
+  def setTerrainMapColors(terrainColors: Array[Color]): MapRepository
+  def rebuildTerrainColors(terrainColors: Array[Color]): MapRepository
+  def terrainMapType(argb: Int): Option[String]
+  def terrainMapType(color: Color): Option[String]
 
-  def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
-    this.terrainById = mapTerrain.map(mt => (mt.id, mt)).toMap
-    this
-  }
+  def updateAdjacencies(as: Seq[Adjacency]): MapRepository
+  def adjacencies: Seq[Adjacency]
+  def updateTileRoutes(routes: Seq[TileRoute]): MapRepository
+  def tileRoutes: Seq[TileRoute]
+  def updateRoutes(routes: Seq[Route]): MapRepository
+  def routes: Map[Int, Seq[Route]]
+  def provinceRoutes(provId: Int): Seq[Route]
+  def buildRoutes(provinces: ProvinceRepository): MapRepository
 
-  def setTerrainMapColors(terrainColors: Array[Color]): MapRepository = {
-    this.terrainColors = terrainColors
-    this
-  }
-
-  def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
-    this.terrainColors = terrainColors
-    this.terrainById = this.terrainById
-      .mapValues(mt => Try(this.terrainColors(mt.colorIndex)).map(mt.withColor).getOrElse(mt))
-    terrainByColor = this.terrainById.values.filter(_.color.isDefined).map(t => (t.color.get, t)).toMap
-    this
-  }
-
-  def terrainMapType(argb: Int): Option[String] =
-    terrainMapType(Color(argb))
-
-  def terrainMapType(color: Color): Option[String] =
-    this.terrainByColor.get(color).map(_.terrainType)
-
-  def setMercator(mercator: Seq[Polygon]): MapRepository = {
-    this._mercator = mercator
-    this
-  }
-
-  def mercator: Seq[Polygon] =
-    this._mercator
-
-  def setSphericalMap(sphericalMap: SphericalMap): MapRepository = {
-    this._sphere = sphericalMap
-    this
-  }
-
-  def spherical: SphericalMap = this._sphere
+  def updateMercator(mercator: Seq[Polygon]): MapRepository
+  def mercator: Seq[Polygon]
+  def updateSphericalMap(sphericalMap: SphericalMap): MapRepository
+  def spherical: SphericalMap
 
 }

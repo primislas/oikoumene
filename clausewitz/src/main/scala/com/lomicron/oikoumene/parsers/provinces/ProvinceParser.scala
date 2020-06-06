@@ -33,6 +33,8 @@ object ProvinceParser extends LazyLogging {
     val withPolitics = addPolitics(withGeography, repos)
     val withTrade = addTrade(withPolitics, repos)
 
+    repos.geography.map.buildRoutes(repos.provinces)
+
     withTrade
   }
 
@@ -71,9 +73,7 @@ object ProvinceParser extends LazyLogging {
         Some(Province(id.toInt, Color(r.toInt, g.toInt, b.toInt), comment))
       case provinceDefinitionPat(id, r, g, b, comment, tag2) =>
         Some(Province(id.toInt, Color(r.toInt, g.toInt, b.toInt), comment, tag2))
-      case _ =>
-        logger.warn(s"'$line' doesn't match province definitions")
-        None
+      case _ => None
     }
 
   def addLocalisation
