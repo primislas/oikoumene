@@ -9,7 +9,7 @@ object Svg {
   val svgHeader = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink= \"http://www.w3.org/1999/xlink\">"
 
   val provinceStyle: PolygonSvgStyle =
-    PolygonSvgStyle(None, 1, Color(), 0.3, 0.6)
+    PolygonSvgStyle(None, 0, Color(), 0.3, 1)
   val groupStyle: PolygonSvgStyle =
     PolygonSvgStyle(stroke = Color(), strokeWidth = 2)
 

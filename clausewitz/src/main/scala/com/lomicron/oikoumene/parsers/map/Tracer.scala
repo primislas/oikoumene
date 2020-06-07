@@ -6,12 +6,11 @@ import java.awt.image.BufferedImage
 import com.lomicron.oikoumene.parsers.map.MapParser.getRGB
 import com.lomicron.utils.collection.CollectionUtils.OptionEx
 
-
 object Tracer {
 
   def trace(img: BufferedImage): Seq[Polygon] = {
     var polygons = Seq[Polygon]()
-    val groups = toGroups(img)
+    val groups = BitmapGrouper.toGroups(img)
     var tracedGroups = Set[Int]()
     for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
       val group = groups(x)(y)
@@ -25,136 +24,90 @@ object Tracer {
     polygons
   }
 
-  def toGroups(img: BufferedImage): Array[Array[Int]] = {
-    val groups = Array.ofDim[Int](img.getWidth(), img.getHeight())
-    def leftNeighborGroup(x: Int, y: Int): Option[Int] =
-      if (x > 0 && y >= 0) Some(groups(x-1)(y))
-      else None
-    def topNeighborGroup(x: Int, y: Int) : Option[Int] =
-      if (x >= 0 && y > 0) Some(groups(x)(y-1))
-      else None
-    def leftNeighborColorMatches(x: Int, y: Int, c: Int): Boolean =
-      getRGB(img, x-1, y).contains(c)
-    def topNeighborColorMatches(x: Int, y: Int, c: Int): Boolean =
-      getRGB(img, x, y-1).contains(c)
-    var groupIds = 0
-    def nextId(): Int = {
-      groupIds = groupIds + 1
-      groupIds
-    }
-
-    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
-      val color = getRGB(img, x, y).get
-
-      val isLeftGroup = leftNeighborColorMatches(x, y, color)
-      val isTopGroup = topNeighborColorMatches(x, y, color)
-      def setGroup(id: Int): Unit =
-        groups(x)(y) = id
-
-      if (y == 36 && x == 26)
-        println()
-
-      if (isLeftGroup) {
-        if (isTopGroup) {
-          val leftGroup = leftNeighborGroup(x, y)
-          val topGroup = topNeighborGroup(x, y)
-          if (!leftGroup.contentsEqual(topGroup)) {
-            // replace all with lowest
-            val id = for {
-              lg <- leftGroup
-              tg <- topGroup
-            } yield mergeGroups(groups, x, y, lg, tg)
-            id.foreach(setGroup)
-          } else
-            leftNeighborGroup(x, y).foreach(setGroup)
-        } else
-          leftNeighborGroup(x, y).foreach(setGroup)
-      } else if (isTopGroup)
-        topNeighborGroup(x, y).foreach(setGroup)
-      else
-        groups(x)(y) = nextId()
-    }
-
-    groups
-  }
-
-  def mergeGroups(gs: Array[Array[Int]], x: Int, y: Int, lg: Int, tg: Int): Int = {
-    if (lg < tg) replaceGroup(gs, x, y-1, tg, lg)
-    else replaceGroup(gs, x-1, y, lg, tg)
-  }
-
-  def replaceGroup(gs: Array[Array[Int]], x: Int, y: Int, from: Int, to: Int): Int = {
-
-    @scala.annotation.tailrec
-    def go(start: Int, by: Int => Int): Int =
-      if (start < 0) 0
-      else if (start >= gs.length) gs.length - 1
-      else if (gs(start)(y) == from) {
-        gs(start)(y) = to
-        val next = by(start)
-        if (next < 0 || next >= gs.length) start
-        else go(by(start), by)
-      } else start
-
-    val xFrom = go(x, _ - 1) + 1
-    val xTo = go(x + 1, _ + 1) - 1
-
-    if (y == 0) to
-    else {
-      for (i <- xFrom to xTo)
-        // TODO tailrec?
-        // Actually there doesn't appear to do a lot of redundancy -
-        // after the first pass gs(i + 1) != from, so the only
-        // downside of this approach is not having tailrec calls
-        if (gs(i)(y - 1) == from) replaceGroup(gs, i, y - 1, from ,to)
-      to
-    }
-
-  }
-
 }
 
 case class Tracer(i: BufferedImage, p: Point, d: Direction = Right) {
 
   private var currentPoint: Point = p
   private var currentDirection: Direction = d
+  private var currentNeighbor: Option[Int] = neighborColor(p, d.rBackward)
   private val color: Int = colorOf(p)
 
   def trace(): Polygon = {
-    val startingPoint = d.svgPoint(p)
-    var outline = Seq(startingPoint)
-    var borderPoints = Set(startingPoint)
-    var (nextPoint, tracedBorder) = next()
-    borderPoints = borderPoints ++ tracedBorder
+    val startingPoint = p
+    val startingDirection = d
+    var outline = Seq.empty[Point2D]
+    var lastP = Option.empty[Point2D]
+    do {
+      val nps = next()
+      val appended = if (nps.headOption.contentsEqual(lastP)) nps.drop(1) else nps
+      outline = outline ++ appended
+      lastP = appended.lastOption
+    } while (!(startingPoint == currentPoint && startingDirection == currentDirection))
 
-    while (startingPoint != nextPoint) {
-      outline = outline :+ nextPoint
-      val pb = next()
-      nextPoint = pb._1
-      tracedBorder = pb._2
-      borderPoints = borderPoints ++ tracedBorder
-    }
-
-    val outline2D = outline.map(Point2D(_))
-    Polygon(outline2D, color, borderPoints = borderPoints)
+    Polygon(outline, color)
   }
 
-  def next(): (Point, Seq[Point]) = {
+  def next(): Seq[Point2D] = {
     var cp = currentPoint
     val cd = currentDirection
-    var tracedBorder = Seq(cp)
+    var cc = currentNeighbor
 
+    val maxHeight: Int = i.getHeight - 1
+    val maxWidth: Int = i.getWidth - 1
+    var pixelLine = 0
     var nextD = nextDirection(cp, cd)
-    // TODO also check for left neighbor color changes and mark those
-    while (nextD == cd) {
+
+    def sameDirection: Boolean = nextD == cd
+    def sameNeighbor(cn: Option[Int]): Boolean = sameExistingNeighbor(cn) || (cn.isEmpty && currentNeighbor.isEmpty)
+    def sameExistingNeighbor(n: Option[Int], cn: Option[Int] = currentNeighbor): Boolean =
+      cn.exists(n.contains(_))
+    def isLongBorderLine: Boolean = pixelLine == 10 && (cp.y == 0 || cp.y == maxHeight || cp.x == 0|| cp.x == maxWidth)
+    def rotationNeighbor: Option[Int] = if (nextD == currentDirection.rBackward) currentNeighbor else neighborColor(cp, nextD.rBackward)
+
+    while (sameDirection && sameNeighbor(cc) && !isLongBorderLine) {
       cp = neighbor(cp, nextD).get
+      cc = neighborColor(cp, nextD.rBackward)
       nextD = nextDirection(cp, cd)
-      tracedBorder = tracedBorder :+ cp
+      if (nextD == cd.rBackward)
+        cp = neighbor(cp, nextD).get
+
+      pixelLine += 1
+    }
+
+    val ps = if (isLongBorderLine) {
+      cd.turnPoints(cp)
+    } else if (!sameNeighbor(cc) && nextD != cd.rBackward) {
+      val diffNeighbor = cd.turnPoints(cp)
+      val rn = cc
+      cc = rotationNeighbor
+      val turnPoints = if (!sameDirection) {
+        val turnSmoothing = if (sameExistingNeighbor(cc, rn)) 1 else 0
+        nextD.turnPoints(cp, turnSmoothing, cd)
+      } else Seq.empty
+      diffNeighbor ++ turnPoints
+    } else {
+      // post-rotation neighbor color
+      cc = rotationNeighbor
+      val smoothing = if (nextD == cd.rForward) {
+        val diagNeighbor = neighbor(cp, cd)
+          .flatMap(neighbor(_, cd.rBackward))
+          .map(colorOf)
+        val isSameNeighbor = for {
+          a <- currentNeighbor
+          b <- diagNeighbor
+          c <- cc
+        } yield a == b && a == c
+        isSameNeighbor.filter(identity).map(_ => 1).getOrElse(0)
+      } else 1
+      nextD.turnPoints(cp, smoothing, cd)
     }
 
     currentDirection = nextD
-    currentPoint = if (nextD == cd.rBackward) neighbor(cp, nextD).get else cp
-    (nextD.svgPoint(currentPoint), tracedBorder)
+    currentPoint = cp
+    currentNeighbor = cc
+
+    ps
   }
 
   def nextDirection(p: Point, d: Direction): Direction =
@@ -164,6 +117,9 @@ case class Tracer(i: BufferedImage, p: Point, d: Direction = Right) {
 
   def neighborColorMatches(p: Point, d: Direction): Boolean =
     neighbor(p, d).map(colorOf).contains(color)
+
+  def neighborColor(p: Point, d: Direction): Option[Int] =
+    neighbor(p, d).map(colorOf)
 
   def neighbor(p: Point, d: Direction): Option[Point] = d match {
     case Up => if (p.y == 0) None else Some(new Point(p.x, p.y - 1))
@@ -194,6 +150,33 @@ sealed trait Direction {
     case Up => new Point(p.x, p.y + 1)
   }
 
+  def turnPoints(p: Point, smoothing: Int = 0, from: Direction = rBackward): Seq[Point2D] = {
+    val startPoint =
+      if (smoothing == 0) Point2D(svgPoint(p))
+      else {
+        val offsetStart = smoothing - 0.5
+        val offsetDir = if (from == rBackward) 1 else if (from == rForward) -1 else 0
+        val offset = offsetDir * offsetStart
+        self match {
+          case Right => Point2D(p.x, p.y + offset)
+          case Down => Point2D(p.x + 1 - offset, p.y)
+          case Left => Point2D(p.x + 1, p.y + 1 - offset)
+          case Up => Point2D(p.x + offset, p.y + 1)
+        }
+      }
+
+    val endPoint = Option(smoothing)
+      .filter(_ > 0)
+      .map(_ => self match {
+        case Right => Point2D(p.x + 0.5, p.y)
+        case Down => Point2D(p.x + 1, p.y + 0.5)
+        case Left => Point2D(p.x + 0.5, p.y + 1)
+        case Up => Point2D(p.x, p.y + 0.5)
+      })
+
+    Seq(startPoint) ++ endPoint.toSeq
+  }
+
   def rForward: Direction = self match {
     case Right => Down
     case Down => Left
@@ -211,6 +194,9 @@ sealed trait Direction {
 }
 
 object Right extends Direction
+
 object Down extends Direction
+
 object Left extends Direction
+
 object Up extends Direction
