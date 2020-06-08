@@ -71,6 +71,8 @@ trait ResourceRepository {
 
   def getHeightMap: Option[Path]
 
+  def getRiversMap: Option[Path]
+
   def getCultures: Option[String]
 
   def getReligions: Map[String, String]

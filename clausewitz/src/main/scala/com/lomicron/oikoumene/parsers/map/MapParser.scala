@@ -23,6 +23,10 @@ object MapParser {
     val r = repos.resources
     val g = repos.geography
 
+    val rivers = r.getRiversMap.map(fetchMap)
+      .map(parseRivers).getOrElse(Seq.empty)
+
+
     val terrainMap = r.getTerrainMap.map(fetchMap)
     terrainMap
       .map(parseTerrainColors)
@@ -83,6 +87,8 @@ object MapParser {
     cm.getRGBs(terrainColors)
     terrainColors
   }
+
+  def parseRivers(rivers: BufferedImage): Seq[River] = RiverParser.trace(rivers)
 
   def parseWorldMap(img: BufferedImage, mapRepo: MapRepository): MapRepository = {
     val (polygons, sphere) = parseWorldMap(img)

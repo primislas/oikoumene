@@ -47,6 +47,7 @@ case class FileResourceRepository
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
   val heightMap = "map/heightmap.bmp"
+  val riversMap = "map/rivers.bmp"
 
   val culturesFile = "common/cultures/00_cultures.txt"
   val religionsDir = "common/religions"
@@ -164,6 +165,8 @@ case class FileResourceRepository
   override def getTerrainMap: Option[Path] = Option(fromSource(terrainMap))
 
   override def getHeightMap: Option[Path] = Option(fromSource(heightMap))
+
+  def getRiversMap: Option[Path] = Option(fromSource(riversMap))
 
 
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
