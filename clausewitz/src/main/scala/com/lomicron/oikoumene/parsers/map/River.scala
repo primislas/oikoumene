@@ -2,11 +2,19 @@ package com.lomicron.oikoumene.parsers.map
 
 import java.awt.Point
 
-case class River(path: Seq[Point2D] = Seq.empty, width: Int = RiverTypes.NARROWEST)
+case class River(path: Seq[RiverSegment] = Seq.empty) {
 
-object River {
+  def isEmpty: Boolean = path.isEmpty
 
-  def ofInts(ps: Seq[Point], width: Int): River =
-    new River(ps.map(Point2D(_)), width)
+  def reverse: River = River(path.map(_.reverse))
+
+  def addStartingPoint(p: Point): River = {
+    val updated = path.headOption
+      .map(_.withStartingPoint(p))
+      .map(s => s +: path.drop(1))
+      .getOrElse(path)
+
+    River(updated)
+  }
 
 }

@@ -16,85 +16,114 @@ object RiverParser {
   val edgeColors = Set(SOURCE, FLOW_IN, FLOW_OUT)
   val nonRiverColors = Set(LAND, SEA)
 
-  def trace(img: BufferedImage): Seq[River] = {
-
-    var id = -1
-
-    def nextId: Int = {
-      id += 1
-      id
-    }
-
-    var rivers = Seq.empty[River]
-
-    val parsed = Array.ofDim[Boolean](img.getWidth, img.getHeight)
-    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
-      val co = getRGB(img, x, y)
-      if (co.exists(c => !nonRiverColors.contains(c) && !parsed(x)(y))) {
-        val r = RiverParser(img, co.get).trace(new Point(x, y))
-        r.path.foreach(p => parsed(p.x.toInt)(p.y.toInt) = true)
-        rivers = rivers :+ r
-      }
-    }
-
-    rivers
-  }
-
+  def trace(img: BufferedImage): Seq[River] = RiverParser(img).trace
 
 }
 
-case class RiverParser(img: BufferedImage, color: Int) extends BitmapWalker with LazyLogging {
+case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging {
 
   import RiverParser._
   import RiverTypes._
 
-  def trace(p: Point): River = {
-    val d1 = Up.directions.find(neighborColor(p, _).exists(riverColors.contains))
-    val d2 = d1.flatMap(_.directionsAfter().find(neighborColor(p, _).exists(riverColors.contains)))
-
-    val r1 = d1.map(traceDirection(p, _)).getOrElse(TraceResult())
-    val r2 = d2.map(traceDirection(p, _)).getOrElse(TraceResult())
-
-    if (r2.ps.isEmpty) {
-      if (r1.ps.isEmpty) River(Seq.empty[Point2D], color)
-      else {
-        if (r1.directionType.isDefined) r1.toRiver(color)
-        else {
-          val withDirection = if (r1.ps.headOption.exists(isInLand)) r1.ps.reverse else r1.ps
-          River.ofInts(withDirection, color)
-        }
-      }
-    } else {
-      val ps = if (r1.directionType.isEmpty && r2.directionType.isEmpty) {
-        logger.warn(s"Failed to identify direction of river at $p")
-        r1.ps ++ r2.ps.drop(1).reverse
-      }
-      else if (r2.directionType.contains(SOURCE) || r1.directionType.contains(END))
-        r1.ps ++ r2.ps.drop(1).reverse
-      else
-        r2.ps ++ r1.ps.drop(1).reverse
-
-      River.ofInts(ps, color)
-    }
-
+  def trace: Seq[River] = {
+    val riverSources = identifyRiverSources(img)
+    val traced = Array.ofDim[Boolean](img.getWidth, img.getHeight)
+    val rs = riverSources.sources.flatMap(traceRiver(_, traced))
+    val ts = riverSources.flowIns.flatMap(traceTributaries(_, traced))
+    rs ++ ts
   }
 
-  def traceDirection(p: Point, d: Direction): TraceResult = {
+  def traceRiver(p: Point, traced: Array[Array[Boolean]]): Option[River] =
+    untracedDirection(p, traced)
+      .map(traceDirection(p, _))
+      .map(ps => {
+        ps.foreach(p => traced(p.x)(p.y) = true)
+        toRiver(ps)
+      })
+
+  def traceTributaries(p: Point, traced: Array[Array[Boolean]]): Seq[River] = {
+    val startingPoint = tracedSiblingRiver(p, traced)
+    val sourceType = colorOf(p)
+    Up.directions
+      .filter(isUntracedDirection(p, _, traced))
+      .map(traceDirection(p, _))
+      .map(toRiver)
+      .flatMap(r => startingPoint.map(r.addStartingPoint))
+      .map(r => if (sourceType == FLOW_IN) r.reverse else r)
+  }
+
+  def untracedDirection(p: Point, traced: Array[Array[Boolean]]): Option[Direction] =
+    Up.directions.find(isUntracedDirection(p, _, traced))
+
+  def tracedSiblingRiver(p: Point, traced: Array[Array[Boolean]]): Option[Point] =
+    Up.directions.flatMap(neighbor(p, _)).find(n => traced(n.x)(n.y))
+
+  def isUntracedDirection(p: Point, d: Direction, traced: Array[Array[Boolean]]): Boolean =
+    neighbor(p, d)
+      .filter(isRiver)
+      .exists(isUntracedPoint(_, traced))
+
+  def isRiver(p: Point): Boolean = riverColors.contains(colorOf(p))
+
+  def isUntracedPoint(p: Point, traced: Array[Array[Boolean]]): Boolean = !traced(p.x)(p.y)
+
+  def identifyRiverSources(img: BufferedImage): RiverSources = {
+    var sources: Seq[Point] = Seq.empty
+    var flowIns: Seq[Point] = Seq.empty
+    var flowOuts: Seq[Point] = Seq.empty
+
+    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
+      val color = getRGB(img, x, y).get
+      if (color == SOURCE) sources = sources :+ p(x, y)
+      else if (color == FLOW_IN) flowIns = flowIns :+ p(x, y)
+      else if (color == FLOW_OUT) flowOuts = flowOuts :+ p(x, y)
+    }
+
+    RiverSources(sources, flowIns, flowOuts)
+  }
+
+  def traceDirection(p: Point, d: Direction): Seq[Point] = {
     var points = Seq(p)
     var currentPoint = p
-    var currentColor = color
     var nextD = Option(d)
 
     do {
       currentPoint = neighbor(currentPoint, nextD.get).get
-      currentColor = colorOf(currentPoint)
       points = points :+ currentPoint
       nextD = nextD.flatMap(nextRiverPoint(currentPoint, _))
-    } while (nextD.isDefined && !edgeColors.contains(currentColor))
+    } while (nextD.isDefined)
 
-    val riverDirection = typeOf(currentPoint, currentColor)
+    points
+  }
 
-    TraceResult(points, riverDirection)
+  def toRiver(ps: Seq[Point]): River = {
+    if (ps.isEmpty) River()
+
+    val source = ps.head
+    val sourceType = colorOf(ps.head)
+
+    val ss = parseRiverPoints(ps, sourceType)
+    val sourceSegment = ss.headOption
+      .map(s => s.copy(points = Point2D(source) +: s.points))
+    val segments = (sourceSegment.toSeq ++ ss.drop(1)).filter(_.nonEmpty)
+
+    River(segments)
+  }
+
+  def parseRiverPoints
+  (ps: Seq[Point],
+   prevType: Int,
+   segments: Seq[RiverSegment] = Seq.empty)
+  : Seq[RiverSegment] = {
+
+    if (ps.isEmpty) segments
+    else {
+      val segmentType = ps.headOption.map(colorOf).get
+      val segmentPs = ps.takeWhile(colorOf(_) == segmentType)
+      val segment = RiverSegment.ofIntPoints(prevType, segmentType, segmentPs)
+      parseRiverPoints(ps.drop(segmentPs.size), segmentType, segments :+ segment)
+    }
+
   }
 
   def nextRiverPoint(p: Point, d: Direction): Option[Direction] =
@@ -117,6 +146,8 @@ case class RiverParser(img: BufferedImage, color: Int) extends BitmapWalker with
 
   def isIn(p: Point, color: Int): Boolean =
     Up.directions.flatMap(neighborColor(p, _)).count(_ == color) >= 3
+
+  def p(x: Int, y: Int): Point = new Point(x, y)
 
 }
 
@@ -145,9 +176,9 @@ object RiverTypes {
 
 }
 
-case class TraceResult(ps: Seq[Point] = Seq.empty, directionType: Option[Int] = None) {
-  def toRiver(c: Int): River = {
-    val withDirection = if (directionType.contains(RiverTypes.SOURCE)) ps.reverse else ps
-    River.ofInts(withDirection, c)
-  }
-}
+case class RiverSources
+(
+  sources: Seq[Point] = Seq.empty,
+  flowIns: Seq[Point] = Seq.empty,
+  flowOuts: Seq[Point] = Seq.empty
+)

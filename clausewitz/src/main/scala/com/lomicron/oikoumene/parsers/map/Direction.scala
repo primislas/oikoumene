@@ -18,7 +18,7 @@ sealed trait Direction {
     case Up => Seq(Left, Up, Right)
     case Right => Seq(Up, Right, Down)
     case Down => Seq(Right, Down, Left)
-    case Left => Seq(Down, Left, Left)
+    case Left => Seq(Down, Left, Up)
   }
 
   def isReverse(d: Direction): Boolean = self match {

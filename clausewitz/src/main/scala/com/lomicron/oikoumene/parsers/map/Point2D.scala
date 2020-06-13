@@ -4,7 +4,11 @@ import java.awt.Point
 
 case class Point2D(x: Double = 0, y: Double = 0) {
 
-  def offset(p: Point2D): Point2D = Point2D(x + p.x, y + p.y)
+  def offset(p: Point2D): Point2D = this + p
+
+  def -(p: Point2D): Point2D = Point2D(x - p.x, y - p.y)
+
+  def +(p: Point2D): Point2D = Point2D(x + p.x, y + p.y)
 
 }
 

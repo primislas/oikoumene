@@ -7,12 +7,23 @@ import com.lomicron.utils.collection.CollectionUtils.toOption
 
 case class WorldMap
 (
-  private val sphere: SphericalMap,
+  private val map: MercatorMap,
   private val repos: RepositoryFactory
 ) {
 
   val uncolonizedProvinceColor: Color = Color(165, 152, 144)
   val impassableTerrainColor: Color = Color(145, 132, 124)
+  private var sphere: Option[SphericalMap] = None
+
+  private def getSphere: SphericalMap =
+    sphere.getOrElse({
+      val s = map.toSphere
+      sphere = Option(s)
+      s
+    })
+
+  def ofMode(mapMode: String): Seq[Polygon] =
+    map.provinces.map(setMapMode(_, mapMode))
 
   def project
   (
@@ -20,8 +31,8 @@ case class WorldMap
     rotation: Option[SphericalCoord] = None,
   ): Seq[Polygon] =
     rotation
-      .map(sphere.rotate)
-      .getOrElse(sphere)
+      .map(getSphere.rotate)
+      .getOrElse(getSphere)
       .project
       .map(setMapMode(_, mapMode))
 
@@ -66,12 +77,12 @@ case class WorldMap
 
 object WorldMap {
 
-  def apply(sphere: SphericalMap, repos: RepositoryFactory): WorldMap = {
-    val updated = addProvinceMeta(sphere.polygons, repos)
-    new WorldMap(SphericalMap(sphere.center, updated), repos)
+  def apply(mercator: MercatorMap, repos: RepositoryFactory): WorldMap = {
+    val updated = addProvinceMeta(mercator.provinces, repos)
+    new WorldMap(mercator.copy(provinces = updated), repos)
   }
 
-  def addProvinceMeta(ps: Seq[SphericalPolygon], repos: RepositoryFactory): Seq[SphericalPolygon] = {
+  def addProvinceMeta(ps: Seq[Polygon], repos: RepositoryFactory): Seq[Polygon] = {
     val psByColor = repos.provinces.findAll.groupBy(_.color)
 
     ps
