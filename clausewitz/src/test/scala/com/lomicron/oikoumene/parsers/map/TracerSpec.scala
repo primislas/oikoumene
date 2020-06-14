@@ -41,7 +41,7 @@ class TracerSpec extends Specification {
       val cp = new Point(1, 1)
       val dir = Down
       val smoothing = 1
-      val ps = dir.turnPoints(cp, smoothing)
+      val ps = dir.turnIntPixelPoints(cp, smoothing)
       ps.size must equalTo(2)
 
       val sp = ps.head
@@ -57,7 +57,7 @@ class TracerSpec extends Specification {
       val cp = new Point(1, 1)
       val dir = Left
       val smoothing = 1
-      val ps = dir.turnPoints(cp, smoothing)
+      val ps = dir.turnIntPixelPoints(cp, smoothing)
       ps.size must equalTo(2)
 
       val sp = ps.head
@@ -73,7 +73,7 @@ class TracerSpec extends Specification {
       val cp = new Point(1, 1)
       val dir = Up
       val smoothing = 1
-      val ps = dir.turnPoints(cp, smoothing)
+      val ps = dir.turnIntPixelPoints(cp, smoothing)
       ps.size must equalTo(2)
 
       val sp = ps.head
@@ -89,7 +89,7 @@ class TracerSpec extends Specification {
       val cp = new Point(1, 1)
       val dir = Right
       val smoothing = 1
-      val ps = dir.turnPoints(cp, smoothing)
+      val ps = dir.turnIntPixelPoints(cp, smoothing)
       ps.size must equalTo(2)
 
       val sp = ps.head

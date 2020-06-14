@@ -1,17 +1,15 @@
 package com.lomicron.oikoumene.parsers.map
 
-import java.awt.Point
 import java.awt.image.{BufferedImage, IndexColorModel}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.{Pixel, TileRoute, Tile}
+import com.lomicron.oikoumene.model.map.{Pixel, Tile, TileRoute}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
 import javax.imageio.ImageIO
 
 import scala.Function.tupled
-import scala.math.BigDecimal.RoundingMode
 import scala.util.Try
 
 object MapParser {
@@ -22,6 +20,12 @@ object MapParser {
   def parseMap(repos: RepositoryFactory): GeographicRepository = {
     val r = repos.resources
     val g = repos.geography
+
+    val rivers = r.getRiversMap.map(fetchMap)
+      .map(parseRivers)
+      .getOrElse(Seq.empty)
+      .map(_.smooth)
+    g.map.createRivers(rivers)
 
     val terrainMap = r.getTerrainMap.map(fetchMap)
     terrainMap
@@ -84,22 +88,17 @@ object MapParser {
     terrainColors
   }
 
+  def parseRivers(rivers: BufferedImage): Seq[River] = RiverParser.trace(rivers)
+
   def parseWorldMap(img: BufferedImage, mapRepo: MapRepository): MapRepository = {
-    val (polygons, sphere) = parseWorldMap(img)
-    mapRepo.updateMercator(polygons).updateSphericalMap(sphere)
+    val mercator = parseWorldMap(img)
+    mapRepo.updateMercator(mercator.provinces)
   }
 
-  def parseWorldMap(img: BufferedImage): (Seq[Polygon], SphericalMap) = {
+  def parseWorldMap(img: BufferedImage): MercatorMap = {
     val polygons = Tracer.trace(img)
-
-    val circumference = if (img.getWidth > img.getHeight) img.getWidth else img.getHeight
-    val radius = BigDecimal(circumference) / (2 * Math.PI)
-    val radiusInt = radius.setScale(0, RoundingMode.CEILING).toInt
-    val center = new Point(radiusInt, radiusInt)
-    val offset = new Point(radiusInt - img.getWidth / 2, radiusInt - img.getHeight / 2)
-    val sphere = Geometry.toSpherical(polygons, center, radius.toDouble, offset)
-
-    (polygons, sphere)
+    // TODO borders rivers etc
+    MercatorMap(polygons, img.getWidth, img.getHeight)
   }
 
   def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =

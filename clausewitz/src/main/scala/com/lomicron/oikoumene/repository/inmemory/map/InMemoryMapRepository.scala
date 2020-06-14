@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
-import com.lomicron.oikoumene.parsers.map.{Point2D, Polygon, SphericalMap}
+import com.lomicron.oikoumene.parsers.map.{Polygon, River, SphericalMap}
 import com.lomicron.oikoumene.repository.api.map.{MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 
@@ -24,7 +24,7 @@ case class InMemoryMapRepository()
   private var _tileRoutes: Seq[TileRoute] = Seq.empty
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
   private var _mercator: Seq[Polygon] = Seq.empty
-  private var _sphere: SphericalMap = SphericalMap(Point2D())
+  private var _rivers: Seq[River] = Seq.empty
 
   def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
     this.terrainById = mapTerrain.map(mt => (mt.id, mt)).toMap
@@ -113,11 +113,11 @@ case class InMemoryMapRepository()
   def mercator: Seq[Polygon] =
     this._mercator
 
-  def updateSphericalMap(sphericalMap: SphericalMap): MapRepository = {
-    this._sphere = sphericalMap
+  def createRivers(rivers: Seq[River]): MapRepository = {
+    this._rivers = rivers
     this
   }
 
-  def spherical: SphericalMap = this._sphere
+  def rivers: Seq[River] = this._rivers
 
 }

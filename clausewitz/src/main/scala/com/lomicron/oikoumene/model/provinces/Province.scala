@@ -48,6 +48,14 @@ case class Province
     copy(history = h)
   }
 
+  def `type`: String = {
+    if (geography.isImpassable) ProvinceTypes.wasteland
+    else if (geography.provinceType == ProvinceTypes.province && state.owner.isEmpty)
+      ProvinceTypes.uncolonized
+    else geography.provinceType
+
+  }
+
 }
 
 object Province extends FromJson[Province] {

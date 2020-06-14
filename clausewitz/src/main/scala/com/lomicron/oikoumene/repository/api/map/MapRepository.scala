@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.api.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
-import com.lomicron.oikoumene.parsers.map.{Polygon, SphericalMap}
+import com.lomicron.oikoumene.parsers.map.{Polygon, River, SphericalMap}
 import com.lomicron.oikoumene.repository.api.AbstractRepository
 
 trait MapRepository extends AbstractRepository[Color, Tile] {
@@ -24,7 +24,7 @@ trait MapRepository extends AbstractRepository[Color, Tile] {
 
   def updateMercator(mercator: Seq[Polygon]): MapRepository
   def mercator: Seq[Polygon]
-  def updateSphericalMap(sphericalMap: SphericalMap): MapRepository
-  def spherical: SphericalMap
+  def createRivers(rivers: Seq[River]): MapRepository
+  def rivers: Seq[River]
 
 }
