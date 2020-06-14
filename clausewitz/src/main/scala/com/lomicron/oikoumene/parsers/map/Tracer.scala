@@ -75,14 +75,14 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
     }
 
     val ps = if (isLongBorderLine) {
-      cd.turnPoints(cp)
+      cd.turnIntPixelPoints(cp)
     } else if (!sameNeighbor(cc) && nextD != cd.rBackward) {
-      val diffNeighbor = cd.turnPoints(cp)
+      val diffNeighbor = cd.turnIntPixelPoints(cp)
       val rn = cc
       cc = rotationNeighbor
       val turnPoints = if (!sameDirection) {
         val turnSmoothing = if (sameExistingNeighbor(cc, rn)) 1 else 0
-        nextD.turnPoints(cp, turnSmoothing, cd)
+        nextD.turnIntPixelPoints(cp, turnSmoothing, cd)
       } else Seq.empty
       diffNeighbor ++ turnPoints
     } else {
@@ -99,7 +99,7 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
         } yield a == b && a == c
         isSameNeighbor.filter(identity).map(_ => 1).getOrElse(0)
       } else 1
-      nextD.turnPoints(cp, smoothing, cd)
+      nextD.turnIntPixelPoints(cp, smoothing, cd)
     }
 
     currentDirection = nextD

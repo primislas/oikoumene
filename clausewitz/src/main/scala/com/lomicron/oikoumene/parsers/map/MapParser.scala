@@ -21,9 +21,11 @@ object MapParser {
     val r = repos.resources
     val g = repos.geography
 
-//    val rivers = r.getRiversMap.map(fetchMap)
-//      .map(parseRivers).getOrElse(Seq.empty)
-
+    val rivers = r.getRiversMap.map(fetchMap)
+      .map(parseRivers)
+      .getOrElse(Seq.empty)
+      .map(_.smooth)
+    g.map.createRivers(rivers)
 
     val terrainMap = r.getTerrainMap.map(fetchMap)
     terrainMap

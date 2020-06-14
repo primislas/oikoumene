@@ -7,7 +7,7 @@ import com.lomicron.utils.collection.CollectionUtils.toOption
 case class WorldMap
 (
   mercator: MercatorMap,
-  private val repos: RepositoryFactory
+  private val repos: RepositoryFactory,
 ) {
 
   private var sphere: Option[SphericalMap] = None
@@ -25,12 +25,16 @@ case class WorldMap
       .getOrElse(getSphere)
       .project
 
+  def rivers: Seq[River] = repos.geography.map.rivers
 
 }
 
 object WorldMap {
 
-  def apply(mercator: MercatorMap, repos: RepositoryFactory): WorldMap = {
+  def apply(
+             mercator: MercatorMap,
+             repos: RepositoryFactory
+           ): WorldMap = {
     val updated = addProvinceMeta(mercator.provinces, repos)
     new WorldMap(mercator.copy(provinces = updated), repos)
   }

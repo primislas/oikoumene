@@ -28,6 +28,13 @@ sealed trait Direction {
     case Down => d == Up
   }
 
+  def svgPoint(p: Point2D): Point2D = self match {
+    case Right => p
+    case Down => Point2D(p.x + 1, p.y)
+    case Left => Point2D(p.x + 1, p.y + 1)
+    case Up => Point2D(p.x, p.y + 1)
+  }
+
   def svgPoint(p: Point): Point = self match {
     case Right => p
     case Down => new Point(p.x + 1, p.y)
@@ -35,9 +42,9 @@ sealed trait Direction {
     case Up => new Point(p.x, p.y + 1)
   }
 
-  def turnPoints(p: Point, smoothing: Int = 0, from: Direction = rBackward): Seq[Point2D] = {
+  def turnPixelPoints(p: Point2D, smoothing: Int = 0, from: Direction = rBackward): Seq[Point2D] = {
     val startPoint =
-      if (smoothing == 0) Point2D(svgPoint(p))
+      if (smoothing == 0) svgPoint(p)
       else {
         val offsetStart = smoothing - 0.5
         val offsetDir = if (from == rBackward) 1 else if (from == rForward) -1 else 0
@@ -62,6 +69,30 @@ sealed trait Direction {
     Seq(startPoint) ++ endPoint.toSeq
   }
 
+  def turnIntPixelPoints(p: Point, smoothing: Int = 0, from: Direction = rBackward): Seq[Point2D] =
+    turnPixelPoints(Point2D(p), smoothing, from)
+
+  def turnPoints(p: Point2D, smoothing: Int = 0, from: Direction = rBackward): Seq[Point2D] = {
+    if (smoothing == 0 || self == from) Seq(p)
+    else {
+      val offset = smoothing - 0.5
+      val startPoint = from match {
+        case Right => Point2D(p.x - offset, p.y)
+        case Down => Point2D(p.x, p.y - offset)
+        case Left => Point2D(p.x + offset, p.y)
+        case Up => Point2D(p.x, p.y + offset)
+      }
+      val endPoint = self match {
+        case Right => Point2D(p.x + offset, p.y)
+        case Down => Point2D(p.x, p.y + offset)
+        case Left => Point2D(p.x - offset, p.y)
+        case Up => Point2D(p.x, p.y - offset)
+      }
+
+      Seq(startPoint, endPoint)
+    }
+  }
+
   def rForward: Direction = self match {
     case Right => Down
     case Down => Left
@@ -79,6 +110,9 @@ sealed trait Direction {
 }
 
 object Right extends Direction
+
 object Down extends Direction
+
 object Left extends Direction
+
 object Up extends Direction

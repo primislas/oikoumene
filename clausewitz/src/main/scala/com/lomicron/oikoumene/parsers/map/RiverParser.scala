@@ -29,8 +29,9 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
     val riverSources = identifyRiverSources(img)
     val traced = Array.ofDim[Boolean](img.getWidth, img.getHeight)
     val rs = riverSources.sources.flatMap(traceRiver(_, traced))
-    val ts = riverSources.flowIns.flatMap(traceTributaries(_, traced))
-    rs ++ ts
+    val fi = riverSources.flowIns.flatMap(traceFlowIn(_, traced))
+    val fo = riverSources.flowOuts.flatMap(traceFlowOut(_, traced))
+    rs ++ fi ++ fo
   }
 
   def traceRiver(p: Point, traced: Array[Array[Boolean]]): Option[River] =
@@ -41,15 +42,20 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
         toRiver(ps)
       })
 
-  def traceTributaries(p: Point, traced: Array[Array[Boolean]]): Seq[River] = {
+  def traceFlowIn(p: Point, traced: Array[Array[Boolean]]): Option[River] = {
     val startingPoint = tracedSiblingRiver(p, traced)
-    val sourceType = colorOf(p)
+    traceRiver(p, traced)
+      .flatMap(r => startingPoint.map(r.addStartingPoint))
+      .map(_.reverse)
+  }
+
+  def traceFlowOut(p: Point, traced: Array[Array[Boolean]]): Seq[River] = {
+    val startingPoint = tracedSiblingRiver(p, traced)
     Up.directions
       .filter(isUntracedDirection(p, _, traced))
       .map(traceDirection(p, _))
       .map(toRiver)
       .flatMap(r => startingPoint.map(r.addStartingPoint))
-      .map(r => if (sourceType == FLOW_IN) r.reverse else r)
   }
 
   def untracedDirection(p: Point, traced: Array[Array[Boolean]]): Option[Direction] =
@@ -102,7 +108,7 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
     val source = ps.head
     val sourceType = colorOf(ps.head)
 
-    val ss = parseRiverPoints(ps, sourceType)
+    val ss = parseRiverPoints(ps.drop(1), sourceType)
     val sourceSegment = ss.headOption
       .map(s => s.copy(points = Point2D(source) +: s.points))
     val segments = (sourceSegment.toSeq ++ ss.drop(1)).filter(_.nonEmpty)
@@ -119,15 +125,17 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
     if (ps.isEmpty) segments
     else {
       val segmentType = ps.headOption.map(colorOf).get
-      val segmentPs = ps.takeWhile(colorOf(_) == segmentType)
+      var segmentPs = ps.takeWhile(colorOf(_) == segmentType)
+      val untracedPs = ps.drop(segmentPs.size)
+      untracedPs.headOption.foreach(p => segmentPs = segmentPs :+ p)
       val segment = RiverSegment.ofIntPoints(prevType, segmentType, segmentPs)
-      parseRiverPoints(ps.drop(segmentPs.size), segmentType, segments :+ segment)
+      parseRiverPoints(untracedPs, segmentType, segments :+ segment)
     }
 
   }
 
   def nextRiverPoint(p: Point, d: Direction): Option[Direction] =
-    d.directionsForward() find (neighborColor(p, _).exists(riverColors.contains))
+    d.directionsForward() find (neighborColor(p, _).exists(waterColors.contains))
 
   def typeOf(p: Point, c: Int): Option[Int] = {
     if (edgeColors.contains(c)) c match {
@@ -153,7 +161,8 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
 
 object RiverTypes {
   val SOURCE: Int = Color(0, 255).toInt
-  val FLOW_IN: Int = Color(255).toInt
+  //noinspection RedundantDefaultArgument
+  val FLOW_IN: Int = Color(255, 0, 0).toInt
   val FLOW_OUT: Int = Color(255, 252).toInt
   val NARROWEST: Int = Color(0, 225, 255).toInt
   val NARROW: Int = Color(0, 200, 255).toInt

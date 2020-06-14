@@ -17,4 +17,9 @@ case class River(path: Seq[RiverSegment] = Seq.empty) {
     River(updated)
   }
 
+  def smooth: River = {
+    val smoothed = path.map(_.smooth)
+    River(smoothed)
+  }
+
 }
