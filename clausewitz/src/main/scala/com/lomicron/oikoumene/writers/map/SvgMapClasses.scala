@@ -21,6 +21,8 @@ object SvgMapClasses {
   val RIVER_WIDE = "river-wide"
   val RIVER_WIDEST = "river-widest"
 
+  val BORDER_GROUP = "border-group"
+
   private val province = ListSet(PROVINCE)
   private val river = ListSet(RIVER)
 

@@ -53,8 +53,9 @@ case class Province
     else if (geography.provinceType == ProvinceTypes.province && state.owner.isEmpty)
       ProvinceTypes.uncolonized
     else geography.provinceType
-
   }
+
+  def isLand: Boolean = ProvinceTypes.landTypes.contains(`type`)
 
 }
 

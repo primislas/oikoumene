@@ -92,13 +92,13 @@ object MapParser {
 
   def parseWorldMap(img: BufferedImage, mapRepo: MapRepository): MapRepository = {
     val mercator = parseWorldMap(img)
-    mapRepo.updateMercator(mercator.provinces)
+    mapRepo.updateMercator(mercator)
   }
 
   def parseWorldMap(img: BufferedImage): MercatorMap = {
-    val polygons = Tracer.trace(img)
+    val shapes = Tracer.trace(img)
     // TODO borders rivers etc
-    MercatorMap(polygons, img.getWidth, img.getHeight)
+    MercatorMap(shapes, img.getWidth, img.getHeight)
   }
 
   def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =

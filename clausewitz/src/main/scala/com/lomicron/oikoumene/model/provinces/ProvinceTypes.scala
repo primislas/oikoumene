@@ -33,4 +33,6 @@ object ProvinceTypes extends FromJson[ProvinceTypes] {
   val uncolonized = "uncolonized"
 
   val empty: ProvinceTypes = ProvinceTypes()
+
+  val landTypes: Set[String] = Set(province, wasteland, random, uncolonized)
 }

@@ -3,24 +3,55 @@ package com.lomicron.oikoumene.parsers.map
 import java.awt.Point
 import java.awt.image.BufferedImage
 
-import com.lomicron.utils.collection.CollectionUtils.OptionEx
+import com.lomicron.utils.collection.CollectionUtils.{OptionEx, toOption}
 
 object Tracer {
 
-  def trace(img: BufferedImage): Seq[Polygon] = {
-    var polygons = Seq[Polygon]()
+  def trace(img: BufferedImage): Seq[Shape] = {
+    var shapes = Seq.empty[Shape]
     val groups = BitmapGrouper.toGroups(img)
-    var tracedGroups = Set[Int]()
+    var tracedGroups = Set.empty[Int]
+    var nestedGroups = Seq.empty[(Int, Int)]
+
     for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
       val group = groups(x)(y)
       if (!tracedGroups.contains(group)) {
-        val poly = Tracer(img, new Point(x, y)).trace()
-        polygons = polygons :+ poly
+        val startingPoint = new Point(x, y)
+        val tracer = Tracer(img, startingPoint)
+        val shape = tracer.trace().copy(groupId = group)
+
+        // single border means nested shape,
+        // we want to clip inner shapes through outer ones
+        if (shape.borders.length == 1)
+          Up.directions
+            .flatMap(tracer.neighbor(startingPoint, _))
+            .map(p => groups(p.x)(p.y))
+            .find(_ != group)
+            .foreach(enclosingGroup => nestedGroups = nestedGroups :+ (enclosingGroup, group))
+
+        shapes = shapes :+ shape
         tracedGroups = tracedGroups + group
       }
     }
 
-    polygons
+    clipShapes(shapes, nestedGroups)
+  }
+
+  def clipShapes(shapes: Seq[Shape], clips: Seq[(Int, Int)]): Seq[Shape] = {
+    val modifiedIds = clips.map(_._1).toSet
+    var byGroup = shapes.groupBy(_.groupId.get).mapValues(_.head)
+    clips.foreach {
+      case (outer, inner) =>
+        val os = byGroup.get(outer)
+        val is = byGroup.get(inner)
+        val clipped = for {
+          outerShape <- os
+          innerShape <- is
+        } yield outerShape.copy(clip = outerShape.clip ++ innerShape.polygon.toSeq)
+        clipped.foreach(s => byGroup = byGroup.updated(outer, s))
+    }
+
+    shapes.map(s => if (s.groupId.exists(modifiedIds.contains)) byGroup.getOrElse(s.groupId.get, s) else s)
   }
 
 }
@@ -32,11 +63,11 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
   private var currentNeighbor: Option[Int] = neighborColor(p, d.rBackward)
   private val color: Int = colorOf(p)
 
-  def trace(): Polygon = {
+  def trace(): Shape = {
     val startingPoint = p
     val startingDirection = d
-    var outline = Seq.empty[Point2D]
-    var lastP = Option.empty[Point2D]
+    var outline = Seq.empty[BorderPoint]
+    var lastP = Option.empty[BorderPoint]
     do {
       val nps = next()
       val appended = if (nps.headOption.contentsEqual(lastP)) nps.drop(1) else nps
@@ -44,10 +75,14 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
       lastP = appended.lastOption
     } while (!(startingPoint == currentPoint && startingDirection == currentDirection))
 
-    Polygon(outline, color)
+    val color = colorOf(p)
+    val bps = outline.map(_.withRight(color))
+    val bs = toBorders(bps)
+    val poly = Polygon(outline.map(_.p), color)
+    Shape(borders = bs, provColor = color, polygon = poly)
   }
 
-  def next(): Seq[Point2D] = {
+  def next(): Seq[BorderPoint] = {
     var cp = currentPoint
     val cd = currentDirection
     var cc = currentNeighbor
@@ -102,11 +137,55 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
       nextD.turnIntPixelPoints(cp, smoothing, cd)
     }
 
+    val bps = ps.map(BorderPoint(_, currentNeighbor))
+
     currentDirection = nextD
     currentPoint = cp
     currentNeighbor = cc
 
-    ps
+    bps
   }
+
+  def toBorders(outline: Seq[BorderPoint]): Seq[Border] = {
+    var bs = Seq.empty[Border]
+    var p = outline.last
+    val h = outline.head
+    var neighbor = h.l
+    var currNeighbor = neighbor
+    var leftPs = outline
+    var currBorder = Border(Seq.empty, h.l, h.r)
+
+    while (leftPs.nonEmpty) {
+
+      while (currNeighbor == neighbor && leftPs.nonEmpty) {
+        currBorder = currBorder + p
+        p = leftPs.head
+        currNeighbor = p.l
+        leftPs = leftPs.drop(1)
+      }
+
+      val lastP = currBorder.points.lastOption.map(BorderPoint(_)).get
+      currNeighbor = p.l
+      if (leftPs.nonEmpty) {
+        bs = bs :+ currBorder
+        currBorder = Border(Seq.empty, p.l, p.r) + lastP
+
+        neighbor = p.l
+        leftPs = p +: leftPs
+      } else {
+        if (neighbor != currNeighbor) {
+          bs = bs :+ currBorder
+          currBorder = Border(Seq.empty, p.l, p.r) + lastP + p
+        } else
+          currBorder = currBorder + p
+        bs = bs :+ currBorder
+      }
+
+    }
+
+    bs
+  }
+
+
 
 }

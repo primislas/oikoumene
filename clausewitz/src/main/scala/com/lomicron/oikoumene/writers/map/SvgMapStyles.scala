@@ -14,11 +14,7 @@ object SvgMapStyles {
     customContent = Some(
       s"""
          |.province {
-         |  stroke: rgb(0,0,0);
-         |  stroke-width: 1;
-         |  stroke-opacity: 0.2;
-         |  stroke-linecap: round;
-         |  opacity: 0.6;
+         |  stroke-width: 0;
          |}
          |.wasteland {
          |  fill: ${Svg.colorToSvg(wastelandColor)};
@@ -37,9 +33,9 @@ object SvgMapStyles {
          |  opacity: 0.5;
          |}
          |.river {
-         |  fill:none;
-         |  stroke-linecap:round;
-         |  stroke-linejoin:round;
+         |  fill: none;
+         |  stroke-linecap: round;
+         |  stroke-linejoin: round;
          |  opacity: 0.4;
          |}
          |.river-narrowest {
@@ -57,7 +53,26 @@ object SvgMapStyles {
          |.river-widest {
          |  stroke: ${Svg.colorToSvg(seaColor)};
          |  stroke-width: 3;
-         |}"""
+         |}
+         |.border {
+         |  fill: none;
+         |  stroke-width: 0;
+         |  stroke-linecap: round;
+         |  stroke-linejoin: round;
+         |  stroke: rgb(50,50,50);
+         |  stroke-opacity: 0.1;
+         |}
+         |.border-country {
+         |  stroke: rgb(50,50,50);
+         |  stroke-width: 2;
+         |  stroke-opacity: 0.2;
+         |}
+         |.border-land-area { stroke:rgb(50,50,50);stroke-opacity:0.1;stroke-width:1; }
+         |.border-sea {stroke:rgb(0,0,50);stroke-opacity:0.1;}
+         |.border-sea-area {stroke:rgb(0,0,50);stroke-opacity:0.2;}
+         |.border-sea-shore {stroke:rgb(50,175,200);stroke-opacity:0.4;stroke-width:1;}
+         |.border-lake-shore {stroke:rgb(50,200,200);stroke-opacity:0.4;stroke-width:1;}
+         |"""
         .stripMargin)
   )
 

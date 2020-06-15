@@ -5,6 +5,7 @@ case class Polygon
   points: Seq[Point2D],
   color: Int,
   provinceId: Option[Int] = None,
+  clip: Seq[Polygon] = Seq.empty,
 ) {
 
   def isEmpty: Boolean = points.isEmpty
@@ -19,6 +20,5 @@ case class Polygon
     val ops = points.map(_.offset(offset))
     copy(points = ops)
   }
-
 
 }

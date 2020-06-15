@@ -1,6 +1,5 @@
 package com.lomicron.oikoumene.parsers.map
 
-import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils.toOption
 
@@ -35,20 +34,26 @@ object WorldMap {
              mercator: MercatorMap,
              repos: RepositoryFactory
            ): WorldMap = {
-    val updated = addProvinceMeta(mercator.provinces, repos)
-    new WorldMap(mercator.copy(provinces = updated), repos)
+
+    val withProvIds = addProvinceMeta(mercator, repos)
+    new WorldMap(withProvIds, repos)
   }
 
-  def addProvinceMeta(ps: Seq[Polygon], repos: RepositoryFactory): Seq[Polygon] = {
-    val psByColor = repos.provinces.findAll.groupBy(_.color)
+  def addProvinceMeta(m: MercatorMap, repos: RepositoryFactory): MercatorMap = {
+    val psByColor = repos.provinces.findAll.groupBy(_.color.toInt)
 
-    ps
-      .map(poly => psByColor
-        .get(Color(poly.color))
-        .flatMap(_.headOption)
-        .map(p => poly.copy(provinceId = p.id))
-        .getOrElse(poly)
+    val withProvIds = m.provinces
+      .map(shape =>
+        if (shape.provColor.isDefined)
+          psByColor
+            .get(shape.provColor.get)
+            .flatMap(_.headOption)
+            .map(p => shape.withProvinceId(p.id))
+            .getOrElse(shape)
+        else shape
       )
+
+    m.copy(provinces = withProvIds)
   }
 
 }

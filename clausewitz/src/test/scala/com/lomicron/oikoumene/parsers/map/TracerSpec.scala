@@ -16,25 +16,25 @@ class TracerSpec extends Specification {
     "- identify nested shapes" >> {
       val url = getClass.getClassLoader.getResource(nestedTest).toURI.toURL
       val img = ImageIO.read(url)
-      val polygons = Tracer.trace(img)
-      polygons.size must equalTo(7)
-      polygons.map(_.color).distinct.size must equalTo(5)
+      val shapes = Tracer.trace(img)
+      shapes.size must equalTo(7)
+      shapes.flatMap(_.provColor).distinct.size must equalTo(5)
     }
 
     "- identify Euboea in Aegean" >> {
       val url = getClass.getClassLoader.getResource(aegeanTest).toURI.toURL
       val img = ImageIO.read(url)
-      val polygons = Tracer.trace(img)
-      polygons.size must equalTo(17)
-      polygons.map(_.color).distinct.size must equalTo(7)
+      val shapes = Tracer.trace(img)
+      shapes.size must equalTo(17)
+      shapes.flatMap(_.provColor).distinct.size must equalTo(7)
     }
 
     "- trace Greenland" >> {
       val url = getClass.getClassLoader.getResource(greenlandTest).toURI.toURL
       val img = ImageIO.read(url)
-      val polygons = Tracer.trace(img)
-      polygons.size must equalTo(49)
-      polygons.map(_.color).distinct.size must equalTo(9)
+      val shapes = Tracer.trace(img)
+      shapes.size must equalTo(49)
+      shapes.flatMap(_.provColor).distinct.size must equalTo(9)
     }
 
     "- rotate down correctly" >> {

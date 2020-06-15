@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
-import com.lomicron.oikoumene.parsers.map.{Polygon, River, SphericalMap}
+import com.lomicron.oikoumene.parsers.map.{MercatorMap, River}
 import com.lomicron.oikoumene.repository.api.map.{MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 
@@ -23,7 +23,7 @@ case class InMemoryMapRepository()
   private var _adjacencies: Seq[Adjacency] = Seq.empty
   private var _tileRoutes: Seq[TileRoute] = Seq.empty
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
-  private var _mercator: Seq[Polygon] = Seq.empty
+  private var _mercator: MercatorMap = MercatorMap()
   private var _rivers: Seq[River] = Seq.empty
 
   def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
@@ -105,12 +105,12 @@ case class InMemoryMapRepository()
       .flatten
   }
 
-  def updateMercator(mercator: Seq[Polygon]): MapRepository = {
+  def updateMercator(mercator: MercatorMap): MapRepository = {
     this._mercator = mercator
     this
   }
 
-  def mercator: Seq[Polygon] =
+  def mercator: MercatorMap =
     this._mercator
 
   def createRivers(rivers: Seq[River]): MapRepository = {

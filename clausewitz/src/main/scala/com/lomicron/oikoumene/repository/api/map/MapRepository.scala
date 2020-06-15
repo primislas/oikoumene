@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.api.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
-import com.lomicron.oikoumene.parsers.map.{Polygon, River, SphericalMap}
+import com.lomicron.oikoumene.parsers.map.{MercatorMap, Polygon, River, SphericalMap}
 import com.lomicron.oikoumene.repository.api.AbstractRepository
 
 trait MapRepository extends AbstractRepository[Color, Tile] {
@@ -22,8 +22,8 @@ trait MapRepository extends AbstractRepository[Color, Tile] {
   def provinceRoutes(provId: Int): Seq[Route]
   def buildRoutes(provinces: ProvinceRepository): MapRepository
 
-  def updateMercator(mercator: Seq[Polygon]): MapRepository
-  def mercator: Seq[Polygon]
+  def updateMercator(mercator: MercatorMap): MapRepository
+  def mercator: MercatorMap
   def createRivers(rivers: Seq[River]): MapRepository
   def rivers: Seq[River]
 
