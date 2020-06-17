@@ -1,5 +1,7 @@
 package com.lomicron.oikoumene.writers.svg
 
+import java.text.DecimalFormat
+
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.parsers.map.Point2D
 
@@ -14,9 +16,14 @@ object Svg {
   def pointsToSvg(ps: Seq[Point2D] = Seq.empty): String = {
     val sb = StringBuilder.newBuilder
     sb.append(" points=\"")
-    sb.append(ps.map(p => f"${p.x}%.2f,${p.y}%.2f").mkString(" "))
+    sb.append(ps.map(pointToSvg(_)).mkString(" "))
     sb.append("\"")
     sb.toString()
   }
+
+  val df = new DecimalFormat("#.#")
+  def doubleToSvg(d: Double): String = df.format(d)
+  def pointToSvg(p: Point2D, separator: String = ","): String =
+    s"${doubleToSvg(p.x)}$separator${doubleToSvg(p.y)}"
 
 }

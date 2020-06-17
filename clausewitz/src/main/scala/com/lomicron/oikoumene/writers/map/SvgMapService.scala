@@ -9,13 +9,23 @@ import com.lomicron.oikoumene.writers.svg.{Svg, SvgElement, SvgFill, SvgTags}
 import com.lomicron.utils.collection.CollectionUtils.toOption
 
 import scala.collection.immutable.ListSet
+import com.lomicron.utils.collection.CollectionUtils.MapEx
 
 case class SvgMapService(repos: RepositoryFactory) {
 
   val emptyGroup: SvgElement = SvgElement(tag = SvgTags.GROUP)
-  val provinceGroup: SvgElement = emptyGroup.copy(id = SvgMapClasses.PROVINCE_GROUP)
-  val riverGroup: SvgElement = emptyGroup.copy(id = SvgMapClasses.RIVER_GROUP)
-  val borderGroup: SvgElement = emptyGroup.copy(id = SvgMapClasses.BORDER_GROUP)
+  val provinceGroup: SvgElement = emptyGroup.copy(
+    id = SvgMapClasses.PROVINCE_GROUP,
+    classes = ListSet(SvgMapClasses.PROVINCE)
+  )
+  val riverGroup: SvgElement = emptyGroup.copy(
+    id = SvgMapClasses.RIVER_GROUP,
+    classes = ListSet(SvgMapClasses.RIVER),
+  )
+  val borderGroup: SvgElement = emptyGroup.copy(
+    id = SvgMapClasses.BORDER_GROUP,
+    classes = ListSet(SvgMapClasses.BORDER)
+  )
   val polyline: SvgElement = SvgElement(tag = SvgTags.POLYLINE)
 
   def worldSvg(worldMap: WorldMap, mapMode: Option[String] = None): String = {
@@ -32,6 +42,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     val borders = borderSvg(worldMap.mercator)
 
     Svg.svgHeader
+      .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
       .add(style)
       .add(withMode.toSeq)
       .add(borders)
@@ -40,19 +51,35 @@ case class SvgMapService(repos: RepositoryFactory) {
   }
 
   def riverSvg(rs: Seq[River]): SvgElement = {
-    val riverPaths = rs.flatMap(riverToSvg)
-    riverGroup.add(riverPaths)
+    val rsByClass = rs.flatMap(riverToSvg)
+      .groupBy(_.classes.head)
+      .mapKVtoValue((t, rs) =>
+        emptyGroup.copy(id = t, classes = ListSet(t), children = rs.map(_.copy(classes = ListSet.empty)))
+      )
+      .values.toSeq
+
+    riverGroup.add(rsByClass)
   }
 
   def riverToSvg(r: River): Seq[SvgElement] =
     r.path.map(riverSegmentToSvg)
 
   def riverSegmentToSvg(rs: RiverSegment): SvgElement =
-    polyline.copy(points = rs.points, classes = SvgMapClasses.ofRiver(rs))
+    polyline.copy(points = rs.points, classes = ListSet(SvgMapClasses.ofRiver(rs)))
 
   def ofMode(map: MercatorMap, mapMode: String): SvgElement = {
-    val ps = map.provinces.map(provinceToSvg(_, mapMode))
-    provinceGroup.add(ps)
+    val psByClass = map.provinces
+      .map(provinceToSvg(_, mapMode))
+      .groupBy(_.classes.head)
+
+    val groupsByClass = ProvinceTypes.list
+      .map(t => {
+        val ps = psByClass.getOrElse(t, Seq.empty)
+        emptyGroup.copy(id = t, classes = ListSet(t), children = ps.map(_.copy(classes = ListSet.empty)))
+      })
+      .toSeq
+
+    provinceGroup.add(groupsByClass)
   }
 
   def provinceToSvg(shape: Shape, mapMode: String): SvgElement = {
@@ -62,7 +89,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       .flatMap(repos.provinces.find(_).toOption)
       .map(prov =>
         defaultProvincePolygon(polygon).copy(
-          classes = SvgMapClasses.ofProvince(prov),
+          classes = ListSet(SvgMapClasses.ofProvince(prov)),
           fill = mapModeColor(prov, mapMode).map(SvgFill(_)),
         )
       )
@@ -111,8 +138,39 @@ case class SvgMapService(repos: RepositoryFactory) {
   }
 
   def borderSvg(borders: Seq[Border]): SvgElement = {
-    val svgBorders = borders.distinct.map(borderSvg)
-    borderGroup.add(svgBorders)
+    val bordsByClass = borders.distinct
+      .map(borderSvg)
+      .groupBy(_.classes.head)
+
+    def bordsOfType(t: String): SvgElement = {
+      val bs = bordsByClass.getOrElse(t, Seq.empty).map(_.copy(classes = ListSet.empty))
+      emptyGroup.copy(id = t, classes = ListSet(t), children = bs)
+    }
+
+    val countries = bordsOfType(BorderTypes.COUNTRY)
+    val landAreas = bordsOfType(BorderTypes.LAND_AREA)
+    val landBorders = bordsOfType(BorderTypes.LAND)
+      .copy(id = "border-land-default", classes = ListSet.empty)
+    val seaShores = bordsOfType(BorderTypes.SEA_SHORE)
+    val lakeShores = bordsOfType(BorderTypes.LAKE_SHORE)
+
+    val seaAreas = bordsOfType(BorderTypes.SEA_AREA)
+    val seaBorders = bordsOfType(BorderTypes.SEA)
+      .copy(id = "border-sea-default", classes = ListSet.empty)
+    val lakes = bordsOfType(BorderTypes.LAKE)
+
+    val land = emptyGroup.copy(
+      id = BorderTypes.LAND,
+      classes = ListSet(BorderTypes.LAND),
+      children = Seq(countries, landAreas, landBorders, seaShores, lakeShores)
+    )
+    val seas = emptyGroup.copy(
+      id = BorderTypes.SEA,
+      classes = ListSet(BorderTypes.SEA),
+      children = Seq(seaAreas, seaBorders, lakes)
+    )
+
+    borderGroup.add(Seq(land, seas))
   }
 
   def borderSvg(b: Border): SvgElement = {
@@ -124,7 +182,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     } yield borderBetween(lProv, rProv)
 
     val borderType = borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
-    polyline.copy(classes = ListSet(BorderTypes.BORDER, borderType), points = b.points)
+    polyline.copy(classes = ListSet(borderType), points = b.points)
   }
 
   def borderBetween(a: Province, b: Province): String = {
@@ -167,6 +225,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     (a.isLand && b.`type` == ProvinceTypes.lake) || (b.isLand && a.`type` == ProvinceTypes.lake)
 
   def isAreaBorder(a: Province, b: Province): Boolean =
-    a.geography.area.exists(!b.geography.area.contains(_))
+    (a.geography.area.isDefined || b.geography.area.isDefined) &&
+      a.geography.area != b.geography.area
 
 }

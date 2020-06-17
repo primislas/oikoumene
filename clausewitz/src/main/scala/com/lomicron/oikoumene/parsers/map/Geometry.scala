@@ -5,6 +5,7 @@ import java.lang.Math._
 object Geometry {
   val halfPI: Double = PI / 2
   val twoPI: Double = PI * 2
+
   implicit def toDouble(bd: BigDecimal): Double = bd.toDouble
 
   def projectMercatorAsSphere
@@ -33,7 +34,6 @@ object Geometry {
     SphericalMap(center, sps)
   }
 
-
   def project(polygons: Seq[SphericalPolygon], center: Point2D): Seq[Polygon] =
     polygons
       .filter(_.nonEmpty)
@@ -47,7 +47,7 @@ object Geometry {
   }
 
   def fromMercator(p: Point2D, center: Point2D, radius: Double): SphericalCoord = {
-    val polar = halfPI  - (center.y - p.y) / radius
+    val polar = halfPI - (center.y - p.y) / radius
     val azimuth = (p.x - center.x) / radius
     SphericalCoord(radius, polar, azimuth)
   }
@@ -83,6 +83,31 @@ object Geometry {
     while (oa > twoPI) oa = oa - twoPI
     oa
   }
+
+  /**
+    * Removes instances of double points, e.g. 2 identical points following each other
+    *
+    * @param ps input sequence
+    * @return clean sequence
+    */
+  def clean[T](ps: Seq[T] = Seq.empty): Seq[T] =
+    cleanRec(ps)
+
+  @scala.annotation.tailrec
+  def cleanRec[T]
+  (
+    remaining: Seq[T] = Seq.empty,
+    cleaned: Seq[T] = Seq.empty,
+    prevPoint: Option[T] = None
+  ): Seq[T] =
+    if (remaining.isEmpty) cleaned
+    else {
+      val recCleaned =
+        if (prevPoint.contains(remaining.head)) cleaned
+        else cleaned :+ remaining.head
+      cleanRec(remaining.drop(1), recCleaned, remaining.headOption)
+    }
+
 
 }
 

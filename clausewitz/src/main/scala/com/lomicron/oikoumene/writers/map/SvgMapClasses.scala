@@ -26,18 +26,13 @@ object SvgMapClasses {
   private val province = ListSet(PROVINCE)
   private val river = ListSet(RIVER)
 
-  def ofProvince(p: Province): ListSet[String] =
-    province + p.`type`
+  def ofProvince(p: Province): String = p.`type`
 
-  def ofRiver(rs: RiverSegment): ListSet[String] = {
-    val width = rs.width match {
-      case RiverTypes.NARROW => RIVER_NARROW
-      case RiverTypes.WIDE => RIVER_WIDE
-      case RiverTypes.WIDEST => RIVER_WIDEST
-      case _ => RIVER_NARROWEST
-    }
-    river + width
+  def ofRiver(rs: RiverSegment): String = rs.width match {
+    case RiverTypes.NARROW => RIVER_NARROW
+    case RiverTypes.WIDE => RIVER_WIDE
+    case RiverTypes.WIDEST => RIVER_WIDEST
+    case _ => RIVER_NARROWEST
   }
-
 
 }

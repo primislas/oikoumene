@@ -3,6 +3,8 @@ package com.lomicron.oikoumene.model.provinces
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.json.FromJson
 
+import scala.collection.immutable.ListSet
+
 case class ProvinceTypes
 (width: Int = 0,
  height: Int = 0,
@@ -34,5 +36,6 @@ object ProvinceTypes extends FromJson[ProvinceTypes] {
 
   val empty: ProvinceTypes = ProvinceTypes()
 
-  val landTypes: Set[String] = Set(province, wasteland, random, uncolonized)
+  val landTypes: Set[String] = ListSet(province, wasteland, random, uncolonized)
+  val list: Set[String] = landTypes ++ Seq(sea, lake)
 }

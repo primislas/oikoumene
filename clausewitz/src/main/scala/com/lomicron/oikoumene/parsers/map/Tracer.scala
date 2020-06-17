@@ -76,7 +76,9 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
     } while (!(startingPoint == currentPoint && startingDirection == currentDirection))
 
     val color = colorOf(p)
-    val bps = outline.map(_.withRight(color))
+    val shifted = outline.last +: outline.dropRight(1)
+    val cleaned = Geometry.clean(shifted)
+    val bps = cleaned.map(_.withRight(color))
     val bs = toBorders(bps)
     val poly = Polygon(outline.map(_.p), color)
     Shape(borders = bs, provColor = color, polygon = poly)
@@ -181,6 +183,13 @@ case class Tracer(img: BufferedImage, p: Point, d: Direction = Right) extends Bi
         bs = bs :+ currBorder
       }
 
+    }
+
+    if (bs.length > 1 && bs.head.identicalNeighbors(bs.last)
+      && bs.head.points.headOption.exists(bs.last.points.lastOption.contains(_))) {
+
+      val union = bs.last + bs.head.points.drop(1)
+      bs = union +: bs.drop(1).dropRight(1)
     }
 
     bs

@@ -9,6 +9,8 @@ case class SvgElement
 (
   tag: String,
   id: Option[String] = Option.empty,
+  width: Option[Int] = Option.empty,
+  height: Option[Int] = Option.empty,
   classes: ListSet[String] = ListSet.empty,
   fill: Option[SvgFill] = Option.empty,
   opacity: Option[Double] = Option.empty,
@@ -37,6 +39,8 @@ case class SvgElement
     val attrs = Seq(
       id.map(i => s"""id="$i""""),
       svgClass,
+      width.map(i => s"""width="$i""""),
+      height.map(i => s"""height="$i""""),
       fill.map(_.toSvg),
       opacity.map(i => s"""opacity="$i""""),
       strokeWidth.map(i => s"""stroke-width="$i""""),
