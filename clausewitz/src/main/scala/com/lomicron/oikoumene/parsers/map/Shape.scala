@@ -17,14 +17,18 @@ case class Shape
   }
 
   def withPolygon: Shape =
-    if (polygon.nonEmpty) this
+    if (polygon.nonEmpty)
+      if (clip.nonEmpty && polygon.exists(_.clip.isEmpty))
+        copy(polygon = polygon.map(_.copy(clip = clip)))
+      else
+        this
     else {
       val ps = borders
         .map(_.points)
         .map(_.drop(1))
         .reduce(_ ++ _)
       val outline = ps.last +: ps.take(ps.size - 1)
-      val p = Polygon(outline, provColor.getOrElse(-1), provId)
+      val p = Polygon(outline, provColor.getOrElse(-1), provId, clip)
       copy(polygon = Some(p))
     }
 

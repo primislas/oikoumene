@@ -9,6 +9,8 @@ case class Border
   left: Option[Int] = None,
   // right neighbor: color or province id
   right: Option[Int] = None,
+  leftGroup: Option[Int] = None,
+  rightGroup: Option[Int] = None,
 ) {
 
   def +(p: BorderPoint): Border = this.+(p.p)
@@ -21,6 +23,10 @@ case class Border
 
   def identicalNeighbors(b: Border): Boolean =
     left == b.left && right == b.right
+
+  def size: Int = points.size
+
+  def isClosed: Boolean = points.headOption.exists(points.lastOption.contains)
 
   override def hashCode(): Int = {
     val leftIsSmaller =

@@ -27,6 +27,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     classes = ListSet(SvgMapClasses.BORDER)
   )
   val polyline: SvgElement = SvgElement(tag = SvgTags.POLYLINE)
+  val path: SvgElement = SvgElement(tag = SvgTags.PATH)
 
   def worldSvg(worldMap: WorldMap, mapMode: Option[String] = None): String = {
 
@@ -96,13 +97,21 @@ case class SvgMapService(repos: RepositoryFactory) {
       .getOrElse(defaultProvincePolygon(polygon))
   }
 
-  def defaultProvincePolygon(polygon: Polygon): SvgElement =
-    SvgElement(
-      tag = SvgTags.POLYGON,
+  def defaultProvincePolygon(polygon: Polygon): SvgElement = {
+    val isPathClosed = true
+    val elem = SvgElement(
+      tag = SvgTags.PATH,
       id = polygon.provinceId.map(_.toString),
       classes = ListSet(SvgMapClasses.PROVINCE),
-      points = polygon.points,
     )
+    if (polygon.clip.isEmpty) elem.copy(path =  Svg.pointsToSvgLinearPath(polygon.points, isPathClosed))
+    else {
+      val outer = Svg.pointsToSvgLinearPath(polygon.points)
+      val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed))
+      val path = (outer +: inners).mkString(" ")
+      elem.copy(path = path, fillRule = "evenodd")
+    }
+  }
 
   def mapModeColor(p: Province, mapMode: String): Option[Color] =
     mapMode match {
@@ -147,6 +156,8 @@ case class SvgMapService(repos: RepositoryFactory) {
       emptyGroup.copy(id = t, classes = ListSet(t), children = bs)
     }
 
+    val mapBorders = bordsOfType(BorderTypes.MAP_BORDER)
+
     val countries = bordsOfType(BorderTypes.COUNTRY)
     val landAreas = bordsOfType(BorderTypes.LAND_AREA)
     val landBorders = bordsOfType(BorderTypes.LAND)
@@ -170,7 +181,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       children = Seq(seaAreas, seaBorders, lakes)
     )
 
-    borderGroup.add(Seq(land, seas))
+    borderGroup.add(Seq(mapBorders, land, seas))
   }
 
   def borderSvg(b: Border): SvgElement = {
@@ -182,7 +193,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     } yield borderBetween(lProv, rProv)
 
     val borderType = borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
-    polyline.copy(classes = ListSet(borderType), points = b.points)
+    path.copy(classes = ListSet(borderType), path = Svg.pointsToSvgLinearPath(b.points))
   }
 
   def borderBetween(a: Province, b: Province): String = {

@@ -13,6 +13,7 @@ case class SvgElement
   height: Option[Int] = Option.empty,
   classes: ListSet[String] = ListSet.empty,
   fill: Option[SvgFill] = Option.empty,
+  fillRule: Option[String] = Option.empty,
   opacity: Option[Double] = Option.empty,
   strokeWidth: Option[Int] = Option.empty,
   strokeOpacity: Option[Double] = Option.empty,
@@ -22,7 +23,8 @@ case class SvgElement
   points: Option[Seq[Point2D]] = Option.empty,
   customAttrs: Option[String] = Option.empty,
   customContent: Option[String] = Option.empty,
-  children: Seq[SvgElement] = Seq.empty
+  children: Seq[SvgElement] = Seq.empty,
+  path: Option[String] = Option.empty,
 ) {
 
   def add(e: SvgElement): SvgElement =
@@ -42,13 +44,15 @@ case class SvgElement
       width.map(i => s"""width="$i""""),
       height.map(i => s"""height="$i""""),
       fill.map(_.toSvg),
+      fillRule.map(i => s"""fill-rule="$i""""),
       opacity.map(i => s"""opacity="$i""""),
       strokeWidth.map(i => s"""stroke-width="$i""""),
       strokeOpacity.map(i => s"""stroke-opacity="$i""""),
       strokeColor.map(i => s"""stroke="${Svg.colorToSvg(i)}""""),
       strokeLinecap.map(i => s"""stroke-linecap="$i""""),
       customAttrs,
-      points.map(i => Svg.pointsToSvg(i)),
+      points.map(i => Svg.pointsToSvgPointsAttribute(i)),
+      path.map(i => s"""d="$i""""),
     )
       .flatten
       .mkString(" ")

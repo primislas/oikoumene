@@ -12,6 +12,9 @@ case class Point2D(x: Double = 0, y: Double = 0) {
 
   def toInt: Point = new Point(x.toInt, y.toInt)
 
+  def dx(p: Point2D): Double = x - p.x
+  def dy(p: Point2D): Double = y - p.y
+
 }
 
 object Point2D {
