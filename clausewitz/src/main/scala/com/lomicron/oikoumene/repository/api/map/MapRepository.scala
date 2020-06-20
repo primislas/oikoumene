@@ -27,4 +27,10 @@ trait MapRepository extends AbstractRepository[Color, Tile] {
   def createRivers(rivers: Seq[River]): MapRepository
   def rivers: Seq[River]
 
+  def updatePositions(positions: Seq[ProvincePositions]): MapRepository
+  def provincePositions: Seq[ProvincePositions]
+  def positionsOf(ids: Seq[Int]): Seq[ProvincePositions] =
+    ids.flatMap(positionsOf(_))
+  def positionsOf(id: Int): Option[ProvincePositions]
+
 }

@@ -28,6 +28,7 @@ case class CanalDefinition(name: String, x: Int, y: Int)
 
 object ProvinceTypes extends FromJson[ProvinceTypes] {
   val province = "province"
+  val owned = "owned"
   val sea = "sea"
   val lake = "lake"
   val random = "random"

@@ -8,7 +8,7 @@ import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
 import com.lomicron.utils.parsing.JsonParser
-import com.lomicron.utils.parsing.scopes.ParsingError
+import com.lomicron.utils.parsing.scopes.{ObjectScope, ParsingError}
 import com.lomicron.utils.parsing.serialization.{DefaultDeserializer, Deserializer}
 import com.lomicron.utils.parsing.tokenizer.{Date, Tokenizer}
 import com.typesafe.scalalogging.LazyLogging
@@ -133,6 +133,19 @@ object ClausewitzParser extends LazyLogging {
 
   def parseFileFieldsAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, parseValuesAsEntities)
+
+  def fieldsToArrays(o: ObjectNode, fs: Seq[String]): ObjectNode = {
+    fs.foreach(f => {
+      val a = o.get(f) match {
+        case an: ArrayNode => an
+        case on: ObjectNode => on.getArray(ObjectScope.arrayKey).getOrElse(arrayNodeOf(on))
+        case _: NullNode => arrayNode
+        case jn: JsonNode => arrayNodeOf(jn)
+      }
+      o.set(f, a)
+    })
+    o
+  }
 
   private def parseFiles
   (filesByName: Map[String, String],

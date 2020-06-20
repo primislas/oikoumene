@@ -32,9 +32,7 @@ object GeographyParser extends LazyLogging {
     TerrainParser(files, localisation, geography, evalEntityFields)
     ClimateParser(files, localisation, geography.climate, evalEntityFields)
     ProvinceTypeParser(files, geography, evalEntityFields)
-
-    // TODO province positions?
-//    val provincePositions = files.getProvincePositions
+    ProvincePositionsParser(files, geography, evalEntityFields)
 
     geography
   }

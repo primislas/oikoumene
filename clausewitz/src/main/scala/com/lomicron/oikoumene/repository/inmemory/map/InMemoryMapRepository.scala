@@ -25,6 +25,7 @@ case class InMemoryMapRepository()
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
   private var _mercator: MercatorMap = MercatorMap()
   private var _rivers: Seq[River] = Seq.empty
+  private var _positions: Map[Int, ProvincePositions] = Map.empty
 
   def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
     this.terrainById = mapTerrain.map(mt => (mt.id, mt)).toMap
@@ -120,4 +121,14 @@ case class InMemoryMapRepository()
 
   def rivers: Seq[River] = this._rivers
 
+  override def updatePositions(positions: Seq[ProvincePositions]): MapRepository = {
+    this._positions = positions.groupBy(_.id).mapValues(_.head)
+    this
+  }
+
+  override def provincePositions: Seq[ProvincePositions] =
+    _positions.values.toSeq
+
+  override def positionsOf(id: Int): Option[ProvincePositions] =
+    _positions.get(id)
 }
