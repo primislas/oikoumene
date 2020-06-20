@@ -35,7 +35,9 @@ case class SvgElement
 
   def addClass(c: String): SvgElement = copy(classes = classes + c)
 
-  def addClasses(cs: Seq[String]) = copy(classes = classes ++ cs)
+  def addClasses(cs: Seq[String]): SvgElement = copy(classes = classes ++ cs)
+
+  def clearClasses: SvgElement = copy(classes = ListSet.empty)
 
   def toSvg: String = toStringBuilder.toString
 

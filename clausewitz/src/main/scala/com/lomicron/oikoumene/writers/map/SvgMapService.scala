@@ -42,7 +42,7 @@ case class SvgMapService(repos: RepositoryFactory) {
 
     val rivers = riverSvg(worldMap.rivers)
     val borders = borderSvg(worldMap.mercator)
-//    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
+    //    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
 
     Svg.svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
@@ -50,15 +50,19 @@ case class SvgMapService(repos: RepositoryFactory) {
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
-//      .add(lakes)
+      //      .add(lakes)
       .toSvg
   }
 
   def riverSvg(rs: Seq[River]): SvgElement = {
-    val rsByClass = rs.flatMap(riverToSvg)
+    val rsByClass = rs
+      .flatMap(riverToSvg)
       .groupBy(_.classes.head)
       .mapKVtoValue((t, rs) =>
-        emptyGroup.copy(id = t, classes = ListSet(t), children = rs.map(_.copy(classes = ListSet.empty)))
+        emptyGroup
+          .copy(id = t)
+          .add(rs.map(_.clearClasses))
+          .addClass(t)
       )
       .values.toSeq
 
@@ -69,7 +73,9 @@ case class SvgMapService(repos: RepositoryFactory) {
     r.path.map(riverSegmentToSvg)
 
   def riverSegmentToSvg(rs: RiverSegment): SvgElement =
-    polyline.copy(points = rs.points, classes = ListSet(SvgMapClasses.ofRiver(rs)))
+    path
+      .copy(path = Svg.pointsToSvgLinearPath(rs.points))
+      .addClass(SvgMapClasses.ofRiver(rs))
 
   def ofMode(map: MercatorMap, mapMode: String): SvgElement = {
     val psByClass = map.provinces
@@ -107,7 +113,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       id = polygon.provinceId.map(_.toString),
       classes = ListSet(SvgMapClasses.PROVINCE),
     )
-    if (polygon.clip.isEmpty) elem.copy(path =  Svg.pointsToSvgLinearPath(polygon.points, isPathClosed))
+    if (polygon.clip.isEmpty) elem.copy(path = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed))
     else {
       val outer = Svg.pointsToSvgLinearPath(polygon.points)
       val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed))
