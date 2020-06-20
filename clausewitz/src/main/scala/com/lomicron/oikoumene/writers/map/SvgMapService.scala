@@ -42,7 +42,7 @@ case class SvgMapService(repos: RepositoryFactory) {
 
     val rivers = riverSvg(worldMap.rivers)
     val borders = borderSvg(worldMap.mercator)
-    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
+//    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
 
     Svg.svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
@@ -50,7 +50,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
-      .add(lakes)
+//      .add(lakes)
       .toSvg
   }
 
