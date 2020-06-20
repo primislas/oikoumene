@@ -41,6 +41,7 @@ case class FileResourceRepository
   val colonialRegionsFile = "common/colonial_regions/00_colonial_regions.txt"
   val terrainFile = "map/terrain.txt"
   val climateFile = "map/climate.txt"
+  val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
   val buildingsDir = "common/buildings"
 
@@ -159,6 +160,9 @@ case class FileResourceRepository
 
   override def getClimate: Option[String] =
     readSourceFileContent(climateFile)
+
+  override def getElevatedLakes: Map[String, String] =
+    readSourceDir(elevatedLakesDir)
 
   override def getProvinceMap: Option[Path] = Option(fromSource(provinceMap))
 

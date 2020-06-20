@@ -33,6 +33,7 @@ object GeographyParser extends LazyLogging {
     ClimateParser(files, localisation, geography.climate, evalEntityFields)
     ProvinceTypeParser(files, geography, evalEntityFields)
     ProvincePositionsParser(files, geography, evalEntityFields)
+    LakeParser(files, geography, evalEntityFields)
 
     geography
   }

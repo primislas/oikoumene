@@ -25,19 +25,20 @@ case class InMemoryMapRepository()
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
   private var _mercator: MercatorMap = MercatorMap()
   private var _rivers: Seq[River] = Seq.empty
+  private var _lakes: Seq[ElevatedLake] = Seq.empty
   private var _positions: Map[Int, ProvincePositions] = Map.empty
 
-  def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
+  override def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
     this.terrainById = mapTerrain.map(mt => (mt.id, mt)).toMap
     this
   }
 
-  def setTerrainMapColors(terrainColors: Array[Color]): MapRepository = {
+  override def setTerrainMapColors(terrainColors: Array[Color]): MapRepository = {
     this.terrainColors = terrainColors
     this
   }
 
-  def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
+  override def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
     this.terrainColors = terrainColors
     this.terrainById = this.terrainById
       .mapValues(mt => Try(this.terrainColors(mt.colorIndex)).map(mt.withColor).getOrElse(mt))
@@ -45,28 +46,28 @@ case class InMemoryMapRepository()
     this
   }
 
-  def terrainMapType(argb: Int): Option[String] =
+  override def terrainMapType(argb: Int): Option[String] =
     terrainMapType(Color(argb))
 
-  def terrainMapType(color: Color): Option[String] =
+  override def terrainMapType(color: Color): Option[String] =
     this.terrainByColor.get(color).map(_.terrainType)
 
-  def updateAdjacencies(as: Seq[Adjacency]): MapRepository = {
+  override def updateAdjacencies(as: Seq[Adjacency]): MapRepository = {
     this._adjacencies = as
     this
   }
 
-  def adjacencies: Seq[Adjacency] = this._adjacencies
+  override def adjacencies: Seq[Adjacency] = this._adjacencies
 
-  def updateTileRoutes(routes: Seq[TileRoute]): MapRepository = {
+  override def updateTileRoutes(routes: Seq[TileRoute]): MapRepository = {
     this._tileRoutes = routes
     this
   }
 
-  def tileRoutes: Seq[TileRoute] =
+  override def tileRoutes: Seq[TileRoute] =
     this._tileRoutes
 
-  def updateRoutes(routes: Seq[Route]): MapRepository = {
+  override def updateRoutes(routes: Seq[Route]): MapRepository = {
     routesByProvId = routes.groupBy(_.from)
     this
   }
@@ -74,10 +75,10 @@ case class InMemoryMapRepository()
 
   override def routes: Map[Int, Seq[Route]] = routesByProvId
 
-  def provinceRoutes(provId: Int): Seq[Route] =
+  override def provinceRoutes(provId: Int): Seq[Route] =
     routesByProvId.getOrElse(provId, Seq.empty)
 
-  def buildRoutes(provinces: ProvinceRepository): MapRepository = {
+  override def buildRoutes(provinces: ProvinceRepository): MapRepository = {
     val trs = buildTileRoutes(provinces)
     val ars = adjacenciesToRoutes(provinces)
     updateRoutes(trs ++ ars)
@@ -106,20 +107,27 @@ case class InMemoryMapRepository()
       .flatten
   }
 
-  def updateMercator(mercator: MercatorMap): MapRepository = {
+  override def updateMercator(mercator: MercatorMap): MapRepository = {
     this._mercator = mercator
     this
   }
 
-  def mercator: MercatorMap =
+  override def mercator: MercatorMap =
     this._mercator
 
-  def createRivers(rivers: Seq[River]): MapRepository = {
+  override def createRivers(rivers: Seq[River]): MapRepository = {
     this._rivers = rivers
     this
   }
 
-  def rivers: Seq[River] = this._rivers
+  override def rivers: Seq[River] = this._rivers
+
+  override def createLakes(lakes: Seq[ElevatedLake]): MapRepository = {
+    this._lakes = lakes
+    this
+  }
+
+  override def lakes: Seq[ElevatedLake] = this._lakes
 
   override def updatePositions(positions: Seq[ProvincePositions]): MapRepository = {
     this._positions = positions.groupBy(_.id).mapValues(_.head)
@@ -131,4 +139,5 @@ case class InMemoryMapRepository()
 
   override def positionsOf(id: Int): Option[ProvincePositions] =
     _positions.get(id)
+
 }

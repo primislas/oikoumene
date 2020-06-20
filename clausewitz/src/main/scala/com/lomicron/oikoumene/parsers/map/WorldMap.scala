@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.parsers.map
 
+import com.lomicron.oikoumene.model.map.ElevatedLake
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.utils.collection.CollectionUtils.toOption
 
 case class WorldMap
 (
@@ -25,6 +25,7 @@ case class WorldMap
       .project
 
   def rivers: Seq[River] = repos.geography.map.rivers
+  def lakes: Seq[ElevatedLake] = repos.geography.map.lakes
 
 }
 

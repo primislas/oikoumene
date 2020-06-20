@@ -35,6 +35,8 @@ case class SvgElement
 
   def addClass(c: String): SvgElement = copy(classes = classes + c)
 
+  def addClasses(cs: Seq[String]) = copy(classes = classes ++ cs)
+
   def toSvg: String = toStringBuilder.toString
 
   def toStringBuilder: StringBuilder = {

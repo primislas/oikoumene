@@ -65,6 +65,8 @@ trait ResourceRepository {
 
   def getClimate: Option[String]
 
+  def getElevatedLakes: Map[String, String]
+
   def getProvinceMap: Option[Path]
 
   def getTerrainMap: Option[Path]

@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.writers.map
 
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.model.map.ElevatedLake
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
 import com.lomicron.oikoumene.parsers.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
@@ -26,6 +27,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     id = SvgMapClasses.BORDER_GROUP,
     classes = ListSet(SvgMapClasses.BORDER)
   )
+  val polygon: SvgElement = SvgElement(tag = SvgTags.POLYGON)
   val polyline: SvgElement = SvgElement(tag = SvgTags.POLYLINE)
   val path: SvgElement = SvgElement(tag = SvgTags.PATH)
 
@@ -39,8 +41,8 @@ case class SvgMapService(repos: RepositoryFactory) {
     } yield ofMode(mercator, mode)
 
     val rivers = riverSvg(worldMap.rivers)
-
     val borders = borderSvg(worldMap.mercator)
+    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
 
     Svg.svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
@@ -48,6 +50,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
+      .add(lakes)
       .toSvg
   }
 
@@ -238,5 +241,16 @@ case class SvgMapService(repos: RepositoryFactory) {
   def isAreaBorder(a: Province, b: Province): Boolean =
     (a.geography.area.isDefined || b.geography.area.isDefined) &&
       a.geography.area != b.geography.area
+
+  def lakeSvg(lakes: Seq[ElevatedLake], mapHeight: Option[Int] = None): SvgElement = {
+    val svgLakes = lakes
+      .filter(_.triangleStrip.nonEmpty)
+      .map(l => polygon.copy(points = l.asPolygon(mapHeight)))
+    emptyGroup
+      .copy(id = "elevated-lakes")
+      .addClass(ProvinceTypes.elevatedLake)
+      .addClass(BorderTypes.LAKE_SHORE)
+      .add(svgLakes)
+  }
 
 }

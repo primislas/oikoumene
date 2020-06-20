@@ -18,7 +18,8 @@ object SvgMapStyles {
          |.wasteland { fill:${Svg.colorToSvg(wastelandColor)}; opacity:0; }
          |.uncolonized { fill:${Svg.colorToSvg(uncolonizedColor)}; opacity:0; }
          |.sea { fill:${Svg.colorToSvg(seaColor)}; opacity:0.3;}
-         |.lake { fill: ${Svg.colorToSvg(lakeColor)}; opacity:0.5;}
+         |.lake { fill:${Svg.colorToSvg(lakeColor)}; opacity:0.5; }
+         |.elevated-lake { fill:${Svg.colorToSvg(lakeColor)}; opacity:0; }
          |.river {
          |  fill:none;
          |  stroke-linecap:round;

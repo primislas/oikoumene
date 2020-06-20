@@ -26,10 +26,11 @@ case class PositionRecord
     ProvincePositions(id, city, unit, text, port, tradeRoute, fightingUnit, tradeWind)
   }
 
+  //noinspection ScalaRedundantConversion
   private def positionAt(id: Int): PositionConf = {
-    val px = position(2 * id)
-    val py = position(2 * id + 1)
-    PositionConf(Point2D(px, py), rotation(id), height(id))
+    val px = position(2 * id).toDouble
+    val py = position(2 * id + 1).toDouble
+    PositionConf(Point2D(px, py), rotation(id).toDouble, height(id).toDouble)
   }
 
 }
