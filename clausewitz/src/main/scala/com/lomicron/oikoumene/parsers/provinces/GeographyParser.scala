@@ -10,7 +10,7 @@ import scala.util.matching.Regex
 object GeographyParser extends LazyLogging {
 
   val adjacencyPat: Regex =
-    "^(?<from>\\d+);(?<to>\\d+);(?<type>[a-zA-Z]*);(?<throuh>\\d+);(?<startX>\\d+);(?<startY>\\d+);(?<stopX>\\d+);(?<stopY>\\d+);(?<comment>.*)".r
+    "^(?<from>\\d+);(?<to>\\d+);(?<type>[a-zA-Z]*);(?<throuh>\\d+);-?(?<startX>\\d+);-?(?<startY>\\d+);-?(?<stopX>\\d+);-?(?<stopY>\\d+);(?<comment>.*)".r
 
   def apply(repos: RepositoryFactory,
             evalEntityFields: Boolean = false)
@@ -41,7 +41,7 @@ object GeographyParser extends LazyLogging {
   def parseAdjacencies(files: ResourceRepository, map: MapRepository): MapRepository = {
     val as = files
       .getAdjacencies
-      .map(_.lines.toSeq)
+      .map(_.lines.toList)
       .getOrElse(Seq.empty)
       .flatMap(parseAdjacency)
     map.updateAdjacencies(as)

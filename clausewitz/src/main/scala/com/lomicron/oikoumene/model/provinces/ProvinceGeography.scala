@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.model.map.ProvincePositions
 import com.lomicron.utils.json.FromJson
 
 case class ProvinceGeography
@@ -16,6 +17,7 @@ adjacencies: Set[Int] = Set.empty,
 crossings: Set[Int] = Set.empty,
 landlocked: Boolean = true,
 tradeNode: Option[String] = None,
+positions: Option[ProvincePositions] = None,
 ) {
   @JsonCreator def this() = this(None)
   def isImpassable: Boolean = climate.contains("impassable")

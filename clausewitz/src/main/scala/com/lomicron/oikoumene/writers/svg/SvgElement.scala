@@ -12,19 +12,29 @@ case class SvgElement
   width: Option[Int] = Option.empty,
   height: Option[Int] = Option.empty,
   classes: ListSet[String] = ListSet.empty,
+  href: Option[String] = Option.empty,
   fill: Option[SvgFill] = Option.empty,
   fillRule: Option[String] = Option.empty,
   opacity: Option[Double] = Option.empty,
-  strokeWidth: Option[Int] = Option.empty,
+  strokeWidth: Option[Double] = Option.empty,
   strokeOpacity: Option[Double] = Option.empty,
   strokeColor: Option[Color] = Option.empty,
   // butt,round,square
   strokeLinecap: Option[String] = Option.empty,
   points: Option[Seq[Point2D]] = Option.empty,
   customAttrs: Option[String] = Option.empty,
+
+  // text
+  startOffset: Option[String] = Option.empty,
+  textLength: Option[String] = Option.empty,
+  textAnchor: Option[String] = Option.empty,
+  fontSize: Option[String] = Option.empty,
+  dominantBaseline: Option[String] = Option.empty,
+
   customContent: Option[String] = Option.empty,
   children: Seq[SvgElement] = Seq.empty,
   path: Option[String] = Option.empty,
+
 ) {
 
   def add(e: SvgElement): SvgElement =
@@ -47,13 +57,19 @@ case class SvgElement
       svgClass,
       width.map(i => s"""width="$i""""),
       height.map(i => s"""height="$i""""),
+      href.map(i => s"""href="$i""""),
       fill.map(_.toSvg),
       fillRule.map(i => s"""fill-rule="$i""""),
       opacity.map(i => s"""opacity="$i""""),
-      strokeWidth.map(i => s"""stroke-width="$i""""),
-      strokeOpacity.map(i => s"""stroke-opacity="$i""""),
+      strokeWidth.map(i => s"""stroke-width="${Svg.doubleToSvg(i)}""""),
+      strokeOpacity.map(i => s"""stroke-opacity="${Svg.doubleToSvg(i)}""""),
       strokeColor.map(i => s"""stroke="${Svg.colorToSvg(i)}""""),
       strokeLinecap.map(i => s"""stroke-linecap="$i""""),
+      startOffset.map(i => s"""startOffset="$i""""),
+      textLength.map(i => s"""textLength="$i""""),
+      textAnchor.map(i => s"""text-anchor="$i""""),
+      fontSize.map(i => s"""font-size="$i""""),
+      dominantBaseline.map(i => s"""dominant-baseline="$i""""),
       customAttrs,
       points.map(i => Svg.pointsToSvgPointsAttribute(i)),
       path.map(i => s"""d="$i""""),

@@ -167,7 +167,10 @@ object ProvinceParser extends LazyLogging {
     val superRegion = region.flatMap(geography.superregions.superRegionOfRegion).map(_.id)
     val continent = geography.continent.continentOfProvince(id).map(_.id)
 
+    val positions = geography.map.positionsOf(province.id)
+
     val provinceGeography = ProvinceGeography(pType, terrain, climate, area, region, superRegion, continent)
+        .copy(positions = positions)
 
     province.copy(geography = provinceGeography)
   }

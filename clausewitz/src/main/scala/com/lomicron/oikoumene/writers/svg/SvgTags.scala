@@ -7,4 +7,7 @@ object SvgTags {
   val POLYGON = "polygon"
   val POLYLINE = "polyline"
   val PATH = "path"
+  val TEXT = "text"
+  val TEXT_PATH = "textPath"
+  val IMAGE = "image"
 }

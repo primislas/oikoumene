@@ -105,6 +105,7 @@ case class InMemoryMapRepository()
         target <- provinces.find(a.to).toOption
       } yield Seq(Route(source.id, target.id, rType), Route(target.id, source.id, rType)))
       .flatten
+      .toList
   }
 
   override def updateMercator(mercator: MercatorMap): MapRepository = {

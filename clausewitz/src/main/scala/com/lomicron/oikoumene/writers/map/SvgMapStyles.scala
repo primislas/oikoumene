@@ -8,12 +8,14 @@ object SvgMapStyles {
   val wastelandColor: Color = Color(145, 132, 124)
   val seaColor: Color = Color(157, 239, 254)
   val lakeColor: Color = Color(135, 248, 250)
+  val riverColor: Color = Color(50, 180, 220)
 
   val defaultMapStyle: SvgElement = SvgElement(
     tag = SvgTags.STYLE,
     customContent = Some(
       s"""
-         |.province { stroke-width:0; fill:none; }
+         |@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@800");
+         |.province { stroke-width:0; fill:none; opacity:0.7; }
          |.owned { stroke-width:0; opacity:0.7; }
          |.wasteland { fill:${Svg.colorToSvg(wastelandColor)}; opacity:0; }
          |.uncolonized { fill:${Svg.colorToSvg(uncolonizedColor)}; opacity:0; }
@@ -24,12 +26,12 @@ object SvgMapStyles {
          |  fill:none;
          |  stroke-linecap:round;
          |  stroke-linejoin:round;
-         |  opacity:0.4;
+         |  opacity:0.3;
          |}
-         |.river-narrowest { stroke:${Svg.colorToSvg(lakeColor)}; stroke-width:1; }
-         |.river-narrow { stroke:${Svg.colorToSvg(lakeColor)}; stroke-width:2; }
-         |.river-wide { stroke:${Svg.colorToSvg(seaColor)}; stroke-width:2; }
-         |.river-widest { stroke:${Svg.colorToSvg(seaColor)}; stroke-width:3; }
+         |.river-narrowest { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:1; }
+         |.river-narrow { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:1.7; }
+         |.river-wide { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:2.4; }
+         |.river-widest { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:3; }
          |.border {
          |  fill: none;
          |  stroke-width: 1;
@@ -46,6 +48,8 @@ object SvgMapStyles {
          |.border-sea-area { stroke:rgb(0,0,50); stroke-opacity:0.2; }
          |.border-sea-shore { stroke:rgb(50,175,200); stroke-opacity:0.4; stroke-width:1; }
          |.border-lake-shore { stroke:rgb(50,200,200); stroke-opacity:0.4; stroke-width:1; }
+         |.tn { font-family: 'Dosis'; paint-order: stroke; fill: black; stroke: white; stroke-opacity: 0.3; stroke-width: 1; font-weight: bold; opacity: 0.9; }
+         |.tn-tiny { stroke-width: 0; }
          |"""
         .stripMargin)
   )

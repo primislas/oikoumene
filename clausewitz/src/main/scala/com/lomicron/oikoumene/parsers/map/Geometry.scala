@@ -2,6 +2,8 @@ package com.lomicron.oikoumene.parsers.map
 
 import java.lang.Math._
 
+import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoint, WeightedObservedPoints}
+
 object Geometry {
   val halfPI: Double = PI / 2
   val twoPI: Double = PI * 2
@@ -107,6 +109,35 @@ object Geometry {
         else cleaned :+ remaining.head
       cleanRec(remaining.drop(1), recCleaned, remaining.headOption)
     }
+
+  def fitQuadratic(ps: Seq[Point2D]): QuadPolynomial =
+    fitQuadratic(Map(1.0 -> ps))
+
+  def fitQuadratic(psByWeight: Map[Double, Seq[Point2D]]): QuadPolynomial = {
+    val coeffs = fit(psByWeight, 2)
+    QuadPolynomial(coeffs)
+  }
+
+  def fit(psByWeight: Map[Double, Seq[Point2D]], polynomialDegree: Int): Array[Double] = {
+    val obs = new WeightedObservedPoints()
+    psByWeight.foreach { case (weight, ps) => ps.foreach(p => obs.add(weight, p.x, p.y))}
+    val fitter = PolynomialCurveFitter.create(polynomialDegree)
+    fitter.fit(obs.toList)
+  }
+
+  def weightedFit(ps: Seq[WeightedObservedPoint], polynomialDegree: Int = 2): QuadPolynomial = {
+    val obs = new WeightedObservedPoints()
+    ps.foreach(p => obs.add(p.getWeight, p.getX, p.getY))
+    val fitter = PolynomialCurveFitter.create(polynomialDegree)
+    val coeffs = fitter.fit(obs.toList)
+    QuadPolynomial(coeffs)
+  }
+
+  def centroid(ps: Seq[Point2D]): Point2D = {
+    val x = ps.map(_.x).sum / ps.size
+    val y = ps.map(_.y).sum / ps.size
+    Point2D(x, y)
+  }
 
 
 }

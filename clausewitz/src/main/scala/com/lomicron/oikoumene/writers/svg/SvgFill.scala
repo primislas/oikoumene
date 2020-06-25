@@ -19,8 +19,8 @@ case class FillUrl(id: String) extends SvgFill {
 }
 
 object SvgFill {
-  val None: SvgFill = apply()
-  def apply(): SvgFill = None
+  val none: SvgFill = None
+  def apply(): SvgFill = none
   def apply(c: Color): SvgFill = FillColor(c)
   def apply(id: String): SvgFill = FillUrl(id)
 }

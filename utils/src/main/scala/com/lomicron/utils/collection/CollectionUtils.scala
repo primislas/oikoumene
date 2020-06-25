@@ -48,6 +48,22 @@ object CollectionUtils {
 
     def toMapEx[K, V](f: T => (K, V)): Map[K, V] =
       seq.map(f).toMap
+
+    def distinctBy[B](f: T => B): Seq[T] = {
+      var builder = Seq.empty[T]
+      val i = seq.iterator
+      var set = Set[B]()
+      while (i.hasNext) {
+        val o = i.next
+        val b = f(o)
+        if (!set(b)) {
+          set += b
+          builder = builder :+ o
+        }
+      }
+      builder
+    }
+
   }
 
   implicit class OptionEx[T](o: Option[T]) {
