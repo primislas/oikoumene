@@ -3,8 +3,8 @@ package com.lomicron.oikoumene.writers.svg
 import java.text.DecimalFormat
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.parsers.map.Point2D
 import com.lomicron.utils.collection.CollectionUtils.toOption
+import com.lomicron.utils.geometry.Point2D
 
 object Svg {
 
@@ -12,6 +12,9 @@ object Svg {
     tag = SvgTags.SVG,
     customAttrs = Some("xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink= \"http://www.w3.org/1999/xlink\"")
   )
+
+  def circle(cx: Double, cy: Double, radius: Double): SvgElement =
+    SvgElements.circle.copy(centerX = cx, centerY = cy, radius = radius)
 
   def colorToSvg(c: Color) = s"rgb(${c.r},${c.g},${c.b})"
 
@@ -42,45 +45,60 @@ object Svg {
       val q1 = remainingPs.head
       remainingPs = remainingPs.drop(1)
       val q2 = remainingPs.head
-      val quad = Seq(s"q ${offset(q1, head)}, ${offset(q2, head)}")
+      val quad = Seq(s"q ${pointOffset(q1, head)}, ${pointOffset(q2, head)}")
 
       val tail =
         if (remainingPs.size == 1) Seq.empty
         else remainingPs
           .sliding(2, 1)
-          .map(s => s"t ${offset(s.last, s.head)}")
+          .map(s => s"t ${pointOffset(s.last, s.head)}")
 
       (moveTo ++ quad ++ tail).mkString(" ")
     }
   }
 
-  def textPath(pathId: String, curve: Seq[Point2D], content: String, textLength: Int): Seq[SvgElement] = {
-    val letterOffset = 7.0 - content.map(c => if (c == 'I') 0.5 else 1.0).sum
+  def textPath
+  (
+    pathId: String,
+    curve: Seq[Point2D],
+    content: String,
+    curveLength: Double,
+    fontSizeLimit: Double
+  ): Seq[SvgElement] = {
+
+    val lengthCoef =
+      if (curveLength > 80) 0.7
+      else 0.1 * (8 - Math.pow(1.08, curveLength - 80))
+    val textLength = curveLength * lengthCoef
+
+    val font =
+      if (textLength >= 80) 2 + textLength / 5.5
+      else 2 + textLength / (5.0 + 0.5 * Math.pow(1.08, textLength - 80))
+    val realTextLength = effectiveTextLength(content)
+    val letterOffset = 7.0 - realTextLength
     val fontSizeOffset =
       if (letterOffset > 0) letterOffset
       else {
-        if (textLength >= 80) letterOffset
+        if (textLength >= 80) letterOffset * textLength / 80
         else letterOffset / (2 - Math.pow(1.05, textLength - 80))
       }
-//      if (textLength < 80) letterOffset
-//      else if (textLength < 160) letterOffset * 2
-//      else letterOffset * 3
-    val font = (2 + textLength.toDouble / 5) + fontSizeOffset
+    val offsetFont = font + fontSizeOffset
     val fontSize =
-      if (font < 7 || textLength < 16) 0
-//      else if (font > 60) 60
-      else font
+      if (offsetFont < 5.0) 0
+      else if (offsetFont > 10.0 && offsetFont > fontSizeLimit) fontSizeLimit
+      else offsetFont
 
     val offsetCurve = textPathCurveOffset(curve, font)
     val quadPath = Svg.pointsToQuadraticPath(offsetCurve)
     val path = SvgElements.path.copy(id = pathId, fill = SvgFill.none, path = quadPath)
+    val realNameLength = adjustNameLengthToTextLength(textLength, content, fontSize)
 
     val textPath = SvgElements.textPath
       .copy(
         href = s"#$pathId",
         startOffset = "50%",
         textAnchor = "middle",
-        textLength = s"$textLength",
+        textLength = s"${realNameLength.toInt}",
         fontSize = s"${doubleToSvg(fontSize)}px",
         customContent = content,
       )
@@ -89,7 +107,7 @@ object Svg {
       .copy(dominantBaseline = "middle")
       .addClass("tn")
       .add(textPath)
-    val tinyText = if (font < 10) text.addClass("tn-tiny") else text
+    val tinyText = if (font < 10.0) text.addClass("tn-tiny") else text
 
     Seq(path, tinyText)
   }
@@ -109,13 +127,34 @@ object Svg {
     val dy = Math.cos(alpha)
 
     val offsetCoeff =
-      if (isConvex) fontSize / 4
-//      else -fontSize / 12
-      else 0
+      if (isConvex) fontSize / 5.0
+      else fontSize / 8
+//      else 0
     val offset = Point2D(offsetCoeff * dx, offsetCoeff * dy)
 
     curve.map(_ + offset)
   }
+
+  /**
+    * Short names have to be adjusted to look more readable and compact in SVG.
+    *
+    * @param tl text length
+    * @param name adjust name
+    * @param fs font size
+    * @return text length adjusted to character count
+    */
+  def adjustNameLengthToTextLength(tl: Double, name: String, fs: Double): Double =
+    if (name.length < 2) 0.0
+    else if (name.length < 7) {
+      val realTextLength = effectiveTextLength(name)
+      val coeff = 1.0 - (7.0 - realTextLength) * 0.05
+      val adjustedLength = tl * coeff
+      val minFontLength = fs / 2 * realTextLength
+      if (adjustedLength > minFontLength) adjustedLength else minFontLength
+    } else tl
+
+  def effectiveTextLength(t: String): Double =
+    t.map(c => if (c == 'I') 0.5 else  if (c == 'M' || c == 'W') 1.5 else 1.0).sum
 
   def toPath(p1: Point2D, p2: Point2D): Option[String] = {
     if (p1 == p2) Option.empty
@@ -124,7 +163,7 @@ object Svg {
     else s"l ${dxSvg(p1, p2)} ${dySvg(p1, p2)}"
   }
 
-  def offset(p2: Point2D, p1: Point2D): String = {
+  def pointOffset(p2: Point2D, p1: Point2D): String = {
     val o = p2 - p1
     s"${doubleToSvg(o.x)} ${doubleToSvg(o.y)}"
   }

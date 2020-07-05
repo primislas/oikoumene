@@ -4,7 +4,7 @@ import java.awt.image.{BufferedImage, IndexColorModel}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.{Pixel, Tile, TileRoute}
+import com.lomicron.oikoumene.model.map.{MercatorMap, Pixel, River, Tile, TileRoute}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
 import javax.imageio.ImageIO

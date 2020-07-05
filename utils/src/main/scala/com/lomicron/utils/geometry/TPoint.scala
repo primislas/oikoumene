@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.utils.geometry
 
 trait TPoint {
   val x: Double

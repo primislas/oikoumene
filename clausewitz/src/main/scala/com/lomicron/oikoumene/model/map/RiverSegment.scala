@@ -1,6 +1,9 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.oikoumene.model.map
 
 import java.awt.Point
+
+import com.lomicron.oikoumene.parsers.map.{Direction, Down, Left, Right, Up}
+import com.lomicron.utils.geometry.Point2D
 
 case class RiverSegment
 (

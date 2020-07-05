@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.repository.inmemory.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
-import com.lomicron.oikoumene.parsers.map.{MercatorMap, River}
 import com.lomicron.oikoumene.repository.api.map.{MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 

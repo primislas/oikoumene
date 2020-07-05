@@ -4,7 +4,9 @@ import java.awt.Point
 import java.awt.image.BufferedImage
 
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.model.map.{River, RiverSegment}
 import com.lomicron.oikoumene.parsers.map.MapParser.getRGB
+import com.lomicron.utils.geometry.Point2D
 import com.typesafe.scalalogging.LazyLogging
 
 object RiverParser {

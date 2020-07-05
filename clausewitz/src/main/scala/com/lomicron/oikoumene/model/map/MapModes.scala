@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.oikoumene.model.map
 
 object MapModes {
   val TERRAIN: String = "terrain"

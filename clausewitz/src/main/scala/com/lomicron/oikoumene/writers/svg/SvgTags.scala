@@ -5,6 +5,7 @@ object SvgTags {
   val STYLE = "style"
   val GROUP = "g"
   val POLYGON = "polygon"
+  val CIRCLE = "circle"
   val POLYLINE = "polyline"
   val PATH = "path"
   val TEXT = "text"

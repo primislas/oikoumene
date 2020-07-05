@@ -1,6 +1,4 @@
-package com.lomicron.oikoumene.parsers.map
-
-import java.lang.Math._
+package com.lomicron.utils.geometry
 
 case class SphericalCoord
 (
@@ -11,7 +9,7 @@ case class SphericalCoord
 
   def isInvisible: Boolean = isInvisible(polar) || isInvisible(azimuth)
 
-  def isInvisible(angle: BigDecimal): Boolean = angle < 0 || angle > PI
+  def isInvisible(angle: BigDecimal): Boolean = angle < 0 || angle > Math.PI
 
   def project(center: Point2D): Point2D =
     Geometry.project(this, center)

@@ -1,7 +1,8 @@
 package com.lomicron.oikoumene.writers.map
 
+import com.lomicron.oikoumene.model.map.RiverSegment
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
-import com.lomicron.oikoumene.parsers.map.{RiverSegment, RiverTypes}
+import com.lomicron.oikoumene.parsers.map.RiverTypes
 
 import scala.collection.immutable.ListSet
 

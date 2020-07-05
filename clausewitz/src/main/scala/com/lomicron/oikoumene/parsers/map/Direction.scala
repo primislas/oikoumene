@@ -2,6 +2,8 @@ package com.lomicron.oikoumene.parsers.map
 
 import java.awt.Point
 
+import com.lomicron.utils.geometry.Point2D
+
 sealed trait Direction {
   self =>
 

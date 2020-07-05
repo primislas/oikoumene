@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.model.map
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.parsers.map.Point2D
+import com.lomicron.utils.geometry.Point2D
 import com.lomicron.utils.json.FromJson
 
 case class ElevatedLake(triangleStrip: Seq[Int] = Seq.empty, height: Int = 0)

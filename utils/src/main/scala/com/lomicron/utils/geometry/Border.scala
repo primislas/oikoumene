@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.utils.geometry
 
 import java.util.Objects
 
@@ -28,6 +28,8 @@ case class Border
 
   def isClosed: Boolean = points.headOption.exists(points.lastOption.contains)
 
+  def reverse: Border = copy(points = points.reverse)
+
   override def hashCode(): Int = {
     val leftIsSmaller =
       if (left.isEmpty) true
@@ -49,5 +51,56 @@ case class Border
   private def samePoints(b: Border): Boolean =
     points.size == b.points.size &&
       ((points.nonEmpty && (points.head == b.points.head || points.head == b.points.last)) || points.isEmpty)
+
+}
+
+object Border {
+
+  def ofBorderPoints(outline: Seq[BorderPoint], group: Int): Seq[Border] = {
+    var bs = Seq.empty[Border]
+    var p = outline.last
+    val h = outline.head
+    var neighbor = h.lg
+    var currNeighbor = neighbor
+    var leftPs = outline
+    var currBorder = Border(Seq.empty, h.l, h.r, neighbor, Some(group))
+
+    while (leftPs.nonEmpty) {
+
+      while (currNeighbor == neighbor && leftPs.nonEmpty) {
+        currBorder = currBorder + p
+        p = leftPs.head
+        currNeighbor = p.lg
+        leftPs = leftPs.drop(1)
+      }
+
+      val lastP = currBorder.points.lastOption.map(BorderPoint(_)).get
+      currNeighbor = p.lg
+      if (leftPs.nonEmpty) {
+        bs = bs :+ currBorder
+        currBorder = Border(Seq.empty, p.l, p.r, p.lg, Some(group)) + lastP
+
+        neighbor = p.lg
+        leftPs = leftPs
+      } else {
+        if (neighbor != currNeighbor) {
+          bs = bs :+ currBorder
+          currBorder = Border(Seq.empty, p.l, p.r, p.lg, Some(group)) + lastP + p
+        } else
+          currBorder = currBorder + p
+        bs = bs :+ currBorder
+      }
+
+    }
+
+    if (bs.length > 1 && bs.head.identicalNeighbors(bs.last)
+      && bs.head.points.headOption.exists(bs.last.points.lastOption.contains(_))) {
+
+      val union = bs.last + bs.head.points.drop(1)
+      bs = union +: bs.drop(1).dropRight(1)
+    }
+
+    bs
+  }
 
 }

@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.map
 
-import com.lomicron.oikoumene.parsers.map.Point2D
+import com.lomicron.utils.geometry.Point2D
 
 case class PositionConf
 (

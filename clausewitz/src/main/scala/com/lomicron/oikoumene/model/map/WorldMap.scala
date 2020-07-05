@@ -1,10 +1,10 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.oikoumene.model.map
 
-import com.lomicron.oikoumene.model.map.{ElevatedLake, Route}
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ProvinceRepository
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
+import com.lomicron.utils.geometry.{Polygon, SphericalCoord, SphericalMap}
 
 case class WorldMap
 (

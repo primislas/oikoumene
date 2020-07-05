@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.writers.svg
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.parsers.map.Point2D
+import com.lomicron.utils.geometry.Point2D
 
 import scala.collection.immutable.ListSet
 
@@ -30,6 +30,11 @@ case class SvgElement
   textAnchor: Option[String] = Option.empty,
   fontSize: Option[String] = Option.empty,
   dominantBaseline: Option[String] = Option.empty,
+
+  // circle
+  centerX: Option[Double] = Option.empty,
+  centerY: Option[Double] = Option.empty,
+  radius: Option[Double] = Option.empty,
 
   customContent: Option[String] = Option.empty,
   children: Seq[SvgElement] = Seq.empty,
@@ -65,11 +70,17 @@ case class SvgElement
       strokeOpacity.map(i => s"""stroke-opacity="${Svg.doubleToSvg(i)}""""),
       strokeColor.map(i => s"""stroke="${Svg.colorToSvg(i)}""""),
       strokeLinecap.map(i => s"""stroke-linecap="$i""""),
+
       startOffset.map(i => s"""startOffset="$i""""),
       textLength.map(i => s"""textLength="$i""""),
       textAnchor.map(i => s"""text-anchor="$i""""),
       fontSize.map(i => s"""font-size="$i""""),
       dominantBaseline.map(i => s"""dominant-baseline="$i""""),
+
+      centerX.map(i => s"""cx="${Svg.doubleToSvg(i)}""""),
+      centerY.map(i => s"""cy="${Svg.doubleToSvg(i)}""""),
+      radius.map(i => s"""r="${Svg.doubleToSvg(i)}""""),
+
       customAttrs,
       points.map(i => Svg.pointsToSvgPointsAttribute(i)),
       path.map(i => s"""d="$i""""),

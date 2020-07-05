@@ -1,14 +1,17 @@
 package com.lomicron.oikoumene.writers.map
 
+import java.lang.Math.PI
+
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.ElevatedLake
+import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
-import com.lomicron.oikoumene.parsers.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.writers.map.SvgMapStyles._
 import com.lomicron.oikoumene.writers.svg.SvgElements._
-import com.lomicron.oikoumene.writers.svg.{Svg, SvgElement, SvgFill, SvgTags}
+import com.lomicron.oikoumene.writers.svg._
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, toOption}
+import com.lomicron.utils.geometry.Geometry.halfPI
+import com.lomicron.utils.geometry._
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
 import scala.collection.immutable.ListSet
@@ -262,7 +265,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     val names = worldMap
       .ownerGroups
       .zipWithIndex.toList
-      .flatMap(gi => countryNames(worldMap, gi._1, s"n${gi._2}"))
+      .flatMap(gi => provinceGroupName(worldMap, gi._1, s"n${gi._2}"))
       .grouped(2).toList
       .sortBy(pp => textLength(pp.last))
       .flatten
@@ -277,56 +280,78 @@ case class SvgMapService(repos: RepositoryFactory) {
       .map(_.toDouble)
       .getOrElse(0.0)
 
-  def countryNames(worldMap: WorldMap, group: Seq[Province], groupId: String): Seq[SvgElement] = {
-    val name = group.head.state.owner
+  def provinceGroupName(worldMap: WorldMap, group: Seq[Province], groupId: String): Seq[SvgElement] = {
+    val height = worldMap.mercator.height
+    val name = mapName(group)
+
+    val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
+    val ps = Geometry.approximateBorder(polygons)
+    val c = Geometry.centroid(ps)
+    val o = Geometry.findOrientation(ps, c)
+
+    // rotating shapes so that they are 'parallel' to x axis
+    // (according to identified orientation)
+    // for further analysis
+    val rotation = if (o == 0.0 || o == PI) 0.0 else if (o > halfPI) PI - o else -o
+    val rotatedShapes = rotate(polygons, c, rotation)
+    val rotatedSegments = rotatedShapes.flatMap(_.segments())
+
+    val namePolyline = toWeightedCentroidPolyline(rotatedSegments)
+    val curve = Geometry.weightedFit(namePolyline)
+    val orderedBezier = quadCurveToBezier(namePolyline, curve, c, rotation, height)
+    val curveLength = orderedBezier.head.distance(orderedBezier.last)
+    val fontSizeLimit = maxFontSize(rotatedSegments)
+
+    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
+    if (oddNames.contains(name))
+      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+
+    Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
+  }
+
+  def mapName(provinces: Seq[Province]): String =
+    provinces.head.state.owner
       .flatMap(repos.tags.find(_).toOption)
       .flatMap(_.localisation.name)
       .map(_.toUpperCase)
       .getOrElse("UNDEFINED")
-    val height = worldMap.mercator.height
-    val bps = borderPoints(worldMap, group)
 
-    var left: Point2D = Point2D(worldMap.mercator.width, 0)
-    var right: Point2D = Point2D.ZERO
-    var top: Point2D = Point2D.ZERO
-    var bottom: Point2D = Point2D(0, worldMap.mercator.height)
-    bps.foreach(p => {
-      if (p.x < left.x) left = p
-      if (p.y < bottom.y) bottom = p
-      if (p.x > right.x) right = p
-      if (p.y > top.y) top = p
-    })
-
-    val isVertical = top.y - bottom.y > right.x - left.x
-    val ps = bps.map(_.reflectY(height))
-    val data =
-      if (isVertical) ps.map(p => Point2D(p.y, p.x))
-      else ps
-
-    val curve = Geometry.weightedFit(simpleSegmentBorders(data))
-    val quadBezier =
-      if (isVertical) curve
-        .toBezier(top.reflectY(height).y, bottom.reflectY(height).y)
-        .map(p => Point2D(p.y, p.x))
-        .map(_.reflectY(height))
-      else curve.toBezier(left.x, right.x).map(_.reflectY(height))
-    val curveLength =
-      if (isVertical) curve.distance(top.reflectY(height).y, bottom.reflectY(height).y)
-      else curve.distance(left.x, right.x)
-
-    val lengthCoef =
-      if (curveLength > 100) 0.6
-      else 0.1 * (8 - Math.pow(1.2, curveLength - 100))
-    val textLength = curveLength * lengthCoef
-
-    val orderedBezier =
-      if (quadBezier.head.x > quadBezier.last.x) quadBezier.reverse
-      else quadBezier
-
-    Svg.textPath(groupId, orderedBezier, name, textLength.toInt)
+  def quadCurveToBezier
+  (
+    namePolyline: Seq[WeightedObservedPoint],
+    curve: QuadPolynomial,
+    c: Point2D,
+    rotation: Double,
+    height: Int,
+  ): Seq[Point2D] = {
+    val left = namePolyline.head.getX
+    val right = namePolyline.last.getX
+    val quadBezier = curve.toBezier(left, right)
+    val bezierPoints = quadBezier.map(rotate(_, c, -rotation)).map(_.reflectY(height))
+    if (bezierPoints.head.x > bezierPoints.last.x) bezierPoints.reverse
+    else bezierPoints
   }
 
-  def borderPoints(worldMap: WorldMap, group: Seq[Province]): Seq[Point2D] = {
+  def maxFontSize(segments: Seq[PointSegment]): Double = {
+    val sizes = segments
+      .groupBy(_.x).values.toList
+      .map(s => s.maxBy(_.max).max - s.minBy(_.min).min)
+      .filter(_ > 5.0)
+      .sorted
+    val p40 = (0.6 * sizes.length).floor.toInt
+    if (sizes.nonEmpty) sizes.drop(p40).head
+    else 0.0
+  }
+
+  def rotate[T <: Rotatable[T]](ps: Seq[T], center: Point2D, angle: Double): Seq[T] =
+    ps.map(rotate(_, center, angle))
+
+  def rotate[T <: Rotatable[T]](p: T, center: Point2D, angle: Double): T =
+    if (angle == 0.0) p
+    else if (angle == halfPI || angle == -halfPI) p.flipXY
+    else p.rotate(center, angle)
+
+  def provinceShapes(worldMap: WorldMap, group: Seq[Province]): Seq[Polygon] = {
     val ids = group.map(_.id).toSet
     val borders = worldMap.mercator.provinces
       .filter(_.provId.exists(ids.contains))
@@ -338,88 +363,94 @@ case class SvgMapService(repos: RepositoryFactory) {
       .flatMapValues(_.headOption)
       .flatMapValues(_.state.owner)
 
-    borders
-      .filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
-      .flatMap(_.points)
+    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
+    Polygon.groupBordersIntoShapes(countryBorders)
   }
 
-  def trimPoints(ps: Seq[Point2D], distance: Int = 10): Seq[Point2D] = {
-    if (ps.length < 1) Seq.empty
-    else if (ps.length < 2) ps
-    else {
-      var currP = ps.head
-      var nextP = currP
-      var trimmed = Seq(currP)
-      var remainingPoints = ps
-      var d = 0.0
-      while (remainingPoints.nonEmpty) {
-        while (d < distance && remainingPoints.nonEmpty) {
-          nextP = remainingPoints.head
-          d = currP.distance(nextP)
-          remainingPoints = remainingPoints.drop(1)
-        }
-
-        if (d >= distance) {
-          trimmed = trimmed :+ nextP
-          currP = nextP
-          d = 0.0
-        }
-      }
-
-      trimmed
-    }
+  def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {
+    val segmented = Geometry.groupSegments(segments).sortBy(_.x)
+    val trimmed = Geometry.trimTinyBorderSegments(segmented)
+    val unweighted = cutoffBorderSegments(trimmed)
+    segmentsToWeightedPoints(unweighted)
   }
 
-  def segmentBorders(ps: Seq[Point2D], segment: Int = 5): Unit = {
-    var segments = Seq.empty[Point2D]
-    val startSegment = (ps.head.x / segment).floor
+  def cutoffBorderSegments
+  (
+    segments: Seq[PointSegment],
+    cutoffSidePercentage: Double = MapSettings.FITTING_SIDE_CUTOFF_PERCENTAGE,
+    minSegmentSizeLimit: Int = MapSettings.MIN_SEGMENT_COUNT,
+  ): Seq[PointSegment] = {
+    val left = segments.head.x
+    val right = segments.last.x
 
-    var currSegment = startSegment
-    var nextSegment = startSegment
-    var nextP = ps.head
-    var remaining = ps
-    var currSegmentPs = Seq.empty[Point2D]
+    val length = right - left
+    val cutoffLength = length * cutoffSidePercentage
+    val minCutoff = left + cutoffLength
+    val maxCutoff = right - cutoffLength
+    val cutoffSegments = segments.filter(s => s.x >= minCutoff && s.x <= maxCutoff)
 
-    while (remaining.nonEmpty) {
-
-      while (remaining.nonEmpty && currSegment == nextSegment) {
-        currSegmentPs = currSegmentPs :+ nextP
-        nextP = remaining.head
-        remaining = remaining.drop(1)
-        nextSegment = (nextP.x / segment).floor
-      }
-
-      val x = 5 * currSegment + segment / 2
-      val y =
-        if (currSegmentPs.nonEmpty)
-          currSegmentPs.map(_.x).sum / currSegmentPs.size
-        else
-          segments.lastOption.map(p => (p.y + nextP.y) / 2).getOrElse(nextP.y)
-      segments = segments :+ Point2D(x, y)
-
-    }
-
-
+    if (cutoffSegments.size < minSegmentSizeLimit) segments else cutoffSegments
   }
 
-  def simpleSegmentBorders(ps: Seq[Point2D], segmentSize: Int = 5): Seq[WeightedObservedPoint] = {
-    def idSegment(p: Point2D): Double = (p.x / segmentSize).floor
+  def segmentsToWeightedPoints
+  (
+    segments: Seq[PointSegment],
+    weightDiff: Double = MapSettings.WEIGHT_DIFF,
+    minDistLimit: Double = MapSettings.MIN_SEGMENT_RANGE,
+  ): Seq[WeightedObservedPoint] = {
+    val ranges = segments.map(_.range)
+    var maxDist = ranges.max
+    if (maxDist < minDistLimit) maxDist = minDistLimit
+    val minDist = ranges.min
+    val k =
+      if (maxDist == minDist) 0.0
+      else -(weightDiff - 1.0) / (maxDist - minDist)
+    val b = weightDiff - k * minDist
 
-    val segmented = ps
-      .groupBy(idSegment)
-      .filterValues(_.nonEmpty)
-      .mapKVtoValue((segment, segPs) => {
-        val ys = segPs.map(_.y)
-        val max = ys.max
-        val min = ys.min
-        val y = (max + min) / 2
-        val weight = max - min
-        val x = segment * segmentSize + segmentSize.toDouble / 2
-        new WeightedObservedPoint(weight, x, y)
-      })
-      .values.toList
+    segments.map(s => new WeightedObservedPoint(k * s.range + b, s.x, s.avg))
+  }
 
-    segmented
+  //noinspection RedundantDefaultArgument
+  def printFittingMeta
+  (
+    c: Point2D,
+    o: Double,
+    rotation: Double,
+    height: Int,
+    ps: Seq[Point2D],
+    rotatedSegments: Seq[PointSegment],
+    orderedBezier: Seq[Point2D],
+  ): Unit = {
+    val borderPoints = ps.map(p => Svg.circle(p.x, p.reflectY(height).y, 1.0).copy(fill = SvgFill(Color(0, 150, 200))))
+    val border = SvgElements.group.add(borderPoints)
+    val centroid = Svg.circle(c.x, c.reflectY(height).y, 3.0).copy(fill = SvgFill(Color(0, 150, 200)))
+
+    val xs = ps.map(_.x)
+    val left = xs.min
+    val right = xs.max
+    val l = Line.ofAngle(o, c)
+    val svgOrientation = Seq(Point2D(left, l.at(left)), Point2D(right, l.at(right)))
+      .map(_.reflectY(height))
+    val oLine = SvgElements.path
+      .copy(path = Svg.pointsToQuadraticPath(svgOrientation), strokeColor = Color(0, 200, 0), strokeWidth = 1, fill = SvgFill.none)
+
+    val approximationTo = toWeightedCentroidPolyline(rotatedSegments)
+      .map(p => Point2D(p.getX, p.getY))
+      .map(rotate(_, c, -rotation))
+      .map(_.reflectY(height))
+    val polyline = SvgElements.polyline
+      .copy(strokeColor = Color(200, 0, 0), strokeWidth = 1, points = approximationTo, fill = SvgFill.none)
+
+    val svgBezier = Svg.pointsToQuadraticPath(orderedBezier)
+    val result = SvgElements.path
+      .copy(path = svgBezier, strokeColor = Color(0, 0, 200), strokeWidth = 1, fill = SvgFill.none)
+
+    println(border.toSvg)
+    println(centroid.toSvg)
+    println(oLine.toSvg)
+    println(polyline.toSvg)
+    println(result.toSvg)
   }
 
 }
+

@@ -3,9 +3,13 @@ package com.lomicron.oikoumene.parsers.map
 import java.awt.Point
 import java.awt.image.BufferedImage
 
+import com.lomicron.oikoumene.parsers.map.Tracer.MAX_MAP_BORDER_LINE_LENGTH
 import com.lomicron.utils.collection.CollectionUtils.{OptionEx, toOption}
+import com.lomicron.utils.geometry.{Border, BorderPoint, Geometry, Point2D, Polygon, Shape}
 
 object Tracer {
+
+  val MAX_MAP_BORDER_LINE_LENGTH = 10
 
   def trace(img: BufferedImage): Seq[Shape] = {
     var shapes = Seq.empty[Shape]
@@ -45,41 +49,10 @@ object Tracer {
       if (enclosedByOuterGroup.keySet.contains(s.groupId.get)) {
         val innerBs = enclosedByOuterGroup.getOrElse(s.groupId.get, Seq.empty)
         val (singleBorderShapes, multiBorders) = innerBs.partition(_.isClosed)
-        val clips = singleBorderShapes.flatMap(b => Shape(Seq(b)).withPolygon.polygon) ++ groupBordersIntoShapes(multiBorders)
+        val clips = singleBorderShapes.flatMap(b => Shape(Seq(b)).withPolygon.polygon) ++ Polygon.groupBordersIntoShapes(multiBorders)
         s.copy(clip = clips)
       } else s
     })
-  }
-
-  @scala.annotation.tailrec
-  def groupBordersIntoShapes(bs: Seq[Border], ps: Seq[Polygon] = Seq.empty): Seq[Polygon] = {
-    if (bs.isEmpty) ps
-    else bs match {
-      case h :: t =>
-        val startPoint = h.points.head
-        var currentPoint = h.points.last
-        var remainingBorders: Seq[Border] = t
-        var currentGroup = Seq(h)
-        while (currentPoint != startPoint && remainingBorders.nonEmpty && currentGroup.nonEmpty) {
-          val next = remainingBorders.find(_.points.head == currentPoint)
-          if (next.isDefined) {
-            val b = next.get
-            remainingBorders = remainingBorders.filterNot(_.points.head == currentPoint)
-            currentGroup = currentGroup :+ b
-            currentPoint = b.points.last
-          } else
-            currentGroup = Seq.empty
-        }
-
-        val parsedPolygon = if (currentPoint == startPoint)
-          Shape(currentGroup).withPolygon.polygon.toSeq
-        else Seq.empty
-
-        groupBordersIntoShapes(remainingBorders, ps ++ parsedPolygon)
-
-      case _ :: Nil => Seq.empty
-    }
-
   }
 
 }
@@ -109,7 +82,7 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
     val shifted = outline.last +: outline.dropRight(1)
     val cleaned = Geometry.clean(shifted)
     val bps = cleaned.map(_.withRight(color))
-    val bs = toBorders(bps)
+    val bs = Border.ofBorderPoints(bps, group)
     val poly = Polygon(outline.map(_.p), color)
     Shape(borders = bs, provColor = color, polygon = poly)
   }
@@ -130,7 +103,7 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
     def sameExistingNeighbor(n: Option[Int], cn: Option[Int] = currentNeighbor): Boolean =
       cn.exists(n.contains(_))
 
-    def isLongBorderLine: Boolean = pixelLine == 10 && (cp.y == 0 || cp.y == maxHeight || cp.x == 0 || cp.x == maxWidth)
+    def isLongBorderLine: Boolean = pixelLine == MAX_MAP_BORDER_LINE_LENGTH && (cp.y == 0 || cp.y == maxHeight || cp.x == 0 || cp.x == maxWidth)
 
     def rotationNeighbor: Option[Int] = if (nextD == currentDirection.rBackward) currentNeighbor else neighborGroup(cp, nextD.rBackward)
 
@@ -182,53 +155,6 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
     currentNeighbor = cg
 
     bps
-  }
-
-  def toBorders(outline: Seq[BorderPoint]): Seq[Border] = {
-    var bs = Seq.empty[Border]
-    var p = outline.last
-    val h = outline.head
-    var neighbor = h.lg
-    var currNeighbor = neighbor
-    var leftPs = outline
-    var currBorder = Border(Seq.empty, h.l, h.r, neighbor, group)
-
-    while (leftPs.nonEmpty) {
-
-      while (currNeighbor == neighbor && leftPs.nonEmpty) {
-        currBorder = currBorder + p
-        p = leftPs.head
-        currNeighbor = p.lg
-        leftPs = leftPs.drop(1)
-      }
-
-      val lastP = currBorder.points.lastOption.map(BorderPoint(_)).get
-      currNeighbor = p.lg
-      if (leftPs.nonEmpty) {
-        bs = bs :+ currBorder
-        currBorder = Border(Seq.empty, p.l, p.r, p.lg, group) + lastP
-
-        neighbor = p.lg
-        leftPs = leftPs
-      } else {
-        if (neighbor != currNeighbor) {
-          bs = bs :+ currBorder
-          currBorder = Border(Seq.empty, p.l, p.r, p.lg, group) + lastP + p
-        } else
-          currBorder = currBorder + p
-        bs = bs :+ currBorder
-      }
-
-    }
-
-    if (bs.length > 1 && bs.head.identicalNeighbors(bs.last)
-      && bs.head.points.headOption.exists(bs.last.points.lastOption.contains(_))) {
-
-      val union = bs.last + bs.head.points.drop(1)
-      bs = union +: bs.drop(1).dropRight(1)
-    }
-
-    bs
   }
 
 }

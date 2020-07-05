@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.utils.geometry
 
 import org.specs2.mutable.Specification
 

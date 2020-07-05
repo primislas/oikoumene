@@ -1,6 +1,8 @@
-package com.lomicron.oikoumene.parsers.map
+package com.lomicron.oikoumene.model.map
 
 import java.awt.Point
+
+import com.lomicron.utils.geometry.{Geometry, Shape, SphericalMap}
 
 import scala.math.BigDecimal.RoundingMode
 
