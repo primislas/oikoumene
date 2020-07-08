@@ -7,6 +7,8 @@ was an ancient Greek term for the known, the inhabited, or the habitable world.
 Under the Roman Empire, it came to refer to civilization 
 as well as the secular and religious imperial administration.
 
+Contacts: primislas@protonmail.com
+
 # TIL
 ### Scala
 - Things they don't tell you about in books - [optics](https://scalac.io/scala-optics-lenses-with-monocle/). See [quicklens](https://github.com/softwaremill/quicklens).
