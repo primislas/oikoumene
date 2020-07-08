@@ -27,7 +27,10 @@ object SvgMapClasses {
   private val province = ListSet(PROVINCE)
   private val river = ListSet(RIVER)
 
-  def ofProvince(p: Province): String = p.`type`
+  def ofProvince(p: Province): Seq[String] = {
+    val isCity = p.state.owner.map(_ => ProvinceTypes.city)
+    Seq(Some(p.`type`), p.state.owner, isCity, p.geography.terrain).flatten
+  }
 
   def ofRiver(rs: RiverSegment): String = rs.width match {
     case RiverTypes.NARROW => RIVER_NARROW

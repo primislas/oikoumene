@@ -54,6 +54,8 @@ case class SvgElement
 
   def clearClasses: SvgElement = copy(classes = ListSet.empty)
 
+  def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat(c)))
+
   def toSvg: String = toStringBuilder.toString
 
   def toStringBuilder: StringBuilder = {

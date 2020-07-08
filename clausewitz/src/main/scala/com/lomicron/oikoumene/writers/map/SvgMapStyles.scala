@@ -16,7 +16,7 @@ object SvgMapStyles {
       s"""
          |@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@800");
          |.province { stroke-width:0; fill:none; opacity:0.7; }
-         |.owned { stroke-width:0; opacity:0.7; }
+         |.city { stroke-width:0; opacity:0.7; }
          |.wasteland { fill:${Svg.colorToSvg(wastelandColor)}; opacity:0; }
          |.uncolonized { fill:${Svg.colorToSvg(uncolonizedColor)}; opacity:0; }
          |.sea { fill:${Svg.colorToSvg(seaColor)}; opacity:0.3;}

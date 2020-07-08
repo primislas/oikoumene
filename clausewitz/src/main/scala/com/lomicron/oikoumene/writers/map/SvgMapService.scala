@@ -45,9 +45,14 @@ case class SvgMapService(repos: RepositoryFactory) {
     val borders = borderSvg(worldMap.mercator)
     //    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
 
+    val terrainStyles = s"/*\n$buildTerrainStyles\n*/\n"
+    val styleWithTags = style
+      .addContent(terrainStyles)
+      .addContent(buildTagStyles)
+
     Svg.svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
-      .add(style)
+      .add(styleWithTags)
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
@@ -87,7 +92,8 @@ case class SvgMapService(repos: RepositoryFactory) {
     val groupsByClass = ProvinceTypes.list
       .map(t => {
         val ps = psByClass.getOrElse(t, Seq.empty)
-        group.copy(id = t, classes = ListSet(t), children = ps.map(_.copy(classes = ListSet.empty)))
+        val children = ps.map(p => p.copy(classes = p.classes.drop(1)))
+        group.copy(id = t, classes = ListSet(t), children = children)
       })
       .toSeq
 
@@ -99,12 +105,8 @@ case class SvgMapService(repos: RepositoryFactory) {
     polygon
       .provinceId
       .flatMap(repos.provinces.find(_).toOption)
-      .map(prov =>
-        defaultProvincePolygon(polygon).copy(
-          classes = ListSet(SvgMapClasses.ofProvince(prov)),
-          fill = mapModeColor(prov, mapMode).map(SvgFill(_)),
-        )
-      )
+      .map(SvgMapClasses.ofProvince)
+      .map(defaultProvincePolygon(polygon).addClasses(_))
       .getOrElse(defaultProvincePolygon(polygon))
   }
 
@@ -113,7 +115,6 @@ case class SvgMapService(repos: RepositoryFactory) {
     val elem = SvgElement(
       tag = SvgTags.PATH,
       id = polygon.provinceId.map(_.toString),
-      classes = ListSet(SvgMapClasses.PROVINCE),
     )
     if (polygon.clip.isEmpty) elem.copy(path = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed))
     else {
@@ -123,6 +124,24 @@ case class SvgMapService(repos: RepositoryFactory) {
       elem.copy(path = path, fillRule = "evenodd")
     }
   }
+
+  def buildTagStyles: String =
+    repos
+      .provinces
+      .findAll
+      .flatMap(_.state.owner)
+      .distinct
+      .flatMap(repos.tags.find(_).toOption)
+      .map(tag => s".${tag.id} { fill:${Svg.colorToSvg(tag.color)} }")
+      .mkString("\n")
+
+  def buildTerrainStyles: String =
+    repos
+    .geography
+    .terrain
+    .findAll
+    .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
+    .mkString("\n")
 
   def mapModeColor(p: Province, mapMode: String): Option[Color] =
     mapMode match {

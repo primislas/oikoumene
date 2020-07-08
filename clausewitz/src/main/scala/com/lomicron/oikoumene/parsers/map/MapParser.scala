@@ -33,13 +33,21 @@ object MapParser {
       .map(cs => cs.map(Color(_)))
       .foreach(colors => g.map.rebuildTerrainColors(colors))
 
+    val tiles = for {
+      provinces <- r.getProvinceMap.map(fetchMap)
+      terrain <- r.getTerrainMap.map(fetchMap)
+      height <- r.getHeightMap.map(fetchMap)
+    } yield parseMapTiles(provinces, terrain, height)
+    val terrainByProv = tiles.getOrElse(Seq.empty)
+      .groupBy(_.color)
+      .mapValues(_.head)
+      .mapValues(_.terrainColor)
+      .filter(_._2.isDefined)
+      .mapValues(_.get)
+    g.map.setTerrainProvinceColors(terrainByProv)
+
     val provinceMap = r.getProvinceMap.map(fetchMap)
     provinceMap.map(parseRoutes).foreach(g.map.updateTileRoutes)
-
-    //    map.foreach(m => {
-    //      g.map.create(m.tiles)
-    //      g.map.rebuildTerrainColors(m.terrainColors.map(Color(_)))
-    //    })
 
     g
   }
@@ -97,7 +105,6 @@ object MapParser {
 
   def parseWorldMap(img: BufferedImage): MercatorMap = {
     val shapes = Tracer.trace(img)
-    // TODO borders rivers etc
     MercatorMap(shapes, img.getWidth, img.getHeight)
   }
 

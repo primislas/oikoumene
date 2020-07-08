@@ -18,6 +18,7 @@ case class InMemoryMapRepository()
 
   private var terrainById: Map[String, TerrainMapColorConf] = Map.empty
   private var terrainByColor: Map[Color, TerrainMapColorConf] = Map.empty
+  private var terrainProvColors: Map[Color, Color] = Map.empty
   private var terrainColors: Array[Color] = Array.empty
   private var _adjacencies: Seq[Adjacency] = Seq.empty
   private var _tileRoutes: Seq[TileRoute] = Seq.empty
@@ -37,6 +38,11 @@ case class InMemoryMapRepository()
     this
   }
 
+  override def setTerrainProvinceColors(terrainProvColors: Map[Color, Color]): MapRepository = {
+    this.terrainProvColors = terrainProvColors
+    this
+  }
+
   override def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
     this.terrainColors = terrainColors
     this.terrainById = this.terrainById
@@ -49,7 +55,10 @@ case class InMemoryMapRepository()
     terrainMapType(Color(argb))
 
   override def terrainMapType(color: Color): Option[String] =
-    this.terrainByColor.get(color).map(_.terrainType)
+    this.terrainProvColors
+      .get(color)
+      .flatMap(terrainByColor.get)
+      .map(_.terrainType)
 
   override def updateAdjacencies(as: Seq[Adjacency]): MapRepository = {
     this._adjacencies = as

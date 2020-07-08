@@ -6,6 +6,6 @@ import com.lomicron.oikoumene.repository.api.AbstractRepository
 trait TerrainRepository extends AbstractRepository[String, Terrain] {
 
   def ofProvince(provinceId: Int): Option[String] =
-    findAll.find(_.hasProvince(provinceId)).flatMap(_.`type`)
+    findAll.find(_.hasProvince(provinceId)).map(_.id)
 
 }
