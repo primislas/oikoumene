@@ -1,10 +1,11 @@
 package com.lomicron.oikoumene.model.map
 
+import com.lomicron.oikoumene.model.map.spherical.SphericalMap
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ProvinceRepository
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
-import com.lomicron.utils.geometry.{Polygon, SphericalCoord, SphericalMap}
+import com.lomicron.utils.geometry.SphericalCoord
 
 case class WorldMap
 (
@@ -16,12 +17,12 @@ case class WorldMap
 
   private def getSphere: SphericalMap =
     sphere.getOrElse({
-      val s = mercator.toSphere
+      val s = SphericalMap.ofMercator(mercator)
       sphere = Option(s)
       s
     })
 
-  def rotate(rotation: Option[SphericalCoord] = None): Seq[Polygon] =
+  def rotate(rotation: Option[SphericalCoord] = None): MercatorMap =
     rotation
       .map(getSphere.rotate)
       .getOrElse(getSphere)
@@ -82,11 +83,8 @@ case class WorldMap
 
 object WorldMap {
 
-  def apply(
-             mercator: MercatorMap,
-             repos: RepositoryFactory
-           ): WorldMap = {
-
+  def apply(repos: RepositoryFactory): WorldMap = {
+    val mercator = repos.geography.map.mercator
     val withProvIds = addProvinceMeta(mercator, repos)
     new WorldMap(withProvIds, repos)
   }

@@ -2,6 +2,8 @@ package com.lomicron.utils.geometry
 
 import java.util.Objects
 
+import com.lomicron.utils.collection.Emptiable
+
 case class Border
 (
   points: Seq[Point2D] = Seq.empty,
@@ -11,7 +13,10 @@ case class Border
   right: Option[Int] = None,
   leftGroup: Option[Int] = None,
   rightGroup: Option[Int] = None,
-) {
+) extends Emptiable
+{
+
+  override def isEmpty: Boolean = points.size < 2
 
   def +(p: BorderPoint): Border = this.+(p.p)
 
@@ -29,6 +34,8 @@ case class Border
   def isClosed: Boolean = points.headOption.exists(points.lastOption.contains)
 
   def reverse: Border = copy(points = points.reverse)
+
+  def offset(diff: Point2D): Border = copy(points = points.map(_.offset(diff)))
 
   override def hashCode(): Int = {
     val leftIsSmaller =

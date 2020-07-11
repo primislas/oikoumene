@@ -31,18 +31,24 @@ case class SvgMapService(repos: RepositoryFactory) {
     classes = ListSet(SvgMapClasses.BORDER)
   )
 
-  def worldSvg(worldMap: WorldMap, mapMode: Option[String] = None): String = {
+  def worldSvg
+  (
+    worldMap: WorldMap,
+    mapMode: Option[String] = None,
+    includeNames: Boolean = true,
+    decimalPrecision: Int = 1,
+  ):
+  String = {
 
     val style = if (mapMode.contains(MapModes.TERRAIN)) physicalMapStyle else defaultMapStyle
-    val names = nameSvg(worldMap)
 
     val withMode = for {
       mercator <- worldMap.mercator
       mode <- mapMode
-    } yield ofMode(mercator, mode)
+    } yield ofMode(mercator, mode, decimalPrecision)
 
-    val rivers = riverSvg(worldMap.rivers)
-    val borders = borderSvg(worldMap.mercator)
+    val rivers = riverSvg(worldMap.mercator.rivers, decimalPrecision)
+    val borders = borderSvg(worldMap.mercator, decimalPrecision)
     //    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
 
     val terrainStyles = s"/*\n$buildTerrainStyles\n*/\n"
@@ -50,20 +56,23 @@ case class SvgMapService(repos: RepositoryFactory) {
       .addContent(terrainStyles)
       .addContent(buildTagStyles)
 
-    Svg.svgHeader
+    val worldSvg = Svg.svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
       .add(styleWithTags)
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
       //      .add(lakes)
-      .add(names)
-      .toSvg
+    if (includeNames) {
+      val names = nameSvg(worldMap)
+      worldSvg.add(names).toSvg
+    }
+    else worldSvg.toSvg
   }
 
-  def riverSvg(rs: Seq[River]): SvgElement = {
+  def riverSvg(rs: Seq[River], precision: Int = 1): SvgElement = {
     val rsByClass = rs
-      .flatMap(riverToSvg)
+      .flatMap(riverToSvg(_, precision))
       .groupBy(_.classes.head)
       .mapKVtoValue((t, rs) =>
         group
@@ -76,17 +85,17 @@ case class SvgMapService(repos: RepositoryFactory) {
     riverGroup.add(rsByClass)
   }
 
-  def riverToSvg(r: River): Seq[SvgElement] =
-    r.path.map(riverSegmentToSvg)
+  def riverToSvg(r: River, precision: Int = 1): Seq[SvgElement] =
+    r.path.map(riverSegmentToSvg(_, precision))
 
-  def riverSegmentToSvg(rs: RiverSegment): SvgElement =
+  def riverSegmentToSvg(rs: RiverSegment, precision: Int = 1): SvgElement =
     path
-      .copy(path = Svg.pointsToSvgLinearPath(rs.points))
+      .copy(path = Svg.pointsToSvgLinearPath(rs.points, precision = precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def ofMode(map: MercatorMap, mapMode: String): SvgElement = {
+  def ofMode(map: MercatorMap, mapMode: String, precision: Int = 1): SvgElement = {
     val psByClass = map.provinces
-      .map(provinceToSvg(_, mapMode))
+      .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
 
     val groupsByClass = ProvinceTypes.list
@@ -100,26 +109,26 @@ case class SvgMapService(repos: RepositoryFactory) {
     provinceGroup.add(groupsByClass)
   }
 
-  def provinceToSvg(shape: Shape, mapMode: String): SvgElement = {
-    val polygon = shape.withPolygon.polygon.get
+  def provinceToSvg(shape: Shape, mapMode: String, precision: Int = 1): SvgElement = {
+    val polygon = shape.polygon.get
     polygon
       .provinceId
       .flatMap(repos.provinces.find(_).toOption)
       .map(SvgMapClasses.ofProvince)
-      .map(defaultProvincePolygon(polygon).addClasses(_))
-      .getOrElse(defaultProvincePolygon(polygon))
+      .map(defaultProvincePolygon(polygon, precision).addClasses(_))
+      .getOrElse(defaultProvincePolygon(polygon, precision))
   }
 
-  def defaultProvincePolygon(polygon: Polygon): SvgElement = {
+  def defaultProvincePolygon(polygon: Polygon, precision: Int = 1): SvgElement = {
     val isPathClosed = true
     val elem = SvgElement(
       tag = SvgTags.PATH,
       id = polygon.provinceId.map(_.toString),
     )
-    if (polygon.clip.isEmpty) elem.copy(path = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed))
+    if (polygon.clip.isEmpty) elem.copy(path = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed, precision))
     else {
-      val outer = Svg.pointsToSvgLinearPath(polygon.points)
-      val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed))
+      val outer = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed, precision)
+      val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed, precision))
       val path = (outer +: inners).mkString(" ")
       elem.copy(path = path, fillRule = "evenodd")
     }
@@ -171,15 +180,11 @@ case class SvgMapService(repos: RepositoryFactory) {
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
-  def borderSvg(mercatorMap: MercatorMap): SvgElement = {
-    val bs = mercatorMap.provinces.flatMap(_.borders)
-    borderSvg(bs)
-  }
+  def borderSvg(mercatorMap: MercatorMap, precision: Int = 1): SvgElement =
+    borderSvg(mercatorMap.borders, precision)
 
-  def borderSvg(borders: Seq[Border]): SvgElement = {
-    val bordsByClass = borders.distinct
-      .map(borderSvg)
-      .groupBy(_.classes.head)
+  def borderSvg(borders: Seq[Border], precision: Int): SvgElement = {
+    val bordsByClass = borders.map(borderSvg(_, precision)).groupBy(_.classes.head)
 
     def bordsOfType(t: String): SvgElement = {
       val bs = bordsByClass.getOrElse(t, Seq.empty).map(_.copy(classes = ListSet.empty))
@@ -192,6 +197,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     val landAreas = bordsOfType(BorderTypes.LAND_AREA)
     val landBorders = bordsOfType(BorderTypes.LAND)
       .copy(id = "border-land-default", classes = ListSet.empty)
+    val countryShores = bordsOfType(BorderTypes.COUNTRY_SHORE)
     val seaShores = bordsOfType(BorderTypes.SEA_SHORE)
     val lakeShores = bordsOfType(BorderTypes.LAKE_SHORE)
 
@@ -203,7 +209,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     val land = group.copy(
       id = BorderTypes.LAND,
       classes = ListSet(BorderTypes.LAND),
-      children = Seq(countries, landAreas, landBorders, seaShores, lakeShores)
+      children = Seq(countries, countryShores, landAreas, landBorders, seaShores, lakeShores)
     )
     val seas = group.copy(
       id = BorderTypes.SEA,
@@ -214,7 +220,7 @@ case class SvgMapService(repos: RepositoryFactory) {
     borderGroup.add(Seq(mapBorders, land, seas))
   }
 
-  def borderSvg(b: Border): SvgElement = {
+  def borderSvg(b: Border, precision: Int): SvgElement = {
     val lp = b.left.flatMap(repos.provinces.findByColor)
     val rp = b.right.flatMap(repos.provinces.findByColor)
     val borderTypeOpt = for {
@@ -223,7 +229,9 @@ case class SvgMapService(repos: RepositoryFactory) {
     } yield borderBetween(lProv, rProv)
 
     val borderType = borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
-    path.copy(classes = ListSet(borderType), path = Svg.pointsToSvgLinearPath(b.points))
+    path
+      .copy(path = Svg.pointsToSvgLinearPath(b.points, precision = precision))
+      .addClass(borderType)
   }
 
   def borderBetween(a: Province, b: Province): String = {
@@ -234,14 +242,19 @@ case class SvgMapService(repos: RepositoryFactory) {
     else if (isSeaBorder(a, b))
       if (isAreaBorder(a, b)) BorderTypes.SEA_AREA
       else BorderTypes.SEA
-    else if (isSeaShoreBorder(a, b)) BorderTypes.SEA_SHORE
-    else if (isLakeShoreBorder(a, b)) BorderTypes.LAKE_SHORE
+    else if (isSeaShoreBorder(a, b))
+      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
+      else BorderTypes.SEA_SHORE
+    else if (isLakeShoreBorder(a, b))
+      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
+      else BorderTypes.LAKE_SHORE
     else if (isLakeBorder(a, b)) BorderTypes.LAKE
     else BorderTypes.UNDEFINED
   }
 
   def isCountryBorder(a: Province, b: Province): Boolean =
-    isLandBorder(a, b) && (a.state.owner.isDefined || b.state.owner.isDefined) &&
+    isLandBorder(a, b) &&
+      anyHasOwner(a, b) &&
       (a.state.owner != b.state.owner)
 
   def isLandBorder(a: Province, b: Province): Boolean =
@@ -249,6 +262,9 @@ case class SvgMapService(repos: RepositoryFactory) {
 
   def isLandAreaBorder(a: Province, b: Province): Boolean =
     isLandBorder(a, b) && isAreaBorder(a, b)
+
+  def anyHasOwner(a: Province, b: Province): Boolean =
+    a.state.owner.isDefined || b.state.owner.isDefined
 
   def isSeaBorder(a: Province, b: Province): Boolean =
     a.`type` == ProvinceTypes.sea && b.`type` == ProvinceTypes.sea

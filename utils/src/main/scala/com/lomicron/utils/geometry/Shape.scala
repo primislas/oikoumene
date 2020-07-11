@@ -1,5 +1,7 @@
 package com.lomicron.utils.geometry
 
+import com.lomicron.utils.collection.Emptiable
+
 case class Shape
 (
   borders: Seq[Border] = Seq.empty,
@@ -8,7 +10,10 @@ case class Shape
   groupId: Option[Int] = None,
   polygon: Option[Polygon] = None,
   clip: Seq[Polygon] = Seq.empty,
-) {
+) extends Emptiable
+{
+
+  override def isEmpty: Boolean = !polygon.exists(_.nonEmpty)
 
   def withProvinceId(id: Int): Shape = {
     val oid = Some(id)
@@ -31,6 +36,12 @@ case class Shape
       val p = Polygon(outline, provColor.getOrElse(-1), provId, clip)
       copy(polygon = Some(p))
     }
+
+  def offset(diff: Point2D): Shape = {
+    val obs = borders.map(_.offset(diff))
+    val op = polygon.map(_.offset(diff))
+    copy(borders = obs, polygon = op)
+  }
 
   def isClipped: Boolean = clip.nonEmpty
 

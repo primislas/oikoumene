@@ -6,6 +6,7 @@ object BorderTypes {
   val BORDER = "border"
 
   val COUNTRY = "border-country"
+  val COUNTRY_SHORE = "border-country-shore"
 
   val LAND = "border-land"
   val LAND_AREA = "border-land-area"

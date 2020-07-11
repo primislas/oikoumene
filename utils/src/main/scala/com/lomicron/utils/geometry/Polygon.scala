@@ -1,5 +1,6 @@
 package com.lomicron.utils.geometry
 
+import com.lomicron.utils.collection.Emptiable
 import com.lomicron.utils.geometry
 
 case class Polygon
@@ -8,11 +9,10 @@ case class Polygon
   color: Int,
   provinceId: Option[Int] = None,
   clip: Seq[Polygon] = Seq.empty,
-) extends Rotatable[Polygon]
+) extends Rotatable[Polygon] with Emptiable
 {
 
   def isEmpty: Boolean = points.isEmpty
-  def nonEmpty: Boolean = points.nonEmpty
 
   def rotate(center: Point2D, angle: Double): Polygon = {
     val rotated = points.map(_.rotate(center, angle))

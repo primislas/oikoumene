@@ -43,8 +43,9 @@ object SvgMapStyles {
          |.border-land { stroke:rgb(50,50,50); stroke-opacity:0.1; }
          |.border-map { stroke:rgb(100,50,0); stroke-width:0; stroke-opacity:0.4; }
          |.border-country { stroke:rgb(50,50,50); stroke-width:2; stroke-opacity:0.6; }
+         |.border-country-shore { stroke:rgb(50,175,200); stroke-opacity:0.4; stroke-width:1; }
          |.border-land-area { stroke:rgb(50,50,50); stroke-opacity:0.2; stroke-width:1; }
-         |.border-sea { stroke:rgb(0,0,50); stroke-opacity:0.1;}
+         |.border-sea { stroke:rgb(0,0,50); stroke-opacity:0.1; }
          |.border-sea-area { stroke:rgb(0,0,50); stroke-opacity:0.2; }
          |.border-sea-shore { stroke:rgb(50,175,200); stroke-opacity:0.4; stroke-width:1; }
          |.border-lake-shore { stroke:rgb(50,200,200); stroke-opacity:0.4; stroke-width:1; }

@@ -18,28 +18,33 @@ object Svg {
 
   def colorToSvg(c: Color) = s"rgb(${c.r},${c.g},${c.b})"
 
-  def pointsToSvgPointsAttribute(ps: Seq[Point2D] = Seq.empty): String = {
+  def pointsToSvgPointsAttribute(ps: Seq[Point2D] = Seq.empty, precision: Int = 1): String = {
     val sb = StringBuilder.newBuilder
     sb.append(" points=\"")
-    sb.append(ps.map(pointToSvg(_)).mkString(" "))
+    sb.append(ps.map(pointToSvg(_, precision = precision)).mkString(" "))
     sb.append("\"")
     sb.toString()
   }
 
-  def pointsToSvgLinearPath(ps: Seq[Point2D] = Seq.empty, isClosed: Boolean = false): String = {
-    val head = ps.headOption.map(p => s"M ${pointToSvg(p, " ")}").toSeq
+  def pointsToSvgLinearPath
+  (
+    ps: Seq[Point2D] = Seq.empty,
+    isClosed: Boolean = false,
+    precision: Int = 1
+  ): String = {
+    val head = ps.headOption.map(p => s"M ${pointToSvg(p, " ", precision)}").toSeq
     val polyline = ps
       .sliding(2, 1)
-      .flatMap(pair => toPath(pair.head, pair.last))
+      .flatMap(pair => toPath(pair.head, pair.last, precision))
     val closing = head.headOption.filter(_ => isClosed).map(_ => "Z").toSeq
     (head ++ polyline ++ closing).mkString(" ")
   }
 
-  def pointsToQuadraticPath(ps: Seq[Point2D]): String = {
+  def pointsToQuadraticPath(ps: Seq[Point2D], precision: Int = 1): String = {
     if (ps.size < 3) pointsToSvgLinearPath(ps)
     else {
       val head = ps.head
-      val moveTo = Seq(s"M ${pointToSvg(head, " ")}")
+      val moveTo = Seq(s"M ${pointToSvg(head, " ", precision)}")
 
       var remainingPs = ps.drop(1)
       val q1 = remainingPs.head
@@ -156,11 +161,11 @@ object Svg {
   def effectiveTextLength(t: String): Double =
     t.map(c => if (c == 'I') 0.5 else  if (c == 'M' || c == 'W') 1.5 else 1.0).sum
 
-  def toPath(p1: Point2D, p2: Point2D): Option[String] = {
+  def toPath(p1: Point2D, p2: Point2D, precision: Int = 1): Option[String] = {
     if (p1 == p2) Option.empty
-    else if (p1.x == p2.x) s"v ${dySvg(p1, p2)}"
-    else if (p1.y == p2.y) s"h ${dxSvg(p1, p2)}"
-    else s"l ${dxSvg(p1, p2)} ${dySvg(p1, p2)}"
+    else if (p1.x == p2.x) s"v ${dySvg(p1, p2, precision)}"
+    else if (p1.y == p2.y) s"h ${dxSvg(p1, p2, precision)}"
+    else s"l ${dxSvg(p1, p2, precision)} ${dySvg(p1, p2, precision)}"
   }
 
   def pointOffset(p2: Point2D, p1: Point2D): String = {
@@ -168,15 +173,27 @@ object Svg {
     s"${doubleToSvg(o.x)} ${doubleToSvg(o.y)}"
   }
 
-  private def dxSvg(p1: Point2D, p2: Point2D): String = doubleToSvg(p2.dx(p1))
+  private def dxSvg(p1: Point2D, p2: Point2D, precision: Int = 1): String =
+    doubleToSvg(p2.dx(p1), precision)
 
-  private def dySvg(p1: Point2D, p2: Point2D): String = doubleToSvg(p2.dy(p1))
+  private def dySvg(p1: Point2D, p2: Point2D, precision: Int = 1): String =
+    doubleToSvg(p2.dy(p1), precision)
 
   val df = new DecimalFormat("#.#")
+  val df2 = new DecimalFormat("#.##")
+  val df3 = new DecimalFormat("#.###")
 
-  def doubleToSvg(d: Double): String = df.format(d)
+  def precisionFormat(precision: Int): DecimalFormat = precision match {
+    case 1 => df
+    case 2 => df2
+    case 3 => df3
+    case _ => df
+  }
 
-  def pointToSvg(p: Point2D, separator: String = ","): String =
-    s"${doubleToSvg(p.x)}$separator${doubleToSvg(p.y)}"
+  def doubleToSvg(d: Double, precision: Int = 1): String =
+    precisionFormat(precision).format(d)
+
+  def pointToSvg(p: Point2D, separator: String = ",", precision: Int = 1): String =
+    s"${doubleToSvg(p.x, precision)}$separator${doubleToSvg(p.y, precision)}"
 
 }

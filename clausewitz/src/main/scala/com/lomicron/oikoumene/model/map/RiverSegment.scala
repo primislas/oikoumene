@@ -28,6 +28,8 @@ case class RiverSegment
     }
   }
 
+  def offset(diff: Point2D): RiverSegment = copy(points = points.map(_.offset(diff)))
+
   @scala.annotation.tailrec
   private def recSmooth(p: Point2D, d: Direction, ps: Seq[Point2D], smoothed: Seq[Point2D]): Seq[Point2D] = {
     if (ps.isEmpty) smoothed
@@ -55,8 +57,6 @@ case class RiverSegment
         recSmooth(nextP, nextD, leftPs, smPs)
       }
     }
-
-
   }
 
   private def direction(a: Point2D, b: Point2D): Direction = {

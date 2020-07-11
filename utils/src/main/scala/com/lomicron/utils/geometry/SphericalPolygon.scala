@@ -4,23 +4,39 @@ case class SphericalPolygon
 (
   points: Seq[SphericalCoord],
   color: Int,
-  provinceId: Option[Int] = None
-) {
+  provinceId: Option[Int] = None,
+  clip: Seq[SphericalPolygon] = Seq.empty,
+) extends TSphericalShape[SphericalPolygon]
+{
 
-  def isEmpty: Boolean = points.size < 2
-  def nonEmpty: Boolean = !isEmpty
+  override def setPoints(ps: Seq[SphericalCoord]): SphericalPolygon =
+    copy(points = ps)
 
-  def rotate(rotation: SphericalCoord): SphericalPolygon =
-    rotate(rotation.polar, rotation.azimuth)
-
-  def rotate(polarRot: Double, azimuthRot: Double): SphericalPolygon = {
-    val rps = points.map(_.rotate(polarRot, azimuthRot))
-    copy(points = rps)
+  override def rotate(polarRot: Double, azimuthRot: Double): SphericalPolygon = {
+    val rotated = super.rotate(polarRot, azimuthRot)
+    val rotatedClips = clip.map(_.rotate(polarRot, azimuthRot))
+    rotated.copy(clip = rotatedClips)
   }
 
   def project(center: Point2D): Polygon = {
-    val ps = points.filterNot(_.isInvisible).map(_.project(center))
-    Polygon(ps, color, provinceId)
+    val ps = projectPoints(center)
+    val clips = clip.map(_.project(center))
+    Polygon(ps, color, provinceId, clips)
   }
 
+}
+
+object SphericalPolygon {
+  def apply
+  (
+    polygon: Polygon,
+    center: Point2D,
+    radius: Double,
+  ): SphericalPolygon =
+    SphericalPolygon(
+      Geometry.fromMercator(polygon.points, center, radius),
+      polygon.color,
+      polygon.provinceId,
+      polygon.clip.map(SphericalPolygon(_, center, radius))
+    )
 }

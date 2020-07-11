@@ -4,9 +4,10 @@ import java.awt.image.{BufferedImage, IndexColorModel}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.{MercatorMap, Pixel, River, Tile, TileRoute}
+import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
+import com.lomicron.oikoumene.repository.api.map.GeographicRepository
+import com.lomicron.utils.geometry.Shape
 import javax.imageio.ImageIO
 
 import scala.Function.tupled
@@ -33,8 +34,9 @@ object MapParser {
       .map(cs => cs.map(Color(_)))
       .foreach(colors => g.map.rebuildTerrainColors(colors))
 
+    val provs = r.getProvinceMap.map(fetchMap)
     val tiles = for {
-      provinces <- r.getProvinceMap.map(fetchMap)
+      provinces <- provs
       terrain <- r.getTerrainMap.map(fetchMap)
       height <- r.getHeightMap.map(fetchMap)
     } yield parseMapTiles(provinces, terrain, height)
@@ -45,6 +47,13 @@ object MapParser {
       .filter(_._2.isDefined)
       .mapValues(_.get)
     g.map.setTerrainProvinceColors(terrainByProv)
+
+    val shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
+    val borders = shapes.flatMap(_.borders).distinct
+    val width = provs.map(_.getWidth).getOrElse(0)
+    val height = provs.map(_.getHeight).getOrElse(0)
+    val mercator = MercatorMap(shapes, borders, rivers, width, height)
+    g.map.updateMercator(mercator)
 
     val provinceMap = r.getProvinceMap.map(fetchMap)
     provinceMap.map(parseRoutes).foreach(g.map.updateTileRoutes)
@@ -98,15 +107,7 @@ object MapParser {
 
   def parseRivers(rivers: BufferedImage): Seq[River] = RiverParser.trace(rivers)
 
-  def parseWorldMap(img: BufferedImage, mapRepo: MapRepository): MapRepository = {
-    val mercator = parseWorldMap(img)
-    mapRepo.updateMercator(mercator)
-  }
-
-  def parseWorldMap(img: BufferedImage): MercatorMap = {
-    val shapes = Tracer.trace(img)
-    MercatorMap(shapes, img.getWidth, img.getHeight)
-  }
+  def parseProvinceShapes(img: BufferedImage): Seq[Shape] = Tracer.trace(img)
 
   def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =
     Try(img.getRGB(x, y)).toOption

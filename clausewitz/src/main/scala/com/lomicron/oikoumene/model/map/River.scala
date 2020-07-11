@@ -2,9 +2,14 @@ package com.lomicron.oikoumene.model.map
 
 import java.awt.Point
 
-case class River(path: Seq[RiverSegment] = Seq.empty) {
+import com.lomicron.utils.collection.Emptiable
+import com.lomicron.utils.geometry.Point2D
 
-  def isEmpty: Boolean = path.isEmpty
+case class River(path: Seq[RiverSegment] = Seq.empty)
+extends Emptiable
+{
+
+  def isEmpty: Boolean = !path.exists(_.nonEmpty)
 
   def reverse: River = River(path.map(_.reverse))
 
@@ -21,5 +26,7 @@ case class River(path: Seq[RiverSegment] = Seq.empty) {
     val smoothed = path.map(_.smooth)
     River(smoothed)
   }
+
+  def offset(diff: Point2D): River = copy(path = path.map(_.offset(diff)))
 
 }

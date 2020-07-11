@@ -12,36 +12,13 @@ object Geometry {
 
   implicit def toDouble(bd: BigDecimal): Double = bd.toDouble
 
-  def projectMercatorAsSphere
-  (
-    polygons: Seq[Polygon],
-    center: Point2D,
-    radius: Double,
-    offset: Point2D = Point2D(0, 0),
-    rotation: Option[SphericalCoord] = None
-  ): Seq[Polygon] = {
-    val sphere = toSpherical(polygons, center, radius, offset)
-    val rotated = rotation.map(sphere.rotate).getOrElse(sphere)
-    rotated.project
-  }
-
-  def toSpherical
-  (
-    polygons: Seq[Polygon],
-    center: Point2D,
-    radius: Double,
-    offset: Point2D = Point2D(0, 0),
-  ): SphericalMap = {
-    val sps = polygons
-      .map(_.offset(offset))
-      .map(_.toSpherical(center, radius))
-    SphericalMap(center, sps)
-  }
-
-  def project(polygons: Seq[SphericalPolygon], center: Point2D): Seq[Polygon] =
+  def projectPolygons(polygons: Seq[SphericalPolygon], center: Point2D): Seq[Polygon] =
     polygons
       .filter(_.nonEmpty)
       .map(_.project(center))
+
+  def project(ps: Seq[SphericalCoord], center: Point2D): Seq[Point2D] =
+    ps.map(project(_, center))
 
   def project(p: SphericalCoord, center: Point2D): Point2D = {
     val polarRadius = p.r * sin(p.polar.abs)
@@ -49,6 +26,9 @@ object Geometry {
     val projectedY = center.y - p.r * cos(p.polar)
     Point2D(projectedX, projectedY)
   }
+
+  def fromMercator(ps: Seq[Point2D], center: Point2D, radius: Double): Seq[SphericalCoord] =
+    ps.map(fromMercator(_, center, radius))
 
   def fromMercator(p: Point2D, center: Point2D, radius: Double): SphericalCoord = {
     val polar = halfPI - (center.y - p.y) / radius
