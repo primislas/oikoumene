@@ -62,6 +62,28 @@ object Svg {
     }
   }
 
+  def pointsToCubicPath(ps: Seq[Point2D], precision: Int = 1): String = {
+    def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+
+    ps match {
+      case p1::p2::p3::p4::tail =>
+        val h = s"M ${psvg(p1)} C ${psvg(p2)}, ${psvg(p3)}, ${psvg(p4)}"
+        val t = stringCubicPath(tail, precision)
+        (h +: t).mkString(" ")
+      case _::_::_::Nil => pointsToQuadraticPath(ps)
+      case _ => pointsToSvgLinearPath()
+    }
+  }
+
+  @scala.annotation.tailrec
+  def stringCubicPath(ps: Seq[Point2D], precision: Int = 1, stringed: Seq[String] = Seq.empty): Seq[String] = ps match {
+    case p1::p2::tail =>
+      val next = s"S ${pointToSvg(p1, " ", precision)}, ${pointToSvg(p2, " ", precision)}"
+      stringCubicPath(tail, precision, stringed :+ next)
+    case p1::Nil => stringed :+ s"L ${pointToSvg(p1, " ", precision)}"
+    case _ => stringed
+  }
+
   def textPath
   (
     pathId: String,
