@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.tools.map
 import java.nio.file.Paths
 
 import com.lomicron.oikoumene.engine.Oikoumene
-import com.lomicron.oikoumene.io.FileIO
+import com.lomicron.oikoumene.io.{FileIO, FileNameAndContent}
 import com.lomicron.oikoumene.model.map.{MapModes, WorldMap}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
@@ -22,42 +22,46 @@ object MapBuilder extends LazyLogging {
     logger.info("Starting the known world...")
     val repos: RepositoryFactory = InMemoryRepositoryFactory(gameDir, modsDir)
     Oikoumene.parseConfigs(repos)
-    buildMap(repos)
+    val mapSvg = buildMap(repos)
+    writeMap(mapSvg)
   }
 
-  def buildMap(repos: RepositoryFactory): Unit = {
+  def buildMap(repos: RepositoryFactory): String = {
     val world = WorldMap(repos)
     val mapService = SvgMapService(repos)
-    val mpSvg = mapService.worldSvg(world, MapModes.POLITICAL)
-    val mpFPath = Paths.get(modsDir, "map_rendering", "mercator_political.svg").toFile
-    FileIO.write(mpFPath, mpSvg)
-    logger.info(s"Produced mercator_political.svg")
-
     /*
-    val globe = world.mercator.toSphere
-    val initAzm = 3 * halfPI / 4
-    val azms = (0 to 7).map(_ * initAzm)
-    val polarOffset = halfPI / 8
-    val polars = (-1 to 1).map(_ * polarOffset)
+      val globe = world.mercator.toSphere
+      val initAzm = 3 * halfPI / 4
+      val azms = (0 to 7).map(_ * initAzm)
+      val polarOffset = halfPI / 8
+      val polars = (-1 to 1).map(_ * polarOffset)
 
-    val modes = Seq(MapModes.POLITICAL)
-    val noNames = false
-    val decimalPrecision = 2
-    for {
-      polarOffset <- polars
-      azimuthOffset <- azms
-      mode <- modes
-    } yield {
-      val fName = f"$polarOffset%.2f_$azimuthOffset%.2f_$mode.svg"
-      val file = Paths.get(modsDir, "map_rendering", fName).toFile
-      val rotation = SphericalCoord(0, polarOffset, azimuthOffset)
-      val projection = globe.rotate(rotation).project
-      val svg = mapService.worldSvg(WorldMap(projection, repos), MapModes.POLITICAL, noNames, decimalPrecision)
-      FileIO.write(file, svg)
-      logger.info(s"Produced $fName")
-    }
+      val modes = Seq(MapModes.POLITICAL)
+      val noNames = false
+      val decimalPrecision = 2
+      for {
+        polarOffset <- polars
+        azimuthOffset <- azms
+        mode <- modes
+      } yield {
+        val fName = f"$polarOffset%.2f_$azimuthOffset%.2f_$mode.svg"
+        val file = Paths.get(modsDir, "map_rendering", fName).toFile
+        val rotation = SphericalCoord(0, polarOffset, azimuthOffset)
+        val projection = globe.rotate(rotation).project
+        val svg = mapService.worldSvg(WorldMap(projection, repos), MapModes.POLITICAL, noNames, decimalPrecision)
+        FileIO.write(file, svg)
+        logger.info(s"Produced $fName")
+      }
     */
 
+    mapService.worldSvg(world, MapModes.POLITICAL)
+  }
+
+  def writeMap(mapSvg: String): Unit = {
+    val mpDirPath = Paths.get(modsDir, "map_rendering")
+    val f = FileNameAndContent("mercator_political.svg", mapSvg)
+    FileIO.write(mpDirPath, f)
+    logger.info(s"Produced mercator_political.svg")
   }
 
 }

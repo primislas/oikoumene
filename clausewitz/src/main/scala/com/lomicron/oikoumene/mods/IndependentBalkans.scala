@@ -29,12 +29,17 @@ object IndependentBalkans {
     val freedBalkanProvinces = balkanProvinces
       .filter(isSubjugated)
       .filterNot(p => p.state.culture.contains("greek") && !p.state.owner.contains("TUR"))
+      .filterNot(p => p.localisation.name.contains("Gallipoli"))
       .flatMap(p => {
-        ModUtils.findProvPrimaryTag(p, repos)
-          .map(_.id)
-          .orElse(p.state.cores.find(t => !p.state.owner.contains(t)))
-          .orElse(if (p.state.culture.contains("transylvanian")) Option("TRA") else None)
-          .map(ModUtils.provinceWithOwner(p, _))
+        if (p.state.cores.contains("EPI") && !p.state.owner.contains("EPI"))
+          Some(ModUtils.provinceWithOwner(p, "EPI"))
+        else
+          ModUtils.findProvPrimaryTag(p, repos)
+            .map(_.id)
+            .orElse(p.state.cores.find(t => !p.state.owner.contains(t)))
+            .orElse(if (p.state.culture.contains("transylvanian")) Option("TRA") else None)
+            .orElse(if (p.state.culture.contains("ruthenian")) Option("TRA") else None)
+            .map(ModUtils.provinceWithOwner(p, _))
       })
       .map(p => if (p.state.owner.contains("TRA")) ModUtils.provinceWithReligion(p, "orthodox") else p)
       .map(ModUtils.removeDhimmiEstate)

@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.repository.fs
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 
 import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
@@ -13,8 +13,10 @@ import scala.collection.immutable.ListMap
 import scala.util.matching.Regex
 
 case class FileResourceRepository
-(gameDir: String,
- modDir: String
+(
+  gameDir: String,
+  modDir: String = FileResourceRepository.defaultModDir,
+  mods: Seq[String] = Seq.empty,
 ) extends ResourceRepository {
 
   val localisationDir = "localisation"
@@ -61,72 +63,108 @@ case class FileResourceRepository
     IO.readTextFile(path, StandardCharsets.ISO_8859_1)
 
   override def getCountryTags: Map[String, String] =
-    readSourceDir(countryTagsDir)
+    readDir(countryTagsDir)
 
   override def getCountries(filesByTags: Map[String, String]): Map[String, String] =
     filesByTags
-      .mapValuesEx(fromSource)
+      .mapValuesEx(filePath)
       .mapValuesEx(_.toString)
       .mapValuesEx(readFile)
 
   override def getCountryHistory: Map[String, FileNameAndContent] =
-    readAllFilesFromDir(fromSource(countryHistoryDir))
+    readDir(countryHistoryDir)
       .mapKVtoValue(FileNameAndContent)
       .mapKeys(filenameToTag)
 
   override def getDiplomaticRelations: Map[String, String] =
-    readSourceDir(diploHistoryDir)
+    readDir(diploHistoryDir)
 
   override def getWarHistory: Map[String, String] =
-    readSourceDir(warHistoryDir)
+    readDir(warHistoryDir)
 
   override def getWarGoalTypes: Map[String, String] =
-    readSourceDir(warGoalTypesDir)
+    readDir(warGoalTypesDir)
 
   override def getCasusBelliTypes: Map[String, String] =
-    readSourceDir(casusBelliTypesDir)
+    readDir(casusBelliTypesDir)
 
   private def filenameToTag(str: String) =
     str.take(3).mkString
 
   def getProvinceDefinitions: Option[String] =
-    readSourceFileContent(provinceDefinitionsFile)
+    readGameFileContent(provinceDefinitionsFile)
 
   override def getAdjacencies: Option[String] =
-    readSourceFileContent(adjacenciesFile)
+    readGameFileContent(adjacenciesFile)
 
-  private def fromSource(relPath: String) = Paths.get(gameDir, relPath)
+  private def baseGame(relPath: String): Path =
+    Paths.get(gameDir, relPath)
 
-  private def readSourceFile(relPath: String): Option[(String, String)] =
-    readFile(fromSource(relPath))
+  private def fromMod(relPath: String): Option[Path] =
+    mods.flatMap(modPath(_, relPath)).headOption
 
-  private def readFile(p: Path): Option[(String, String)] =
+  private def modPath(mod: String, relPath: String): Option[Path] =
+    Option(Paths.get(modDir, mod, relPath)).filter(Files.exists(_))
+
+  private def filePath(relPath: String): Path =
+    fromMod(relPath).getOrElse(baseGame(relPath))
+
+  private def readGameFile(relPath: String): Option[(String, String)] =
+    readFileWithName(filePath(relPath))
+
+  private def readFileWithName(p: Path): Option[(String, String)] =
     Option(p)
       .map(_.toFile)
       .filter(_.exists)
       .map(_.getAbsolutePath)
       .map(readFileKeepFilename)
 
-  private def readSourceDir(relPath: String): Map[String, String] =
-    readAllFilesFromDir(fromSource(relPath))
-
-  private def readAllFilesFromDir(p: Path): Map[String, String] = {
-    readFiles(IO.listFiles(p)).toMap
+  private def dirFiles(relPath: String): Seq[Path] = {
+    val (modFiles, modFileNames) = readModDir(relPath, mods)
+    val vanillaFiles = baseGame(relPath).map(readAllFilesFromDir(_, modFileNames)).getOrElse(Seq.empty)
+    modFiles ++ vanillaFiles
   }
+
+  private def readDir(relPath: String): Map[String, String] = {
+    val ps = dirFiles(relPath).map(_.toString)
+    readFiles(ps).toMap
+  }
+
+  @scala.annotation.tailrec
+  private def readModDir
+  (
+    relPath: String,
+    mods: Seq[String],
+    files: Seq[Path] = Seq.empty,
+    excludes: Set[Path] = Set.empty
+  ): (Seq[Path], Set[Path]) = {
+    if (mods.isEmpty) files -> excludes
+    else {
+      val modDir = mods.headOption.flatMap(modPath(_, relPath))
+      val modFiles = modDir.map(readAllFilesFromDir(_, excludes)).getOrElse(Seq.empty)
+      val modFileNames = modFiles.map(_.getFileName)
+      readModDir(relPath, mods.drop(1), files ++ modFiles, excludes ++ modFileNames)
+    }
+  }
+
+  private def readAllFilesFromDir(p: Path, excludes: Set[Path] = Set.empty): Seq[Path] =
+    IO.listFiles(p)
+        .map(Paths.get(_))
+        .filterNot(p => excludes.contains(p.getFileName))
 
   def readFiles(files: Seq[String]): Seq[(String, String)] =
     files.map(readFileKeepFilename)
 
   def readSourceFiles(files: Seq[String]): Map[String, String] =
-    files.map(readSourceFile).flatMap(_.toSeq).toMap
+    files.map(readGameFile).flatMap(_.toSeq).toMap
 
-  private def readFileKeepFilename(path: String) =
+  private def readFileKeepFilename(path: String): (String, String) =
     (Paths.get(path).getFileName.toString, readFile(path))
 
   override def getLocalisation(language: String)
   : Seq[LocalisationEntry] =
-    IO
-      .listFiles(fromSource(localisationDir))
+    dirFiles(localisationDir)
+      .map(_.toString)
       .filter(_.matches(s"^.*_l_$language.yml"))
       .par
       .map(IO.readTextFile(_, StandardCharsets.UTF_8))
@@ -138,46 +176,46 @@ case class FileResourceRepository
     readSourceFileMapToName(provinceTypesFile)
 
   override def getAreas: Option[String] =
-    readSourceFileContent(areasFile)
+    readGameFileContent(areasFile)
 
   override def getProvincePositions: Option[String] =
-    readSourceFileContent(provincePositionsFile)
+    readGameFileContent(provincePositionsFile)
 
   override def getRegions: Option[String] =
-    readSourceFileContent(regionsFile)
+    readGameFileContent(regionsFile)
 
   override def getSuperregions: Option[String] =
-    readSourceFileContent(supperregionsFile)
+    readGameFileContent(supperregionsFile)
 
   override def getContinents: Option[String] =
-    readSourceFileContent(continentsFile)
+    readGameFileContent(continentsFile)
 
   override def getColonialRegions: Option[String] =
-    readSourceFileContent(colonialRegionsFile)
+    readGameFileContent(colonialRegionsFile)
 
   override def getTerrain: Map[String, String] =
     readSourceFileMapToName(terrainFile)
 
   override def getClimate: Option[String] =
-    readSourceFileContent(climateFile)
+    readGameFileContent(climateFile)
 
   override def getElevatedLakes: Map[String, String] =
-    readSourceDir(elevatedLakesDir)
+    readDir(elevatedLakesDir)
 
-  override def getProvinceMap: Option[Path] = Option(fromSource(provinceMap))
+  override def getProvinceMap: Option[Path] = Option(filePath(provinceMap))
 
-  override def getTerrainMap: Option[Path] = Option(fromSource(terrainMap))
+  override def getTerrainMap: Option[Path] = Option(filePath(terrainMap))
 
-  override def getHeightMap: Option[Path] = Option(fromSource(heightMap))
+  override def getHeightMap: Option[Path] = Option(filePath(heightMap))
 
-  def getRiversMap: Option[Path] = Option(fromSource(riversMap))
+  def getRiversMap: Option[Path] = Option(filePath(riversMap))
 
 
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
   val provNameRegex: Regex = provNamePat.r
 
   override def getProvinceHistory: Map[Int, FileNameAndContent] = {
-    readAllFilesFromDir(fromSource(provinceHistoryDir))
+    readDir(provinceHistoryDir)
       .mapKVtoValue(FileNameAndContent)
       .mapKeys(idFromProvHistFileName)
       .filterKeys(_.isDefined)
@@ -185,7 +223,7 @@ case class FileResourceRepository
   }
 
   override def getBuildings: Seq[String] =
-    readAllFilesFromDir(fromSource(buildingsDir)).values.toSeq
+    readDir(buildingsDir).values.toSeq
 
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {
@@ -193,36 +231,38 @@ case class FileResourceRepository
       case _ => None
     }
 
-  private def readSourceFileContent(relPath: String): Option[String] =
-    readSourceFile(relPath).map(_._2)
+  private def readGameFileContent(relPath: String): Option[String] =
+    readGameFile(relPath).map(_._2)
 
   private def readSourceFileMapToName(relPath: String): Map[String, String] =
-    readSourceFile(relPath)
+    readGameFile(relPath)
       .map(nc => ListMap(nc._1 -> nc._2))
       .getOrElse(Map.empty)
 
   override def getCultures: Option[String] =
-    readSourceFileContent(culturesFile)
+    readGameFileContent(culturesFile)
 
   override def getReligions: Map[String, String] =
-    readSourceDir(religionsDir)
+    readDir(religionsDir)
 
   override def getIdeas: Map[String, String] =
-    readSourceDir(ideasDir)
+    readDir(ideasDir)
 
   override def getTradeGoods: Map[String, String] =
-    readSourceDir(tradeGoodsDir)
+    readDir(tradeGoodsDir)
 
   override def getPrices: Map[String, String] =
-    readSourceDir(pricesDir)
+    readDir(pricesDir)
 
   override def getTradeNodes: Map[String, String] =
-    readSourceDir(tradeNodesDir)
+    readDir(tradeNodesDir)
 
 }
 
 object FileResourceRepository {
+  val defaultModDir = s"${System.getProperty("user.home")}/Paradox Interactive/Europa Universalis IV/mod"
+
   def apply(gameDir: String, modDir: String): ResourceRepository =
-    new FileResourceRepository(gameDir, modDir)
+    FileResourceRepository(gameDir, modDir, Seq.empty)
 }
 

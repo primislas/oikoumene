@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.io
 
 import java.awt.image.BufferedImage
 import java.io._
+import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.utils.collection.CollectionUtils.OptionEx
@@ -11,6 +12,8 @@ import scala.util.{Failure, Success, Try}
 
 object FileIO {
   self =>
+
+  val defaultCharset: Charset = StandardCharsets.ISO_8859_1
 
   def cleanly[A, B](resource: A)(cleanup: A => Unit)(doWork: A => B): Try[B] = {
     try {
@@ -58,16 +61,22 @@ object FileIO {
       .orElse(Option(f))
   }
 
-  def write(p: Path, f: FileNameAndContent): Try[Unit] =
+  def writeUTF(p: Path, f: FileNameAndContent): Try[Unit] = write(p, f, StandardCharsets.UTF_8)
+
+  def writeLatin(p: Path, f: FileNameAndContent): Try[Unit] = write(p, f)
+
+  def write(p: Path, f: FileNameAndContent, charset: Charset = defaultCharset): Try[Unit] =
     Option(p)
       .map(p => Paths.get(p.toString, f.name))
       .map(_.toFile)
-      .map(write(_, f.content))
+      .map(write(_, f.content, charset))
       .getOrElse(Try())
 
-  def write(f: File, content: String): Try[Unit] = {
-    val bw = new BufferedWriter(new FileWriter(f))
-    cleanly(bw)(_.close())(_.write(content))
+  def write(f: File, content: String, charset: Charset): Try[Unit] = {
+    val stream = new FileOutputStream(f)
+    val streamWriter = new OutputStreamWriter(stream, charset)
+    val bufferedWriter = new BufferedWriter(streamWriter)
+    cleanly(bufferedWriter)(_.close())(_.write(content))
   }
 
   def clearDir(dir: String): Option[File] =

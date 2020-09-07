@@ -8,12 +8,14 @@ import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
 import com.lomicron.utils.geometry.Shape
+import com.typesafe.scalalogging.LazyLogging
 import javax.imageio.ImageIO
+import com.lomicron.utils.collection.CollectionUtils.SeqEx
 
 import scala.Function.tupled
 import scala.util.Try
 
-object MapParser {
+object MapParser extends LazyLogging {
 
   def apply(repos: RepositoryFactory): GeographicRepository =
     MapParser.parseMap(repos)
@@ -22,41 +24,54 @@ object MapParser {
     val r = repos.resources
     val g = repos.geography
 
+    logger.info("Parsing rivers...")
     val rivers = r.getRiversMap.map(fetchMap)
       .map(parseRivers)
       .getOrElse(Seq.empty)
       .map(_.smooth)
     g.map.createRivers(rivers)
+    logger.info(s"Identified ${rivers.size} rivers")
 
+    logger.info("Parsing terrain...")
     val terrainMap = r.getTerrainMap.map(fetchMap)
     terrainMap
       .map(parseTerrainColors)
       .map(cs => cs.map(Color(_)))
       .foreach(colors => g.map.rebuildTerrainColors(colors))
+    logger.info("Identified terrain colors...")
 
+    logger.info("Parsing map provinces...")
     val provs = r.getProvinceMap.map(fetchMap)
     val tiles = for {
       provinces <- provs
       terrain <- r.getTerrainMap.map(fetchMap)
       height <- r.getHeightMap.map(fetchMap)
     } yield parseMapTiles(provinces, terrain, height)
+    logger.info(s"Identified ${tiles.map(_.size).getOrElse(0)} map tiles")
+
+    logger.info("Parsing map terrain...")
     val terrainByProv = tiles.getOrElse(Seq.empty)
-      .groupBy(_.color)
-      .mapValues(_.head)
+      .mapBy(_.color)
       .mapValues(_.terrainColor)
       .filter(_._2.isDefined)
       .mapValues(_.get)
     g.map.setTerrainProvinceColors(terrainByProv)
+    logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
+    logger.info("Calculating map shapes...")
     val shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
+    logger.info(s"Identified ${shapes.size} map shapes")
     val borders = shapes.flatMap(_.borders).distinct
+    logger.info(s"Identified ${borders.size} border segments")
     val width = provs.map(_.getWidth).getOrElse(0)
     val height = provs.map(_.getHeight).getOrElse(0)
     val mercator = MercatorMap(shapes, borders, rivers, width, height)
     g.map.updateMercator(mercator)
 
+    logger.info("Calculating map routes...")
     val provinceMap = r.getProvinceMap.map(fetchMap)
     provinceMap.map(parseRoutes).foreach(g.map.updateTileRoutes)
+    logger.info("Identified map routes")
 
     g
   }

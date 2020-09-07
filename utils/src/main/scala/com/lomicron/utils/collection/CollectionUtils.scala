@@ -49,6 +49,9 @@ object CollectionUtils {
     def toMapEx[K, V](f: T => (K, V)): Map[K, V] =
       seq.map(f).toMap
 
+    def mapBy[V](f: T => V): Map[V, T] =
+      seq.map(e => (f(e), e)).toMap
+
     def distinctBy[B](f: T => B): Seq[T] = {
       var builder = Seq.empty[T]
       val i = seq.iterator

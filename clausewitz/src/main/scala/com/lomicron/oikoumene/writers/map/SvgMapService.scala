@@ -62,7 +62,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       .add(withMode.toSeq)
       .add(borders)
       .add(rivers)
-      //      .add(lakes)
+    //      .add(lakes)
     if (includeNames) {
       val names = nameSvg(worldMap)
       worldSvg.add(names).toSvg
@@ -113,11 +113,13 @@ case class SvgMapService(repos: RepositoryFactory) {
     val polygon = shape.polygon.get
     polygon
       .provinceId
-      .flatMap(repos.provinces.find(_).toOption)
-      .map(SvgMapClasses.ofProvince)
+      .map(classesOfProvince)
       .map(defaultProvincePolygon(polygon, precision).addClasses(_))
       .getOrElse(defaultProvincePolygon(polygon, precision))
   }
+
+  def classesOfProvince(pId: Int): Seq[String] =
+    repos.provinces.find(pId).toOption.map(SvgMapClasses.ofProvince).getOrElse(Seq.empty)
 
   def defaultProvincePolygon(polygon: Polygon, precision: Int = 1): SvgElement = {
     val isPathClosed = true
@@ -146,11 +148,11 @@ case class SvgMapService(repos: RepositoryFactory) {
 
   def buildTerrainStyles: String =
     repos
-    .geography
-    .terrain
-    .findAll
-    .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
-    .mkString("\n")
+      .geography
+      .terrain
+      .findAll
+      .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
+      .mkString("\n")
 
   def mapModeColor(p: Province, mapMode: String): Option[Color] =
     mapMode match {
@@ -223,15 +225,28 @@ case class SvgMapService(repos: RepositoryFactory) {
   def borderSvg(b: Border, precision: Int): SvgElement = {
     val lp = b.left.flatMap(repos.provinces.findByColor)
     val rp = b.right.flatMap(repos.provinces.findByColor)
-    val borderTypeOpt = for {
-      lProv <- lp
-      rProv <- rp
-    } yield borderBetween(lProv, rProv)
-
-    val borderType = borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
+    val borderType = borderBetweenProvs(lp, rp)
     path
       .copy(path = Svg.pointsToSvgLinearPath(b.points, precision = precision))
       .addClass(borderType)
+  }
+
+  def borderBetweenProvIds(p1: Option[Int], p2: Option[Int]): String =
+    borderBetweenProvs(
+      p1.flatMap(repos.provinces.find(_).toOption),
+      p2.flatMap(repos.provinces.find(_).toOption)
+    )
+
+  def borderBetweenProvs(p1: Option[Province], p2: Option[Province]): String = {
+    val borderTypeOpt = for {
+      lProv <- p1
+      rProv <- p2
+    } yield borderBetween(lProv, rProv)
+
+    if (p1.isDefined || p2.isDefined)
+      borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
+    else
+      BorderTypes.UNDEFINED
   }
 
   def borderBetween(a: Province, b: Province): String = {
@@ -337,9 +352,9 @@ case class SvgMapService(repos: RepositoryFactory) {
     val curveLength = orderedBezier.head.distance(orderedBezier.last)
     val fontSizeLimit = maxFontSize(rotatedSegments)
 
-    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
-    if (oddNames.contains(name))
-      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+    //    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
+    //    if (oddNames.contains(name))
+    //      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
 
     Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
   }

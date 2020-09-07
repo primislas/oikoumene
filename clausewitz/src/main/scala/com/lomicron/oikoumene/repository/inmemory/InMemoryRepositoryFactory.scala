@@ -15,9 +15,10 @@ import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
-case class InMemoryRepositoryFactory(gameDir: String, modDir: String) extends RepositoryFactory { self =>
+case class InMemoryRepositoryFactory(gameDir: String, modDir: String, mods: Seq[String] = Seq.empty)
+  extends RepositoryFactory { self =>
 
-  private val files = FileResourceRepository(gameDir, modDir).asInstanceOf[FileResourceRepository]
+  private val files = FileResourceRepository(gameDir, modDir, mods)
   private val localisation: LocalisationRepository = InMemoryLocalisationRepository(files)
 
   private val tagRepo: TagRepository = InMemoryTagRepository()

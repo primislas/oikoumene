@@ -25,7 +25,7 @@ object Oikoumene extends LazyLogging {
   }
 
   def parseConfigs(repos: RepositoryFactory): RepositoryFactory = {
-    logger.info("Parsing configs")
+    logger.info("Parsing configs...")
 
     val tags = TagParser(repos)
     logger.info(s"Loaded ${tags.size} tags")
@@ -60,9 +60,9 @@ object Oikoumene extends LazyLogging {
     val geography = MapParser(repos)
     logger.info(s"Loaded ${geography.map.tileRoutes.map(_.source).distinct.size} map provinces")
 
-    logger.info("Loading provinces...")
+    logger.info("Loading province configs...")
     val provinces = ProvinceParser(repos)
-    logger.info(s"Parsed ${provinces.size} province configs")
+    logger.info(s"Loaded ${provinces.size} province configs")
 
     logger.info(s"Configs loaded")
     repos

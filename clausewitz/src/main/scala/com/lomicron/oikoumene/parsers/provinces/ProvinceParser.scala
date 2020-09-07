@@ -46,7 +46,7 @@ object ProvinceParser extends LazyLogging {
    provinces: ProvinceRepository)
   : ProvinceRepository = {
 
-    val provinceById = parseProvinceDefinitions(definitions)
+    val provinceById = parseProvinceDefinitionsToNodeById(definitions)
     val withLocalisation = addLocalisation(provinceById, localisation)
     val withHistory = addHistory(withLocalisation, provinceHistory, buildings)
 
@@ -58,14 +58,17 @@ object ProvinceParser extends LazyLogging {
     provinces
   }
 
-  def parseProvinceDefinitions(definitions: Option[String]): Map[Int, ObjectNode] =
+  def parseProvinceDefinitionsToNodeById(definitions: Option[String]): Map[Int, ObjectNode] =
+    parseProvinceDefinitions(definitions)
+      .map(p => p.id -> p)
+      .toMap
+      .flatMapValues(toObjectNode)
+
+  def parseProvinceDefinitions(definitions: Option[String]): Seq[Province] =
     definitions
       .map(_.lines.toSeq)
       .getOrElse(Seq.empty)
       .flatMap(parseDefinition)
-      .map(p => p.id -> p)
-      .toMap
-      .flatMapValues(toObjectNode)
 
   def parseDefinition(line: String): Option[Province] =
     line match {

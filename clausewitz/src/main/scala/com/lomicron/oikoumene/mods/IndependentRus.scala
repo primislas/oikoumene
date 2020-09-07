@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.mods.ModUtils._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
+import com.lomicron.oikoumene.repository.api.politics.TagRepository
 import com.typesafe.scalalogging.LazyLogging
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.parsing.tokenizer.Date
@@ -47,6 +48,7 @@ object IndependentRus extends LazyLogging {
 
   def apply(repos: RepositoryFactory): Unit = {
     val provinces = repos.provinces
+    val tags = repos.tags
 
     val eastSlavicPs = provinces.search(ProvinceSearchConf.ofCultureGroup(eastSlavic).all).entities
     val zaporizhia = findAreaProvinces(zaporizhiaArea, repos)
@@ -68,11 +70,12 @@ object IndependentRus extends LazyLogging {
     logger.info(s"Modded ${freedTags.size} Rus tags: $freedTags")
     logger.info(s"Modded ${freedRusProvinces.size} Rus provinces")
 
-    val QAS = repos.tags.find("QAS").toOption.map(tagWithReligion(_, orthodox)).get
-    val LIT = repos.tags.find("LIT").toOption.map(tagWithReligion(_, orthodox)).get
+    val QAS = tags.find("QAS").toOption.map(tagWithReligion(_, orthodox)).get
+    val LIT = tags.find("LIT").toOption.map(tagWithReligion(_, orthodox)).get
     val principalities = Seq(LIT, QAS, polotsk, minsk, turov, chernihiv, smolensk, halych, kyiv)
+        .map(updateTagHistory(_, tags))
 
-    principalities.foreach(repos.tags.update)
+    principalities.foreach(tags.update)
     writeCountries(repos, mod, principalities)
 
     provinces.update(freedRusProvinces)
@@ -256,6 +259,12 @@ object IndependentRus extends LazyLogging {
     val l = Localisation(name = name)
     Tag(id = id, localisation = l, history = history)
   }
+
+  def updateTagHistory(t: Tag, repository: TagRepository): Tag =
+    repository
+      .find(t.id)
+      .map(_.copy(history = t.history))
+      .getOrElse(t)
 
 
 }
