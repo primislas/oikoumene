@@ -3,7 +3,8 @@ package services
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
 import com.lomicron.oikoumene.repository.api.politics.TagSearchConf
-import com.lomicron.oikoumene.repository.api.{RepositoryFactory, SearchDictionary, SearchResult}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.search.{SearchDictionary, SearchResult}
 import javax.inject.Inject
 
 class TagService @Inject

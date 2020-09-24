@@ -6,7 +6,8 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
 import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, booleanYes, toObjectNode}
@@ -86,7 +87,7 @@ object ProvinceParser extends LazyLogging {
     provinceById
       .foreachKV((id, prov) => localById
         .get(id)
-        .foreach(loc => prov.set("localisation", loc)))
+        .foreach(loc => prov.setEx("localisation", loc)))
   }
 
   def addHistory
@@ -140,7 +141,7 @@ object ProvinceParser extends LazyLogging {
       .foreachKV { case (k, v) =>
         val buildings = JsonMapper.arrayNodeOf(v)
         val buildingField = if (k) addBuildingField else removeBuildingField
-        event.set(buildingField, buildings)
+        event.setEx(buildingField, buildings)
       }
     buildingFields.foreach(event.remove)
 

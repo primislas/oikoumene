@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.repository.api
 
+import com.lomicron.oikoumene.repository.api.search.{SearchConf, SearchResult}
 import com.lomicron.utils.collection.CollectionUtils._
 
 import scala.collection.immutable.SortedMap

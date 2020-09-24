@@ -7,16 +7,19 @@ import com.lomicron.oikoumene.io.{FileIO, FileNameAndContent}
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.parsers.map.MapParser
 import com.lomicron.oikoumene.parsers.provinces.ProvinceParser
-import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.parsers.save.SaveGameParser
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
+import com.lomicron.oikoumene.service.map.SvgMapService
 import com.lomicron.oikoumene.tools.map.MapBuilder
 import com.lomicron.oikoumene.tools.model.SupportedGames
 import com.lomicron.oikoumene.tools.model.map.{BorderSvgJson, PolygonSvgJson}
 import com.lomicron.oikoumene.tools.model.metadata._
-import com.lomicron.oikoumene.writers.map.SvgMapService
 import com.lomicron.utils.collection.CollectionUtils.{SeqEx, toOption}
 import com.lomicron.utils.json.JsonMapper.prettyPrint
+import com.softwaremill.quicklens._
 import com.typesafe.scalalogging.LazyLogging
 
 object ClausewitzMapBuilder extends LazyLogging {
@@ -29,19 +32,18 @@ object ClausewitzMapBuilder extends LazyLogging {
   val cultureGroupsJson = "culture-groups.json"
   val religionsJson = "religion.json"
   val religionGroupsJson = "religion-groups.json"
-  val politicalSvgMap = "world.svg"
 
   def main(args: Array[String]): Unit = {
     val settings = parseArgs(args)
     if (args.isEmpty || settings.isHelp)
       printHelp()
     else {
-      if (settings.gameDir.isEmpty) {
+      if (settings.fileSettings.gameDir.isEmpty) {
         logger.error("Game directory has not been configured. Rerun tracer with -gd or --game-dir parameter.")
         logger.info("Exiting...")
       } else {
         val repo = initMetadata(settings)
-        generatedMapOutlines(settings, repo)
+        generateMapOutlines(settings, repo)
         generateMetadata(settings, repo)
         generateMap(settings, repo)
       }
@@ -59,69 +61,133 @@ object ClausewitzMapBuilder extends LazyLogging {
         |             [--game-dir|-gd <game_dir_path>]
         |             [--mod-dir|-md <mod_dir_path>]
         |             [--mod|-m <mod>]
+        |             [--cache-dir|-cd <cache_dir_pat>]
+        |             [--rebuild-cache|-rc]
         |             [--output-dir|-od <output_dir>]
         |             [--no-borders|-nb]
+        |             [--no-rivers|-nr]
+        |             [--no-names|-nn]
+        |             [--no-wastelands|-nw]
         |             [--meta|-meta eu4]
         |             [--svg|-svg eu4]
+        |             [--mode|-mode political|terrain|province_outline]
+        |             [--background|-bg autumn|winter|spring|summer]
         |
         |e.g.
-        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\"""".stripMargin
+        |simply parse provinces.bmp into svg shape and border jsons (add "-meta eu4" to parse additional metadata to jsons)
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\"
+        |
+        |generate a province outline map:
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_base_game\" -svg eu4 -mode province_outlines"
+        |
+        |generate a political map from a save:
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -md \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod\" -m rus -m balkans -m anatolia -m mashriq -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_my_mods\" -svg eu4 -mode province_outlines -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/autosave.eu4\""
+        |
+        |""".stripMargin
     logger.info(help)
   }
 
-  def parseArgs(args: Array[String]): MapBuilderSettings = parseArgs(args.toList)
+  def parseArgs(args: Array[String]): CLMapBuilderSettings = parseArgs(args.toList)
 
   @scala.annotation.tailrec
-  def parseArgs(args: List[String] = List.empty, settings: MapBuilderSettings = MapBuilderSettings()): MapBuilderSettings =
+  def parseArgs(args: List[String] = List.empty, settings: CLMapBuilderSettings = CLMapBuilderSettings()): CLMapBuilderSettings =
     args match {
       case "-h" :: _ | "--help" :: _ => settings.copy(isHelp = true)
       case "-i" :: inputFile :: tail =>
         parseArgs(tail, settings.copy(input = inputFile))
       case "--input" :: inputFile :: tail => parseArgs(tail, settings.copy(input = inputFile))
-      case "-gd" :: gameDir :: tail => parseArgs(tail, settings.copy(gameDir = gameDir))
-      case "--game-dir" :: gameDir :: tail => parseArgs(tail, settings.copy(gameDir = gameDir))
-      case "-md" :: modDir :: tail => parseArgs(tail, settings.copy(modDir = modDir))
-      case "--mod-dir" :: modDir :: tail => parseArgs(tail, settings.copy(modDir = modDir))
-      case "-m" :: mod :: tail => parseArgs(tail, settings.addMod(mod))
-      case "--mod" :: mod :: tail => parseArgs(tail, settings.addMod(mod))
       case "-od" :: outputFile :: tail => parseArgs(tail, settings.copy(outputDir = outputFile))
       case "--output-dir" :: outputFile :: tail => parseArgs(tail, settings.copy(outputDir = outputFile))
-      case "-nb" :: tail => parseArgs(tail, settings.copy(includeBorders = false))
-      case "--no-borders" :: tail => parseArgs(tail, settings.copy(includeBorders = false))
       case "-meta" :: engine :: tail => parseArgs(tail, settings.copy(meta = engine))
       case "--metadata" :: engine :: tail => parseArgs(tail, settings.copy(meta = engine))
-      case "-svg" :: engine :: tail => parseArgs(tail, settings.copy(svg = engine))
-      case "--svg" :: engine :: tail => parseArgs(tail, settings.copy(svg = engine))
+
+
+      case "-gd" :: gameDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.gameDir).setTo(gameDir))
+      case "--game-dir" :: gameDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.gameDir).setTo(gameDir))
+      case "-md" :: modDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.modDir).setTo(modDir))
+      case "--mod-dir" :: modDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.modDir).setTo(modDir))
+      case "-m" :: mod :: tail => parseArgs(tail, settings.addMod(mod))
+      case "--mod" :: mod :: tail => parseArgs(tail, settings.addMod(mod))
+      case "-cd" :: cacheDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.cacheDir).setTo(cacheDir))
+      case "--cache-dir" :: cacheDir :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.cacheDir).setTo(cacheDir))
+      case "-rc" :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.rebuildCache).setTo(true))
+      case "--rebuild-cache" :: tail =>
+        parseArgs(tail, settings.modify(_.fileSettings.rebuildCache).setTo(true))
+      case "-save" :: save :: tail =>
+        parseArgs(tail, settings.modify(_.save).setTo(save))
+      case "--save-game" :: save :: tail =>
+        parseArgs(tail, settings.modify(_.save).setTo(save))
+
+
+      case "-mode" :: mapMode :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.mapMode).setTo(mapMode))
+      case "--map-mode" :: mapMode :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.mapMode).setTo(mapMode))
+      case "-nw" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.ownWastelands).setTo(false))
+      case "--no-wastelands" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.ownWastelands).setTo(false))
+      case "-nn" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.includeNames).setTo(false))
+      case "--no-names" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.includeNames).setTo(false))
+      case "-nb" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.includeBorders).setTo(false))
+      case "--no-borders" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.includeBorders).setTo(false))
+      case "-svg" :: engine :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.svg).setTo(engine))
+      case "--svg" :: engine :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.svg).setTo(engine))
+      case "-bg" :: season :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.svgBackground).setTo(season))
+      case "--background" :: season :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.svgBackground).setTo(season))
+
+
       case Nil => settings
       case _ => parseArgs(args.drop(1), settings)
     }
 
-  def generatedMapOutlines(settings: MapBuilderSettings, repo: RepositoryFactory)
-  : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) =
-  {
-    val r = repo.resources
-    val inputFile = getProvincesBmp(r)
-    val (ps, bs) = parseProvinceShapes(inputFile, settings.includeBorders)
-    val (psid, bsid) = parseProvinceIds(r, ps, bs)
-    val (psmeta, bsmeta) = addSvgClasses(settings, repo, psid, bsid)
-    writeProvinces(settings, psmeta)
-    writeBorders(settings, bsmeta)
-    (psmeta, bsmeta)
+  def generateMapOutlines(settings: CLMapBuilderSettings, repo: RepositoryFactory)
+  : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) = {
+    if (settings.mapSettings.svg.isEmpty || settings.meta.contains(SupportedGames.eu4)) {
+      val r = repo.resources
+      val inputFile = getProvincesBmp(r)
+      val mercator = repo.geography.map.mercator
+      val (ps, bs) = if (mercator.borders.isEmpty)
+        parseProvinceShapes(inputFile, settings.mapSettings.withBorders)
+      else
+        (
+          mercator.provinces.flatMap(_.polygon).map(PolygonSvgJson(_)),
+          mercator.borders.map(BorderSvgJson(_))
+        )
+      val (psid, bsid) = parseProvinceIds(r, ps, bs)
+      val (psmeta, bsmeta) = addSvgClasses(settings, repo, psid, bsid)
+      writeProvinces(settings, psmeta)
+      writeBorders(settings, bsmeta)
+      (psmeta, bsmeta)
+    } else (Seq.empty, Seq.empty)
   }
 
-  def initMetadata(settings: MapBuilderSettings): RepositoryFactory = {
-    val gameDir = settings.gameDir.get
-    val modDir = settings.modDir.getOrElse("")
-    val mods = settings.mods
-    val emptyRepos = InMemoryRepositoryFactory(gameDir, modDir, mods)
+  def initMetadata(settings: CLMapBuilderSettings): RepositoryFactory = {
+    val emptyRepos = InMemoryRepositoryFactory(settings.fileSettings)
+    val loadConfigs =
+      settings.meta.contains(SupportedGames.eu4) ||
+        settings.mapSettings.svg.contains(SupportedGames.eu4)
 
-    settings.meta match {
-      case Some(SupportedGames.eu4) => Oikoumene.parseConfigs(emptyRepos)
-      case _ => emptyRepos
-    }
+    if (loadConfigs) Oikoumene.loadConfigs(emptyRepos)
+    else emptyRepos
   }
 
-  def generateMetadata(settings: MapBuilderSettings, repos: RepositoryFactory): RepositoryFactory = {
+  def generateMetadata(settings: CLMapBuilderSettings, repos: RepositoryFactory): RepositoryFactory = {
     settings.meta match {
       case Some(SupportedGames.eu4) =>
 
@@ -144,27 +210,46 @@ object ClausewitzMapBuilder extends LazyLogging {
     }
   }
 
-  def generateMap(settings: MapBuilderSettings, repos: RepositoryFactory): RepositoryFactory = {
-    settings.svg match {
+  def generateMap(settings: CLMapBuilderSettings, repos: RepositoryFactory): RepositoryFactory = {
+    settings.mapSettings.svg match {
       case Some(SupportedGames.eu4) =>
-        val svgMap = MapBuilder.buildMap(repos)
-        val fc = FileNameAndContent(politicalSvgMap, svgMap)
+        val save = settings
+          .save
+          .flatMap(save => {
+            val p = Paths.get(save)
+            val f = p.toFile
+            val fname = f.getName
+            if (!f.exists()) {
+              logger.info(s"Save file not found, omitting: $save")
+              None
+            } else {
+              FileIO
+                .readSave(save)
+                .map(SaveGameParser(_))
+                .map(state => (fname, state))
+            }
+          })
+        val saveFileName = save.map(_._1)
+        val saveGame = save.map(_._2)
+
+        val svgMap = MapBuilder.buildMap(repos, settings.mapSettings, saveGame)
+        val fc = FileNameAndContent(mapName(settings.mapSettings.mapMode, saveFileName), svgMap)
         val fp = writeUTF(settings, fc)
         logger.info(s"Stored map to $fp")
+      case _ =>
     }
 
     repos
   }
 
-  def initRepo(settings: MapBuilderSettings): FileResourceRepository = {
-    val modDir = settings.modDir.getOrElse(FileResourceRepository.defaultModDir)
-    val mods = if (settings.modDir.isDefined) settings.mods else Seq.empty
+  def mapName(mode: String, saveFileName: Option[String] = None): String =
+    saveFileName
+      .map(_.replaceAll("\\.eu4", ""))
+      .map(fname => s"eu4_${fname}_$mode.svg")
+      .getOrElse(s"eu4_$mode.svg")
 
-    settings
-      .gameDir
-      .map(FileResourceRepository(_, modDir, mods))
-      .get
-  }
+  def initRepo(settings: CLMapBuilderSettings): FileResourceRepository =
+    FileResourceRepository(settings.fileSettings)
 
   def getProvincesBmp(repo: ResourceRepository): Path =
     repo.getProvinceMap.get
@@ -213,7 +298,7 @@ object ClausewitzMapBuilder extends LazyLogging {
 
   def addSvgClasses
   (
-    settings: MapBuilderSettings,
+    settings: CLMapBuilderSettings,
     repos: RepositoryFactory,
     polygons: Seq[PolygonSvgJson],
     borders: Seq[BorderSvgJson]
@@ -221,33 +306,38 @@ object ClausewitzMapBuilder extends LazyLogging {
     if (!settings.meta.contains("eu4")) (polygons, borders)
     else {
       val service = SvgMapService(repos)
-      val ps = polygons.map(p => p.provId.map(service.classesOfProvince).map(p.addClasses).getOrElse(p))
+      val ps = polygons
+        .map(p => p.provId
+          .map(service.classesOfProvince(_, settings.mapSettings.mapMode))
+          .map(p.addClasses)
+          .getOrElse(p)
+        )
       val bs = borders.map(b => b.addClass(service.borderBetweenProvIds(b.lProv, b.rProv)))
       (ps, bs)
     }
 
-  def writeProvinces(settings: MapBuilderSettings, polygons: Seq[PolygonSvgJson]): Unit =
+  def writeProvinces(settings: CLMapBuilderSettings, polygons: Seq[PolygonSvgJson]): Unit =
     writeMetadata(settings, polygons, "polygons", mapPolygonsJson)
 
-  def writeBorders(settings: MapBuilderSettings, borders: Seq[BorderSvgJson]): Unit =
-    if (settings.includeBorders)
+  def writeBorders(settings: CLMapBuilderSettings, borders: Seq[BorderSvgJson]): Unit =
+    if (settings.mapSettings.withBorders)
       writeMetadata(settings, borders, "borders", bordersJson)
 
-  def writeMetadata[T](settings: MapBuilderSettings, es: Seq[T], key: String, filename: String): Unit = {
+  def writeMetadata[T](settings: CLMapBuilderSettings, es: Seq[T], key: String, filename: String): Unit = {
     val fc = FileNameAndContent(filename, prettyPrint(Map(key -> es)))
     val fp = write(settings, fc)
     logger.info(s"Stored ${es.length} $key to $fp")
   }
 
-  def write(settings: MapBuilderSettings, fc: FileNameAndContent): Path =
+  def write(settings: CLMapBuilderSettings, fc: FileNameAndContent): Path =
     writeHOF(settings, fc, FileIO.writeLatin)
 
-  def writeUTF(settings: MapBuilderSettings, fc: FileNameAndContent): Path =
+  def writeUTF(settings: CLMapBuilderSettings, fc: FileNameAndContent): Path =
     writeHOF(settings, fc, FileIO.writeUTF)
 
   private def writeHOF
   (
-    settings: MapBuilderSettings,
+    settings: CLMapBuilderSettings,
     fc: FileNameAndContent,
     writeF: (Path, FileNameAndContent) => Unit
   ): Path = {

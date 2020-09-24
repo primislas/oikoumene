@@ -3,8 +3,9 @@ package com.lomicron.oikoumene.parsers.diplomacy
 import com.lomicron.oikoumene.model.diplomacy.CasusBelli
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.diplomacy.CasusBelliRepository
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.json.JsonMapper._
 
 object CasusBelliParser {

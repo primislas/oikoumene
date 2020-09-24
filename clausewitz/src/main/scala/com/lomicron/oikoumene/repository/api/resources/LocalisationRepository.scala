@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.repository.api
+package com.lomicron.oikoumene.repository.api.resources
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
@@ -7,7 +7,11 @@ import com.lomicron.utils.json.JsonMapper.patchFieldValue
 
 trait LocalisationRepository {
 
+  def upsertEntries(es: Seq[LocalisationEntry]): LocalisationRepository
+
   def findEntry(key: String): Option[LocalisationEntry]
+
+  def fetchAllEntries: Seq[LocalisationEntry]
 
   def searchEntries(keyPattern: String): Seq[LocalisationEntry]
 

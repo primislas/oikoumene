@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAI
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALUE_AS_ARRAY, FAIL_ON_UNKNOWN_PROPERTIES}
 import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node._
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -14,13 +15,13 @@ import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.collection.JavaConverters._
 import scala.util.Try
 
 case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyLogging {
 
   private val writer = defaultWriter(mapper)
   private val prettyPrinter = defaultWriter(mapper).withDefaultPrettyPrinter
+  private val jsonNodeTypeRef = new TypeReference[JsonNode] {}
 
   private def defaultWriter(mapper: ObjectMapper) =
     mapper.writer.`with`(WRITE_BIGDECIMAL_AS_PLAIN)
@@ -48,10 +49,13 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
     fromJson[T](toJson(source))
 
   def toJsonNode(obj: AnyRef): JsonNode =
-    mapper.convertValue(obj, new TypeReference[JsonNode] {})
+    obj match {
+      case node: JsonNode => node
+      case _ => mapper.convertValue(obj, jsonNodeTypeRef)
+    }
 
   def toJsonNodeFromVal(obj: AnyVal): JsonNode =
-    mapper.convertValue(obj, new TypeReference[JsonNode] {})
+    mapper.convertValue(obj, jsonNodeTypeRef)
 
   def toObjectNode(obj: AnyRef): Option[ObjectNode] =
     Try(toJsonNode(obj).asInstanceOf[ObjectNode]).toOption
@@ -169,7 +173,7 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
         // TODO what about subtraction? Does it even happen for numbers, ever?
         JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
       } else {
-        target.set(k, arrayNodeOf(Seq(existing, update)))
+        target.setEx(k, arrayNodeOf(Seq(existing, update)))
       }
 
     }
@@ -216,10 +220,10 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
 
   def flatten(a: ArrayNode): ArrayNode = {
     val flatArray = arrayNode
-    a.elements().asScala
+    a.toSeq
       .flatMap {
-        case o: ObjectNode => Seq(o)
-        case an: ArrayNode => an.elements().asScala.to[Seq]
+        case an: ArrayNode => an.toSeq
+        case o => Seq(o)
       }
       .foreach(flatArray.add)
 
@@ -237,6 +241,9 @@ object JsonMapper {
 
   def defaultObjectMapper(): ObjectMapper with ScalaObjectMapper = {
     val m = new ObjectMapper() with ScalaObjectMapper
+    val customSerializers = new SimpleModule()
+    customSerializers.addDeserializer(classOf[ObjectNode], new ObjectNodeDeserializer())
+
     m
       .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
       // sometimes JSON fields contain single object where accepting class
@@ -245,6 +252,7 @@ object JsonMapper {
       .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
       // omits 'empty' (null or empty collections/objects) fields from output
       .setSerializationInclusion(NON_EMPTY)
+      .registerModule(customSerializers)
       .registerModule(DefaultScalaModule)
     m
   }
@@ -310,17 +318,23 @@ object JsonMapper {
     * @param update field update
     * @return target object with field update merged to provided field
     */
-  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode = defaultMapper.mergeFieldValue(target, k, update)
+  def mergeFieldValue(target: ObjectNode, k: String, update: JsonNode): ObjectNode =
+    defaultMapper.mergeFieldValue(target, k, update)
 
-  def removeFieldValue(o: ObjectNode, k: String, v: JsonNode): ObjectNode = defaultMapper.removeFieldValue(o, k, v)
+  def removeFieldValue(o: ObjectNode, k: String, v: JsonNode): ObjectNode =
+    defaultMapper.removeFieldValue(o, k, v)
 
-  def overwriteField(o: ObjectNode, field: String, value: JsonNode): ObjectNode = defaultMapper.overwriteField(o, field, value)
+  def overwriteField(o: ObjectNode, field: String, value: JsonNode): ObjectNode =
+    defaultMapper.overwriteField(o, field, value)
 
-  def removeField(o: ObjectNode, field: String): ObjectNode = defaultMapper.removeField(o, field)
+  def removeField(o: ObjectNode, field: String): ObjectNode =
+    defaultMapper.removeField(o, field)
 
-  def renameField(o: ObjectNode, from: String, to: String): ObjectNode = defaultMapper.renameField(o, from, to)
+  def renameField(o: ObjectNode, from: String, to: String): ObjectNode =
+    defaultMapper.renameField(o, from, to)
 
-  def flatten(a: ArrayNode): ArrayNode = defaultMapper.flatten(a)
+  def flatten(a: ArrayNode): ArrayNode =
+    defaultMapper.flatten(a)
 
   implicit class JsonNodeEx(n: JsonNode) {
 
@@ -352,6 +366,9 @@ object JsonMapper {
 
   implicit class ArrayNodeEx(a: ArrayNode) {
     def toSeq: Seq[JsonNode] = a.elements().toSeq
+    //noinspection AccessorLikeMethodIsEmptyParen
+    def isEmpty(): Boolean = a.size() == 0
+    def nonEmpty: Boolean = a.size() > 0
   }
 
   implicit class ObjectNodeEx(o: ObjectNode) {
@@ -369,8 +386,12 @@ object JsonMapper {
       o
     }
 
+    def fieldSeq(): Seq[Entry[String, JsonNode]] = o.fields().toSeq
+
     def entries(): Seq[(String, JsonNode)] =
-      o.fields().toSeq.map(e => (e.getKey, e.getValue))
+      o.fieldSeq().map(e => (e.getKey, e.getValue))
+
+    def values(): Seq[JsonNode] = fieldSeq().map(_.getValue)
 
     def getObject(f: String): Option[ObjectNode] = Option(o.get(f)).cast[ObjectNode]
 
@@ -379,6 +400,11 @@ object JsonMapper {
     def getString(f: String): Option[String] = Option(o.get(f)).cast[TextNode].map(_.asText)
 
     def getInt(f: String): Option[Int] = Option(o.get(f)).map(_.asInt)
+
+    //noinspection AccessorLikeMethodIsEmptyParen
+    def isEmpty(): Boolean = !nonEmpty
+
+    def nonEmpty: Boolean = o.fieldNames().hasNext
 
   }
 

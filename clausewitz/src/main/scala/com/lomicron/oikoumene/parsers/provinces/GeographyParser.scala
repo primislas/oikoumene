@@ -2,7 +2,8 @@ package com.lomicron.oikoumene.parsers.provinces
 
 import com.lomicron.oikoumene.model.map.Adjacency
 import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.matching.Regex

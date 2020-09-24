@@ -5,7 +5,8 @@ import com.lomicron.oikoumene.model.provinces.Building
 import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.repository.api.map.BuildingRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.patchFieldValue

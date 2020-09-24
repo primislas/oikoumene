@@ -25,7 +25,7 @@ case class ConfigField
   def +(cf: ConfigField): ConfigField = copy(hits = hits + cf.hits)
 
   def caseClassCode: Seq[String] = {
-    val metadata = s"// hits = $hits, isOptional = $isOptional, sample = ${JsonMapper.toJson(valueSample)}"
+    val metadata = s"// hits = $hits, isOptional = $isOptional, sample = ${JsonMapper.toJson(valueSample).take(500)}"
     val camelCaseField = JsonParser.camelCase(field)
     val defVal = defaultValue.getOrElse("")
     val classField = caseClassField(camelCaseField, valueType, defVal)
@@ -43,7 +43,7 @@ object ConfigField extends LazyLogging {
 
   object ValueTypes {
     val unknown = "UNKNOWN"
-    val `object` = "Object"
+    val `object` = "ObjectNode"
     val array = "Seq[]"
     val boolean = "Boolean"
     val number = "Int"
@@ -140,7 +140,7 @@ object ConfigField extends LazyLogging {
     case ValueTypes.`object` => field match {
       case "localisation" => "Localisation.empty"
       case "color" => "Color.black"
-      case _ => "Object.empty"
+      case _ => "JsonMapper.objectNode"
     }
     case ValueTypes.string => "Entity.UNDEFINED"
     case ValueTypes.boolean => "false"
@@ -266,7 +266,7 @@ object ConfigField extends LazyLogging {
         curr <- countsByType.get(res)
         check <- countsByType.get(k)
       } yield check > curr
-      if (isGreater.contains(true) || countsByType.get(res).isEmpty) k else res
+      if (isGreater.contains(true) || !countsByType.contains(res)) k else res
     })
   }
 

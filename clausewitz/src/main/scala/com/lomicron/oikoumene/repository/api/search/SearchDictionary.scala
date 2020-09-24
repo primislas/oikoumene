@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.repository.api
+package com.lomicron.oikoumene.repository.api.search
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.json.FromJson
@@ -27,5 +27,5 @@ case class SearchDictionary
 }
 
 object SearchDictionary extends FromJson[SearchDictionary] {
-  val empty = SearchDictionary()
+  val empty: SearchDictionary = SearchDictionary()
 }

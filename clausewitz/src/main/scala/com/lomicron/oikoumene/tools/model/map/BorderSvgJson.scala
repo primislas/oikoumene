@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.tools.model.map
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.writers.svg.Svg
+import com.lomicron.oikoumene.service.svg.Svg
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.Border
 

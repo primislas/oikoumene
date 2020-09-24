@@ -5,9 +5,10 @@ import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
-import com.lomicron.oikoumene.repository.fs.{FSGFXRepository, FileResourceRepository}
+import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
+import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
 import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRepository
 import com.lomicron.oikoumene.repository.inmemory.map._
@@ -15,11 +16,11 @@ import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
-case class InMemoryRepositoryFactory(gameDir: String, modDir: String, mods: Seq[String] = Seq.empty)
+case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   extends RepositoryFactory { self =>
 
-  private val files = FileResourceRepository(gameDir, modDir, mods)
-  private val localisation: LocalisationRepository = InMemoryLocalisationRepository(files)
+  private val files = FileResourceRepository(settings)
+  private val localisation: LocalisationRepository = InMemoryLocalisationRepository()
 
   private val tagRepo: TagRepository = InMemoryTagRepository()
   private val cultureGroupRepo: CultureGroupRepository = InMemoryCultureGroupRepository()
@@ -88,16 +89,20 @@ case class InMemoryRepositoryFactory(gameDir: String, modDir: String, mods: Seq[
 
 
 
-  override def gfx: GFXRepository = FSGFXRepository(gameDir, modDir, this)
+  override def gfx: GFXRepository = FSGFXRepository(this)
 
   override def modWriters(mod: String): WriterFactory =
     modWriters(Option(mod))
 
   private def modWriters(mod: Option[String]): WriterFactory = {
-    val settings = ModSettings(eu4ModDir = Option(modDir), modDir = mod)
-    FileWriterFactory(settings, files)
+    val modSettings = ModSettings(eu4ModDir = settings.modDir, modDir = mod)
+    FileWriterFactory(modSettings, files)
   }
 
+  override def storeToCache: RepositoryFactory =
+    CacheWriter(this).store
 
+  override def loadFromCache: Option[RepositoryFactory] =
+    CacheReader(this).load
 
 }

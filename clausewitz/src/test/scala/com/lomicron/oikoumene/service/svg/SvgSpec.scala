@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.writers.svg
+package com.lomicron.oikoumene.service.svg
 
 import org.specs2.mutable.Specification
 

@@ -1,8 +1,9 @@
 ## Tools
 
-[Province Tracer](#map-builder)
+[Map Builder](#map-builder)
 * [Command Line Tool](#tracer-command-line)
 * [Output Files](#tracer-output-files)
+* [Rasterize SVG (svg -> png)](#rasterize-svg)
 
 ### Map Builder
 
@@ -13,8 +14,9 @@ contain svg shape outlines with province ids and (if configured)
 border outlines for individual border styling.
 * Extract game data for building the map into easily digestible JSONs
 (such as province data, tag metadata, etc).
-* Build fully featured eu4 svg.
-* TODO: Rasterize svg map to an image (png or jpeg).
+* Build fully featured eu4 svg map.
+* Build maps from save games.
+* Rasterize svg map to an image (e.g. png or jpeg).
 
 #### Tracer Command Line
 
@@ -31,28 +33,47 @@ commands. For example:
 > runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd "D:/Steam/steamapps/common/Europa Universalis IV" -md "C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod" -m cool_map -m best_tags -m expanded_timeline
 
 or
-> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -md \"C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod\" -m cool_map -m best_tags -m expanded_timeline"
+> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \\"D:/Steam/steamapps/common/Europa Universalis IV\\" -md \\"C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod\\" -m cool_map -m best_tags -m expanded_timeline"
 
 To invoke the tracer, execute the following in sbt REPL with necessary options
 > runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder
 * --game-dir|-gd <game_dir_path> - provide the path to game dir, e.g. 
 > -gd "D:/Steam/steamapps/common/Europa Universalis IV"
 * --mod-dir|-md <mod_dir_path> - provide the path to mod dir (root directory containing all the mods),
-if you require any mods to be included
-> -md "C:/Users/konst/Documents/Paradox Interactive/Europa Universalis IV/mod"
+if you require any mods to be included, in combination with individual mod folders (see --mod below)
+> -md "C:/Users/saymyname/Documents/Paradox Interactive/Europa Universalis IV/mod"
 * --mod|-m <mod> - specify a mod (directory) that should be included; if you need several mods,
 list them all with individual -m flags:
 > -m cool_map -m best_tags -m expanded_timeline
+* --cache-dir|-cd <cache_dir> - specify a path to a dir where map metadata cache will be stored to speed
+up subsequent generations. If no files in cache dir exist, game data will be parsed and relevant data
+written here. Otherwise if you need to rebuild the cache, run builder with added -rc command (see below).
+> -cd "C:/Users/saymyname/Documents/Paradox Interactive/Europa Universalis IV/mod/map_cache"
+* --rebuild-cache|-rc - use this flag to rebuild a cache (e.g. after a mod update or to keep using 
+the same cache directory)
 * --output-dir|-od <output_dir> - specify a path to the output directory where produced files will
 be written; if omitted, files will be written to ./target/ dir
 > -od ~/eu4/svg_map/
-* --no-borders|-nb - use this flag if you don't want or need the borders.json (border svg paths)
+* --no-borders|-nb - use this flag if you don't want or need the borders.json (border svg paths) and/or
+borders in svg map
+* --no-rivers|-nr - use this flag if you don't want or need the rivers.json (river svg paths) and/or
+rivers in svg map
+* --no-names|-nn - use this flag if you don't want or need (tag) names on produced svg map
+* --no-wastelands|-nw - use this flag if you don't want owned (colored) wastelands on produced svg map
 * --metadata|-meta <engine> - use this flag to include additional province metadata relevant to
 selected game engine; currently the only supported game engine is eu4:
 > -meta eu4
 * --svg|-svg <engine> - use this flag to straight up build a full map svg with all the metadata;
 currently the only supported engine is eu4:
 > -svg eu4
+* --background|-bg <season> - use this flag to add terrain and water backgrounds to your map, 
+default season is **summer**, backgrounds are only added if the map is deemed to have been unmodified
+> bg winter
+* --map-mode|-mode <map_mode> - use this toggle to select map mode, default map mode is **political**,
+currently supported map modes are: political, province_outline (use this to generate an "empty" map)
+> -mode province_outline
+* --save-game|-save <path_to_save_.eu4_file> - save file will be parsed and its data applied to produced map
+> -save "C:/Users/saymyname/Documents/Paradox Interactive/Europa Universalis IV/save games/Ironman.eu4"
 
 #### Tracer Output Files
 
@@ -101,3 +122,23 @@ Additional fields will be included if you run the tracer with "-meta eu4" key:
     * border-lake
     * border-lake-shore
     * border-undefined
+
+#### Rasterize SVG
+
+Generally speaking, produced map turned out to be too big to be converted to an image 
+by existing online converters. Furthermore, if you build an svg with names, none of those
+services will be able to preserve names in resulting image. So the best approach is to 
+open the map in Chrome or Firefox and capture the page as an image.
+* Chrome has it hidden:
+    1. open the map
+    1. _Ctrl + Shift + I_ to open dev tools
+    1. _Ctrl + Shift + P_ to open dev console
+    1. type in _screenshot_ and select "Capture full size screenshot"
+* In Firefox:
+    1. open the map
+    1. _Ctrl + Shift + K_ to open dev console
+    1. type in _:screenshot --fullpage_
+    1. alternatively copy to clipboard with _:screenshot --fullpage --clipboard_
+    
+Additionally, you could use chrome (and firefox) from command line to do the conversion:
+> "C:/Program Files (x86)/Google/Chrome/Application/chrome" --headless --window-size=5632,2048 --screenshot="D:/eu4_political.png" "file:///D:/eu4_political.svg" 

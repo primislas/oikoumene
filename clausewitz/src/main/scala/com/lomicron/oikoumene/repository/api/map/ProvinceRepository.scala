@@ -2,7 +2,8 @@ package com.lomicron.oikoumene.repository.api.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.Province
-import com.lomicron.oikoumene.repository.api.{AbstractRepository, SearchResult}
+import com.lomicron.oikoumene.repository.api.AbstractRepository
+import com.lomicron.oikoumene.repository.api.search.SearchResult
 
 trait ProvinceRepository extends AbstractRepository[Int, Province] {
 

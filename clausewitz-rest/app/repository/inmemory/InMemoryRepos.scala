@@ -5,8 +5,9 @@ import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, TagRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
@@ -51,9 +52,15 @@ case class InMemoryRepos() extends RepositoryFactory {
 
   override def modWriters(mod: String): WriterFactory = {
     val fileRes = resources.asInstanceOf[FileResourceRepository]
-    val settings = ModSettings(eu4ModDir = Option(fileRes.modDir), modDir = Option(mod))
+    val settings = ModSettings(eu4ModDir = fileRes.settings.modDir, modDir = Option(mod))
     FileWriterFactory(settings, fileRes)
   }
+
+  override def settings: GameFilesSettings = repos.settings
+
+  override def storeToCache: RepositoryFactory = repos.storeToCache
+
+  override def loadFromCache: Option[RepositoryFactory] = repos.loadFromCache
 }
 
 object InMemoryReposSingleton {

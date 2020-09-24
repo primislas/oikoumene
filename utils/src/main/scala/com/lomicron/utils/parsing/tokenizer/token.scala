@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.node.{DecimalNode, IntNode}
+import com.fasterxml.jackson.databind.node.{BooleanNode, DecimalNode, IntNode}
 import com.lomicron.utils.parsing.serialization.DateSerializer
 
 sealed trait Token {
@@ -15,7 +15,9 @@ sealed trait Token {
 case class Identifier(lexeme: String) extends Token
 case class StringT(lexeme: String) extends Token
 case class InvalidIdentifier(lexeme: String) extends Token
-case class Bool(lexeme: String, asBoolean: Boolean) extends Token
+case class Bool(lexeme: String, asBoolean: Boolean) extends Token {
+  def toJsonNode: JsonNode = BooleanNode.valueOf(asBoolean)
+}
 case class Number(lexeme: String, asBigDecimal: scala.BigDecimal) extends Token {
   override def toString: String = s"Number($lexeme)"
   def isInt: Boolean = lexeme.matches("""^(\d+)$""")
@@ -45,7 +47,7 @@ case class Date(lexeme: String, year: Int = 0, month: Int = 0, day: Int = 0) ext
   }
 }
 object Date {
-  val zero = Date("0.0.0", 0, 0, 0)
+  val zero: Date = Date("0.0.0", 0, 0, 0)
 
   def toString(year: Int, month: Int, day: Int): String =
 //    s"${f"$year%02d"}.${f"$month%02d"}.${f"$day%02d"}"

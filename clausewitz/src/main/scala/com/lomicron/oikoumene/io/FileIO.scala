@@ -6,6 +6,7 @@ import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.utils.collection.CollectionUtils.OptionEx
+import com.lomicron.utils.io.IO
 import javax.imageio.ImageIO
 
 import scala.util.{Failure, Success, Try}
@@ -14,6 +15,7 @@ object FileIO {
   self =>
 
   val defaultCharset: Charset = StandardCharsets.ISO_8859_1
+  private val saveGamestateFile = "gamestate"
 
   def cleanly[A, B](resource: A)(cleanup: A => Unit)(doWork: A => B): Try[B] = {
     try {
@@ -78,6 +80,9 @@ object FileIO {
     val bufferedWriter = new BufferedWriter(streamWriter)
     cleanly(bufferedWriter)(_.close())(_.write(content))
   }
+
+  def readSave(filePath: String): Option[String] =
+    IO.readZipFile(filePath, saveGamestateFile, defaultCharset)
 
   def clearDir(dir: String): Option[File] =
     Option(dir)

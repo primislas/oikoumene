@@ -20,6 +20,8 @@ case class FieldScope(parent: Option[ObjectScope],
         AssignmentScope(parent, key).nextScope(t)
       case _: Comment => (self, parsedObject)
       case id: Identifier => (ArrayScope(parent, Seq(toJsonNode(key), toJsonNode(id.lexeme))), parsedObject)
+      case n: Number => (ArrayScope(parent, Seq(toJsonNode(key), toJsonNode(n.lexeme))), parsedObject)
+      case b: Bool => (ArrayScope(parent, Seq(toJsonNode(key), toJsonNode(b.lexeme))), parsedObject)
       case d: Date => (ArrayScope(parent, Seq(toJsonNode(key), toJsonNode(d.lexeme))), parsedObject)
       case CloseBrace =>
         // single element array

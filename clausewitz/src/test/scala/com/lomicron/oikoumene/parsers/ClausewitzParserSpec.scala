@@ -7,6 +7,8 @@ import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.toJsonNode
 import com.lomicron.utils.parsing.tokenizer.Date
 import org.specs2.mutable.Specification
+import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
+import com.lomicron.utils.json.JsonMapper.ArrayNodeEx
 
 class ClausewitzParserSpec extends Specification {
 
@@ -95,7 +97,7 @@ class ClausewitzParserSpec extends Specification {
       val fileName = "151 - Constantinople.txt"
       val provinceTxt = IO.readTextResource(fileName)
       val (province, errors) = ClausewitzParser.parse(provinceTxt)
-      errors must beEmpty
+      errors must be empty
 
       val date = Date(1700, 1, 1)
       val parsed = ClausewitzParser.rollUpEvents(province, date)
@@ -114,6 +116,20 @@ class ClausewitzParserSpec extends Specification {
       p.init.revolt must not be empty
     }
 
+  }
+
+  "ClausewitzParser#parse" should {
+
+    "- merge array fields into a single flat array" >> {
+      val arrays =
+        """monsoon = { 1 2 }
+          |monsoon = { 3 4 }""".stripMargin
+      val (obj, errors) = ClausewitzParser.parse(arrays)
+      errors must be empty
+
+      val monsoon = obj.getArray("monsoon").map(_.toSeq).getOrElse(Seq.empty)
+      monsoon.size must equalTo(4)
+    }
 
   }
 

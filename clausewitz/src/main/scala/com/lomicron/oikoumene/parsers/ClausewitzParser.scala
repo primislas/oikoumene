@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
-import com.lomicron.oikoumene.repository.api.LocalisationRepository
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
@@ -98,7 +98,7 @@ object ClausewitzParser extends LazyLogging {
           // it is a bug, shouldn't be reported twice
           event.getArray(tradeGoods).foreach(a => {
             val actualGood = a.get(a.size() - 1)
-            event.set(tradeGoods, actualGood)
+            event.setEx(tradeGoods, actualGood)
           })
         }
 
@@ -142,7 +142,7 @@ object ClausewitzParser extends LazyLogging {
         case _: NullNode => arrayNode
         case jn: JsonNode => arrayNodeOf(jn)
       }
-      o.set(f, a)
+      o.setEx(f, a)
     })
     o
   }
@@ -220,10 +220,9 @@ object ClausewitzParser extends LazyLogging {
       .flatMap(_.getObject(Fields.update))
       .foldLeft(objectNode)(mergeFields)
 
-    val history = objectNode
-    history.set(Fields.state, state)
-    history.set(Fields.events, JsonMapper.arrayNodeOf(events))
-    history
+    objectNode
+      .setEx(Fields.state, state)
+      .setEx(Fields.events, JsonMapper.arrayNodeOf(events))
   }
 
   def getEvents(history: ObjectNode): Seq[(Date, ObjectNode)] = history.fields.toSeq
@@ -259,11 +258,11 @@ object ClausewitzParser extends LazyLogging {
   def parseColor(o: ObjectNode, colorField: String): ObjectNode = {
     o.getArray(colorField).filter(_.size == 3).foreach(a => {
       val c = objectNode
-      c.set("r", a.get(0))
-      c.set("g", a.get(1))
-      c.set("b", a.get(2))
+        .setEx("r", a.get(0))
+        .setEx("g", a.get(1))
+        .setEx("b", a.get(2))
 
-      o.set(colorField, c)
+      o.setEx(colorField, c)
     })
 
     o
@@ -331,7 +330,7 @@ object ClausewitzParser extends LazyLogging {
         println(s"Removing a number value: $key=${value.asText}")
       JsonMapper.removeFieldValue(target, field, value)
     } else
-      target.set(key, value).asInstanceOf[ObjectNode]
+      target.setEx(key, value)
   }
 
   def fieldNameWithoutPrefix(field: String, prefix: String): String = {

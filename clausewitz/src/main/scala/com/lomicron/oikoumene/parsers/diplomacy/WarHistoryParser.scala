@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.diplomacy.War
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.diplomacy.WarHistoryRepository
-import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 

@@ -5,10 +5,13 @@ import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.politics._
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
 
 trait RepositoryFactory {
+
+  def settings: GameFilesSettings
 
   def resources: ResourceRepository
   def localisations: LocalisationRepository
@@ -36,5 +39,7 @@ trait RepositoryFactory {
   def gfx: GFXRepository
 
   def modWriters(mod: String): WriterFactory
+  def storeToCache: RepositoryFactory
+  def loadFromCache: Option[RepositoryFactory]
 
 }

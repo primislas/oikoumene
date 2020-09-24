@@ -7,8 +7,8 @@ lazy val commonSettings = Seq(
   logLevel := Level.Info,
   libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0" withSources() withJavadoc(),
   libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
-  libraryDependencies += "org.specs2" %% "specs2-core" % "3.9.1" % "test" withSources() withJavadoc(),
-  libraryDependencies += "org.specs2" %% "specs2-mock" % "3.9.1" % "test" withSources() withJavadoc()
+  libraryDependencies += "org.specs2" %% "specs2-core" % "4.10.3" % "test" withSources() withJavadoc(),
+  libraryDependencies += "org.specs2" %% "specs2-mock" % "4.10.3" % "test" withSources() withJavadoc()
 )
 
 lazy val utils = (project in file("utils"))

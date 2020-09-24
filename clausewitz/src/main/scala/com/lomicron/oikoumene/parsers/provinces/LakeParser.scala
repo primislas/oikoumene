@@ -3,7 +3,8 @@ package com.lomicron.oikoumene.parsers.provinces
 import com.lomicron.oikoumene.model.map.ElevatedLake
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
-import com.lomicron.oikoumene.repository.api.{RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx}
 
 object LakeParser {

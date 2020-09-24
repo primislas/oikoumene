@@ -2,12 +2,15 @@ package com.lomicron.oikoumene.engine
 
 import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyParser, WarGoalTypeParser, WarHistoryParser}
 import com.lomicron.oikoumene.parsers.government.IdeaParser
+import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.oikoumene.parsers.map.MapParser
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
 import com.lomicron.oikoumene.parsers.trade.{TradeGoodParser, TradeNodeParser}
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
+import com.lomicron.oikoumene.repository.fs.CacheReader
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
+import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.typesafe.scalalogging.LazyLogging
 
 object Oikoumene extends LazyLogging {
@@ -16,16 +19,30 @@ object Oikoumene extends LazyLogging {
     logger.info("Starting the known world...")
 
     val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
-    val modDir = ""
-
-    val repos = InMemoryRepositoryFactory(gameDir, modDir)
-    parseConfigs(repos)
+    val repos = InMemoryRepositoryFactory(GameFilesSettings(gameDir))
+    loadConfigs(repos)
 
     logger.info("Bye")
   }
 
+  def loadConfigs(repos: RepositoryFactory): RepositoryFactory = {
+    val cacheIsConfigured = repos.settings.cacheDir.isDefined
+    val cached = CacheReader(repos).load
+    if (cached.isEmpty) {
+      val parsed = parseConfigs(repos)
+      if (cacheIsConfigured)
+        parsed.storeToCache
+      else
+        parsed
+    } else
+      cached.get
+  }
+
   def parseConfigs(repos: RepositoryFactory): RepositoryFactory = {
     logger.info("Parsing configs...")
+
+    val les = LocalisationParser(repos)
+    logger.info(s"Loaded ${les.size} localisation entries")
 
     val tags = TagParser(repos)
     logger.info(s"Loaded ${tags.size} tags")

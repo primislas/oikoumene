@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.repository.api
+package com.lomicron.oikoumene.repository.api.resources
 
 import java.nio.file.Path
 
@@ -74,6 +74,10 @@ trait ResourceRepository {
   def getHeightMap: Option[Path]
 
   def getRiversMap: Option[Path]
+
+  def getBackground(season: String): Option[Path]
+
+  def isMapModded: Boolean
 
   def getCultures: Option[String]
 

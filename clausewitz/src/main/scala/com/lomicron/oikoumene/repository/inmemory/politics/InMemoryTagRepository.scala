@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory.politics
 
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.repository.api.politics.{TagRepository, TagSearchConf}
-import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
+import com.lomicron.oikoumene.repository.api.search.{SearchConf, SearchResult}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 import com.lomicron.oikoumene.service.NamingService
 

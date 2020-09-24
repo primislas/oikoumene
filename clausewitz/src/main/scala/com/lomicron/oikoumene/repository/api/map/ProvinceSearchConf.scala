@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.repository.api.map
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.repository.api.SearchConf
+import com.lomicron.oikoumene.repository.api.search.SearchConf
 
 case class ProvinceSearchConf
 (

@@ -23,6 +23,7 @@ case class ArrayScope(parent: Option[ObjectScope],
     case id: Identifier => addElement(toJsonNode(id.lexeme))
     case date: Date => addElement(toJsonNode(date.lexeme))
     case n: Number => addElement(n.toJsonNode)
+    case b: Bool => addElement(b.toJsonNode)
     case Equals =>
       elems.lastOption match {
         case Some(jsonNode) =>

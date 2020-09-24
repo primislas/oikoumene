@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.writers.map
+package com.lomicron.oikoumene.service.map
 
 import java.lang.Math.PI
 
@@ -6,9 +6,9 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.oikoumene.writers.map.SvgMapStyles._
-import com.lomicron.oikoumene.writers.svg.SvgElements._
-import com.lomicron.oikoumene.writers.svg._
+import com.lomicron.oikoumene.service.map.SvgMapStyles._
+import com.lomicron.oikoumene.service.svg.SvgElements._
+import com.lomicron.oikoumene.service.svg._
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, toOption}
 import com.lomicron.utils.geometry.Geometry.halfPI
 import com.lomicron.utils.geometry._
@@ -34,40 +34,32 @@ case class SvgMapService(repos: RepositoryFactory) {
   def worldSvg
   (
     worldMap: WorldMap,
-    mapMode: Option[String] = None,
-    includeNames: Boolean = true,
-    decimalPrecision: Int = 1,
-  ):
-  String = {
+    settingOverrides: MapBuilderSettings = MapBuilderSettings.default,
+  ): String = {
 
-    val style = if (mapMode.contains(MapModes.TERRAIN)) physicalMapStyle else defaultMapStyle
+    val settings = MapModes.settingsOf(settingOverrides.mapMode, settingOverrides)
+    if (settings.ownWastelands.contains(true))
+      worldMap.recalculateWastelandOwners
 
-    val withMode = for {
-      mercator <- worldMap.mercator
-      mode <- mapMode
-    } yield ofMode(mercator, mode, decimalPrecision)
+    val precision: Int = settings.decimalPrecision
+    val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
+    val style = SvgMapStyles.styleOf(settings, repos)
+    val provinces = provinceSvg(worldMap.mercator, settings.mapMode, precision)
+    val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(worldMap.mercator.rivers, precision)).toSeq
+    val names = settings.includeNames.filter(_.booleanValue()).toSeq.map(_ => nameSvg(worldMap))
+    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(worldMap.mercator, precision))
 
-    val rivers = riverSvg(worldMap.mercator.rivers, decimalPrecision)
-    val borders = borderSvg(worldMap.mercator, decimalPrecision)
-    //    val lakes = lakeSvg(worldMap.lakes, worldMap.mercator.height)
-
-    val terrainStyles = s"/*\n$buildTerrainStyles\n*/\n"
-    val styleWithTags = style
-      .addContent(terrainStyles)
-      .addContent(buildTagStyles)
-
-    val worldSvg = Svg.svgHeader
+    val worldSvg = Svg
+      .svgHeader
       .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
-      .add(styleWithTags)
-      .add(withMode.toSeq)
+      .add(background)
+      .add(style)
+      .add(provinces)
       .add(borders)
       .add(rivers)
-    //      .add(lakes)
-    if (includeNames) {
-      val names = nameSvg(worldMap)
-      worldSvg.add(names).toSvg
-    }
-    else worldSvg.toSvg
+      .add(names)
+
+    worldSvg.toSvg
   }
 
   def riverSvg(rs: Seq[River], precision: Int = 1): SvgElement = {
@@ -93,7 +85,7 @@ case class SvgMapService(repos: RepositoryFactory) {
       .copy(path = Svg.pointsToSvgLinearPath(rs.points, precision = precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def ofMode(map: MercatorMap, mapMode: String, precision: Int = 1): SvgElement = {
+  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = 1): SvgElement = {
     val psByClass = map.provinces
       .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
@@ -105,21 +97,27 @@ case class SvgMapService(repos: RepositoryFactory) {
         group.copy(id = t, classes = ListSet(t), children = children)
       })
       .toSeq
+      .filter(_.children.nonEmpty)
 
     provinceGroup.add(groupsByClass)
   }
 
   def provinceToSvg(shape: Shape, mapMode: String, precision: Int = 1): SvgElement = {
     val polygon = shape.polygon.get
-    polygon
+    val elem = polygon
       .provinceId
-      .map(classesOfProvince)
+      .map(classesOfProvince(_, mapMode))
       .map(defaultProvincePolygon(polygon, precision).addClasses(_))
       .getOrElse(defaultProvincePolygon(polygon, precision))
+    polygon
+      .provinceId
+      .map(buildProvTooltip)
+      .map(elem.addTitle)
+      .getOrElse(elem)
   }
 
-  def classesOfProvince(pId: Int): Seq[String] =
-    repos.provinces.find(pId).toOption.map(SvgMapClasses.ofProvince).getOrElse(Seq.empty)
+  def classesOfProvince(pId: Int, mapMode: String): Seq[String] =
+    repos.provinces.find(pId).toOption.map(SvgMapClasses.ofProvince(_, mapMode)).getOrElse(Seq.empty)
 
   def defaultProvincePolygon(polygon: Polygon, precision: Int = 1): SvgElement = {
     val isPathClosed = true
@@ -136,23 +134,11 @@ case class SvgMapService(repos: RepositoryFactory) {
     }
   }
 
-  def buildTagStyles: String =
-    repos
-      .provinces
-      .findAll
-      .flatMap(_.state.owner)
-      .distinct
-      .flatMap(repos.tags.find(_).toOption)
-      .map(tag => s".${tag.id} { fill:${Svg.colorToSvg(tag.color)} }")
-      .mkString("\n")
-
-  def buildTerrainStyles: String =
-    repos
-      .geography
-      .terrain
-      .findAll
-      .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
-      .mkString("\n")
+  def buildProvTooltip(pId: Int): String =
+    repos.provinces.find(pId).toOption
+      .map(p => p.localisation.name.map(n => s"$n (#${p.id})").getOrElse(s"#${p.id}"))
+      .map(_.replaceAll("&", "&amp;"))
+      .getOrElse("UNDEFINED PROV")
 
   def mapModeColor(p: Province, mapMode: String): Option[Color] =
     mapMode match {
@@ -177,7 +163,7 @@ case class SvgMapService(repos: RepositoryFactory) {
 
   def defaultColor(p: Province): Color =
     p.geography.`type`.map {
-      case ProvinceTypes.sea => seaColor
+      case ProvinceTypes.sea => oceanColor
       case ProvinceTypes.lake => lakeColor
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
@@ -270,7 +256,10 @@ case class SvgMapService(repos: RepositoryFactory) {
   def isCountryBorder(a: Province, b: Province): Boolean =
     isLandBorder(a, b) &&
       anyHasOwner(a, b) &&
-      (a.state.owner != b.state.owner)
+      (a.state.owner != b.state.owner || (
+        (a.geography.isImpassable || b.geography.isImpassable)
+          && (!a.geography.isImpassable || !b.geography.isImpassable))
+        )
 
   def isLandBorder(a: Province, b: Province): Boolean =
     a.isLand && b.isLand
@@ -427,8 +416,8 @@ case class SvgMapService(repos: RepositoryFactory) {
   def cutoffBorderSegments
   (
     segments: Seq[PointSegment],
-    cutoffSidePercentage: Double = MapSettings.FITTING_SIDE_CUTOFF_PERCENTAGE,
-    minSegmentSizeLimit: Int = MapSettings.MIN_SEGMENT_COUNT,
+    cutoffSidePercentage: Double = MapBuilderConstants.FITTING_SIDE_CUTOFF_PERCENTAGE,
+    minSegmentSizeLimit: Int = MapBuilderConstants.MIN_SEGMENT_COUNT,
   ): Seq[PointSegment] = {
     val left = segments.head.x
     val right = segments.last.x
@@ -445,8 +434,8 @@ case class SvgMapService(repos: RepositoryFactory) {
   def segmentsToWeightedPoints
   (
     segments: Seq[PointSegment],
-    weightDiff: Double = MapSettings.WEIGHT_DIFF,
-    minDistLimit: Double = MapSettings.MIN_SEGMENT_RANGE,
+    weightDiff: Double = MapBuilderConstants.WEIGHT_DIFF,
+    minDistLimit: Double = MapBuilderConstants.MIN_SEGMENT_RANGE,
   ): Seq[WeightedObservedPoint] = {
     val ranges = segments.map(_.range)
     var maxDist = ranges.max

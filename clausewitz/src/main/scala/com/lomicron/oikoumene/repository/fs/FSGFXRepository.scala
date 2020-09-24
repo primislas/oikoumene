@@ -7,11 +7,13 @@ import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import javax.imageio.ImageIO
 
-case class FSGFXRepository(gameDir: String, modDir: String, repos: RepositoryFactory)
+// TODO account for mods
+case class FSGFXRepository(repos: RepositoryFactory)
   extends GFXRepository {
 
-  val tradeGoodsFile = s"$gameDir/gfx/interface/resources.dds"
-  val religionsFile = s"$gameDir/gfx/interface/icon_religion.dds"
+  private val gameDir = repos.settings.gameDir
+  private val tradeGoodsFile = s"$gameDir/gfx/interface/resources.dds"
+  private val religionsFile = s"$gameDir/gfx/interface/icon_religion.dds"
 
   override def findFlag(tag: String): Option[BufferedImage] = {
     Option(tag)

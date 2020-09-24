@@ -1,7 +1,10 @@
 package com.lomicron.utils.io
 
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.{Path, Paths}
+import java.util.stream.Collectors
+import java.util.zip.ZipFile
 
 import scala.io.{Codec, Source}
 import scala.language.reflectiveCalls
@@ -36,7 +39,22 @@ object IO {
   def readTextFile(path: String, charset: Charset): String =
     cleanly(Source.fromFile(path)(Codec.apply(charset)))(_.close())(_.mkString)
 
-  //using(Source.fromFile(path))(_.mkString)
+  def readZipFile(zipPath: String, filename: String, charset: Charset): Option[String] = {
+    val zipFile = new ZipFile(zipPath)
+    val entries = zipFile.entries()
+
+    var stream: Option[InputStream] = None
+    while(entries.hasMoreElements){
+      val entry = entries.nextElement()
+      if (entry.getName == filename) stream = Option(zipFile.getInputStream(entry))
+    }
+
+    stream
+      .map(new InputStreamReader(_, charset))
+      .map(new BufferedReader(_))
+      .map(_.lines())
+      .map(_.collect(Collectors.joining("\n")))
+  }
 
   def readTextResource(path: String): String =
     cleanly(Source.fromURL(getClass.getClassLoader.getResource(path))(Codec.apply(StandardCharsets.ISO_8859_1)))(_.close)(_.mkString)

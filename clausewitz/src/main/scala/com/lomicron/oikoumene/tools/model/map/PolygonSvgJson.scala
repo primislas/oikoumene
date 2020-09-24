@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.tools.model.map
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.writers.svg.Svg
+import com.lomicron.oikoumene.service.svg.Svg
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.Polygon
 
@@ -20,6 +20,6 @@ case class PolygonSvgJson
 object PolygonSvgJson {
   def apply(p: Polygon): PolygonSvgJson = {
     val path = Svg.pointsToSvgLinearPath(p.points)
-    PolygonSvgJson(Color(p.color), None, path, p.clip.map(PolygonSvgJson(_).copy(color = None)))
+    PolygonSvgJson(Color(p.color), p.provinceId, path, p.clip.map(PolygonSvgJson(_).copy(color = None)))
   }
 }

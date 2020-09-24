@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.repository.inmemory.map
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceHistory}
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.{SearchConf, SearchResult}
+import com.lomicron.oikoumene.repository.api.search.{SearchConf, SearchResult}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryIntRepository
 import com.lomicron.oikoumene.service.NamingService
 import com.lomicron.utils.collection.CollectionUtils._

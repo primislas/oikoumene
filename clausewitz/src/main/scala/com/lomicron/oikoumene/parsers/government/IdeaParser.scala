@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.government.IdeaGroup
 import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper._
 

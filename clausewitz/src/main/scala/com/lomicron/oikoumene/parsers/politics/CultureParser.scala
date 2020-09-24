@@ -5,7 +5,8 @@ import com.lomicron.oikoumene.model.politics.{Culture, CultureGroup}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.repository.api.politics.CultureRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper.{arrayNodeOf, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging

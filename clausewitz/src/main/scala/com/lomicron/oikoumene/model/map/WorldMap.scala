@@ -4,8 +4,9 @@ import com.lomicron.oikoumene.model.map.spherical.SphericalMap
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ProvinceRepository
-import com.lomicron.utils.collection.CollectionUtils.SeqEx
+import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx, toOption}
 import com.lomicron.utils.geometry.SphericalCoord
+import com.softwaremill.quicklens._
 
 case class WorldMap
 (
@@ -79,6 +80,42 @@ case class WorldMap
       .filter(_.state.owner == p.state.owner)
       .distinctBy(_.id)
 
+  def recalculateWastelandOwners: Seq[Province] = {
+    val updated = repos.provinces.findAll
+      .filter(_.geography.isImpassable)
+      .flatMap(p => wastelandOwner(p).map(owner => p.modify(_.history.state.owner).setTo(owner)))
+    repos.provinces.update(updated)
+    updated
+  }
+
+  def wastelandOwner(provId: Int): Option[String] =
+    repos.provinces.find(provId).toOption.flatMap(wastelandOwner)
+
+  def wastelandOwner(p: Province): Option[String] =
+    Option(p)
+      .filter(_.geography.isImpassable)
+      .flatMap(p => {
+        val neighbors = repos.geography.map.routes
+          .getOrElse(p.id, Seq.empty)
+          .map(_.to)
+          .flatMap(repos.provinces.find(_).toOption)
+          .filter(_.isLand)
+        val totalNeighbors = neighbors.size
+        val ownershipThreshold = totalNeighbors / 2
+        val owners = neighbors
+          .groupBy(_.state.owner)
+          .mapValues(_.size)
+          .filterValues(_ >= ownershipThreshold)
+          .keySet
+
+        val none = Option.empty[String]
+        if (owners.size == 1) owners.head
+        else if (owners.size == 2) {
+          val nonEmpty = owners.filter(_.nonEmpty)
+          if (nonEmpty.size != 1) none
+          else nonEmpty.head
+        } else none
+      })
 }
 
 object WorldMap {

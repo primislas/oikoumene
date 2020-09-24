@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.repository.api
+package com.lomicron.oikoumene.repository.api.search
 
 trait SearchConf {
   /**

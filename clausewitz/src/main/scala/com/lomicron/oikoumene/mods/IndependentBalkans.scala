@@ -2,8 +2,9 @@ package com.lomicron.oikoumene.mods
 
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.typesafe.scalalogging.LazyLogging
 
-object IndependentBalkans {
+object IndependentBalkans extends LazyLogging {
 
   def apply(repos: RepositoryFactory): Unit = {
     val provinces = repos.provinces
@@ -52,6 +53,7 @@ object IndependentBalkans {
     provinces.update(freedBalkanProvinces)
     ModUtils.writeProvinces(repos, modDir, freedBalkanProvinces)
     ModUtils.writeCountries(repos, modDir, Seq(transylvaniaTag))
+    logger.info(s"Modded ${freedBalkanProvinces.size} Balkan provinces")
   }
 
 }

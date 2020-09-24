@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.writers.svg
+package com.lomicron.oikoumene.service.svg
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.geometry.Point2D
@@ -19,10 +19,16 @@ case class SvgElement
   strokeWidth: Option[Double] = Option.empty,
   strokeOpacity: Option[Double] = Option.empty,
   strokeColor: Option[Color] = Option.empty,
+
   // butt,round,square
   strokeLinecap: Option[String] = Option.empty,
   points: Option[Seq[Point2D]] = Option.empty,
   customAttrs: Option[String] = Option.empty,
+
+  // image
+  x: Option[Int] = Option.empty,
+  y: Option[Int] = Option.empty,
+  patternUnits: Option[String] = Option.empty,
 
   // text
   startOffset: Option[String] = Option.empty,
@@ -54,7 +60,10 @@ case class SvgElement
 
   def clearClasses: SvgElement = copy(classes = ListSet.empty)
 
-  def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat(c)))
+  def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat(c)).orElse(Option(c)))
+
+  def addTitle(t: String): SvgElement =
+    add(SvgElements.title.copy(customContent = Option(t)))
 
   def toSvg: String = toStringBuilder.toString
 
@@ -62,9 +71,12 @@ case class SvgElement
     val attrs = Seq(
       id.map(i => s"""id="$i""""),
       svgClass,
+      patternUnits.map(i => s"""patternUnits="$i""""),
+      x.map(i => s"""x="$i""""),
+      y.map(i => s"""y="$i""""),
       width.map(i => s"""width="$i""""),
       height.map(i => s"""height="$i""""),
-      href.map(i => s"""href="$i""""),
+      href.map(i => s"""xlink:href="$i""""),
       fill.map(_.toSvg),
       fillRule.map(i => s"""fill-rule="$i""""),
       opacity.map(i => s"""opacity="$i""""),

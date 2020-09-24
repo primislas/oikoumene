@@ -5,9 +5,10 @@ import com.lomicron.oikoumene.model.provinces.Area
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.map.AreaRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{objectNode, patchFieldValue}
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, objectNode, patchFieldValue}
 import com.lomicron.utils.parsing.scopes.ObjectScope
 import com.lomicron.utils.parsing.serialization.BaseDeserializer
 import com.typesafe.scalalogging.LazyLogging
@@ -38,12 +39,10 @@ object AreaParser extends LazyLogging {
       .filterValues(_.size() > 0)
       .mapValues {
         case o@(_: ArrayNode) =>
-          val area = objectNode
-          area.set(provinceIdsKey, o)
-          area
+          objectNode.setEx(provinceIdsKey, o)
         case area: ObjectNode =>
           val ids = area.remove(ObjectScope.arrayKey)
-          Option(ids).foreach(area.set(provinceIdsKey, _))
+          Option(ids).foreach(area.setEx(provinceIdsKey, _))
           area
         case default =>
           logger.warn("Unexpected area definition, omitting: {}", default.toString)

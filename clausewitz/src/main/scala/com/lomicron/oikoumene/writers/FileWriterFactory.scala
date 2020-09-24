@@ -12,7 +12,7 @@ case class FileWriterFactory(settings: ModSettings, repo: FileResourceRepository
 
 object FileWriterFactory {
   def apply(repo: FileResourceRepository): FileWriterFactory = {
-    val settings = ModSettings(eu4ModDir = Some(repo.modDir))
+    val settings = ModSettings(eu4ModDir = repo.settings.modDir)
     FileWriterFactory(settings, repo)
   }
 }

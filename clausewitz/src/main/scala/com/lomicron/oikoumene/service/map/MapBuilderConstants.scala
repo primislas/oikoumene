@@ -1,6 +1,6 @@
-package com.lomicron.oikoumene.writers.map
+package com.lomicron.oikoumene.service.map
 
-object MapSettings {
+object MapBuilderConstants {
   val WEIGHT_DIFF: Double = 50.0
   val MIN_SEGMENT_RANGE: Double = 5.0
   val MIN_SEGMENT_COUNT: Int = 10

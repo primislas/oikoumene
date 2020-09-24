@@ -3,9 +3,9 @@ package com.lomicron.utils.parsing.scopes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.objectNode
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, objectNode}
 import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
-import com.lomicron.utils.parsing.tokenizer.{CloseBrace, Comment, Date, EOF, Identifier, Number, Token}
+import com.lomicron.utils.parsing.tokenizer.{Bool, CloseBrace, Comment, Date, EOF, Identifier, Number, OpenBrace, Token}
 
 case class ObjectScope(key: String,
                        parent: Option[ObjectScope],
@@ -15,16 +15,18 @@ case class ObjectScope(key: String,
   extends ParsingScope {
   self =>
 
-  override def validTokens: Seq[String] = Seq("identifier", "}")
+  override def validTokens: Seq[String] = Seq("identifier", "number", "bool", "date","{", "}")
 
   override def nextScope(t: Token): (ParsingScope, ObjectNode) =
     t match {
       case Identifier(s) => (FieldScope(Option(self), s), parsedObject)
       case d: Date => (FieldScope(Option(self), d.toString), parsedObject)
-      case CloseBrace => moveParsingErrors
-      case EOF => (rootScope, rootObject)
       case _: Comment => (self, parsedObject)
       case n: Number => (ArrayScope(Some(self), elements :+ n.toJsonNode), parsedObject)
+      case b: Bool => (ArrayScope(Some(self), elements :+ b.toJsonNode), parsedObject)
+      case OpenBrace => AssignmentScope(Option(self), arrayKey).nextScope(OpenBrace)
+      case CloseBrace => moveParsingErrors
+      case EOF => (rootScope, rootObject)
       case _ => addParsingError(t)
     }
 
@@ -60,7 +62,7 @@ case class ObjectScope(key: String,
 
   def withElements(es: Seq[JsonNode]): ObjectScope = {
     val array = JsonMapper.arrayNodeOf(es)
-    obj.set(arrayKey, array)
+    obj.setEx(arrayKey, array)
     // TODO mutable obj is being copied
     copy(elements = es)
   }

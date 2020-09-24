@@ -1,4 +1,4 @@
-package com.lomicron.oikoumene.writers.svg
+package com.lomicron.oikoumene.service.svg
 
 object SvgTags {
   val SVG = "svg"
@@ -11,4 +11,7 @@ object SvgTags {
   val TEXT = "text"
   val TEXT_PATH = "textPath"
   val IMAGE = "image"
+  val DEFS = "defs"
+  val PATTERN = "pattern"
+  val TITLE = "title"
 }

@@ -2,7 +2,8 @@ package services
 
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
-import com.lomicron.oikoumene.repository.api.{RepositoryFactory, SearchDictionary, SearchResult}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.search.{SearchDictionary, SearchResult}
 import javax.inject.Inject
 
 class ProvinceService @Inject

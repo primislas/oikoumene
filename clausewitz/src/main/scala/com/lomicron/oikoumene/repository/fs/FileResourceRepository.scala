@@ -5,19 +5,16 @@ import java.nio.file.{Files, Path, Paths}
 
 import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-import com.lomicron.oikoumene.repository.api.ResourceRepository
+import com.lomicron.oikoumene.repository.api.GameFilesSettings
+import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
 import scala.collection.immutable.ListMap
 import scala.util.matching.Regex
 
-case class FileResourceRepository
-(
-  gameDir: String,
-  modDir: String = FileResourceRepository.defaultModDir,
-  mods: Seq[String] = Seq.empty,
-) extends ResourceRepository {
+case class FileResourceRepository(settings: GameFilesSettings)
+  extends ResourceRepository {
 
   val localisationDir = "localisation"
 
@@ -51,6 +48,7 @@ case class FileResourceRepository
   val terrainMap = "map/terrain.bmp"
   val heightMap = "map/heightmap.bmp"
   val riversMap = "map/rivers.bmp"
+  def background(season: String): String = s"map/terrain/colormap_$season.dds"
 
   val culturesFile = "common/cultures/00_cultures.txt"
   val religionsDir = "common/religions"
@@ -98,13 +96,13 @@ case class FileResourceRepository
     readGameFileContent(adjacenciesFile)
 
   private def baseGame(relPath: String): Path =
-    Paths.get(gameDir, relPath)
+    Paths.get(settings.gameDir.getOrElse("."), relPath)
 
   private def fromMod(relPath: String): Option[Path] =
-    mods.flatMap(modPath(_, relPath)).headOption
+    settings.mods.flatMap(modPath(_, relPath)).headOption
 
   private def modPath(mod: String, relPath: String): Option[Path] =
-    Option(Paths.get(modDir, mod, relPath)).filter(Files.exists(_))
+    settings.modDir.map(Paths.get(_, mod, relPath)).filter(Files.exists(_))
 
   private def filePath(relPath: String): Path =
     fromMod(relPath).getOrElse(baseGame(relPath))
@@ -120,7 +118,7 @@ case class FileResourceRepository
       .map(readFileKeepFilename)
 
   private def dirFiles(relPath: String): Seq[Path] = {
-    val (modFiles, modFileNames) = readModDir(relPath, mods)
+    val (modFiles, modFileNames) = readModDir(relPath, settings.mods)
     val vanillaFiles = baseGame(relPath).map(readAllFilesFromDir(_, modFileNames)).getOrElse(Seq.empty)
     modFiles ++ vanillaFiles
   }
@@ -210,6 +208,10 @@ case class FileResourceRepository
 
   def getRiversMap: Option[Path] = Option(filePath(riversMap))
 
+  override def getBackground(season: String): Option[Path] =
+    Option(filePath(background(season)))
+
+  override def isMapModded: Boolean = fromMod(provinceMap).isDefined
 
   val provNamePat: String = """^(?<id>\d+).*\.txt$"""
   val provNameRegex: Regex = provNamePat.r
@@ -263,6 +265,6 @@ object FileResourceRepository {
   val defaultModDir = s"${System.getProperty("user.home")}/Paradox Interactive/Europa Universalis IV/mod"
 
   def apply(gameDir: String, modDir: String): ResourceRepository =
-    FileResourceRepository(gameDir, modDir, Seq.empty)
+    FileResourceRepository(GameFilesSettings(gameDir, modDir))
 }
 

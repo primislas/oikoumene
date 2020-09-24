@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TagService } from './tag-service.service';
+import { TagService } from './tag.service';
 
 describe('TagServiceService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

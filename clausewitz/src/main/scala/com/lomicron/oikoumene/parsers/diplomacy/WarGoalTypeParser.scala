@@ -4,7 +4,8 @@ import com.lomicron.oikoumene.model.diplomacy.WarGoalType
 import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.diplomacy.WarGoalTypeRepository
-import com.lomicron.oikoumene.repository.api.{LocalisationRepository, RepositoryFactory, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
 import com.lomicron.utils.parsing.JsonParser.rootKey
 import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
 import com.lomicron.utils.parsing.scopes.ParsingError
@@ -22,35 +23,33 @@ object DefaultDeserializer extends BaseDeserializer {
   }
 
   override def rec(o: ObjectNode, path: List[String], errors: Seq[ParsingError]): (JsonNode, List[String], Seq[ParsingError]) = {
-    val array = Option(o.get(arrayKey))
-
-    // legit array - all elements have been added as array elements
-    // and no other fields exist
+    val array = o.getArray(arrayKey)
     if (array.isDefined) {
-      if (o.fieldNames().asScala.length == 1) return getArray(o, path, errors)
-      else {
+      // legit array - all elements have been added as array elements
+      // and no other fields exist
+      if (o.fieldNames().asScala.length == 1) getArray(o, path, errors)
+      else if (array.exists(_.isEmpty())) {
+        // cleaning up
+        o.remove(arrayKey)
+        deserializeObjectValues(o, path, errors)
+      } else {
         // A conflicting situation where an array was mixed with an object.
         // More often than not it is a result of an error. Thus, attempting
         // to address it by a best guess of a type based on the amount of elements.
         val errPath = path.mkString(" -> ")
         val err = ParsingError(s"A conflicting array-object definition is encountered at path $errPath: ${o.asText()}")
         val fieldCount = o.fieldNames().asScala.length - 1 // minus elements field
-        val isArray = Option(o.get(arrayKey))
-          .filter(_.isInstanceOf[ArrayNode])
-          .map(_.asInstanceOf[ArrayNode])
-          .map(_.iterator().asScala.length)
-          .exists(_ > fieldCount)
+        val isArray = array.map(_.size()).exists(_ > fieldCount)
 
-        if (isArray) return getArray(o, path, errors :+ err)
+        if (isArray) getArray(o, path, errors :+ err)
         else {
           o.remove(arrayKey)
-          return (o, path, errors :+ err)
+          deserializeObjectValues(o, path, errors :+ err)
         }
 
       }
-    }
-
-    deserializeObjectValues(o, path, errors)
+    } else
+      deserializeObjectValues(o, path, errors)
   }
 
 }
@@ -118,13 +117,13 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
               // there's no easy way to single out such arrays, so we have to
               // rely on settings to identify them.
               case _ =>
-                if (!(ro.isInstanceOf[ObjectNode] && !ro.fieldNames().hasNext)) o.set(oConf.field, ro)
+                if (!(ro.isInstanceOf[ObjectNode] && !ro.fieldNames().hasNext)) o.setEx(oConf.field, ro)
                 else {
                   settings.fields
                     .find(_.matches(oConf.field))
                     .filter(_.isArray)
-                    .map(_ => o.set(oConf.field, JsonMapper.arrayNode))
-                    .getOrElse(o.set(oConf.field, ro))
+                    .map(_ => o.setEx(oConf.field, JsonMapper.arrayNode))
+                    .getOrElse(o.setEx(oConf.field, ro))
                 }
             }
             if (errs.nonEmpty) recErrs = recErrs ++ errs
@@ -132,7 +131,7 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
 
       deserializedArrays.foreach(field => {
         val flatArray = JsonMapper.flatten(o.get(field).asInstanceOf[ArrayNode])
-        o.set(field, flatArray)
+        o.setEx(field, flatArray)
       })
 
       (o, path, errors ++ recErrs)
