@@ -20,9 +20,11 @@ case class Localisation(name: Option[String] = None, adjective: Option[String] =
 }
 
 object Localisation {
-  val empty = Localisation()
+  val empty: Localisation = Localisation()
 }
 
 trait WithLocalisation {
   val localisation: Localisation
+  def name: Option[String] = localisation.name
+  def isNamed(name: String): Boolean = localisation.name.contains(name)
 }

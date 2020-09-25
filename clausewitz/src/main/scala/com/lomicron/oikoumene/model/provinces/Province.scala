@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.oikoumene.model.localisation.{Localisation, WithLocalisation}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
@@ -15,7 +15,7 @@ case class Province
  localisation: Localisation = Localisation.empty,
  history: ProvinceHistory = ProvinceHistory.empty,
  geography: ProvinceGeography = ProvinceGeography.empty,
-) {
+) extends WithLocalisation {
   self =>
   @JsonCreator def this() = this(0, Color.black)
 

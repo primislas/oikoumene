@@ -68,9 +68,9 @@ case class CacheReader(repos: RepositoryFactory) extends LazyLogging {
     val g = repos.geography
 
     readAndUpdate[Seq[Area]](CacheConstants.areas, es => g.areas.update(es))
-    readAndUpdate[Seq[Region]](CacheConstants.areas, es => g.regions.update(es))
-    readAndUpdate[Seq[SuperRegion]](CacheConstants.areas, es => g.superregions.update(es))
-    readAndUpdate[Seq[Continent]](CacheConstants.areas, es => g.continent.update(es))
+    readAndUpdate[Seq[Region]](CacheConstants.regions, es => g.regions.update(es))
+    readAndUpdate[Seq[SuperRegion]](CacheConstants.superregions, es => g.superregions.update(es))
+    readAndUpdate[Seq[Continent]](CacheConstants.continents, es => g.continent.update(es))
 
     readAndUpdate[Seq[ColonialRegion]](CacheConstants.colonies, es => g.colonies.update(es))
     readAndUpdate[Seq[Climate]](CacheConstants.climate, es => g.climate.update(es))
@@ -106,7 +106,7 @@ case class CacheReader(repos: RepositoryFactory) extends LazyLogging {
 
   def read[T : Manifest](fname: String): T = {
     val path = cacheDir.resolve(fname)
-    val content = IO.readTextFile(path.toString, StandardCharsets.ISO_8859_1)
+    val content = IO.readTextFile(path.toString, StandardCharsets.UTF_8)
     JsonMapper.fromJson[T](content)
   }
 

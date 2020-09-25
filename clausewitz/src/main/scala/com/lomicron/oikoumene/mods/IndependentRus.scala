@@ -27,7 +27,8 @@ object IndependentRus extends LazyLogging {
   val coresByProvName = Map(
     "Yuriev" -> "RSO",
     "Vladimir" -> "RSO",
-    "Murom" -> "RSO",
+    "Suzdal" -> "RSO",
+    "Murom" -> "NZH",
     "Bezhetsk" -> "BLO",
     "Vologda" -> "BLO",
     "Velsk" -> "BLO",
@@ -42,7 +43,10 @@ object IndependentRus extends LazyLogging {
     "Ingermanland" -> "PSK",
     "Toropets" -> "TVE",
     "Kasimov" -> "QAS",
+    "Penza" -> "QAS",
+    "Alatyr" -> "QAS",
     "Chelm" -> "VOL",
+    "Kharkov" -> "CHR",
   )
   val muscovitePs = Set("Ryazan", "Pronsk", "Tula", "Oka")
 
@@ -53,8 +57,9 @@ object IndependentRus extends LazyLogging {
     val eastSlavicPs = provinces.search(ProvinceSearchConf.ofCultureGroup(eastSlavic).all).entities
     val zaporizhia = findAreaProvinces(zaporizhiaArea, repos)
     val muscovy = findProvincesByCore("MOS", provinces)
+    val penza = provinces.findByName("Penza").toSeq
 
-    val rusProvinces = (eastSlavicPs ++ zaporizhia ++ muscovy).distinct
+    val rusProvinces = (eastSlavicPs ++ zaporizhia ++ muscovy ++ penza).distinct
 
     val freedRusProvinces = rusProvinces
       .map(minskProvinces)
@@ -65,6 +70,7 @@ object IndependentRus extends LazyLogging {
       .map(ruthenianSivershchyna)
       .map(lytvynSmolensk)
       .map(muscoviteRyazan)
+      .filterNot(p => p.state.owner.exists(rusSubjugators.contains))
 
     val freedTags = freedRusProvinces.flatMap(_.history.init.owner).distinct
     logger.info(s"Modded ${freedTags.size} Rus tags: $freedTags")
@@ -263,7 +269,10 @@ object IndependentRus extends LazyLogging {
   def updateTagHistory(t: Tag, repository: TagRepository): Tag =
     repository
       .find(t.id)
-      .map(_.copy(history = t.history))
+      .map(et => {
+        val withSource = et.history.sourceFile.map(sf => t.history.copy(sourceFile = sf)).getOrElse(t.history)
+        et.copy(history = withSource)
+      })
       .getOrElse(t)
 
 

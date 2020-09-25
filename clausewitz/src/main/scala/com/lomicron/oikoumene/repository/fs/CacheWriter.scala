@@ -74,7 +74,7 @@ case class CacheWriter(repos: RepositoryFactory) {
 
 
   def store[T <: AnyRef](obj: T, fname: String): Unit = {
-    FileIO.writeLatin(cacheDir, FileNameAndContent(fname, JsonMapper.prettyPrint(obj)))
+    FileIO.writeUTF(cacheDir, FileNameAndContent(fname, JsonMapper.prettyPrint(obj)))
   }
 
 
