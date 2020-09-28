@@ -393,6 +393,8 @@ object JsonMapper {
 
     def values(): Seq[JsonNode] = fieldSeq().map(_.getValue)
 
+    def getNode(f: String): Option[JsonNode] = Option(o.get(f))
+
     def getObject(f: String): Option[ObjectNode] = Option(o.get(f)).cast[ObjectNode]
 
     def getArray(f: String): Option[ArrayNode] = Option(o.get(f)).cast[ArrayNode]

@@ -15,6 +15,8 @@ object FileIO {
   self =>
 
   val defaultCharset: Charset = StandardCharsets.ISO_8859_1
+  val utf8Charset: Charset = StandardCharsets.UTF_8
+  val latinCharset: Charset = StandardCharsets.ISO_8859_1
   private val saveGamestateFile = "gamestate"
 
   def cleanly[A, B](resource: A)(cleanup: A => Unit)(doWork: A => B): Try[B] = {
@@ -63,15 +65,26 @@ object FileIO {
       .orElse(Option(f))
   }
 
-  def writeUTF(p: Path, f: FileNameAndContent): Try[Unit] = write(p, f, StandardCharsets.UTF_8)
+  def writeUTF(p: Path, f: FileNameAndContent): Try[Unit] =
+    writeUTF(p, f.name, f.content)
 
-  def writeLatin(p: Path, f: FileNameAndContent): Try[Unit] = write(p, f)
+  def writeUTF(dir: Path, fname: String, content: String): Try[Unit] =
+    write(dir, fname, content, utf8Charset)
 
-  def write(p: Path, f: FileNameAndContent, charset: Charset = defaultCharset): Try[Unit] =
+  def writeLatin(p: Path, f: FileNameAndContent): Try[Unit] =
+    writeLatin(p, f.name, f.content)
+
+  def writeLatin(dir: Path, fname: String, content: String): Try[Unit] =
+    write(dir, fname, content, latinCharset)
+
+  def write(p: Path, f: FileNameAndContent, charset: Charset): Try[Unit] =
+    write(p, f.name, f.content, charset)
+
+  def write(p: Path, fname: String, content: String, charset: Charset = defaultCharset): Try[Unit] =
     Option(p)
-      .map(p => Paths.get(p.toString, f.name))
+      .map(p => Paths.get(p.toString, fname))
       .map(_.toFile)
-      .map(write(_, f.content, charset))
+      .map(write(_, content, charset))
       .getOrElse(Try())
 
   def write(f: File, content: String, charset: Charset): Try[Unit] = {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.{IntNode, ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.save.GamestateSave
 import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, _}
+import com.lomicron.utils.parsing.tokenizer.Date
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.Try
@@ -15,6 +16,13 @@ object SaveGameParser extends LazyLogging {
   val tagsKey = "countries"
 
   def apply(gamestate: String): GamestateSave = {
+    val save = toObjectNode(gamestate)
+    val state = GamestateSave.fromJson(save)
+    logger.info("Parsed save game")
+    state
+  }
+
+  def toObjectNode(gamestate: String): ObjectNode = {
     logger.info("Parsing save game...")
     val (save, errors) = ClausewitzParser.parse(gamestate)
     errors.foreach(pe => logger.error(pe.message))
@@ -22,18 +30,16 @@ object SaveGameParser extends LazyLogging {
     val provinces = parseProvinces(save)
     val countries = parseTags(save)
 
-    val state = GamestateSave.fromJson(save)
-    logger.info("Parsed save game")
-    state
+    save
   }
 
   def parseTags(save: ObjectNode): Seq[ObjectNode] = {
     val tags = save
-      .getObject("countries")
+      .getObject(tagsKey)
       .getOrElse(objectNode)
       .entries()
       .map(setTagId)
-      .map(prepTagHistory)
+      .map(prepHistory)
     save.setEx(tagsKey, tags)
 
     tags
@@ -45,16 +51,29 @@ object SaveGameParser extends LazyLogging {
     tag.setEx("id", TextNode.valueOf(k))
   }
 
-  def prepTagHistory(t: ObjectNode): ObjectNode =
-    t
+  def prepHistory(o: ObjectNode): ObjectNode =
+    o
       .getObject("history")
       .map(ClausewitzParser.parseHistory)
-      .map(t.setEx("history", _))
-      .getOrElse(t)
+      .map(h => {
+        val events = h
+          .getArray("events")
+          .map(_.toSeq).getOrElse(Seq.empty)
+          .flatMap(_.asObject)
+          .map(e => e.getString("date")
+            .map(Date(_))
+            .map(d => arrayNodeOfVals(Seq(d.year, d.month, d.day)))
+            .map(e.setEx("date", _))
+            .getOrElse(e)
+          )
+        h.setEx("events", arrayNodeOf(events))
+      })
+      .map(o.setEx("history", _))
+      .getOrElse(o)
 
   def parseProvinces(save: ObjectNode): Seq[ObjectNode] = {
     val provs = save
-      .getObject("provinces")
+      .getObject(provincesKey)
       .getOrElse(objectNode)
       .entries()
       .flatMap(kv => {
@@ -66,6 +85,7 @@ object SaveGameParser extends LazyLogging {
           p <- pOpt
         } yield p.setEx("id", IntNode.valueOf(id))
       })
+      .map(prepHistory)
       .map(cleanUpProvince)
     save.setEx(provincesKey, provs)
     provs

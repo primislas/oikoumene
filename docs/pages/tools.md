@@ -24,7 +24,11 @@ You will need to install
 [sbt](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Windows.html) and 
 its pre-requisite JDK (see sbt installation guide) to run the scripts.
 
-With your command-line navigate to project's folder. From there you have two options:
+Clone game repo and navigate to the directory:
+> https://github.com/primislas/oikoumene.git oikoumene
+> cd oikoumene
+
+From there you have two options:
 run sbt and then run commands from inside sbt REPL, or you can write and invoke one-command
 scripts, however that would require you to modify and most likely escape (screen) your
 commands. For example:

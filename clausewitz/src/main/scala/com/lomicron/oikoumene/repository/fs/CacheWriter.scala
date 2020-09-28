@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.fs
 
 import java.nio.file.Paths
 
-import com.lomicron.oikoumene.io.{FileIO, FileNameAndContent}
+import com.lomicron.oikoumene.io.FileIO
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.json.JsonMapper
 
@@ -74,7 +74,7 @@ case class CacheWriter(repos: RepositoryFactory) {
 
 
   def store[T <: AnyRef](obj: T, fname: String): Unit = {
-    FileIO.writeUTF(cacheDir, FileNameAndContent(fname, JsonMapper.prettyPrint(obj)))
+    FileIO.writeUTF(cacheDir, fname, JsonMapper.prettyPrint(obj))
   }
 
 

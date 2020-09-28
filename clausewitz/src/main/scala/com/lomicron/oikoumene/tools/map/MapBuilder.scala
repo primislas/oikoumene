@@ -3,28 +3,26 @@ package com.lomicron.oikoumene.tools.map
 import java.nio.file.Paths
 
 import com.lomicron.oikoumene.engine.Oikoumene
-import com.lomicron.oikoumene.io.{FileIO, FileNameAndContent}
+import com.lomicron.oikoumene.io.FileIO
 import com.lomicron.oikoumene.model.localisation.Localisation
-import com.lomicron.oikoumene.model.map.{MapModes, WorldMap}
+import com.lomicron.oikoumene.model.map.WorldMap
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.model.save.GamestateSave
 import com.lomicron.oikoumene.model.save.tag.TagSave
-import com.lomicron.oikoumene.parsers.save.SaveGameParser
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
+import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
 import com.lomicron.oikoumene.service.map.{MapBuilderSettings, SvgMapService}
-import com.typesafe.scalalogging.LazyLogging
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.utils.geometry.Geometry.halfPI
-import com.lomicron.utils.geometry.{Geometry, SphericalCoord}
 import com.softwaremill.quicklens._
+import com.typesafe.scalalogging.LazyLogging
 
 object MapBuilder extends LazyLogging {
 
-  val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
-  val modsDir = s"${System.getProperty("user.home")}\\Documents\\Paradox Interactive\\Europa Universalis IV\\mod"
-  val saveGame = "C:/Users/konst/Documents/Paradox Interactive/Europa Universalis IV/mod/save_editor/Bharat Battle.eu4"
-  val mods = Seq("rus", "balkans", "turkey")
+  private val gameDir = "D:/Steam/steamapps/common/Europa Universalis IV"
+  private val modsDir = FileResourceRepository.defaultModsDir
+  private val saveGame = Paths.get(FileResourceRepository.defaultSaveDir, "autosave.eu4").toString
+  val mods = Seq("rus", "balkans", "anatolia", "mashriq")
 
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
@@ -110,9 +108,9 @@ object MapBuilder extends LazyLogging {
 
   def writeMap(mapSvg: String): Unit = {
     val mpDirPath = Paths.get(modsDir, "map_rendering")
-    val f = FileNameAndContent("mercator_political.svg", mapSvg)
-    FileIO.writeUTF(mpDirPath, f)
-    logger.info(s"Produced mercator_political.svg")
+    val fname = "mercator_political.svg"
+    FileIO.writeUTF(mpDirPath, fname, mapSvg)
+    logger.info(s"Produced $fname")
   }
 
 }

@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.tools
 import java.nio.file.{Path, Paths}
 
 import com.lomicron.oikoumene.engine.Oikoumene
-import com.lomicron.oikoumene.io.{FileIO, FileNameAndContent}
+import com.lomicron.oikoumene.io.FileIO
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.parsers.map.MapParser
 import com.lomicron.oikoumene.parsers.provinces.ProvinceParser
@@ -21,6 +21,8 @@ import com.lomicron.utils.collection.CollectionUtils.{SeqEx, toOption}
 import com.lomicron.utils.json.JsonMapper.prettyPrint
 import com.softwaremill.quicklens._
 import com.typesafe.scalalogging.LazyLogging
+
+import scala.util.Try
 
 object ClausewitzMapBuilder extends LazyLogging {
 
@@ -63,6 +65,7 @@ object ClausewitzMapBuilder extends LazyLogging {
         |             [--mod|-m <mod>]
         |             [--cache-dir|-cd <cache_dir_pat>]
         |             [--rebuild-cache|-rc]
+        |             [--save-game|-save <save_file_path>]
         |             [--output-dir|-od <output_dir>]
         |             [--no-borders|-nb]
         |             [--no-rivers|-nr]
@@ -75,7 +78,7 @@ object ClausewitzMapBuilder extends LazyLogging {
         |
         |e.g.
         |simply parse provinces.bmp into svg shape and border jsons (add "-meta eu4" to parse additional metadata to jsons)
-        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\"
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\""
         |
         |generate a province outline map:
         |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_base_game\" -svg eu4 -mode province_outlines"
@@ -233,8 +236,8 @@ object ClausewitzMapBuilder extends LazyLogging {
         val saveGame = save.map(_._2)
 
         val svgMap = MapBuilder.buildMap(repos, settings.mapSettings, saveGame)
-        val fc = FileNameAndContent(mapName(settings.mapSettings.mapMode, saveFileName), svgMap)
-        val fp = writeUTF(settings, fc)
+        val fname = mapName(settings.mapSettings.mapMode, saveFileName)
+        val fp = writeUTF(settings, fname, svgMap)
         logger.info(s"Stored map to $fp")
       case _ =>
     }
@@ -324,26 +327,26 @@ object ClausewitzMapBuilder extends LazyLogging {
       writeMetadata(settings, borders, "borders", bordersJson)
 
   def writeMetadata[T](settings: CLMapBuilderSettings, es: Seq[T], key: String, filename: String): Unit = {
-    val fc = FileNameAndContent(filename, prettyPrint(Map(key -> es)))
-    val fp = write(settings, fc)
+    val fp = write(settings, filename, prettyPrint(Map(key -> es)))
     logger.info(s"Stored ${es.length} $key to $fp")
   }
 
-  def write(settings: CLMapBuilderSettings, fc: FileNameAndContent): Path =
-    writeHOF(settings, fc, FileIO.writeLatin)
+  def write(settings: CLMapBuilderSettings, fname: String, content: String): Path =
+    writeHOF(settings, fname, content, FileIO.writeLatin)
 
-  def writeUTF(settings: CLMapBuilderSettings, fc: FileNameAndContent): Path =
-    writeHOF(settings, fc, FileIO.writeUTF)
+  def writeUTF(settings: CLMapBuilderSettings, fname: String, content: String): Path =
+    writeHOF(settings, fname, content, FileIO.writeUTF)
 
   private def writeHOF
   (
     settings: CLMapBuilderSettings,
-    fc: FileNameAndContent,
-    writeF: (Path, FileNameAndContent) => Unit
+    fname: String,
+    content: String,
+    writeF: (Path, String, String) => Try[Unit]
   ): Path = {
     val od = Paths.get(settings.outputDir)
-    writeF(od, fc)
-    od.resolve(fc.name)
+    writeF(od, fname, content)
+    od.resolve(fname)
   }
 
 }

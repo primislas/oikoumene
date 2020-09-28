@@ -20,7 +20,7 @@ trait FileModWriter[T] extends ModWriter[T, FileNameAndContent] { self =>
 
 
   override def storeSerialized(e: FileNameAndContent): ModWriter[T, FileNameAndContent] = {
-    targetPath.foreach(FileIO.write(_, e))
+    targetPath.foreach(FileIO.writeLatin(_, e))
     self
   }
 

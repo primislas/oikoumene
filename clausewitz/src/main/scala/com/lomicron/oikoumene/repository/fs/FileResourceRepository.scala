@@ -262,7 +262,10 @@ case class FileResourceRepository(settings: GameFilesSettings)
 }
 
 object FileResourceRepository {
-  val defaultModDir = s"${System.getProperty("user.home")}/Paradox Interactive/Europa Universalis IV/mod"
+  val userHome: String = Option(System.getProperty("user.home")).getOrElse("~/")
+  val eu4SettingsDir: String = Paths.get(userHome, "/Paradox Interactive/Europa Universalis IV").toString
+  val defaultModsDir: String = Paths.get(eu4SettingsDir, "/mod").toString
+  val defaultSaveDir: String = Paths.get(eu4SettingsDir, "/save games").toString
 
   def apply(gameDir: String, modDir: String): ResourceRepository =
     FileResourceRepository(GameFilesSettings(gameDir, modDir))
