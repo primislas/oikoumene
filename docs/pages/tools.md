@@ -1,9 +1,24 @@
 ## Tools
 
-[Map Builder](#map-builder)
-* [Command Line Tool](#tracer-command-line)
-* [Output Files](#tracer-output-files)
-* [Rasterize SVG (svg -> png)](#rasterize-svg)
+1. [Prerequisites](#prerequisites)
+1. [Map Builder](#map-builder)
+    * [Command Line Tool](#tracer-command-line)
+    * [Output Files](#tracer-output-files)
+    * [Rasterize SVG (svg -> png)](#rasterize-svg)
+1. [Save to JSON](#save-to-json)
+
+### Prerequisites
+
+You will need to install 
+[sbt](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Windows.html) and 
+its pre-requisite JDK (see sbt installation guide) to run the scripts.
+I also recommend [Git Bash](https://gitforwindows.org/) as a bash emulator
+(command line utility) for Windows.
+
+Clone game repo and navigate to the directory:
+> git clone https://github.com/primislas/oikoumene.git oikoumene
+>
+> cd oikoumene
 
 ### Map Builder
 
@@ -20,18 +35,10 @@ border outlines for individual border styling.
 
 #### Tracer Command Line
 
-You will need to install 
-[sbt](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Windows.html) and 
-its pre-requisite JDK (see sbt installation guide) to run the scripts.
-
-Clone game repo and navigate to the directory:
-> https://github.com/primislas/oikoumene.git oikoumene
-> cd oikoumene
-
-From there you have two options:
-run sbt and then run commands from inside sbt REPL, or you can write and invoke one-command
-scripts, however that would require you to modify and most likely escape (screen) your
-commands. For example:
+You have two options from the project directory:
+1. run sbt and then run commands from inside sbt REPL
+1. write and invoke one-command scripts, however that would require you 
+to modify and most likely escape (screen) your commands. For example:
 > sbt -J-Xmx3G -J-Xss3M
 
 > runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd "D:/Steam/steamapps/common/Europa Universalis IV" -md "C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod" -m cool_map -m best_tags -m expanded_timeline
@@ -146,3 +153,12 @@ open the map in Chrome or Firefox and capture the page as an image.
     
 Additionally, you could use chrome (and firefox) from command line to do the conversion:
 > "C:/Program Files (x86)/Google/Chrome/Application/chrome" --headless --window-size=5632,2048 --screenshot="D:/eu4_political.png" "file:///D:/eu4_political.svg" 
+
+### Save to JSON
+
+Parses and stores a save game file as json. Note that the tool will create a new folder in your specified
+output directory named after the save file (e.g. BBB.eu4 will generate a BBB folder) and split the save into
+multiple json files so as to make them more digestible. (Most editors would struggle with a single huge text file.)
+
+Navigate to oikoumene project folder and run
+> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.SaveGameToJson -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/My Campaign.eu4\" -od \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/save_editor\""
