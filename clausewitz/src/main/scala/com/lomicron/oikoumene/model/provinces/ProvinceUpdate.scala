@@ -32,9 +32,9 @@ case class ProvinceUpdate
   // hits = 3073, isOptional = true, sample = 3
   baseManpower: Option[Int] = None,
   // hits = 14, isOptional = true, sample = "ANS"
-  addClaim: Option[String] = None,
+  addClaim: Option[Seq[String]] = None,
   // hits = 7, isOptional = true, sample = "FRA"
-  removeClaim: Option[String] = None,
+  removeClaim: Option[Seq[String]] = None,
 
   // hits = 2924, isOptional = true, sample = true
   isCity: Option[Boolean] = None,
@@ -67,7 +67,7 @@ case class ProvinceUpdate
   // hits = 993, isOptional = true, sample = 3
   nativeSize: Option[Int] = None,
   // hits = 980, isOptional = true, sample = 2
-  nativeFerocity: Option[Int] = None,
+  nativeFerocity: Option[BigDecimal] = None,
   // hits = 975, isOptional = true, sample = 1
   nativeHostileness: Option[Int] = None,
 

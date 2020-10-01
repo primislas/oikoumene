@@ -130,7 +130,6 @@ object ConfigField extends LazyLogging {
     case _: BooleanNode => ValueTypes.boolean
     case _: ArrayNode => ValueTypes.array
     case n: NumericNode =>
-      // TODO isFloatingPointNumber returns 'true' for negative values such as -1
       if (n.isFloatingPointNumber) ValueTypes.decimal
       else ValueTypes.number
     case _ => ValueTypes.unknown
@@ -165,7 +164,6 @@ object ConfigField extends LazyLogging {
             .flatMap(_.valueSample).map(_.get(0)).map(getNodeType).map(ValueTypes.arrayOf)
             .getOrElse(ValueTypes.arrayOf(ValueTypes.unknown))
         else if (ValueTypes.number == t)
-        // TODO isFloatingPointNumber seems to return unexpected result, investigate
           if (vals.exists(_.valueSample.exists(_.isFloatingPointNumber))) ValueTypes.decimal
           else ValueTypes.integer
         else t

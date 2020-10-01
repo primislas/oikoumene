@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.repository.fs
 
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
@@ -120,7 +121,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   private def dirFiles(relPath: String): Seq[Path] = {
     val (modFiles, modFileNames) = readModDir(relPath, settings.mods)
     val vanillaFiles = baseGame(relPath).map(readAllFilesFromDir(_, modFileNames)).getOrElse(Seq.empty)
-    modFiles ++ vanillaFiles
+    vanillaFiles ++ modFiles
   }
 
   private def readDir(relPath: String): Map[String, String] = {
@@ -160,15 +161,39 @@ case class FileResourceRepository(settings: GameFilesSettings)
     (Paths.get(path).getFileName.toString, readFile(path))
 
   override def getLocalisation(language: String)
-  : Seq[LocalisationEntry] =
-    dirFiles(localisationDir)
-      .map(_.toString)
-      .filter(_.matches(s"^.*_l_$language.yml"))
+  : Seq[LocalisationEntry] = {
+    (settings.mods.map(Option(_)) :+ None)
       .par
+      .flatMap(readLocalisation(_, language))
+      .seq
+  }
+
+  def readLocalisation(mod: Option[String], language: String): Seq[LocalisationEntry] = {
+    mod
+      .flatMap(modPath(_, localisationDir))
+      .orElse(baseGame(localisationDir))
+      .flatMap(readFilesAndSubdirFilesFromDir)
+      .getOrElse(Seq.empty)
+      .par
+      .map(_.toString)
+      .filter(_.matches(s".*_l_$language\\.yml$$"))
       .map(IO.readTextFile(_, StandardCharsets.UTF_8))
       .flatMap(_.lines)
       .flatMap(LocalisationEntry.fromString)
       .seq
+  }
+
+  def readFilesAndSubdirFilesFromDir(d: Path): Seq[File] = {
+    val fs = readAllFilesFromDir(d)
+    val isSubDir = fs.map(_.toFile).groupBy(_.isDirectory)
+    val subDirFiles = isSubDir.getOrElse(true, Seq.empty)
+      .map(_.toPath)
+      .flatMap(readAllFilesFromDir(_))
+      .map(_.toFile)
+      .filterNot(_.isDirectory)
+    val rootDirFiles = isSubDir.getOrElse(false, Seq.empty)
+    rootDirFiles ++ subDirFiles
+  }
 
   override def getProvinceTypes: Map[String, String] =
     readSourceFileMapToName(provinceTypesFile)
@@ -217,7 +242,11 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val provNameRegex: Regex = provNamePat.r
 
   override def getProvinceHistory: Map[Int, FileNameAndContent] = {
-    readDir(provinceHistoryDir)
+    val ps = dirFiles(provinceHistoryDir)
+      .reverse
+      .distinctBy(p => idFromProvHistFileName(p.getFileName.toString))
+      .map(_.toString)
+    readFiles(ps).toMap
       .mapKVtoValue(FileNameAndContent)
       .mapKeys(idFromProvHistFileName)
       .filterKeys(_.isDefined)
@@ -263,7 +292,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
 object FileResourceRepository {
   val userHome: String = Option(System.getProperty("user.home")).getOrElse("~/")
-  val eu4SettingsDir: String = Paths.get(userHome, "/Paradox Interactive/Europa Universalis IV").toString
+  val eu4SettingsDir: String = Paths.get(userHome, "/Documents/Paradox Interactive/Europa Universalis IV").toString
   val defaultModsDir: String = Paths.get(eu4SettingsDir, "/mod").toString
   val defaultSaveDir: String = Paths.get(eu4SettingsDir, "/save games").toString
 

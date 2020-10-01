@@ -54,9 +54,11 @@ object ClausewitzParser extends LazyLogging {
   def parse(str: String, deserializer: Deserializer): (ObjectNode, Seq[ParsingError]) = {
     Option(str)
       .map(JsonParser.parse(_, deserializer))
-      // TODO add at least logging to highlight the case
-      // where returned value is not an object node
-      .filter(_._1.isInstanceOf[ObjectNode])
+      .filter(t => {
+        val isObj = t._1.isInstanceOf[ObjectNode]
+        if (!isObj) logger.warn(s"Expected an object node but encountered ${t._1}")
+        isObj
+      })
       .map(t => (t._1.asInstanceOf[ObjectNode], t._2))
       .getOrElse(empty)
   }
@@ -141,8 +143,10 @@ object ClausewitzParser extends LazyLogging {
         case on: ObjectNode => on.getArray(ObjectScope.arrayKey).getOrElse(arrayNodeOf(on))
         case _: NullNode => arrayNode
         case jn: JsonNode => arrayNodeOf(jn)
+        case _ => nullNode
       }
-      o.setEx(f, a)
+      if (a != nullNode) o.setEx(f, a)
+      else o
     })
     o
   }

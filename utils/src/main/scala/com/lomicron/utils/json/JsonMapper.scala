@@ -135,7 +135,6 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
         patchMerge(existing.asInstanceOf[ObjectNode], update.asInstanceOf[ObjectNode])
 
       } else if (existing.isNumber && update.isNumber) {
-        // TODO what about subtraction? Does it even happen for numbers, ever?
         JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
       } else {
         target.set(k, update)
@@ -170,7 +169,6 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
         if (update.isArray) update.forEach(n => existingArray.add(n))
         else existingArray.add(update)
       } else if (existing.isNumber && update.isNumber) {
-        // TODO what about subtraction? Does it even happen for numbers, ever?
         JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(existing.asText).add(new java.math.BigDecimal(update.asText)))
       } else {
         target.setEx(k, arrayNodeOf(Seq(existing, update)))

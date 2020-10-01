@@ -20,7 +20,9 @@ object LocalisationParser {
   def apply(repos: RepositoryFactory)
   : Seq[LocalisationEntry] = {
     val resources = repos.resources
-    val localisationEntries = resources.getLocalisation(resources.SupportedLanguages.english)
+    val localisationEntries = resources
+      .getLocalisation(resources.SupportedLanguages.english)
+      .reverse
     repos.localisations.upsertEntries(localisationEntries)
     localisationEntries
   }

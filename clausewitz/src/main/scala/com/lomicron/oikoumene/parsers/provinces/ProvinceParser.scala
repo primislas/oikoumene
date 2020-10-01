@@ -115,10 +115,23 @@ object ProvinceParser extends LazyLogging {
         histAndErrors._1
       })
       .map(parseHistory)
+      .map(cleanUpHistory)
       .map(setHistBuildings(_, buildings))
       .map(setHistSourceFile(_, history))
       .map(province.setEx(Fields.history, _))
       .getOrElse(province)
+
+  def cleanUpHistory(update: ObjectNode): ObjectNode = {
+    // TODO: a plug for a failing mod, instead make a universal mechanism
+    //  to cleanup known arrays (empty obj to empty array, array to last val for non-array fields
+    update.getObject(Fields.init).foreach(init => {
+      init.getArray("is_city").map(_.toSeq).foreach(a => {
+        if (a.nonEmpty) init.setEx("is_city", a.last)
+        else init.remove("is_city")
+      })
+    })
+    update
+  }
 
   def setHistBuildings(h: ObjectNode, buildings: BuildingRepository): ObjectNode = {
     h.getObject(Fields.init).foreach(setBuildings(_, buildings))

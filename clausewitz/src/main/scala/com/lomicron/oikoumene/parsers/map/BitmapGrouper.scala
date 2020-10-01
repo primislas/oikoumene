@@ -113,7 +113,7 @@ case class GroupMgr() {
 
   def add(a: Int, b: Int): Int = {
     // TODO most likely could be optimized considerably,
-    // look here if willing to squeeze extra performance
+    //  look here if willing to squeeze extra performance
     val exstA = ids.getOrElse(a, SameGroup().add(a))
     val exstB = ids.getOrElse(b, SameGroup().add(b))
     val merged = exstA.add(exstB)

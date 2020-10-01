@@ -12,11 +12,12 @@ import com.lomicron.oikoumene.service.svg._
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, toOption}
 import com.lomicron.utils.geometry.Geometry.halfPI
 import com.lomicron.utils.geometry._
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
 import scala.collection.immutable.ListSet
 
-case class SvgMapService(repos: RepositoryFactory) {
+case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
 
   val provinceGroup: SvgElement = group.copy(
     id = SvgMapClasses.PROVINCE_GROUP,
@@ -324,28 +325,36 @@ case class SvgMapService(repos: RepositoryFactory) {
     val name = mapName(group)
 
     val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
-    val ps = Geometry.approximateBorder(polygons)
-    val c = Geometry.centroid(ps)
-    val o = Geometry.findOrientation(ps, c)
+    if (polygons.isEmpty) {
+      // possible in case of mods, where certain vanilla provinces do not exist on the map
+//      val ps = group.map(p => (p.id, p.name))
+//      logger.warn(s"No map polygons for provinces $groupId with provinces $ps")
+      Seq.empty
+    } else {
 
-    // rotating shapes so that they are 'parallel' to x axis
-    // (according to identified orientation)
-    // for further analysis
-    val rotation = if (o == 0.0 || o == PI) 0.0 else if (o > halfPI) PI - o else -o
-    val rotatedShapes = rotate(polygons, c, rotation)
-    val rotatedSegments = rotatedShapes.flatMap(_.segments())
+      val ps = Geometry.approximateBorder(polygons)
+      val c = Geometry.centroid(ps)
+      val o = Geometry.findOrientation(ps, c)
 
-    val namePolyline = toWeightedCentroidPolyline(rotatedSegments)
-    val curve = Geometry.weightedFit(namePolyline)
-    val orderedBezier = quadCurveToBezier(namePolyline, curve, c, rotation, height)
-    val curveLength = orderedBezier.head.distance(orderedBezier.last)
-    val fontSizeLimit = maxFontSize(rotatedSegments)
+      // rotating shapes so that they are 'parallel' to x axis
+      // (according to identified orientation)
+      // for further analysis
+      val rotation = if (o == 0.0 || o == PI) 0.0 else if (o > halfPI) PI - o else -o
+      val rotatedShapes = rotate(polygons, c, rotation)
+      val rotatedSegments = rotatedShapes.flatMap(_.segments())
 
-    //    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
-    //    if (oddNames.contains(name))
-    //      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+      val namePolyline = toWeightedCentroidPolyline(rotatedSegments)
+      val curve = Geometry.weightedFit(namePolyline)
+      val orderedBezier = quadCurveToBezier(namePolyline, curve, c, rotation, height)
+      val curveLength = orderedBezier.head.distance(orderedBezier.last)
+      val fontSizeLimit = maxFontSize(rotatedSegments)
 
-    Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
+      //    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
+      //    if (oddNames.contains(name))
+      //      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+
+      Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
+    }
   }
 
   def mapName(provinces: Seq[Province]): String =

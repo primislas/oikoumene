@@ -22,11 +22,13 @@ object MapBuilder extends LazyLogging {
   private val gameDir = "D:/Steam/steamapps/common/Europa Universalis IV"
   private val modsDir = FileResourceRepository.defaultModsDir
   private val saveGame = Paths.get(FileResourceRepository.defaultSaveDir, "autosave.eu4").toString
-  val mods = Seq("rus", "balkans", "anatolia", "mashriq")
+  val mods = Seq("MEIOUandTaxes1")
 
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
-    val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods))
+    val cacheDir = Paths.get(modsDir, "map_rendering", "meiou").toString
+    val rebuildCache = true
+    val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods, cacheDir, rebuildCache))
     Oikoumene.loadConfigs(repos)
 //    val saveFile = FileIO.readSave(saveGame).get
 //    val saveGamestate = SaveGameParser(saveFile)

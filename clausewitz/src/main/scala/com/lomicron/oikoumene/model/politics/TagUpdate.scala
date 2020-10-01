@@ -41,7 +41,7 @@ case class TagUpdate
   // hits = 845, isOptional = true, sample = {"name":"Zheng He","type":"explorer","fire":1,"shock":1,"manuever":6,"siege":0,"death_date":"1433.1.1"}
   leader: Option[Seq[Leader]] = None,
   // hits = 1, isOptional = true, sample = {"name":"shahrukhs_empire"}
-  addRulerModifier: Option[RulerModifier] = None,
+  addRulerModifier: Option[Seq[RulerModifier]] = None,
   // hits = 291, isOptional = true, sample = ["scholar_personality","just_personality"]
   addRulerPersonality: Option[Seq[String]] = None,
   // hits = 38, isOptional = true, sample = "well_advised_personality"
@@ -52,17 +52,17 @@ case class TagUpdate
   clearScriptedPersonalities: Option[Boolean] = None,
 
   // hits = 842, isOptional = true, sample = "iqta"
-  addGovernmentReform: Option[String] = None,
+  addGovernmentReform: Option[Seq[String]] = None,
   // hits = 40, isOptional = true, sample = "abolish_slavery_act"
   decision: Option[Seq[String]] = None,
   // hits = 26, isOptional = true, sample = 25
-  mercantilism: Option[Int] = None,
+  mercantilism: Option[BigDecimal] = None,
   // hits = 11, isOptional = true, sample = "MIL"
   nationalFocus: Option[String] = None,
   // hits = 21, isOptional = true, sample = {"trade_goods":"gems","key":"FACETING","value":0.25,"duration":-1}
   changePrice: Option[Seq[PriceModifier]] = None,
   // hits = 1, isOptional = true, sample = {"name":"tur_janissary","duration":-1}
-  addCountryModifier: Option[CountryModifier] = None,
+  addCountryModifier: Option[Seq[CountryModifier]] = None,
 
   // hits = 28, isOptional = true, sample = "COC"
   historicalRival: Option[Seq[String]] = None,

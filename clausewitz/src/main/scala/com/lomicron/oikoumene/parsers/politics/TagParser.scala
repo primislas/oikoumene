@@ -119,6 +119,16 @@ object TagParser extends LazyLogging {
           logger.warn(s"Encountered errors parsing country configuration for tag '$tag': $errors")
         t2._1
       })
+      .mapKVtoValue((tag, o) => {
+        val emptyObjects = o.entries().filter(e => e._2.isObject && e._2.isEmpty())
+        emptyObjects.foreach(eo => {
+          // TODO instead it would be more reliable to prepare a list of array keys and convert to
+          //  empty array based on it; also note that an empty obj / array might mean a reset
+          logger.warn(s"Removing empty object for key ${eo._1} from tag $tag")
+          o.removeEx(eo._1)
+        })
+        o
+      })
   }
 
   def parseCountryHistories

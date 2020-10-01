@@ -38,7 +38,7 @@ case class TagState
   // hits = 40, isOptional = true, sample = "abolish_slavery_act"
   decisions: Seq[String] = Seq.empty,
   // hits = 24, isOptional = true, sample = 25
-  mercantilism: Option[Int] = None,
+  mercantilism: Option[BigDecimal] = None,
   // hits = 11, isOptional = true, sample = "MIL"
   nationalFocus: Option[String] = None,
   // hits = 28, isOptional = true, sample = true
@@ -156,13 +156,13 @@ case class TagState
 
 
 
-  def addGovernmentReform(reform: String): TagState = copy(governmentReforms = governmentReforms :+ reform)
+  def addGovernmentReform(reform: Seq[String]): TagState = copy(governmentReforms = governmentReforms ++ reform)
 
   def addDecision(decision: String): TagState = addDecisions(Seq(decision))
 
   def addDecisions(decisions: Seq[String]): TagState = copy(decisions = this.decisions ++ decisions)
 
-  def setMercantilism(mercantilism: Int): TagState = copy(mercantilism = Option(mercantilism))
+  def setMercantilism(mercantilism: BigDecimal): TagState = copy(mercantilism = Option(mercantilism))
 
   def setNationalFocus(focus: String): TagState = copy(nationalFocus = Option(focus))
 
@@ -228,7 +228,11 @@ case class TagState
 
   def addCountryModifier(cm: CountryModifier): TagState = copy(countryModifiers = countryModifiers :+ cm)
 
+  def addCountryModifier(cms: Seq[CountryModifier]): TagState = copy(countryModifiers = countryModifiers ++ cms)
+
   def addRulerModifier(rm: RulerModifier): TagState = copy(rulerModifiers = rulerModifiers :+ rm)
+
+  def addRulerModifier(rms: Seq[RulerModifier]): TagState = copy(rulerModifiers = rulerModifiers ++ rms)
 
 
 
@@ -262,16 +266,17 @@ object TagState extends FromJson[TagState] {
       nextF(update.queen, (s, v: Queen) => s.updateQueen(v)),
       nextF(update.leader, (s, v: Seq[Leader]) => s.addLeaders(v)),
       nextF(update.addRulerPersonality, (s, v: Seq[String]) => s.addRulerPersonalities(v)),
+      nextF(update.addRulerModifier, (s, v: Seq[RulerModifier]) => s.addRulerModifier(v)),
       nextF(update.addQueenPersonality, (s, v: String) => s.addQueenPersonality(v)),
       nextF(update.addHeirPersonality, (s, v: Seq[String]) => s.addHeirPersonalities(v)),
       nextF(update.clearScriptedPersonalities, (s, v: Boolean) => if (v) s.clearPersonalities() else s),
 
-      nextF(update.addGovernmentReform, (s, v: String) => s.addGovernmentReform(v)),
+      nextF(update.addGovernmentReform, (s, v: Seq[String]) => s.addGovernmentReform(v)),
       nextF(update.decision, (s, v: Seq[String]) => s.addDecisions(v)),
-      nextF(update.mercantilism, (s, v: Int) => s.setMercantilism(v)),
+      nextF(update.mercantilism, (s, v: BigDecimal) => s.setMercantilism(v)),
       nextF(update.nationalFocus, (s, v: String) => s.setNationalFocus(v)),
       nextF(update.changePrice, (s, v: Seq[PriceModifier]) => s.addPriceModifiers(v)),
-      nextF(update.addCountryModifier, (s, v: CountryModifier) => s.addCountryModifier(v)),
+      nextF(update.addCountryModifier, (s, v: Seq[CountryModifier]) => s.addCountryModifier(v)),
 
       nextF(update.historicalRival, (s, v: Seq[String]) => s.addHistoricalRivals(v)),
       nextF(update.historicalFriend, (s, v: Seq[String]) => s.addHistoricalFriends(v)),

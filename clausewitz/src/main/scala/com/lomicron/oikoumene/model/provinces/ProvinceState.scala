@@ -24,7 +24,7 @@ case class ProvinceState
  isCity: Boolean = false,
 
  nativeSize: Int = 0,
- nativeFerocity: Int = 0,
+ nativeFerocity: BigDecimal = 0,
  nativeHostileness: Int = 0,
 
  unrest: Int = 0,
@@ -54,9 +54,11 @@ case class ProvinceState
 
   def development: Int = baseTax + baseProduction + baseManpower
 
-  def updateOwner(v: String): ProvinceState = copy(owner = Some(v))
+  def updateOwner(v: String): ProvinceState =
+    if (v != "---") copy(owner = Some(v)) else copy(owner = None)
 
-  def updateController(v: String): ProvinceState = copy(controller = Some(v))
+  def updateController(v: String): ProvinceState =
+    if (v != "---") copy(owner = Some(v)) else copy(owner = None)
 
   def addCore(v: String): ProvinceState = copy(cores = cores + v)
 
@@ -84,7 +86,11 @@ case class ProvinceState
 
   def addClaim(v: String): ProvinceState = copy(claims = claims + v)
 
+  def addClaim(v: Seq[String]): ProvinceState = copy(claims = claims ++ v)
+
   def removeClaim(v: String): ProvinceState = copy(claims = claims - v)
+
+  def removeClaim(v: Seq[String]): ProvinceState = copy(claims = claims -- v)
 
   def isCity(v: Boolean): ProvinceState = copy(isCity = v)
 
@@ -128,7 +134,7 @@ case class ProvinceState
 
   def updateNativeSize(v: Int): ProvinceState = copy(nativeSize = v)
 
-  def updateNativeFerocity(v: Int): ProvinceState = copy(nativeFerocity = v)
+  def updateNativeFerocity(v: BigDecimal): ProvinceState = copy(nativeFerocity = v)
 
   def updateNativeHostileness(v: Int): ProvinceState = copy(nativeHostileness = v)
 
@@ -175,8 +181,8 @@ object ProvinceState {
       nextF(update.baseTax, (s, v: Int) => s.updateBaseTax(v)),
       nextF(update.baseProduction, (s, v: Int) => s.updateBaseProduction(v)),
       nextF(update.baseManpower, (s, v: Int) => s.updateBaseManpower(v)),
-      nextF(update.addClaim, (s, v: String) => s.addClaim(v)),
-      nextF(update.removeClaim, (s, v: String) => s.removeClaim(v)),
+      nextF(update.addClaim, (s, v: Seq[String]) => s.addClaim(v)),
+      nextF(update.removeClaim, (s, v: Seq[String]) => s.removeClaim(v)),
       nextF(update.isCity, (s, v: Boolean) => s.isCity(v)),
       nextF(update.addBuilding, (s, v: Seq[String]) => s.addBuildings(v)),
       nextF(update.removeBuilding, (s, v: Seq[String]) => s.removeBuildings(v)),
@@ -191,7 +197,7 @@ object ProvinceState {
       nextF(update.revolt, (s, v: Seq[ProvinceRevolt]) => s.updateRevolts(v)),
       nextF(update.revoltRisk, (s, v: Int) => s.updateRevoltRisk(v)),
       nextF(update.nativeSize, (s, v: Int) => s.updateNativeSize(v)),
-      nextF(update.nativeFerocity, (s, v: Int) => s.updateNativeFerocity(v)),
+      nextF(update.nativeFerocity, (s, v: BigDecimal) => s.updateNativeFerocity(v)),
       nextF(update.nativeHostileness, (s, v: Int) => s.updateNativeHostileness(v)),
       nextF(update.estate, (s, v: String) => s.estate(v)),
       nextF(update.addLocalAutonomy, (s, v: Int) => s.addLocalAutonomy(v)),

@@ -253,7 +253,7 @@ object IndependentRus extends LazyLogging {
   ): Tag = {
     val init = TagUpdate(
       government = "monarchy",
-      addGovernmentReform = "principality",
+      addGovernmentReform = Seq("principality"),
       governmentRank = 1,
       primaryCulture = culture,
       religion = orthodox,
