@@ -22,5 +22,27 @@ class GeometrySpec extends Specification {
 
   }
 
+  "Geometry#cleanSameLinePoints" should {
+
+    "- eliminate redundant points belonging to the same line(s)" >> {
+      val ps = Seq(p(0,0), p(1, 1), p(2, 2), p(3, 3), p(4,2), p(5, 1))
+      val cleaned = Geometry.cleanSameLinePoints(ps)
+      cleaned.length mustEqual 3
+    }
+
+    "- account for tail points potentially belonging to the same line as starting points" >> {
+      val ps = Seq(p(0,0), p(1, 1), p(3, 3), p(4,2), p(-2, -3), p(-2, -2), p(-1, -1))
+      val cleaned = Geometry.cleanSameLinePoints(ps)
+      cleaned.length mustEqual 4
+    }
+
+    "- don't clean up tail points for open polylines" >> {
+      val ps = Seq(p(0,0), p(1, 1), p(3, 3), p(4,2), p(-2, -3), p(-2, -2), p(-1, -1))
+      val isPolyline = false
+      val cleaned = Geometry.cleanSameLinePoints(ps, isPolyline)
+      cleaned.length mustEqual 6
+    }
+
+  }
 
 }

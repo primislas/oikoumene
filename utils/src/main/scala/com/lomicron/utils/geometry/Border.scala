@@ -107,7 +107,8 @@ object Border {
       bs = union +: bs.drop(1).dropRight(1)
     }
 
-    bs
+    val isClosedPolyline = false
+    bs.map(b => b.copy(points = Geometry.cleanSameLinePoints(b.points, isClosedPolyline)))
   }
 
 }

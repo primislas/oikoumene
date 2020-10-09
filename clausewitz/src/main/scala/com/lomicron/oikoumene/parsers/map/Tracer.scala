@@ -83,7 +83,9 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
     val cleaned = Geometry.clean(shifted)
     val bps = cleaned.map(_.withRight(color))
     val bs = Border.ofBorderPoints(bps, group)
-    val poly = Polygon(outline.map(_.p), color)
+    val outlinePs = outline.map(_.p)
+    val cleanedOutlinePs = Geometry.cleanSameLinePoints(outlinePs)
+    val poly = Polygon(cleanedOutlinePs, color)
     Shape(borders = bs, provColor = color, polygon = poly)
   }
 

@@ -5,6 +5,8 @@ import java.lang.Math._
 import com.lomicron.utils.collection.CollectionUtils._
 import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoint, WeightedObservedPoints}
 
+import scala.annotation.tailrec
+
 object Geometry {
   val halfPI: Double = PI / 2
   val threeHalfPI: Double = 3 * halfPI
@@ -91,6 +93,44 @@ object Geometry {
         else cleaned :+ remaining.head
       cleanRec(remaining.drop(1), recCleaned, remaining.headOption)
     }
+
+  def cleanSameLinePoints(ps: Seq[Point2D], isClosed: Boolean = true): Seq[Point2D] =
+    if (ps.length < 3) ps
+    else {
+      val p1 = ps.head
+      val p2 = ps.drop(1).head
+      val angle = p2.angleTo(p1)
+      var cleaned = cleanSameLinePointsRec(Seq(p1), ps.drop(2), p2, angle)
+
+      if (isClosed) {
+        var tailAngle = p1.angleTo(cleaned.last)
+        if (tailAngle == angle) {
+          cleaned = cleaned.drop(1)
+          val withoutTail = cleaned.dropRight(1)
+          tailAngle = cleaned.last.angleTo(withoutTail.last)
+          if (tailAngle == angle) cleaned = withoutTail
+        }
+      }
+
+      cleaned
+    }
+
+  @tailrec
+  def cleanSameLinePointsRec
+  (
+    cleaned: Seq[Point2D],
+    remaining: Seq[Point2D],
+    prevPoint: Point2D,
+    prevAngle: Double,
+  ): Seq[Point2D] =
+    if (remaining.isEmpty) cleaned :+ prevPoint
+    else {
+      val point = remaining.head
+      val angle = point.angleTo(prevPoint)
+      val cleanedPs = if (angle == prevAngle) cleaned else cleaned :+ prevPoint
+      cleanSameLinePointsRec(cleanedPs, remaining.drop(1), point, angle)
+    }
+
 
   def fitQuadratic(ps: Seq[Point2D]): QuadPolynomial =
     fitQuadratic(Map(1.0 -> ps))

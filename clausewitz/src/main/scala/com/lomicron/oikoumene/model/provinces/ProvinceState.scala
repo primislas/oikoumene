@@ -58,7 +58,7 @@ case class ProvinceState
     if (v != "---") copy(owner = Some(v)) else copy(owner = None)
 
   def updateController(v: String): ProvinceState =
-    if (v != "---") copy(owner = Some(v)) else copy(owner = None)
+    if (v != "---") copy(controller = Some(v)) else copy(controller = None)
 
   def addCore(v: String): ProvinceState = copy(cores = cores + v)
 
