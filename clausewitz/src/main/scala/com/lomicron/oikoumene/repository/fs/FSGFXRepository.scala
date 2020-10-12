@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 case class FSGFXRepository(repos: RepositoryFactory)
   extends GFXRepository {
 
-  private val gameDir = repos.settings.gameDir
+  private val gameDir = repos.settings.gameDir.get
   private val tradeGoodsFile = s"$gameDir/gfx/interface/resources.dds"
   private val religionsFile = s"$gameDir/gfx/interface/icon_religion.dds"
 
@@ -46,4 +46,5 @@ case class FSGFXRepository(repos: RepositoryFactory)
     val height = image.getHeight
     image.getSubimage(height * index, 0, height, height)
   }
+
 }
