@@ -55,7 +55,8 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "clausewitz-eu4-ui:build",
-            "proxyConfig": "src/proxy.conf.js"
+            "proxyConfig": "src/proxy.conf.js",
+            "disableHostCheck": true
           },
           "configurations": {
             "production": {

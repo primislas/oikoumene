@@ -14,6 +14,7 @@ import {TagSearchModalComponent} from './tag-search/tag-search.modal.component';
 import {TagSearchTableComponent} from './tag-search/tag-search.table.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { MapComponent } from './map/map.component';
+import {WebsocketService} from "./services/web-socket.service";
 
 @NgModule({
     declarations: [
@@ -37,7 +38,7 @@ import { MapComponent } from './map/map.component';
     entryComponents: [
         TagSearchModalComponent,
     ],
-    providers: [],
+    providers: [WebsocketService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

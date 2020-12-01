@@ -1,3 +1,55 @@
-<p>
-  map works!
-</p>
+<div class="container-fluid">
+  <div class="row mt-2">
+    <div class="col-12" style="width: 100%; height: 90vh; overflow: scroll;">
+      <svg x="0" y="0" [attr.width]="map.width" [attr.height]="map.height">
+
+        <defs>
+          <pattern id="background-water" patternUnits="userSpaceOnUse" width="5632" height="2048">
+            <image x="0" y="0" width="5632" height="2048" xlink:href="https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-water.png"></image>
+          </pattern>
+          <pattern id="background-terrain" patternUnits="userSpaceOnUse" width="5632" height="2048">
+            <image x="0" y="0" width="5632" height="2048" xlink:href="https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-summer-nowater.png"></image>
+          </pattern>
+        </defs>
+        <polygon class="terrain" fill="url(#background-water)"  points="0,0 5632,0 5632,2048 0,2048"></polygon>
+        <polygon class="terrain" fill="url(#background-terrain)"  points="0,0 5632,0 5632,2048 0,2048"></polygon>
+
+        <style>{{map.style}}</style>
+
+        <g id="province-group" class="province">
+
+          <g id="province" class="province">
+            <path *ngFor="let p of map.provinceShapes" id="{{p.provinceId}}" fill-rule="evenodd" [attr.d]="p.path" [ngClass]="p.classes">
+              <title>{{p.name}}</title>
+            </path>
+          </g>
+
+        </g>
+
+        <g id="border-group" class="border">
+          <path *ngFor="let b of map.borders" id="{{b.id}}" [attr.d]="b.path" [ngClass]="b.classes"></path>
+        </g>
+
+        <g id="river-group" class="river">
+          <ng-container *ngFor="let rClass of map.riverClasses">
+            <g id="{{rClass}}" [ngClass]="rClass">
+              <path *ngFor="let r of map.riversByClass.get(rClass)" [attr.d]="r.path"></path>
+            </g>
+          </ng-container>
+        </g>
+
+        <g id="name-group" class="tn">
+          <ng-container *ngFor="let n of map.names">
+            <path id="{{n.id}}" fill="none" opacity="0" [attr.d]="n.path"></path>
+            <text dominant-baseline="middle">
+              <textPath [attr.xlink:href]="'#' + n.id" startOffset="50%" [attr.textLength]="n.textLength" text-anchor="middle"
+                        [attr.font-size]="n.fontSize">{{n.name}}</textPath>
+            </text>
+          </ng-container>
+        </g>
+
+
+      </svg>
+    </div>
+  </div>
+</div>

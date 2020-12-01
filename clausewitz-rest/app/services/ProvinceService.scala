@@ -7,9 +7,8 @@ import com.lomicron.oikoumene.repository.api.search.{SearchDictionary, SearchRes
 import javax.inject.Inject
 
 class ProvinceService @Inject
-(
-  repos: RepositoryFactory
-) {
+(repos: RepositoryFactory)
+{
 
   def findProvinces(searchConf: ProvinceSearchConf): SearchResult[ResProvinceListEntity] = {
     val sr = repos.provinces.search(searchConf)

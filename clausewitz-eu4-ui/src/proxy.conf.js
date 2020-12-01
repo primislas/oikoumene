@@ -10,6 +10,15 @@ const PROXY_CONFIG = {
   //     }
   //   }
   // }
+  "/clausewitz/eu4/map/data": {
+    "target": "ws://localhost:9000",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "pathRewrite": {
+      // "^/turmchen": ""
+    }
+  },
   "/clausewitz/*": {
     "target": "http://localhost:9000",
     "secure": false,

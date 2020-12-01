@@ -56,11 +56,13 @@ class ProvinceController @Inject()
     val s = size.getOrElse(10)
 
     val withDict = with_dictionary.getOrElse(false)
-    val conf = ProvinceSearchConf(p, s, withDict, name, owner, controller, core,
+    val conf = ProvinceSearchConf(
+      p, s, withDict, name, owner, controller, core,
       religion, religion_group, culture, culture_group,
       area, region, superregion, continent,
       trade_good, trade_node,
-      include_fields.toSet, exclude_fields.toSet)
+      include_fields.toSet, exclude_fields.toSet
+    )
     val res = group_by match {
       case Some(group) => provinceService.groupProvinces(conf, group)
       case _ => provinceService.findProvinces(conf)
