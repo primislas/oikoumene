@@ -29,6 +29,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val casusBelliTypesDir = "common/cb_types"
 
   val ideasDir = "common/ideas"
+  val governmentReformsDir = "common/government_reforms"
 
   val provinceDefinitionsFile = "map/definition.csv"
   val adjacenciesFile = "map/adjacencies.csv"
@@ -57,6 +58,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val tradeGoodsDir = "common/tradegoods"
   val pricesDir = "common/prices"
   val tradeNodesDir = "common/tradenodes"
+
+  val eventModifiersDir = "common/event_modifiers"
 
   private def readFile(path: String): String =
     IO.readTextFile(path, StandardCharsets.ISO_8859_1)
@@ -253,8 +256,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
       .mapKeys(_.get)
   }
 
-  override def getBuildings: Seq[String] =
-    readDir(buildingsDir).values.toSeq
+  override def getBuildings: Map[String, String] =
+    readDir(buildingsDir)
 
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {
@@ -279,6 +282,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getIdeas: Map[String, String] =
     readDir(ideasDir)
 
+  override def getGovernmentReforms: Map[String, String] =
+    readDir(governmentReformsDir)
+
   override def getTradeGoods: Map[String, String] =
     readDir(tradeGoodsDir)
 
@@ -288,6 +294,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getTradeNodes: Map[String, String] =
     readDir(tradeNodesDir)
 
+  override def getEventModifiers: Map[String, String] =
+    readDir(eventModifiersDir)
 }
 
 object FileResourceRepository {

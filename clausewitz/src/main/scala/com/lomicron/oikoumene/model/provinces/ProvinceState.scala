@@ -7,50 +7,55 @@ import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 import scala.collection.immutable.ListSet
 
 case class ProvinceState
-(baseTax: Int = 0,
- baseProduction: Int = 0,
- baseManpower: Int = 0,
- discoveredBy: Set[String] = ListSet.empty,
- tradeGood: Option[String] = None,
- capital: Option[String] = None,
- culture: Option[String] = None,
- cultureGroup: Option[String] = None,
- religion: Option[String] = None,
- religionGroup: Option[String] = None,
- owner: Option[String] = None,
- controller: Option[String] = None,
- cores: Set[String] = ListSet.empty,
- claims: Set[String] = ListSet.empty,
- isCity: Boolean = false,
+(
+  baseTax: Int = 0,
+  baseProduction: Int = 0,
+  baseManpower: Int = 0,
 
- nativeSize: Int = 0,
- nativeFerocity: BigDecimal = 0,
- nativeHostileness: Int = 0,
+  production: ProvinceProduction = ProvinceProduction.empty,
+  modifiers: Map[String, ActiveProvinceModifier] = Map.empty,
 
- unrest: Int = 0,
- revoltRisk: Int = 0,
- revolt: Option[ProvinceRevolt] = None,
+  discoveredBy: Set[String] = ListSet.empty,
+  tradeGood: Option[String] = None,
+  capital: Option[String] = None,
+  culture: Option[String] = None,
+  cultureGroup: Option[String] = None,
+  religion: Option[String] = None,
+  religionGroup: Option[String] = None,
+  owner: Option[String] = None,
+  controller: Option[String] = None,
+  cores: Set[String] = ListSet.empty,
+  claims: Set[String] = ListSet.empty,
+  isCity: Boolean = false,
 
- buildings: Set[String] = ListSet.empty,
- centerOfTrade: Int = 0,
- estate: Option[String] = None,
- extraCost: Int = 0,
- localAutonomy: Int = 0,
- permanentModifiers: Seq[ProvinceModifier] = Seq.empty,
- triggeredModifiers: Set[String] = Set.empty,
- latentTradeGoods: Set[String] = ListSet.empty,
- isInHre: Boolean = true,
- reformationCenter: Option[String] = None,
- seatInParliament: Boolean = false,
- tradeCompany: Option[String] = None,
- tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
+  nativeSize: Int = 0,
+  nativeFerocity: BigDecimal = 0,
+  nativeHostileness: Int = 0,
+
+  unrest: Int = 0,
+  revoltRisk: Int = 0,
+  revolt: Option[ProvinceRevolt] = None,
+
+  buildings: Set[String] = ListSet.empty,
+  centerOfTrade: Int = 0,
+  estate: Option[String] = None,
+  extraCost: Int = 0,
+  localAutonomy: Int = 0,
+  permanentModifiers: Seq[ActiveProvinceModifier] = Seq.empty,
+  triggeredModifiers: Set[String] = Set.empty,
+  latentTradeGoods: Set[String] = ListSet.empty,
+  isInHre: Boolean = true,
+  reformationCenter: Option[String] = None,
+  seatInParliament: Boolean = false,
+  tradeCompany: Option[String] = None,
+  tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
 ) extends HistState[ProvinceState, ProvinceUpdate] {
   self =>
 
   @JsonCreator def this() = this(0)
 
   override def next(update: ProvinceUpdate): ProvinceState =
-      updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))
+    updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))
 
   def development: Int = baseTax + baseProduction + baseManpower
 
@@ -142,9 +147,9 @@ case class ProvinceState
 
   def addLocalAutonomy(v: Int): ProvinceState = copy(localAutonomy = localAutonomy + v)
 
-  def addPermanentModifier(v: ProvinceModifier): ProvinceState = copy(permanentModifiers = permanentModifiers :+ v)
+  def addPermanentModifier(v: ActiveProvinceModifier): ProvinceState = copy(permanentModifiers = permanentModifiers :+ v)
 
-  def addPermanentModifiers(v: Seq[ProvinceModifier]): ProvinceState =
+  def addPermanentModifiers(v: Seq[ActiveProvinceModifier]): ProvinceState =
     v.foldLeft(this)(_ addPermanentModifier _)
 
 
@@ -201,7 +206,7 @@ object ProvinceState {
       nextF(update.nativeHostileness, (s, v: Int) => s.updateNativeHostileness(v)),
       nextF(update.estate, (s, v: String) => s.estate(v)),
       nextF(update.addLocalAutonomy, (s, v: Int) => s.addLocalAutonomy(v)),
-      nextF(update.addPermanentProvinceModifier, (s, v: Seq[ProvinceModifier]) => s.addPermanentModifiers(v)),
+      nextF(update.addPermanentProvinceModifier, (s, v: Seq[ActiveProvinceModifier]) => s.addPermanentModifiers(v)),
       nextF(update.latentTradeGoods, (s, v: Seq[String]) => s.latentTradeGoods(v)),
       nextF(update.addTradeCompanyInvestment, (s, v: Seq[TradeCompanyInvestment]) => s.addTradeCompanyInvestments(v)),
       nextF(update.addToTradeCompany, (s, v: String) => s.addToTradeCompany(v))

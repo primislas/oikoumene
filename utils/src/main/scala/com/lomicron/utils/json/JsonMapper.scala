@@ -78,7 +78,13 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
 
   def textNode(t: String): TextNode = TextNode.valueOf(t)
 
+  def booleanNode(b: Boolean): BooleanNode = BooleanNode.valueOf(b)
+
   def numericNode(int: Int): NumericNode = IntNode.valueOf(int)
+
+  def numericNode(double: Double): NumericNode = DoubleNode.valueOf(double)
+
+  def numericNode(bigDecimal: BigDecimal): NumericNode = DoubleNode.valueOf(bigDecimal.doubleValue())
 
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
@@ -289,7 +295,13 @@ object JsonMapper {
 
   def textNode(t: String): TextNode = defaultMapper.textNode(t)
 
+  def booleanNode(bool: Boolean): BooleanNode = defaultMapper.booleanNode(bool)
+
   def numericNode(i: Int): NumericNode = defaultMapper.numericNode(i)
+
+  def numericNode(d: Double): NumericNode = defaultMapper.numericNode(d)
+
+  def numericNode(bd: BigDecimal): NumericNode = defaultMapper.numericNode(bd)
 
   def patch[T <: AnyRef, P <: AnyRef](target: T, update: P): T = defaultMapper.patch(target, update)
 
@@ -375,7 +387,13 @@ object JsonMapper {
 
     def setEx(field: String, value: String): ObjectNode = setEx(field, textNode(value))
 
+    def setEx(field: String, value: Boolean): ObjectNode = setEx(field, booleanNode(value))
+
     def setEx(field: String, value: Int): ObjectNode = setEx(field, numericNode(value))
+
+    def setEx(field: String, value: Double): ObjectNode = setEx(field, numericNode(value))
+
+    def setEx(field: String, value: BigDecimal): ObjectNode = setEx(field, numericNode(value))
 
     def setEx(field: String, a: Seq[JsonNode]): ObjectNode = setEx(field, arrayNodeOf(a))
 
@@ -397,9 +415,16 @@ object JsonMapper {
 
     def getArray(f: String): Option[ArrayNode] = Option(o.get(f)).cast[ArrayNode]
 
+    def getNumber(f: String): Option[NumericNode] = Option(o.get(f)).filter(_.isNumber).cast[NumericNode]
+
+    def getBoolean(f: String): Option[Boolean] = Option(o.get(f)).filter(_.isBoolean).map(_.booleanValue())
+
     def getString(f: String): Option[String] = Option(o.get(f)).cast[TextNode].map(_.asText)
 
     def getInt(f: String): Option[Int] = Option(o.get(f)).map(_.asInt)
+
+    def getBigDecimal(f: String): Option[BigDecimal] =
+      Option(o.get(f)).filter(_.isNumber).map(_.numberValue().doubleValue()).map(BigDecimal(_))
 
     //noinspection AccessorLikeMethodIsEmptyParen
     def isEmpty(): Boolean = !nonEmpty

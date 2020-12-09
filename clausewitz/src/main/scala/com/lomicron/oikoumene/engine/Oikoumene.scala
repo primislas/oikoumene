@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyPars
 import com.lomicron.oikoumene.parsers.government.IdeaParser
 import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.oikoumene.parsers.map.MapParser
+import com.lomicron.oikoumene.parsers.modifiers.{EventModifierParser, ModifierAnalyzer}
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
 import com.lomicron.oikoumene.parsers.trade.{TradeGoodParser, TradeNodeParser}
@@ -44,6 +45,8 @@ object Oikoumene extends LazyLogging {
     val les = LocalisationParser(repos)
     logger.info(s"Loaded ${les.size} localisation entries")
 
+//    ModifierAnalyzer(repos)
+
     val tags = TagParser(repos)
     logger.info(s"Loaded ${tags.size} tags")
     val buildings = BuildingParser(repos)
@@ -72,6 +75,10 @@ object Oikoumene extends LazyLogging {
     logger.info(s"Loaded ${tradeGoods.size} trade goods")
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
+
+    logger.info("Loading event modifiers...")
+    val eventModifiers = EventModifierParser(repos)
+    logger.info(s"Loaded ${eventModifiers.size} event modifiers")
 
     logger.info("Loading map...")
     val geography = MapParser(repos)

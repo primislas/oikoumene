@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
+import com.lomicron.oikoumene.model.MapClassTemplate
 import com.lomicron.oikoumene.parsers.ConfigField.ValueTypes
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.{JsonMapper, ToJson}
@@ -29,6 +30,15 @@ case class ConfigField
     val camelCaseField = JsonParser.camelCase(field)
     val defVal = defaultValue.getOrElse("")
     val classField = caseClassField(camelCaseField, valueType, defVal)
+
+    Seq(metadata, classField)
+  }
+
+  def getterCode: Seq[String] = {
+    val metadata = s"  // hits = $hits, isOptional = $isOptional, sample = ${JsonMapper.toJson(valueSample).take(500)}"
+    val getterName = JsonParser.camelCase(field)
+    val vType = if (valueType.startsWith("O")) valueType.substring(7, valueType.length - 1) else valueType
+    val classField = s"""  def $getterName: Option[$vType] = modifier.get$vType("$field")"""
 
     Seq(metadata, classField)
   }
@@ -79,6 +89,64 @@ object ConfigField extends LazyLogging {
   def printCaseClass(name: String, entities: Seq[ObjectNode]): Unit = {
     printCaseClassFromConfigs(name, apply(entities))
   }
+
+  def printMapClass(name: String, entities: Seq[ObjectNode]): Unit =
+    printMapClassFromConfigs(name, apply(entities))
+
+  // TODO remove code duplication
+  private def printMapClassFromConfigs(name: String, fields: Seq[ConfigField]): Unit = {
+    val hasId = fields.exists(cf => cf.field == "id" && !cf.isOptional && cf.valueType == ValueTypes.string)
+    val hasLocalisation = fields.exists(cf => cf.field == "localisation")
+    val isEntity = hasId && hasLocalisation
+    val usesEntityConstant = fields.exists(cf => cf.defaultValue.contains("Entity.UNDEFINED"))
+    val importsEntity = isEntity || usesEntityConstant
+    val hasColor = fields.exists(_.field == "color")
+
+    println("import com.fasterxml.jackson.annotation.JsonCreator")
+
+    if (hasColor && importsEntity)
+      println("import com.lomicron.oikoumene.model.{Color, Entity}")
+    else if (importsEntity)
+      println("import com.lomicron.oikoumene.model.Entity")
+    else if (hasColor)
+      println("import com.lomicron.oikoumene.model.Color")
+    println("import com.lomicron.utils.json.JsonMapper.ObjectNodeEx")
+
+    if (hasLocalisation) println("import com.lomicron.oikoumene.model.localisation.Localisation")
+
+    println("import com.lomicron.utils.json.FromJson")
+    println()
+
+    println(s"case class $name")
+    println("(")
+    val id = fields.find(_.field == "id").toSeq
+    val typE = fields.find(_.field == "`type`").toSeq
+    val loc = fields.find(_.field == "localisation").toSeq
+    val sourceFile = fields.find(_.field == "source_file").toSeq
+    val isOptional = false
+    val modifier = Seq(ConfigField("modifier", isOptional, "ObjectNode"))
+    val reordered = id ++ typE ++ loc ++ sourceFile ++ modifier
+    reordered.flatMap(_.caseClassCode).foreach(println)
+
+    val firstFieldDefault = reordered.headOption.flatMap(_.defaultValue).getOrElse("")
+    if (isEntity) println(") extends Entity {")
+    else println(") {")
+    println(s"\t@JsonCreator def this() = this($firstFieldDefault)\n}")
+
+    println("  def add(other: MapClassTemplate): MapClassTemplate =")
+    println("    copy(modifier = MapClassTemplate.add(modifier, other.modifier))")
+    println("  def +(other: MapClassTemplate): MapClassTemplate = add(other)\n")
+
+    fields
+      .filterNot(f => reorderedFields.contains(f.field))
+      .flatMap(_.getterCode)
+      .foreach(println)
+
+    println()
+    println(s"object $name extends FromJson[$name]")
+    println()
+  }
+
 
   private def printCaseClassFromConfigs(name: String, fields: Seq[ConfigField]): Unit = {
     val hasId = fields.exists(cf => cf.field == "id" && !cf.isOptional && cf.valueType == ValueTypes.string)

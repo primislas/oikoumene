@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, Di
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
+import com.lomicron.oikoumene.repository.api.modifiers.EventModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
@@ -35,6 +36,8 @@ trait RepositoryFactory {
 
   def tradeGoods: TradeGoodRepository
   def tradeNodes: TradeNodeRepository
+
+  def eventModifiers: EventModifierRepository
 
   def gfx: GFXRepository
 

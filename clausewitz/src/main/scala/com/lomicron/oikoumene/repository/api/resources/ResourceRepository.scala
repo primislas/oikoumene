@@ -45,7 +45,7 @@ trait ResourceRepository {
 
   def getProvinceHistory: Map[Int, FileNameAndContent]
 
-  def getBuildings: Seq[String]
+  def getBuildings: Map[String, String]
 
   def getProvinceTypes: Map[String, String]
 
@@ -85,11 +85,15 @@ trait ResourceRepository {
 
   def getIdeas: Map[String, String]
 
+  def getGovernmentReforms: Map[String, String]
+
   def getTradeGoods: Map[String, String]
 
   def getPrices: Map[String, String]
 
   def getTradeNodes: Map[String, String]
+
+  def getEventModifiers: Map[String, String]
 
   object SupportedLanguages {
     val english = "english"

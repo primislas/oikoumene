@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.model.localisation
 
 import com.lomicron.oikoumene.service.NamingService
+import com.lomicron.utils.json.{FromJson, ToJson}
 
-case class Localisation(name: Option[String] = None, adjective: Option[String] = None) {
+case class Localisation(name: Option[String] = None, adjective: Option[String] = None) extends ToJson {
 
   private var locAliases: Set[String] = Set.empty
 
@@ -19,7 +20,7 @@ case class Localisation(name: Option[String] = None, adjective: Option[String] =
 
 }
 
-object Localisation {
+object Localisation extends FromJson[Localisation] {
   val empty: Localisation = Localisation()
 }
 
