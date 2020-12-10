@@ -95,6 +95,8 @@ trait ResourceRepository {
 
   def getEventModifiers: Map[String, String]
 
+  def getStaticModifiers: Map[String, String]
+
   object SupportedLanguages {
     val english = "english"
     val german = "german"

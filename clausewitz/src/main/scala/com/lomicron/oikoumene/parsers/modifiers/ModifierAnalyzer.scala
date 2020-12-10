@@ -4,21 +4,24 @@ import com.lomicron.oikoumene.parsers.government.IdeaParser.parseIdeaGroup
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx}
+import com.lomicron.utils.parsing.JsonParser
 
 object ModifierAnalyzer {
 
   def apply(repos: RepositoryFactory): Seq[ConfigField] = {
     val files = repos.resources
 
-    val eventModifiers = ClausewitzParser
+    val events = ClausewitzParser
       .parseFileFieldsAsEntities(files.getEventModifiers)
-    val buildingModifiers = ClausewitzParser
+    val static = ClausewitzParser
+      .parseFileFieldsAsEntities(files.getStaticModifiers)
+    val buildings = ClausewitzParser
       .parseFileFieldsAsEntities(files.getBuildings)
       .flatMap(_.getObject("modifier"))
-    val reformModifiers = ClausewitzParser
+    val reforms = ClausewitzParser
       .parseFileFieldsAsEntities(files.getGovernmentReforms)
       .flatMap(_.getObject("modifiers"))
-    val ideaModifiers = ClausewitzParser
+    val ideas = ClausewitzParser
       .parseFileFieldsAsEntities(files.getIdeas)
       .map(parseIdeaGroup)
       .flatMap(_.getArray("ideas"))
@@ -26,8 +29,11 @@ object ModifierAnalyzer {
       .flatMap(_.asObject)
       .flatMap(_.getObject("modifiers"))
 
-    val modifiers = eventModifiers ++ buildingModifiers ++ reformModifiers ++ ideaModifiers
+    val modifiers = events ++ static ++ buildings ++ reforms ++ ideas
     ConfigField.printMapClass("Modifier", modifiers)
+
+    val staticIds = static.flatMap(_.getString("id"))
+    staticIds.foreach(id => println(s"""  def ${JsonParser.camelCase(id)}: Option[Modifier] = find("$id").toOption"""))
 
     Seq.empty
   }

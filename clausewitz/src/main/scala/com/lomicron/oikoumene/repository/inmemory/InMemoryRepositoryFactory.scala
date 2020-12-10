@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, Di
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.modifiers.EventModifierRepository
+import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
@@ -13,7 +13,7 @@ import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepo
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
 import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRepository
 import com.lomicron.oikoumene.repository.inmemory.map._
-import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryEventModifierRepository
+import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
@@ -46,7 +46,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository()
   private val tradeNodeRepository: TradeNodeRepository = InMemoryTradeNodeRepository()
 
-  private val eventModifierRepository: EventModifierRepository = InMemoryEventModifierRepository()
+  private val eventModifierRepository: ModifierRepository = InMemoryModifierRepository()
 
 
 
@@ -94,7 +94,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
 
 
-  override def eventModifiers: EventModifierRepository = eventModifierRepository
+  override def eventModifiers: ModifierRepository = eventModifierRepository
 
 
 

@@ -60,6 +60,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val tradeNodesDir = "common/tradenodes"
 
   val eventModifiersDir = "common/event_modifiers"
+  val staticModifiersDir = "common/static_modifiers"
 
   private def readFile(path: String): String =
     IO.readTextFile(path, StandardCharsets.ISO_8859_1)
@@ -296,6 +297,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getEventModifiers: Map[String, String] =
     readDir(eventModifiersDir)
+
+  override def getStaticModifiers: Map[String, String] =
+    readDir(staticModifiersDir)
 }
 
 object FileResourceRepository {
