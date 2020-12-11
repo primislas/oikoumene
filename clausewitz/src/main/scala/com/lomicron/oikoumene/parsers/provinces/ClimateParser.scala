@@ -1,14 +1,14 @@
 package com.lomicron.oikoumene.parsers.provinces
 
-import com.fasterxml.jackson.databind.node.{ArrayNode, TextNode}
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.lomicron.oikoumene.model.provinces.Climate
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ClimateRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{objectNode, patchFieldValue}
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, objectNode, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging
 
 object ClimateParser extends LazyLogging {
@@ -25,7 +25,7 @@ object ClimateParser extends LazyLogging {
    evalEntityFields: Boolean)
   : ClimateRepository = {
 
-    val jsonNodes = files
+    val climateSettings = files
       .getClimate
       .map(ClausewitzParser.parse)
       .map(o => {
@@ -34,14 +34,12 @@ object ClimateParser extends LazyLogging {
       })
       .getOrElse(Stream.empty)
       .map(e => e.getKey -> e.getValue).toMap
-      .filterKeyValue((id, n) => {
-        if (!n.isInstanceOf[ArrayNode])
-          logger.warn(s"Expected climate ArrayNode but at '$id' encountered ${n.toString}")
-        n.isInstanceOf[ArrayNode]
-      })
+
+    val jsonNodes = climateSettings
+      .filterValues(_.isInstanceOf[ArrayNode])
       .mapValues(_.asInstanceOf[ArrayNode])
       .mapValues(patchFieldValue(objectNode, provinceIdsKey, _))
-      .mapKVtoValue((id, region) => patchFieldValue(region, idKey, TextNode.valueOf(id)))
+      .mapKVtoValue((id, region) => region.setEx(idKey, id))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
 
@@ -49,6 +47,11 @@ object ClimateParser extends LazyLogging {
       ConfigField.printCaseClass("Climate", jsonNodes)
 
     jsonNodes.map(Climate.fromJson).foreach(climates.create)
+    climateSettings
+      .get("equator_y_on_province_image")
+      .filter(_.isInt)
+      .map(_.intValue())
+      .foreach(climates.equatorYOnProvinceImage)
 
     climates
   }

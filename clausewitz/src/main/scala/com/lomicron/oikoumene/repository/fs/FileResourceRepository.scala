@@ -58,6 +58,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val tradeGoodsDir = "common/tradegoods"
   val pricesDir = "common/prices"
   val tradeNodesDir = "common/tradenodes"
+  val centersOfTradeDir = "common/centers_of_trade"
 
   val eventModifiersDir = "common/event_modifiers"
   val staticModifiersDir = "common/static_modifiers"
@@ -294,6 +295,10 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getTradeNodes: Map[String, String] =
     readDir(tradeNodesDir)
+
+
+  override def getCentersOfTrade: Map[String, String] =
+    readDir(centersOfTradeDir)
 
   override def getEventModifiers: Map[String, String] =
     readDir(eventModifiersDir)

@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.parsers.modifiers
 
 import com.lomicron.oikoumene.parsers.government.IdeaParser.parseIdeaGroup
+import com.lomicron.oikoumene.parsers.provinces.TerrainParser
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx}
@@ -15,6 +16,7 @@ object ModifierAnalyzer {
       .parseFileFieldsAsEntities(files.getEventModifiers)
     val static = ClausewitzParser
       .parseFileFieldsAsEntities(files.getStaticModifiers)
+    val terrain = TerrainParser(repos).terrain.findAll.flatMap(_.modifier).map(_.conf)
     val buildings = ClausewitzParser
       .parseFileFieldsAsEntities(files.getBuildings)
       .flatMap(_.getObject("modifier"))
@@ -29,7 +31,7 @@ object ModifierAnalyzer {
       .flatMap(_.asObject)
       .flatMap(_.getObject("modifiers"))
 
-    val modifiers = events ++ static ++ buildings ++ reforms ++ ideas
+    val modifiers = events ++ static ++ buildings ++ reforms ++ ideas ++ terrain
     ConfigField.printMapClass("Modifier", modifiers)
 
     val staticIds = static.flatMap(_.getString("id"))

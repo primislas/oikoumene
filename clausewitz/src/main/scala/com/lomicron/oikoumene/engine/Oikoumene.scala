@@ -4,10 +4,10 @@ import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyPars
 import com.lomicron.oikoumene.parsers.government.IdeaParser
 import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.oikoumene.parsers.map.MapParser
-import com.lomicron.oikoumene.parsers.modifiers.{ModifierParser, ModifierAnalyzer}
+import com.lomicron.oikoumene.parsers.modifiers.{ModifierAnalyzer, ModifierParser}
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
-import com.lomicron.oikoumene.parsers.trade.{TradeGoodParser, TradeNodeParser}
+import com.lomicron.oikoumene.parsers.trade.{CenterOfTradeParser, TradeGoodParser, TradeNodeParser}
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.CacheReader
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
@@ -75,6 +75,8 @@ object Oikoumene extends LazyLogging {
     logger.info(s"Loaded ${tradeGoods.size} trade goods")
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
+    val centersOfTrade = CenterOfTradeParser(repos)
+    logger.info(s"Loaded ${centersOfTrade.size}")
 
     logger.info("Loading event modifiers...")
     val eventModifiers = ModifierParser(repos)

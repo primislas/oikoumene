@@ -7,7 +7,7 @@ import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
+import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
@@ -15,7 +15,7 @@ import com.lomicron.oikoumene.repository.inmemory.government.InMemoryIdeaGroupRe
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
-import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
+import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
@@ -45,6 +45,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
   private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository()
   private val tradeNodeRepository: TradeNodeRepository = InMemoryTradeNodeRepository()
+  private val centerOfTradeRepository: CenterOfTradeRepository = InMemoryCenterOfTradeRepository()
 
   private val eventModifierRepository: ModifierRepository = InMemoryModifierRepository()
 
@@ -88,9 +89,13 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
   override def warGoalTypes: WarGoalTypeRepository = warGoalTypesRepo
 
+
+
   override def tradeGoods: TradeGoodRepository = tradeGoodRepository
 
   override def tradeNodes: TradeNodeRepository = tradeNodeRepository
+
+  override def centersOfTrade: CenterOfTradeRepository = centerOfTradeRepository
 
 
 

@@ -93,6 +93,8 @@ trait ResourceRepository {
 
   def getTradeNodes: Map[String, String]
 
+  def getCentersOfTrade: Map[String, String]
+
   def getEventModifiers: Map[String, String]
 
   def getStaticModifiers: Map[String, String]

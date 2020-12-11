@@ -59,6 +59,8 @@ case class Modifier
   def globalAutonomy: Option[BigDecimal] = conf.getBigDecimal("global_autonomy")
   // hits = 146, isOptional = true, sample = 0.25
   def defensiveness: Option[BigDecimal] = conf.getBigDecimal("defensiveness")
+  // parsed from terrain
+  def defence: Option[BigDecimal] = conf.getBigDecimal("defence")
   // hits = 144, isOptional = true, sample = -0.15
   def localDevelopmentCost: Option[BigDecimal] = conf.getBigDecimal("local_development_cost")
   // hits = 144, isOptional = true, sample = 0.10
@@ -231,6 +233,8 @@ case class Modifier
   def warExhaustion: Option[BigDecimal] = conf.getBigDecimal("war_exhaustion")
   // hits = 22, isOptional = true, sample = 0.15
   def movementSpeed: Option[BigDecimal] = conf.getBigDecimal("movement_speed")
+  // parsed from terrain
+  def movementCost: Option[BigDecimal] = conf.getBigDecimal("movement_cost")
   // hits = 22, isOptional = true, sample = 0.10
   def shipDurability: Option[BigDecimal] = conf.getBigDecimal("ship_durability")
   // hits = 20, isOptional = true, sample = 0.33
@@ -439,6 +443,8 @@ case class Modifier
   def mayPerformSlaveRaidOnSameReligion: Option[Boolean] = conf.getBoolean("may_perform_slave_raid_on_same_religion")
   // hits = 5, isOptional = true, sample = 1
   def monarchMilitaryPower: Option[Int] = conf.getInt("monarch_military_power")
+  // parsed from terrain
+  def supplyLimit: Option[Int] = conf.getInt("supply_limit")
   // hits = 5, isOptional = true, sample = -0.5
   def supplyLimitModifier: Option[BigDecimal] = conf.getBigDecimal("supply_limit_modifier")
   // hits = 4, isOptional = true, sample = 1
@@ -711,6 +717,8 @@ case class Modifier
   def yearlyArmyProfessionalism: Option[BigDecimal] = conf.getBigDecimal("yearly_army_professionalism")
   // hits = 1, isOptional = true, sample = 1
   def yearlyTribalAllegiance: Option[Int] = conf.getInt("yearly_tribal_allegiance")
+
+  def nationDesignerCostMultiplier: Option[BigDecimal] = conf.getBigDecimal("nation_designer_cost_multiplier")
 
 }
 

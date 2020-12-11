@@ -63,6 +63,10 @@ object ClausewitzParser extends LazyLogging {
       .getOrElse(empty)
   }
 
+  def objToEmptyArray(n: JsonNode): JsonNode =
+    if (n.isObject && n.isEmpty) arrayNode
+    else n
+
   /**
     * Returns a seq of object fields. Optionally
     * sets field names as idKey in thos objects.
