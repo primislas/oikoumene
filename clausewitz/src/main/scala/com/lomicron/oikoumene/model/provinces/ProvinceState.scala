@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.history.HistState
+import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 
 import scala.collection.immutable.ListSet
@@ -13,7 +14,8 @@ case class ProvinceState
   baseManpower: Int = 0,
 
   production: ProvinceProduction = ProvinceProduction.empty,
-  modifiers: Map[String, ActiveProvinceModifier] = Map.empty,
+  activeModifiers: Map[String, ActiveModifier] = Map.empty,
+  modifier: Modifier = Modifier(),
 
   discoveredBy: Set[String] = ListSet.empty,
   tradeGood: Option[String] = None,
@@ -41,7 +43,7 @@ case class ProvinceState
   estate: Option[String] = None,
   extraCost: Int = 0,
   localAutonomy: Int = 0,
-  permanentModifiers: Seq[ActiveProvinceModifier] = Seq.empty,
+  permanentModifiers: Seq[ActiveModifier] = Seq.empty,
   triggeredModifiers: Set[String] = Set.empty,
   latentTradeGoods: Set[String] = ListSet.empty,
   isInHre: Boolean = true,
@@ -58,6 +60,28 @@ case class ProvinceState
     updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))
 
   def development: Int = baseTax + baseProduction + baseManpower
+
+  def addModifier(am: ActiveModifier): ProvinceState = {
+    val id = am.name
+    val actives = activeModifiers + (id -> am)
+    val cumulative = am.effect.map(modifier.add).getOrElse(modifier)
+    copy(activeModifiers = actives, modifier = cumulative)
+  }
+
+  def addModifier(m: Modifier): ProvinceState =
+    m.id
+      .map(id => ActiveModifier(name = id, effect = Some(m)))
+      .map(addModifier)
+      .getOrElse(self)
+
+  def removeModifier(m: Modifier): ProvinceState =
+    m.id
+      .map(id => {
+        val actives = activeModifiers - id
+        val cumulative = modifier.remove(m)
+        copy(activeModifiers = actives, modifier = cumulative)
+      })
+      .getOrElse(self)
 
   def updateOwner(v: String): ProvinceState =
     if (v != "---") copy(owner = Some(v)) else copy(owner = None)
@@ -147,9 +171,9 @@ case class ProvinceState
 
   def addLocalAutonomy(v: Int): ProvinceState = copy(localAutonomy = localAutonomy + v)
 
-  def addPermanentModifier(v: ActiveProvinceModifier): ProvinceState = copy(permanentModifiers = permanentModifiers :+ v)
+  def addPermanentModifier(v: ActiveModifier): ProvinceState = copy(permanentModifiers = permanentModifiers :+ v)
 
-  def addPermanentModifiers(v: Seq[ActiveProvinceModifier]): ProvinceState =
+  def addPermanentModifiers(v: Seq[ActiveModifier]): ProvinceState =
     v.foldLeft(this)(_ addPermanentModifier _)
 
 
@@ -206,7 +230,7 @@ object ProvinceState {
       nextF(update.nativeHostileness, (s, v: Int) => s.updateNativeHostileness(v)),
       nextF(update.estate, (s, v: String) => s.estate(v)),
       nextF(update.addLocalAutonomy, (s, v: Int) => s.addLocalAutonomy(v)),
-      nextF(update.addPermanentProvinceModifier, (s, v: Seq[ActiveProvinceModifier]) => s.addPermanentModifiers(v)),
+      nextF(update.addPermanentProvinceModifier, (s, v: Seq[ActiveModifier]) => s.addPermanentModifiers(v)),
       nextF(update.latentTradeGoods, (s, v: Seq[String]) => s.latentTradeGoods(v)),
       nextF(update.addTradeCompanyInvestment, (s, v: Seq[TradeCompanyInvestment]) => s.addTradeCompanyInvestments(v)),
       nextF(update.addToTradeCompany, (s, v: String) => s.addToTradeCompany(v))

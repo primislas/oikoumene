@@ -5,7 +5,7 @@ import com.lomicron.oikoumene.model.Entity.UNDEFINED
 import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.utils.parsing.tokenizer.Date
 
-case class ActiveProvinceModifier
+case class ActiveModifier
 (
   name: String = UNDEFINED,
   effect: Option[Modifier] = None,

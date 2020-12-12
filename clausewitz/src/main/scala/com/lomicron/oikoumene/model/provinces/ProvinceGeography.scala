@@ -21,6 +21,10 @@ positions: Option[ProvincePositions] = None,
 ) {
   @JsonCreator def this() = this(None)
   def isImpassable: Boolean = climate.contains("impassable")
+  def isLand: Boolean = ProvinceTypes.landTypes.contains(provinceType)
+  def isSea: Boolean = `type`.contains(ProvinceTypes.sea)
+  def isCoastal: Boolean = isLand && !landlocked
+  def hasPort: Boolean = isCoastal
   def provinceType: String = `type`.getOrElse(ProvinceTypes.wasteland)
 }
 

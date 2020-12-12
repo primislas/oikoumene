@@ -99,7 +99,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
 
 
-  override def eventModifiers: ModifierRepository = eventModifierRepository
+  override def modifiers: ModifierRepository = eventModifierRepository
 
 
 

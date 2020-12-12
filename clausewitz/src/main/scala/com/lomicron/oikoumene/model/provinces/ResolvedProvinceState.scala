@@ -37,7 +37,7 @@ case class ResolvedProvinceState
   estate: Option[String] = None,
   extraCost: Int = 0,
   localAutonomy: Int = 0,
-  permanentModifiers: Seq[ActiveProvinceModifier] = Seq.empty,
+  permanentModifiers: Seq[ActiveModifier] = Seq.empty,
   triggeredModifiers: Set[String] = Set.empty,
   latentTradeGoods: Set[String] = ListSet.empty,
   isInHre: Boolean = true,

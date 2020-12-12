@@ -38,7 +38,7 @@ trait RepositoryFactory {
   def tradeNodes: TradeNodeRepository
   def centersOfTrade: CenterOfTradeRepository
 
-  def eventModifiers: ModifierRepository
+  def modifiers: ModifierRepository
 
   def gfx: GFXRepository
 

@@ -15,7 +15,7 @@ case class Modifier
   localisation: Option[Localisation] = None,
   sourceFile: Option[String] = None,
   conf: ObjectNode = JsonMapper.objectNode
-) {
+) { self =>
 
   def name: Option[String] = localisation.flatMap(_.name)
 
@@ -26,6 +26,19 @@ case class Modifier
   def remove(other: Modifier): Modifier =
     copy(conf = MapClassTemplate.remove(conf, other.conf))
   def -(other: Modifier): Modifier = remove(other)
+
+  def multiply(coef: Int): Modifier = multiply(coef.doubleValue())
+
+  def multiply(coef: Double): Modifier = {
+    val c = conf.deepCopy()
+    c.fieldSeq()
+      .foreach(e => {
+        val (k, v) = (e.getKey, e.getValue)
+        if (v.isNumber) c.setEx(k, v.doubleValue() * coef)
+      })
+
+    copy(conf = c)
+  }
 
   // hits = 339, isOptional = true, sample = 0.5
   def prestige: Option[BigDecimal] = conf.getBigDecimal("prestige")
@@ -468,7 +481,7 @@ case class Modifier
   // hits = 4, isOptional = true, sample = 2
   def monarchDiplomaticPower: Option[Int] = conf.getInt("monarch_diplomatic_power")
   // hits = 4, isOptional = true, sample = 2
-  def navalForcelimit: Option[Int] = conf.getInt("naval_forcelimit")
+  def navalForcelimit: Option[BigDecimal] = conf.getBigDecimal("naval_forcelimit")
   // hits = 4, isOptional = true, sample = true
   def noReligionPenalty: Option[Boolean] = conf.getBoolean("no_religion_penalty")
   // hits = 4, isOptional = true, sample = 1
@@ -481,6 +494,7 @@ case class Modifier
   def sunkShipMoraleHitRecieved: Option[BigDecimal] = conf.getBigDecimal("sunk_ship_morale_hit_recieved")
   // hits = 4, isOptional = true, sample = 5
   def taxIncome: Option[Int] = conf.getInt("tax_income")
+  def localTaxIncome: Option[BigDecimal] = conf.getBigDecimal("local_tax_income")
   // hits = 4, isOptional = true, sample = -0.2
   def tradeCompanyInvestmentCost: Option[BigDecimal] = conf.getBigDecimal("trade_company_investment_cost")
   // hits = 4, isOptional = true, sample = -0.25
@@ -504,7 +518,7 @@ case class Modifier
   // hits = 3, isOptional = true, sample = -0.1
   def justifyTradeConflictCost: Option[BigDecimal] = conf.getBigDecimal("justify_trade_conflict_cost")
   // hits = 3, isOptional = true, sample = 1
-  def landForcelimit: Option[Int] = conf.getInt("land_forcelimit")
+  def landForcelimit: Option[BigDecimal] = conf.getBigDecimal("land_forcelimit")
   // hits = 3, isOptional = true, sample = -0.25
   def leaderCost: Option[BigDecimal] = conf.getBigDecimal("leader_cost")
   // hits = 3, isOptional = true, sample = 50
@@ -644,7 +658,7 @@ case class Modifier
   // hits = 1, isOptional = true, sample = -0.5
   def flagshipCost: Option[BigDecimal] = conf.getBigDecimal("flagship_cost")
   // hits = 1, isOptional = true, sample = 5
-  def globalManpower: Option[Int] = conf.getInt("global_manpower")
+  def globalManpower: Option[BigDecimal] = conf.getBigDecimal("global_manpower")
   // hits = 1, isOptional = true, sample = 0.5
   def globalReligiousConversionResistance: Option[BigDecimal] = conf.getBigDecimal("global_religious_conversion_resistance")
   // hits = 1, isOptional = true, sample = 0.1
@@ -725,5 +739,3 @@ case class Modifier
 object Modifier extends FromJson[Modifier] {
   val empty: Modifier = Modifier()
 }
-
-

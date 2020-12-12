@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.parsers.modifiers
 
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.parsers.government.IdeaParser.parseIdeaGroup
 import com.lomicron.oikoumene.parsers.provinces.TerrainParser
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
@@ -32,10 +33,11 @@ object ModifierAnalyzer {
       .flatMap(_.getObject("modifiers"))
 
     val modifiers = events ++ static ++ buildings ++ reforms ++ ideas ++ terrain
-    ConfigField.printMapClass("Modifier", modifiers)
-
-    val staticIds = static.flatMap(_.getString("id"))
-    staticIds.foreach(id => println(s"""  def ${JsonParser.camelCase(id)}: Option[Modifier] = find("$id").toOption"""))
+//    ConfigField.printMapClass("Modifier", modifiers)
+//
+    val staticIds = static.flatMap(_.getString(Fields.idKey)).toSet
+//    staticIds.foreach(id => println(s"""  def ${JsonParser.camelCase(id)}: Option[Modifier] = find("$id").toOption"""))
+    staticIds.foreach(id => println(s"""  val ${JsonParser.camelCase(id)}: String = "$id""""))
 
     Seq.empty
   }

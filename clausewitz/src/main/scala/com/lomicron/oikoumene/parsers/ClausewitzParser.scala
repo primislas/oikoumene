@@ -20,6 +20,7 @@ object ClausewitzParser extends LazyLogging {
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
   object Fields {
+    val localisation = "localisation"
     val sourceFile = "source_file"
     val history = "history"
     val state = "state"
