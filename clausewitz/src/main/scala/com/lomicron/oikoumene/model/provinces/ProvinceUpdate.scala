@@ -76,7 +76,7 @@ case class ProvinceUpdate
   // hits = 170, isOptional = true, sample = 25
   addLocalAutonomy: Option[Int] = None,
   // hits = 82, isOptional = true, sample = {"name":"skanemarket","duration":-1}
-  addPermanentProvinceModifier: Option[Seq[ProvinceModifier]] = None,
+  addPermanentProvinceModifier: Option[Seq[ActiveModifier]] = None,
   // hits = 53, isOptional = true, sample = ["coal"]
   latentTradeGoods: Option[Seq[String]] = None,
   // hits = 36, isOptional = true, sample = {"investment":"local_quarter","investor":"POR"}

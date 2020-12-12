@@ -33,6 +33,7 @@ object ContinentParser extends LazyLogging {
       })
       .getOrElse(Stream.empty)
       .map(e => e.getKey -> e.getValue).toMap
+      .mapValues(ClausewitzParser.objToEmptyArray)
       .filterValues(n => {
         if (!n.isInstanceOf[ArrayNode])
           logger.warn(s"Expected super-region ArrayNodes but encountered ${n.toString}")

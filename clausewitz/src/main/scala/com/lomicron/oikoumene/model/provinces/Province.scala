@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.localisation.{Localisation, WithLocalisation
 import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
+import com.softwaremill.quicklens._
 
 case class Province
 (id: Int,
@@ -20,6 +21,12 @@ case class Province
   @JsonCreator def this() = this(0, Color.black)
 
   def state: ProvinceState = history.state
+
+  def addModifier(am: ActiveModifier): Province = {
+    val s = state.addModifier(am)
+    self.modify(_.history.state).setTo(s)
+  }
+
 
   def withState(state: ProvinceState): Province = copy(history = history.withState(state))
 
@@ -55,7 +62,10 @@ case class Province
     else geography.provinceType
   }
 
-  def isLand: Boolean = ProvinceTypes.landTypes.contains(`type`)
+  def isLand: Boolean = geography.isLand
+  def isSea: Boolean = geography.isSea
+  def isCoastal: Boolean = geography.isCoastal
+  def hasPort: Boolean = geography.hasPort
 
 }
 

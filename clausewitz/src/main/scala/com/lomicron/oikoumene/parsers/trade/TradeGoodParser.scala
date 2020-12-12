@@ -1,14 +1,11 @@
 package com.lomicron.oikoumene.parsers.trade
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.model.Entity
-import com.lomicron.oikoumene.model.trade.TradeGood
-import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.model.trade.{Price, TradeGood}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.trade.TradeGoodRepository
-import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper._
 
 object TradeGoodParser {
@@ -45,9 +42,3 @@ object TradeGoodParser {
       .getOrElse(o)
 
 }
-
-case class Price(id: String, basePrice: BigDecimal = BigDecimal(0)) {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
-
-object Price extends FromJson[Price]

@@ -20,6 +20,7 @@ object ClausewitzParser extends LazyLogging {
   type JsonEntry = java.util.Map.Entry[String, JsonNode]
 
   object Fields {
+    val localisation = "localisation"
     val sourceFile = "source_file"
     val history = "history"
     val state = "state"
@@ -62,6 +63,10 @@ object ClausewitzParser extends LazyLogging {
       .map(t => (t._1.asInstanceOf[ObjectNode], t._2))
       .getOrElse(empty)
   }
+
+  def objToEmptyArray(n: JsonNode): JsonNode =
+    if (n.isObject && n.isEmpty) arrayNode
+    else n
 
   /**
     * Returns a seq of object fields. Optionally

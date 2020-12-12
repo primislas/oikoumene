@@ -12,12 +12,15 @@ import com.lomicron.utils.json.JsonMapper._
 
 object IdeaParser {
 
-  val ideaGroupFields: Set[String] = Set("id", "localisation",
-    "source_file", "start", "bonus", "ideas",
-    "trigger", "free", "ai_will_do", "category")
+  val ideaGroupFields: Set[String] = Set(
+    "id", "localisation", "source_file", "start", "bonus",
+    "ideas", "trigger", "free", "ai_will_do", "category"
+  )
 
-  def apply(repos: RepositoryFactory,
-            evalEntityFields: Boolean = false): IdeaGroupRepository =
+  def apply(
+             repos: RepositoryFactory,
+             evalEntityFields: Boolean = false
+           ): IdeaGroupRepository =
     apply(repos.resources, repos.localisations, repos.ideas, evalEntityFields)
 
   def apply
@@ -38,7 +41,7 @@ object IdeaParser {
       .map(setLocalisation(_, localisation))
 
     if (evalEntityFields) {
-      val modifiers = ideas.flatMap(_.getObject("modifiers"))
+      val modifiers = ideas.flatMap(_.getObject("modifier"))
       val factors = ideaGroups.flatMap(_.getObject("ai_will_do"))
       val tagConditions = ClausewitzParser.parseNestedConditions(factors)
 
@@ -57,7 +60,7 @@ object IdeaParser {
     val ideas = ideaFields
       .flatMap(i => ig
         .getObject(i)
-        .map(modifiers => objectNode.setEx("id", i).setEx("modifiers", modifiers))
+        .map(modifiers => objectNode.setEx("id", i).setEx("modifier", modifiers))
       )
     ideaFields.foreach(ig.remove)
     ig.setEx("ideas", ideas)

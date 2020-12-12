@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.model.government
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
-import com.lomicron.oikoumene.model.politics.TagModifier
+import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.utils.json.FromJson
 
 case class Idea
@@ -13,7 +13,7 @@ case class Idea
   // hits = 2804, isOptional = true, sample = {"name":"Noble Knights"}
   localisation: Localisation = Localisation.empty,
   // hits = 2823, isOptional = false, sample = {"cavalry_power":0.10,"cavalry_cost":-0.10}
-  modifiers: TagModifier = TagModifier.empty,
+  modifier: Modifier = Modifier.empty,
 ) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
 }

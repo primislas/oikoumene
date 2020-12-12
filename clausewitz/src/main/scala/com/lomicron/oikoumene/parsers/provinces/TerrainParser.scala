@@ -6,13 +6,19 @@ import com.lomicron.oikoumene.model.provinces.Terrain
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities, setLocalisation}
 import com.lomicron.oikoumene.parsers.ConfigField
+import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, _}
 import com.typesafe.scalalogging.LazyLogging
 
 object TerrainParser extends LazyLogging {
+
+  val terrainFields = Set(
+    "type", "color", "sound_type",
+    "is_water", "inland_sea", "terrain_override",
+    "id", "localisation", "source_file", "province_ids"
+  )
 
   def apply(repos: RepositoryFactory,
             evalEntityFields: Boolean = false)
@@ -39,6 +45,7 @@ object TerrainParser extends LazyLogging {
       .flatMap(fieldsToObjects(_, idKey))
       .map(renameField(_, terrainProvincesKey, provinceIdsKey))
       .map(setLocalisation(_, localisation))
+      .map(parseModifiers)
 
     if (evalEntityFields)
       ConfigField.printCaseClass("Terrain", terrainCategories)
@@ -69,5 +76,16 @@ object TerrainParser extends LazyLogging {
       .flatMap(_.headOption)
       .map(c => conf.setEx("color", c))
       .getOrElse(conf)
+
+  def parseModifiers(t: ObjectNode): ObjectNode = {
+    val modifierFields = t.fieldSeq().filterNot(e => terrainFields.contains(e.getKey))
+    if (modifierFields.nonEmpty) {
+      val modifier = modifierFields.foldLeft(objectNode)((acc, e) => acc.setEx(e.getKey, e.getValue))
+      modifierFields.map(_.getKey).foreach(t.remove)
+      t.setEx("modifier", modifier)
+    }
+
+    t
+  }
 
 }

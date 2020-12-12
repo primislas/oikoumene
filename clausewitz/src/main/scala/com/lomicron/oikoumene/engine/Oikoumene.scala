@@ -4,12 +4,14 @@ import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyPars
 import com.lomicron.oikoumene.parsers.government.IdeaParser
 import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.oikoumene.parsers.map.MapParser
+import com.lomicron.oikoumene.parsers.modifiers.{ModifierAnalyzer, ModifierParser}
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
-import com.lomicron.oikoumene.parsers.trade.{TradeGoodParser, TradeNodeParser}
+import com.lomicron.oikoumene.parsers.trade.{CenterOfTradeParser, TradeGoodParser, TradeNodeParser}
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.CacheReader
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
+import com.lomicron.oikoumene.service.province.ProvinceService
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.typesafe.scalalogging.LazyLogging
 
@@ -44,6 +46,8 @@ object Oikoumene extends LazyLogging {
     val les = LocalisationParser(repos)
     logger.info(s"Loaded ${les.size} localisation entries")
 
+//    ModifierAnalyzer(repos)
+
     val tags = TagParser(repos)
     logger.info(s"Loaded ${tags.size} tags")
     val buildings = BuildingParser(repos)
@@ -72,6 +76,12 @@ object Oikoumene extends LazyLogging {
     logger.info(s"Loaded ${tradeGoods.size} trade goods")
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
+    val centersOfTrade = CenterOfTradeParser(repos)
+    logger.info(s"Loaded ${centersOfTrade.size}")
+
+    logger.info("Loading event modifiers...")
+    val eventModifiers = ModifierParser(repos)
+    logger.info(s"Loaded ${eventModifiers.size} event modifiers")
 
     logger.info("Loading map...")
     val geography = MapParser(repos)
@@ -80,6 +90,11 @@ object Oikoumene extends LazyLogging {
     logger.info("Loading province configs...")
     val provinces = ProvinceParser(repos)
     logger.info(s"Loaded ${provinces.size} province configs")
+
+    val provService = ProvinceService(repos)
+    provinces.findAll
+      .map(provService.init)
+      .foreach(provinces.update)
 
     logger.info(s"Configs loaded")
     repos
