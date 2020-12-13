@@ -129,11 +129,6 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
             if (errs.nonEmpty) recErrs = recErrs ++ errs
         })
 
-      deserializedArrays.foreach(field => {
-        val flatArray = JsonMapper.flatten(o.get(field).asInstanceOf[ArrayNode])
-        o.setEx(field, flatArray)
-      })
-
       (o, path, errors ++ recErrs)
     }
   }

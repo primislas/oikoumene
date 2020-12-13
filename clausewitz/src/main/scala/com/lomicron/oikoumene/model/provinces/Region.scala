@@ -13,8 +13,7 @@ case class Region
  // hits = 92, isOptional = false, sample = {"name":"American East Coast"}
  localisation: Localisation = Localisation.empty,
  // hits = 31, isOptional = true, sample = ["0.10.1","00.12.30","0.1.1","00.03.30"]
- // TODO unwrap monsoon to actual dates
- monsoon: Seq[String] = Seq.empty,
+ monsoon: Seq[Seq[String]] = Seq.empty,
 ) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
 }

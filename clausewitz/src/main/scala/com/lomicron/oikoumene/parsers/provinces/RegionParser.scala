@@ -46,6 +46,7 @@ object RegionParser extends LazyLogging {
 
     if (evalEntityFields) ConfigField.printCaseClass("Region", jsonNodes)
 
+    // TODO unwrap 'monsoon' field to dates
     jsonNodes.map(Region.fromJson).foreach(regions.create)
 
     regions
