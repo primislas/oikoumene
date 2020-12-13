@@ -29,6 +29,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val casusBelliTypesDir = "common/cb_types"
 
   val ideasDir = "common/ideas"
+  val governmentsDir = "common/governments"
   val governmentReformsDir = "common/government_reforms"
 
   val provinceDefinitionsFile = "map/definition.csv"
@@ -280,6 +281,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getReligions: Map[String, String] =
     readDir(religionsDir)
+
+  override def getGovernments: Map[String, String] =
+    readDir(governmentsDir)
 
   override def getIdeas: Map[String, String] =
     readDir(ideasDir)

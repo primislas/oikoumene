@@ -148,6 +148,7 @@ class ParserSpec extends Specification {
 
     "- merge two values under the same key into an array" >> {
       // TODO don't forget about these nonsense monsoon declarations when serializing
+      //  These are actually arrays of arrays!
       val content = """
                       monsoon = {
                         00.11.01
@@ -162,7 +163,12 @@ class ParserSpec extends Specification {
       errors.size mustEqual 0
 
       val dates = node.get("monsoon")
-      dates.size() mustEqual 4
+      dates.size() mustEqual 2
+
+      import com.lomicron.utils.json.JsonMapper.JsonNodeEx
+      import com.lomicron.utils.json.JsonMapper.ArrayNodeEx
+      val isArrayOfArrays = dates.asArray.map(_.toSeq).getOrElse(Seq.empty).map(_.isArray).forall(identity)
+      isArrayOfArrays must beTrue
     }
 
   }
