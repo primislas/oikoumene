@@ -1,6 +1,7 @@
 package com.lomicron.oikoumene.model.politics
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
+import com.lomicron.oikoumene.model.events.TagCondition
 import com.lomicron.oikoumene.model.history.HistEvent
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
@@ -9,6 +10,8 @@ case class TagUpdate
 (
   // hits = 13270, isOptional = true, sample = {"year":1730,"month":1,"day":1}
   override val date: Option[Date] = None,
+
+  @JsonProperty("if") condition: Option[TagCondition] = None,
 
   // hits = 796, isOptional = true, sample = "east_african"
   technologyGroup: Option[String] = None,

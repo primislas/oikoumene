@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.parsing.tokenizer.Tokenizer
 import org.specs2.mutable.Specification
-import collection.JavaConverters._
+
+import scala.collection.JavaConverters._
 
 class ParserSpec extends Specification {
   val provinceFile = "151 - Constantinople.txt"
@@ -165,8 +166,7 @@ class ParserSpec extends Specification {
       val dates = node.get("monsoon")
       dates.size() mustEqual 2
 
-      import com.lomicron.utils.json.JsonMapper.JsonNodeEx
-      import com.lomicron.utils.json.JsonMapper.ArrayNodeEx
+      import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx}
       val isArrayOfArrays = dates.asArray.map(_.toSeq).getOrElse(Seq.empty).map(_.isArray).forall(identity)
       isArrayOfArrays must beTrue
     }

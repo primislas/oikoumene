@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government.{GovernmentRepository, IdeaGroupRepository}
+import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository}
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
@@ -11,7 +11,7 @@ import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, Tra
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
-import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentRepository, InMemoryIdeaGroupRepository}
+import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository}
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
@@ -31,6 +31,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val religionRepo: ReligionRepository = InMemoryReligionRepository(religionGroupRepo)
 
   private val governmentsRepo = InMemoryGovernmentRepository()
+  private val governmentReformsRepo = InMemoryGovernmentReformRepository()
   private val ideasRepo = InMemoryIdeaGroupRepository()
 
   private val diplomacyRepo: DiplomacyRepository = InMemoryDiplomacyRepository()
@@ -66,7 +67,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
 
   override def governments: GovernmentRepository = governmentsRepo
-
+  override def governmentReforms: GovernmentReformRepository = governmentReformsRepo
   override def ideas: IdeaGroupRepository = ideasRepo
 
 

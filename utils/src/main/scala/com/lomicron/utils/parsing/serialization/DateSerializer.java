@@ -9,10 +9,6 @@ import java.io.IOException;
 
 public class DateSerializer extends StdSerializer<Date> {
 
-    public DateSerializer() {
-        this(null);
-    }
-
     @SuppressWarnings("WeakerAccess")
     public DateSerializer(Class<Date> t) {
         super(t);
@@ -24,10 +20,5 @@ public class DateSerializer extends StdSerializer<Date> {
             throws IOException {
 
         jgen.writeString(value.toString());
-//        jgen.writeStartObject();
-//        jgen.writeNumberField("year", value.year());
-//        jgen.writeNumberField("month", value.month());
-//        jgen.writeNumberField("day", value.day());
-//        jgen.writeEndObject();
     }
 }

@@ -285,11 +285,11 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getGovernments: Map[String, String] =
     readDir(governmentsDir)
 
-  override def getIdeas: Map[String, String] =
-    readDir(ideasDir)
-
   override def getGovernmentReforms: Map[String, String] =
     readDir(governmentReformsDir)
+
+  override def getIdeas: Map[String, String] =
+    readDir(ideasDir)
 
   override def getTradeGoods: Map[String, String] =
     readDir(tradeGoodsDir)
