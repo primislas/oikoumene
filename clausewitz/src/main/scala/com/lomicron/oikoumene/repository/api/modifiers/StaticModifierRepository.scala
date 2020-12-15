@@ -6,6 +6,8 @@ trait StaticModifierRepository extends ModifierRepository {
 
   def nullModifier: Option[Modifier] = find("null_modifier").toOption
 
+  def governmentRank(id: Int): Option[Modifier] = find(s"configured_gov_rank_$id").toOption
+
   def difficultyVeryEasyPlayer: Option[Modifier] = find("difficulty_very_easy_player").toOption
   def difficultyEasyPlayer: Option[Modifier] = find("difficulty_easy_player").toOption
   def difficultyNormalPlayer: Option[Modifier] = find("difficulty_normal_player").toOption

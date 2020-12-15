@@ -85,6 +85,8 @@ trait ResourceRepository {
 
   def getGovernments: Map[String, String]
 
+  def getGovernmentRanks: Map[String, String]
+
   def getGovernmentReforms: Map[String, String]
 
   def getIdeas: Map[String, String]
