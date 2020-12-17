@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers.government
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.government.IdeaGroup
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
@@ -33,12 +32,12 @@ object IdeaParser {
     val ideaGroups = ClausewitzParser
       .parseFileFieldsAsEntities(configs)
       .map(parseIdeaGroup)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
     val ideas = ideaGroups
       .flatMap(_.getArray("ideas"))
       .flatMap(_.toSeq)
       .flatMap(_.asObject)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields) {
       val modifiers = ideas.flatMap(_.getObject("modifier"))

@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers.government
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.government.GovernmentReform
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.GovernmentReformRepository
@@ -27,7 +26,7 @@ object GovernmentReformParser {
     val reformConfigs = ClausewitzParser.parseFileFieldsAsEntities(reformFiles)
     val reforms = reformConfigs
       .map(parseGovernmenReform)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields)
       ConfigField.printCaseClass("GovernmentReform", reforms)

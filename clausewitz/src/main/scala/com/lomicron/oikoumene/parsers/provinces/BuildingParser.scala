@@ -1,7 +1,6 @@
 package com.lomicron.oikoumene.parsers.provinces
 
 import com.lomicron.oikoumene.model.provinces.Building
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.BuildingRepository
@@ -29,7 +28,7 @@ object BuildingParser extends LazyLogging {
 
     val confs = ClausewitzParser
       .parseFileFieldsAsEntities(files.getBuildings)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setBuildingLocalisation)
 
     val buildings = confs.filterNot(c => c.getString(idField).contains(manufactoryId))
     val manufactory = confs

@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers.government
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.oikoumene.model.government.{Government, LegacyGovernmentMapping}
 import com.lomicron.oikoumene.model.modifiers.Modifier
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, setLocalisation}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.GovernmentRepository
@@ -38,7 +38,7 @@ object GovernmentParser {
     val govs = govConfigs
       .filterNot(_.getString(Fields.idKey).contains(preDharmaMapping))
       .map(parseGovernment)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
     val preDharmaMappingConfigs = govConfigs.filter(_.getString(Fields.idKey).contains(preDharmaMapping))
 
     if (evalEntityFields)

@@ -201,29 +201,6 @@ object ClausewitzParser extends LazyLogging {
     })
   }
 
-  /**
-    * Looks for localisation entry by default filed "id"
-    * and sets it to "localisation" field if found.
-    *
-    * @param o object that might have localisation
-    * @param l localisation repository
-    * @return object with localisation field if localisation is found
-    */
-  def setLocalisation(o: ObjectNode, l: LocalisationRepository): ObjectNode =
-    setLocalisationByField(o, "id", l)
-
-  /**
-    * Looks for localisation entry by id taken from provided
-    * objects field, and sets it to "localisation" field if found.
-    *
-    * @param o     object that might have localisation
-    * @param field object's field with localisation id
-    * @param l     localisation repository
-    * @return object with localisation field if localisation is found
-    */
-  def setLocalisationByField(o: ObjectNode, field: String, l: LocalisationRepository): ObjectNode =
-    o.getString(field).map(id => l.findAndSetAsLocName(id, o)).getOrElse(o)
-
   def setIndex(jsons: Seq[ObjectNode]): Seq[ObjectNode] =
     jsons.zipWithIndex.map(oi => oi._1.setEx("index", oi._2))
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.{JsonNodeEx, patchFieldValue}
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, patchFieldValue}
 
 trait LocalisationRepository {
 
@@ -58,5 +58,11 @@ trait LocalisationRepository {
     */
   def setLocalisationByField(o: ObjectNode, field: String): ObjectNode =
     o.getString(field).map(id => findAndSetAsLocName(id, o)).getOrElse(o)
+
+  def setBuildingLocalisation(o: ObjectNode): ObjectNode =
+    o.getString(Fields.idKey)
+      .map(id => s"building_$id")
+      .map(findAndSetAsLocName(_, o))
+      .getOrElse(o)
 
 }

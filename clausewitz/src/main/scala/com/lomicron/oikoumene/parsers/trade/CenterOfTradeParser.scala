@@ -1,7 +1,6 @@
 package com.lomicron.oikoumene.parsers.trade
 
 import com.lomicron.oikoumene.model.trade.CenterOfTrade
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.trade.CenterOfTradeRepository
@@ -13,7 +12,7 @@ object CenterOfTradeParser {
     val localisation = repos.localisations
     val cots = ClausewitzParser
       .parseFileFieldsAsEntities(cotFiles)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields)
       ConfigField.printCaseClass("CenterOfTrade", cots)

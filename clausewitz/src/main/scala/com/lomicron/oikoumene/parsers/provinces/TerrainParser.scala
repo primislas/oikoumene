@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.map.TerrainMapColorConf
 import com.lomicron.oikoumene.model.provinces.Terrain
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities, setLocalisation}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities}
 import com.lomicron.oikoumene.parsers.ConfigField
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
@@ -44,7 +44,7 @@ object TerrainParser extends LazyLogging {
       .flatMap(_.getObject(terrainCategoriesKey))
       .flatMap(fieldsToObjects(_, idKey))
       .map(renameField(_, terrainProvincesKey, provinceIdsKey))
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
       .map(parseModifiers)
 
     if (evalEntityFields)

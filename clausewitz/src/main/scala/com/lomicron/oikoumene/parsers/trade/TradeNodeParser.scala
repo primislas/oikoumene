@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers.trade
 
 import com.lomicron.oikoumene.model.trade.TradeNode
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.trade.TradeNodeRepository
 import com.lomicron.utils.json.JsonMapper._
@@ -20,7 +19,7 @@ object TradeNodeParser {
 
     val nodes = ClausewitzParser
       .parseFileFieldsAsEntities(files)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields) {
       val routes = nodes.flatMap(_.getSeqOfObjects("outgoing"))

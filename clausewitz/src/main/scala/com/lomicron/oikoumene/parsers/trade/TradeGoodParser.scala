@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers.trade
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.trade.{Price, TradeGood}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.trade.TradeGoodRepository
@@ -17,7 +16,7 @@ object TradeGoodParser {
 
     val goods = ClausewitzParser
       .parseFileFieldsAsEntities(tgFiles)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
       .map(parseTradeGood)
     val withIndex = ClausewitzParser.setIndex(goods)
 

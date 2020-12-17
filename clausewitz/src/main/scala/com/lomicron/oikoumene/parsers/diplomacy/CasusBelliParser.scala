@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers.diplomacy
 
 import com.lomicron.oikoumene.model.diplomacy.CasusBelli
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.diplomacy.CasusBelliRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
@@ -22,7 +21,7 @@ object CasusBelliParser {
     val configs = files.getCasusBelliTypes
     val cbs = ClausewitzParser
       .parseFileFieldsAsEntities(configs)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields) {
       val prereqs = cbs.flatMap(_.getObject("prerequisites"))

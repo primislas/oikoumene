@@ -1,7 +1,6 @@
 package com.lomicron.oikoumene.parsers.diplomacy
 
 import com.lomicron.oikoumene.model.diplomacy.WarGoalType
-import com.lomicron.oikoumene.parsers.ClausewitzParser.setLocalisation
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.diplomacy.WarGoalTypeRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
@@ -23,7 +22,7 @@ object WarGoalTypeParser extends LazyLogging {
 
     val warGoals = ClausewitzParser
       .parseFileFieldsAsEntities(files.getWarGoalTypes)
-      .map(setLocalisation(_, localisation))
+      .map(localisation.setLocalisation)
 
     if (evalEntityFields) {
       val attackerConfs = warGoals.flatMap(_.getObject("attacker"))
