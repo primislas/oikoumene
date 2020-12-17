@@ -40,7 +40,7 @@ object GovernmentReformParser {
   def parseGovernmenReform(o: ObjectNode): ObjectNode = removeEmptyObjects(o)
 
   def removeEmptyObjects(o: ObjectNode): ObjectNode = {
-    o.fieldSeq()
+    o.entrySeq()
       .filter(e => e.getValue.isObject && e.getValue.isEmpty)
       .foreach(e => o.remove(e.getKey))
     o

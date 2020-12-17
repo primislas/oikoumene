@@ -89,7 +89,13 @@ trait ResourceRepository {
 
   def getGovernmentReforms: Map[String, String]
 
+  def getTechnologies: Map[String, String]
+
+  def getTechGroupConfig: Option[String]
+
   def getIdeas: Map[String, String]
+
+  def getPolicies: Map[String, String]
 
   def getTradeGoods: Map[String, String]
 

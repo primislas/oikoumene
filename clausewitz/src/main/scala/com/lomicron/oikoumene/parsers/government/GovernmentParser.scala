@@ -63,7 +63,7 @@ object GovernmentParser {
   }
 
   def parseReformLevels(rls: ObjectNode): ArrayNode = {
-    val parsedSeq = rls.fieldSeq().flatMap(e => {
+    val parsedSeq = rls.entrySeq().flatMap(e => {
       val (k, v) = (e.getKey, e.getValue)
       v.asObject.map(rl => rl.setEx(Fields.idKey, k))
     })
@@ -74,7 +74,7 @@ object GovernmentParser {
     ms.flatMap(parsePreDharmaMapping)
 
   def parsePreDharmaMapping(o: ObjectNode): Seq[ObjectNode] =
-    o.fieldSeq().flatMap(e => e.getValue.asObject.map(_.setEx(Fields.idKey, e.getKey)))
+    o.entrySeq().flatMap(e => e.getValue.asObject.map(_.setEx(Fields.idKey, e.getKey)))
 
   def parseGovernmentRanks(files: ResourceRepository, modifiers: ModifierRepository): Seq[Modifier] = {
     val govRankConfs = files.getGovernmentRanks

@@ -28,10 +28,13 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val warGoalTypesDir = "common/wargoal_types"
   val casusBelliTypesDir = "common/cb_types"
 
-  val ideasDir = "common/ideas"
   val governmentsDir = "common/governments"
   val governmentRanksDir = "common/government_ranks"
   val governmentReformsDir = "common/government_reforms"
+  val technologyDir = "common/technologies"
+  val techGroupFile = "common/technology.txt"
+  val ideasDir = "common/ideas"
+  val policiesDir = "common/policies"
 
   val provinceDefinitionsFile = "map/definition.csv"
   val adjacenciesFile = "map/adjacencies.csv"
@@ -292,8 +295,17 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getGovernmentReforms: Map[String, String] =
     readDir(governmentReformsDir)
 
+  override def getTechnologies: Map[String, String] =
+    readDir(technologyDir)
+
+  override def getTechGroupConfig: Option[String] =
+    readGameFileContent(techGroupFile)
+
   override def getIdeas: Map[String, String] =
     readDir(ideasDir)
+
+  def getPolicies: Map[String, String] =
+    readDir(policiesDir)
 
   override def getTradeGoods: Map[String, String] =
     readDir(tradeGoodsDir)

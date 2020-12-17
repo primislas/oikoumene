@@ -14,7 +14,7 @@ object MapClassTemplate extends LazyLogging {
 
   def combine(a: ObjectNode, b: ObjectNode, f: (Double, Double) => Double): ObjectNode = {
     val merged = a.deepCopy()
-    b.fieldSeq().foreach(e => {
+    b.entrySeq().foreach(e => {
       val (k, v) = (e.getKey, e.getValue)
       a
         .getNumber(k)

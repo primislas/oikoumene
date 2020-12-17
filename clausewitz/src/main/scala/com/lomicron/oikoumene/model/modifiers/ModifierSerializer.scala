@@ -12,7 +12,7 @@ class ModifierSerializer extends JsonSerializer[Modifier] {
     m.id.foreach(target.setEx("id", _))
     m.localisation.map(JsonMapper.toJsonNode).foreach(target.set("localisation", _))
     m.sourceFile.foreach(target.setEx("source_file", _))
-    m.conf.fieldSeq().foreach(e => target.setEx(e.getKey, e.getValue))
+    m.conf.entrySeq().foreach(e => target.setEx(e.getKey, e.getValue))
     json.writeObject(target)
   }
 

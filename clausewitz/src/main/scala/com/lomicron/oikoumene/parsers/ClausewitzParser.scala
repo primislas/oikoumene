@@ -41,6 +41,7 @@ object ClausewitzParser extends LazyLogging {
     val terrainCategoriesKey = "categories"
     val terrainProvincesKey = "terrain_override"
     val terrainKey = "terrain"
+    val modifier = "modifier"
   }
 
   val empty: (ObjectNode, Seq[ParsingError]) =
@@ -52,7 +53,7 @@ object ClausewitzParser extends LazyLogging {
   def parse(str: String): (ObjectNode, Seq[ParsingError]) =
     parse(str, DefaultDeserializer)
 
-  def parse(str: String, deserializer: Deserializer): (ObjectNode, Seq[ParsingError]) = {
+  def parse(str: String, deserializer: Deserializer): (ObjectNode, Seq[ParsingError]) =
     Option(str)
       .map(JsonParser.parse(_, deserializer))
       .filter(t => {
@@ -62,7 +63,15 @@ object ClausewitzParser extends LazyLogging {
       })
       .map(t => (t._1.asInstanceOf[ObjectNode], t._2))
       .getOrElse(empty)
-  }
+
+  def parseAndLogErrors(str: String): ObjectNode =
+    parse(str)
+      .map(oes => {
+        val (o, es) = oes
+        es.foreach(e => logger.warn(s"Encountered a parsing error: ${e.message}"))
+        o
+      })
+      .getOrElse(objectNode)
 
   def objToEmptyArray(n: JsonNode): JsonNode =
     if (n.isObject && n.isEmpty) arrayNode

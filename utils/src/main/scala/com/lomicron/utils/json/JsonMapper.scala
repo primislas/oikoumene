@@ -364,13 +364,16 @@ object JsonMapper {
 
     def getInt(f: String): Option[Int] = getField(f).map(_.asInt)
 
-    def getSeqOfObjects(f: String): Seq[ObjectNode] =
+    def getSeq(f: String): Seq[JsonNode] =
       if (!n.has(f)) Seq.empty
       else n.get(f) match {
-        case a: ArrayNode => a.toSeq.flatMap(_.asObject)
-        case o: ObjectNode => Seq(o)
+        case a: ArrayNode => a.toSeq
+        case n: JsonNode => Seq(n)
         case _ => Seq.empty
       }
+
+    def getSeqOfObjects(f: String): Seq[ObjectNode] =
+      getSeq(f).flatMap(_.asObject)
 
   }
 
@@ -397,17 +400,23 @@ object JsonMapper {
 
     def setEx(field: String, a: Seq[JsonNode]): ObjectNode = setEx(field, arrayNodeOf(a))
 
+    def setEx(e: Entry[String, JsonNode]): ObjectNode = setEx(e.getKey, e.getValue)
+
+    def setEx(t: (String, JsonNode)): ObjectNode = setEx(t._1, t._2)
+
     def removeEx(field: String): ObjectNode = {
       o.remove(field)
       o
     }
 
-    def fieldSeq(): Seq[Entry[String, JsonNode]] = o.fields().toSeq
+    def fieldSeq(): Seq[String] = o.fieldNames().toSeq
+
+    def entrySeq(): Seq[Entry[String, JsonNode]] = o.fields().toSeq
 
     def entries(): Seq[(String, JsonNode)] =
-      o.fieldSeq().map(e => (e.getKey, e.getValue))
+      o.entrySeq().map(e => (e.getKey, e.getValue))
 
-    def values(): Seq[JsonNode] = fieldSeq().map(_.getValue)
+    def values(): Seq[JsonNode] = entrySeq().map(_.getValue)
 
     def getNode(f: String): Option[JsonNode] = Option(o.get(f))
 

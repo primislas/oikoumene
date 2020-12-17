@@ -78,7 +78,7 @@ object TerrainParser extends LazyLogging {
       .getOrElse(conf)
 
   def parseModifiers(t: ObjectNode): ObjectNode = {
-    val modifierFields = t.fieldSeq().filterNot(e => terrainFields.contains(e.getKey))
+    val modifierFields = t.entrySeq().filterNot(e => terrainFields.contains(e.getKey))
     if (modifierFields.nonEmpty) {
       val modifier = modifierFields.foldLeft(objectNode)((acc, e) => acc.setEx(e.getKey, e.getValue))
       modifierFields.map(_.getKey).foreach(t.remove)

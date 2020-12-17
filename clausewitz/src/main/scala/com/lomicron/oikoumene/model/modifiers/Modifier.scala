@@ -31,7 +31,7 @@ case class Modifier
 
   def multiply(coef: Double): Modifier = {
     val c = conf.deepCopy()
-    c.fieldSeq()
+    c.entrySeq()
       .foreach(e => {
         val (k, v) = (e.getKey, e.getValue)
         if (v.isNumber) c.setEx(k, v.doubleValue() * coef)
