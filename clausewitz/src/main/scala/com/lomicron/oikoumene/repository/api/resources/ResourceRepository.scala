@@ -66,6 +66,7 @@ trait ResourceRepository {
   def getTechGroupConfig: Option[String]
   def getIdeas: Map[String, String]
   def getPolicies: Map[String, String]
+  def getStateEdicts: Map[String, String]
 
   def getTradeGoods: Map[String, String]
   def getPrices: Map[String, String]

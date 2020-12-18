@@ -3,7 +3,6 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
-import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
@@ -42,6 +41,9 @@ object ClausewitzParser extends LazyLogging {
     val terrainProvincesKey = "terrain_override"
     val terrainKey = "terrain"
     val modifier = "modifier"
+    val potential = "potential"
+    val allow = "allow"
+    val aiWillDo = "ai_will_do"
   }
 
   val empty: (ObjectNode, Seq[ParsingError]) =

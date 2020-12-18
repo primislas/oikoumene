@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.parsers.government
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.government.Policy
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.PolicyRepository
@@ -10,18 +11,12 @@ import com.typesafe.scalalogging.LazyLogging
 
 object PolicyParser extends LazyLogging {
 
-  private val CPFs = ClausewitzParser.Fields
-
-  object Fields {
-    val monarchPower = "monarch_power"
-    val potential = "potential"
-    val allow = "technology"
-    val aiWillDo = "ai_will_do"
-    val all: Set[String] = Set(CPFs.idKey, CPFs.sourceFile, CPFs.localisation,
-      monarchPower, potential, allow, aiWillDo, CPFs.modifier)
-
-    val groups = "groups"
-  }
+  val monarchPower = "monarch_power"
+  val groups = "groups"
+  val policyFields = Set(
+    Fields.idKey, Fields.sourceFile, Fields.localisation, monarchPower,
+    Fields.potential, Fields.allow, Fields.aiWillDo, Fields.modifier
+  )
 
   def apply(repos: RepositoryFactory, evalEntityFields: Boolean = false): PolicyRepository = {
     val files = repos.resources
@@ -45,10 +40,10 @@ object PolicyParser extends LazyLogging {
   def parsePolicy(o: ObjectNode): ObjectNode = {
     val modifier = o
       .entrySeq()
-      .filterNot(e => Fields.all.contains(e.getKey))
+      .filterNot(e => policyFields.contains(e.getKey))
       .foldLeft(objectNode)(_ setEx _)
     modifier.fieldSeq().foreach(o.remove)
-    o.setEx(CPFs.modifier, modifier)
+    o.setEx(Fields.modifier, modifier)
   }
 
 }
