@@ -19,8 +19,10 @@ object TechnologyParser extends LazyLogging {
     val governments = "governments"
     val buildings = "buildings"
     val enable = "enable"
-    val all: Set[String] = Set(CPFs.idKey, CPFs.sourceFile, monarchPower,
-      aheadOfTime, governments, buildings, technology, enable, CPFs.modifier)
+    val all: Set[String] = Set(
+      CPFs.idKey, CPFs.localisation, CPFs.sourceFile, CPFs.modifier,
+      monarchPower, aheadOfTime, governments, buildings, technology, enable
+    )
 
     val groups = "groups"
   }

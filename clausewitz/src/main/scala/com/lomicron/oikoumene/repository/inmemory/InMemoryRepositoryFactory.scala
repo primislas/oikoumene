@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository, TechnologyRepository}
+import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository, PolicyRepository, TechnologyRepository}
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
@@ -11,7 +11,7 @@ import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, Tra
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
-import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository, InMemoryTechGroupRepository, InMemoryTechnologyRepository}
+import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository, InMemoryPolicyRepository, InMemoryTechGroupRepository, InMemoryTechnologyRepository}
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
@@ -35,6 +35,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val techGroupRepo = InMemoryTechGroupRepository()
   private val technologyRepo = InMemoryTechnologyRepository(techGroupRepo)
   private val ideasRepo = InMemoryIdeaGroupRepository()
+  private val policiesRepo = InMemoryPolicyRepository()
 
   private val diplomacyRepo: DiplomacyRepository = InMemoryDiplomacyRepository()
   private val warHistoryRepo: WarHistoryRepository = InMemoryWarRepository()
@@ -66,6 +67,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   override def governmentReforms: GovernmentReformRepository = governmentReformsRepo
   override def technology: TechnologyRepository = technologyRepo
   override def ideas: IdeaGroupRepository = ideasRepo
+  override def policies: PolicyRepository = policiesRepo
 
   override def provinces: ProvinceRepository = provinceRepo
   override def buildings: BuildingRepository = buildingRepo
