@@ -3,14 +3,16 @@ package com.lomicron.oikoumene.parsers.provinces
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.model.map.RouteTypes
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
-import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, booleanYes, toObjectNode}
+import com.softwaremill.quicklens._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.matching.Regex
@@ -33,8 +35,6 @@ object ProvinceParser extends LazyLogging {
     val withGeography = addGeography(withHistory, repos.geography)
     val withPolitics = addPolitics(withGeography, repos)
     val withTrade = addTrade(withPolitics, repos)
-
-    repos.geography.map.buildRoutes(repos.provinces)
 
     withTrade
   }
@@ -161,11 +161,22 @@ object ProvinceParser extends LazyLogging {
     event
   }
 
+  private val landlockedRoutes = Set(RouteTypes.LAND, RouteTypes.IMPASSABLE)
   def addGeography
-  (provinceRepo: ProvinceRepository, geography: GeographicRepository)
+  (provinces: ProvinceRepository, geography: GeographicRepository)
   : ProvinceRepository = {
-    provinceRepo.findAll.map(addGeography(_, geography)).foreach(provinceRepo.update)
-    provinceRepo
+    provinces.findAll.map(addGeography(_, geography)).foreach(provinces.update)
+    geography.map.buildRoutes(provinces)
+    val landlocked = geography.map
+      .routes
+      .filterValues(_.nonEmpty)
+      .filterValues(_.forall(r => landlockedRoutes.contains(r.`type`)))
+      .keys.toList
+    provinces
+      .find(landlocked)
+      .map(p => p.modify(_.geography.landlocked).setTo(true))
+      .foreach(provinces.update)
+    provinces
   }
 
   def addGeography
