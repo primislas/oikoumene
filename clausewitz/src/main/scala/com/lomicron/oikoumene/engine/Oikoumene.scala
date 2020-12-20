@@ -1,11 +1,10 @@
 package com.lomicron.oikoumene.engine
 
-import com.lomicron.oikoumene.model.government.Technology
 import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyParser, WarGoalTypeParser, WarHistoryParser}
-import com.lomicron.oikoumene.parsers.government.{GovernmentParser, GovernmentReformParser, IdeaParser, PolicyParser, StateEdictParser, TechnologyParser}
+import com.lomicron.oikoumene.parsers.government._
 import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.oikoumene.parsers.map.MapParser
-import com.lomicron.oikoumene.parsers.modifiers.{ModifierAnalyzer, ModifierParser}
+import com.lomicron.oikoumene.parsers.modifiers.ModifierParser
 import com.lomicron.oikoumene.parsers.politics._
 import com.lomicron.oikoumene.parsers.provinces.{BuildingParser, GeographyParser, ProvinceParser}
 import com.lomicron.oikoumene.parsers.trade.{CenterOfTradeParser, TradeGoodParser, TradeNodeParser}
@@ -81,6 +80,8 @@ object Oikoumene extends LazyLogging {
     logger.info(s"Loaded ${ideas.size} idea groups")
     val policies = PolicyParser(repos)
     logger.info(s"Loaded ${policies.size} policies")
+    val rulerPersonalities = RulerPersonalityParser(repos)
+    logger.info(s"Loaded ${rulerPersonalities.size} ruler personalities")
     val edicts = StateEdictParser(repos)
     logger.info(s"Loaded ${edicts.size} state edicts")
 

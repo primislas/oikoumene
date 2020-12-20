@@ -1,9 +1,9 @@
 package com.lomicron.oikoumene.repository.api.resources
 
-import java.nio.file.Path
-
 import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+
+import java.nio.file.Path
 
 trait ResourceRepository {
 
@@ -28,6 +28,7 @@ trait ResourceRepository {
     * @return country history by country tag
     */
   def getCountryHistory: Map[String, FileNameAndContent]
+  def getRulerPersonalities: Map[String, String]
 
   def getDiplomaticRelations: Map[String, String]
   def getWarHistory: Map[String, String]

@@ -1,9 +1,5 @@
 package com.lomicron.oikoumene.repository.fs
 
-import java.io.File
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
-
 import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.oikoumene.repository.api.GameFilesSettings
@@ -11,6 +7,9 @@ import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
+import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path, Paths}
 import scala.collection.immutable.ListMap
 import scala.util.matching.Regex
 
@@ -22,6 +21,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val countryTagsDir = "common/country_tags"
   val countriesDir = "common/countries"
   val countryHistoryDir = "history/countries"
+  val rulerPersonalitiesDir = "common/ruler_personalities"
 
   val diploHistoryDir = "history/diplomacy"
   val warHistoryDir = "history/wars"
@@ -85,6 +85,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
     readDir(countryHistoryDir)
       .mapKVtoValue(FileNameAndContent)
       .mapKeys(filenameToTag)
+
+  override def getRulerPersonalities: Map[String, String] =
+    readDir(rulerPersonalitiesDir)
 
   override def getDiplomaticRelations: Map[String, String] =
     readDir(diploHistoryDir)

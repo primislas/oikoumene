@@ -40,6 +40,9 @@ case class TagService(repos: RepositoryFactory) {
       .flatMap(repos.governmentReforms.find(_).toOption)
       .flatMap(_.modifierWithId)
     val traditions = repos.ideas.ofTag(tag).flatMap(_.startWithId)
+    val personalityIds = its.monarch.flatMap(_.personalities).getOrElse(Seq.empty)
+    val personalities = repos.rulerPersonalities.find(personalityIds).flatMap(_.modifierWithId)
+
     // TODO production efficiency
     val legitimacy = statics.legitimacy.map(_ * ((its.legitimacy - 50).doubleValue() / 100))
     val prestige = statics.prestige.map(_ * its.prestige)
@@ -54,12 +57,11 @@ case class TagService(repos: RepositoryFactory) {
     // TODO additional tag modifiers
     //  active modifiers
     //  ruler modifiers
-    //  val monarch = ts.monarch.flatMap(_.personalities)
     val modifiers = Seq(
       allNations, base, rank, gov, traditions,
       legitimacy, prestige, stab, positiveStab, negativeStab,
       mercantilism, armyTrad, navyTrad
-    ).flatten ++ reforms ++ cots
+    ).flatten ++ reforms ++ cots ++ personalities
     its = modifiers.foldLeft(its)(_ addModifier _)
 
     // TODO further tag initialization

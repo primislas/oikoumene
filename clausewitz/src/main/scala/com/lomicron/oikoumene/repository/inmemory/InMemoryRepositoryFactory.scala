@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository, PolicyRepository, StateEdictRepository, TechnologyRepository}
+import com.lomicron.oikoumene.repository.api.government._
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
@@ -11,7 +11,7 @@ import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, Tra
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
-import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository, InMemoryPolicyRepository, InMemoryStateEdictRepository, InMemoryTechGroupRepository, InMemoryTechnologyRepository}
+import com.lomicron.oikoumene.repository.inmemory.government._
 import com.lomicron.oikoumene.repository.inmemory.map._
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
@@ -29,6 +29,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val cultureRepo: CultureRepository = InMemoryCultureRepository(cultureGroupRepo)
   private val religionGroupRepo: ReligionGroupRepository = InMemoryReligionGroupRepository()
   private val religionRepo: ReligionRepository = InMemoryReligionRepository(religionGroupRepo)
+  private val rulerPersonalitiesRepo: RulerPersonalityRepository = InMemoryRulerPersonalityRepository()
 
   private val governmentsRepo = InMemoryGovernmentRepository()
   private val governmentReformsRepo = InMemoryGovernmentReformRepository()
@@ -63,6 +64,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   override def tags: TagRepository = tagRepo
   override def cultures: CultureRepository = cultureRepo
   override def religions: ReligionRepository = religionRepo
+  override def rulerPersonalities: RulerPersonalityRepository = rulerPersonalitiesRepo
 
   override def governments: GovernmentRepository = governmentsRepo
   override def governmentReforms: GovernmentReformRepository = governmentReformsRepo

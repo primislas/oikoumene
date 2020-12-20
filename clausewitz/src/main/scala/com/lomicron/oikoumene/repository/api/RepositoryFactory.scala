@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.repository.api
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository, PolicyRepository, StateEdictRepository, TechnologyRepository}
+import com.lomicron.oikoumene.repository.api.government._
 import com.lomicron.oikoumene.repository.api.map._
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
@@ -20,6 +20,7 @@ trait RepositoryFactory {
   def tags: TagRepository
   def cultures: CultureRepository
   def religions: ReligionRepository
+  def rulerPersonalities: RulerPersonalityRepository
 
   def governments: GovernmentRepository
   def governmentReforms: GovernmentReformRepository
