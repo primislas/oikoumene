@@ -12,6 +12,7 @@ import com.lomicron.oikoumene.parsers.trade.{CenterOfTradeParser, TradeGoodParse
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.CacheReader
 import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
+import com.lomicron.oikoumene.service.government.TagService
 import com.lomicron.oikoumene.service.province.ProvinceService
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.typesafe.scalalogging.LazyLogging
@@ -102,6 +103,8 @@ object Oikoumene extends LazyLogging {
     val provinces = ProvinceParser(repos)
     logger.info(s"Loaded ${provinces.size} province configs")
 
+    val tagService = TagService(repos)
+    tags.findAll.map(tagService.init).foreach(tags.update)
     val provService = ProvinceService(repos)
     provinces.findAll
       .map(provService.init)

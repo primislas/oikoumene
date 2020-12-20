@@ -11,7 +11,6 @@ case class InMemoryModifierRepository()
   extends InMemoryCrudRepository[String, Modifier](_.id)
     with StaticModifierRepository { self =>
 
-
   override def static: StaticModifierRepository =
     self.asInstanceOf[StaticModifierRepository]
 

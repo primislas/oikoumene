@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.lomicron.oikoumene.model.WithCumulativeModifier
 import com.lomicron.oikoumene.model.history.HistState
-import com.lomicron.oikoumene.model.modifiers.Modifier
+import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier}
 import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 
 import scala.collection.immutable.ListSet
@@ -14,8 +15,8 @@ case class ProvinceState
   baseManpower: Int = 0,
 
   production: ProvinceProduction = ProvinceProduction.empty,
-  activeModifiers: Map[String, ActiveModifier] = Map.empty,
-  modifier: Modifier = Modifier(),
+  override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
+  override val modifier: Modifier = Modifier(),
 
   discoveredBy: Set[String] = ListSet.empty,
   tradeGood: Option[String] = None,
@@ -51,7 +52,7 @@ case class ProvinceState
   seatInParliament: Boolean = false,
   tradeCompany: Option[String] = None,
   tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
-) extends HistState[ProvinceState, ProvinceUpdate] {
+) extends HistState[ProvinceState, ProvinceUpdate] with WithCumulativeModifier[ProvinceState] {
   self =>
 
   @JsonCreator def this() = this(0)
@@ -61,27 +62,11 @@ case class ProvinceState
 
   def development: Int = baseTax + baseProduction + baseManpower
 
-  def addModifier(am: ActiveModifier): ProvinceState = {
-    val id = am.name
-    val actives = activeModifiers + (id -> am)
-    val cumulative = am.effect.map(modifier.add).getOrElse(modifier)
-    copy(activeModifiers = actives, modifier = cumulative)
-  }
 
-  def addModifier(m: Modifier): ProvinceState =
-    m.id
-      .map(id => ActiveModifier(name = id, effect = Some(m)))
-      .map(addModifier)
-      .getOrElse(self)
+  override def self: ProvinceState = self
 
-  def removeModifier(m: Modifier): ProvinceState =
-    m.id
-      .map(id => {
-        val actives = activeModifiers - id
-        val cumulative = modifier.remove(m)
-        copy(activeModifiers = actives, modifier = cumulative)
-      })
-      .getOrElse(self)
+  override def withModifiers(activeModifiers: Map[String, ActiveModifier], cumulative: Modifier): ProvinceState =
+    copy(activeModifiers = activeModifiers, modifier = cumulative)
 
   def updateOwner(v: String): ProvinceState =
     if (v != "---") copy(owner = Some(v)) else copy(owner = None)

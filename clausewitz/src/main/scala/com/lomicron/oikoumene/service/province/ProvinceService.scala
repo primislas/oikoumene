@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.service.province
 
-import com.lomicron.oikoumene.model.modifiers.{Modifier, StaticModifiers}
+import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier, StaticModifiers}
 import com.lomicron.oikoumene.model.provinces._
 import com.lomicron.oikoumene.model.trade.CenterOfTrade
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
@@ -62,17 +62,14 @@ case class ProvinceService(repos: RepositoryFactory) {
       .map(b => b.modifier.copy(id = b.id))
       .foldLeft(state)(_ addModifier _)
 
-  def addCot(state: ProvinceState, isLandlocked: Boolean): ProvinceState = {
-    val level = state.centerOfTrade
-    if (level > 0) {
-      val cotType = if (isLandlocked) CenterOfTrade.Types.inland else CenterOfTrade.Types.coastal
-      repos.centersOfTrade.findAll.filter(_.level == level)
-        .find(_.`type` == cotType)
-        .flatMap(cot => cot.provinceModifiers.map(_.copy(id = cot.id)))
-        .map(cot => state.addModifier(cot))
-        .getOrElse(state)
-    } else
-      state
+  def addCot(ps: ProvinceState, isLandlocked: Boolean): ProvinceState = {
+    repos
+      .centersOfTrade
+      .ofProvince(ps, isLandlocked)
+      .flatMap(cot => cot.provinceModifiers.map(_.copy(id = cot.id)))
+      .map(ActiveModifier.of)
+      .map(ps.addModifier)
+      .getOrElse(ps)
   }
 
   def findModifier(mId: String): Option[Modifier] =

@@ -2,6 +2,7 @@ package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.{JsonCreator, JsonIgnore}
 import com.lomicron.oikoumene.model.history.HistEvent
+import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.utils.parsing.tokenizer.Date
 
 case class ProvinceUpdate

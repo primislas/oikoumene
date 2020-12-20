@@ -2,10 +2,12 @@ package com.lomicron.oikoumene.model.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier}
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
+import com.softwaremill.quicklens.ModifyPimp
 
 import scala.collection.immutable.ListMap
 
@@ -51,11 +53,18 @@ case class Tag
   allYourCoreAreBelongToUs: Boolean = false,
   // hits = 1, isOptional = true, sample = true
   rightToBearArms: Boolean = false,
-) extends Entity {
+) extends Entity { self =>
 
   @JsonCreator def this() = this(Entity.UNDEFINED)
 
   def state: TagState = history.state
+  def withState(ts: TagState): Tag = self.modify(_.history.state).setTo(ts)
+
+  def addModifier(m: Modifier): Tag = addModifier(ActiveModifier.of(m))
+  def addModifier(am: ActiveModifier): Tag = {
+    val s = state.addModifier(am)
+    self.modify(_.history.state).setTo(s)
+  }
 
   def atStart: Tag = at(startDate)
 

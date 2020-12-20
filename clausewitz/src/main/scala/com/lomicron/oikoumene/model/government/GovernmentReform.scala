@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.model.government
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.oikoumene.model.Entity
+import com.lomicron.oikoumene.model.{Entity, WithModifier}
 import com.lomicron.oikoumene.model.events.TagCondition
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.model.modifiers.Modifier
@@ -171,8 +171,13 @@ case class GovernmentReform
   statesGeneralMechanic: Option[ObjectNode] = None,
   // hits = 1, isOptional = true, sample = ""
   tradeCityReform: Option[String] = None,
-) extends Entity {
+) extends Entity with WithModifier {
+
   @JsonCreator def this() = this(Entity.UNDEFINED)
+
+  override def modifierId: String = id
+  override def modifier: Option[Modifier] = modifiers
+
 }
 
 object GovernmentReform extends FromJson[GovernmentReform]

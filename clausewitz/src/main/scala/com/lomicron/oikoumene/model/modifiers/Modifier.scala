@@ -17,6 +17,8 @@ case class Modifier
   conf: ObjectNode = JsonMapper.objectNode
 ) { self =>
 
+  def withId(id: String): Modifier = copy(id = Option(id))
+
   def name: Option[String] = localisation.flatMap(_.name)
 
   def add(other: Modifier): Modifier =
@@ -28,7 +30,7 @@ case class Modifier
   def -(other: Modifier): Modifier = remove(other)
 
   def multiply(coef: Int): Modifier = multiply(coef.doubleValue())
-
+  def *(coef: Int): Modifier = multiply(coef: Int)
   def multiply(coef: Double): Modifier = {
     val c = conf.deepCopy()
     c.entrySeq()
@@ -39,6 +41,8 @@ case class Modifier
 
     copy(conf = c)
   }
+  def *(coef: Double): Modifier = multiply(coef)
+  def *(coef: BigDecimal): Modifier = multiply(coef.doubleValue())
 
   // hits = 339, isOptional = true, sample = 0.5
   def prestige: Option[BigDecimal] = conf.getBigDecimal("prestige")

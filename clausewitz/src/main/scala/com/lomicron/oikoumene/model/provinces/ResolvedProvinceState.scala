@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.model.provinces
 
+import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.oikoumene.model.politics.{Culture, CultureGroup, Religion, ReligionGroup, Tag}
 import com.lomicron.oikoumene.model.trade.TradeGood
 

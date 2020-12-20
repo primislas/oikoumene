@@ -13,7 +13,20 @@ case class ProvinceProduction
   sailors: BigDecimal = bd0,
   landForcelimit: BigDecimal = bd0,
   navalForcelimit: BigDecimal = bd0,
-)
+) {
+  def +(p: ProvinceProduction): ProvinceProduction =
+    ProvinceProduction(
+      taxes + p.taxes,
+      goodsProduced + p.goodsProduced,
+      production + p.production,
+      tradePower + p.tradePower,
+      tradeValue + p.tradeValue,
+      manpower + p.manpower,
+      sailors + p.sailors,
+      landForcelimit + p.landForcelimit,
+      navalForcelimit + p.navalForcelimit,
+    )
+}
 
 object ProvinceProduction {
   val empty: ProvinceProduction = ProvinceProduction()

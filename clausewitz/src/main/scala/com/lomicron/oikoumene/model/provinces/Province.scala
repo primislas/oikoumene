@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.provinces
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.localisation.{Localisation, WithLocalisation}
+import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
@@ -26,7 +27,6 @@ case class Province
     val s = state.addModifier(am)
     self.modify(_.history.state).setTo(s)
   }
-
 
   def withState(state: ProvinceState): Province = copy(history = history.withState(state))
 

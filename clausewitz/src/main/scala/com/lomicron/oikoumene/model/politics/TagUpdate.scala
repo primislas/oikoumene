@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.politics
 import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
 import com.lomicron.oikoumene.model.events.TagCondition
 import com.lomicron.oikoumene.model.history.HistEvent
+import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
@@ -65,7 +66,7 @@ case class TagUpdate
   // hits = 21, isOptional = true, sample = {"trade_goods":"gems","key":"FACETING","value":0.25,"duration":-1}
   changePrice: Option[Seq[PriceModifier]] = None,
   // hits = 1, isOptional = true, sample = {"name":"tur_janissary","duration":-1}
-  addCountryModifier: Option[Seq[CountryModifier]] = None,
+  addCountryModifier: Option[Seq[ActiveModifier]] = None,
 
   // hits = 28, isOptional = true, sample = "COC"
   historicalRival: Option[Seq[String]] = None,

@@ -1,8 +1,10 @@
 package com.lomicron.oikoumene.model.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.history.HistState
+import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier}
+import com.lomicron.oikoumene.model.provinces.ProvinceProduction
+import com.lomicron.oikoumene.model.{Entity, WithCumulativeModifier}
 import com.lomicron.utils.json.FromJson
 
 case class TagState
@@ -23,6 +25,16 @@ case class TagState
   globalFlags: Seq[String] = Seq.empty,
   // hits = 16, isOptional = true, sample = ["total_war_series","total_war"]
   countryFlags: Seq[String] = Seq.empty,
+
+  stability: BigDecimal = 1,
+  legitimacy: Int = 100,
+  prestige: BigDecimal = 0,
+
+  override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
+  override val modifier: Modifier = Modifier(),
+  enabledBuildings: Set[String] = Set.empty,
+  enabledGovernments: Set[String] = Set.empty,
+  production: ProvinceProduction = ProvinceProduction.empty,
 
   // hits = 8023, isOptional = true, sample = {"name":"Yusuf","dynasty":"Jaladi","dip":3,"mil":1,"adm":2}
   monarch: Option[Monarch] = None,
@@ -70,6 +82,8 @@ case class TagState
   unitType: Option[String] = None,
   // hits = 25, isOptional = true, sample = 0.05
   armyProfessionalism: Option[BigDecimal] = None,
+  armyTradition: BigDecimal = 0,
+  navyTradition: BigDecimal = 0,
 
   // hits = 28, isOptional = true, sample = "COC"
   historicalRivals: Seq[String] = Seq.empty,
@@ -81,21 +95,23 @@ case class TagState
   // hits = 21, isOptional = true, sample = {"trade_goods":"gems","key":"FACETING","value":0.25,"duration":-1}
   priceModifiers: Seq[PriceModifier] = Seq.empty,
   // hits = 1, isOptional = true, sample = {"name":"tur_janissary","duration":-1}
-  countryModifiers: Seq[CountryModifier] = Seq.empty,
+  countryModifiers: Seq[ActiveModifier] = Seq.empty,
   // hits = 1, isOptional = true, sample = {"name":"shahrukhs_empire"}
   rulerModifiers: Seq[RulerModifier] = Seq.empty,
 
   ambientObjects: Seq[String] = Seq.empty,
 
-
-) extends HistState[TagState, TagUpdate] { self =>
+) extends HistState[TagState, TagUpdate] with WithCumulativeModifier[TagState] { self =>
 
   @JsonCreator def this() = this(Entity.UNDEFINED)
 
   override def next(update: TagUpdate): TagState =
     TagState.updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))
 
+  override def self: TagState = self
 
+  override def withModifiers(activeModifiers: Map[String, ActiveModifier], cumulative: Modifier): TagState =
+    copy(activeModifiers = activeModifiers, modifier = cumulative)
 
   def updateTechnologyGroup(technologyGroup: String): TagState = copy(technologyGroup = technologyGroup)
 
@@ -179,6 +195,17 @@ case class TagState
   def revolutionTarget(isTarget: Boolean): TagState = copy(isRevolutionTarget = isTarget)
 
 
+  def toggleBuildings(bs: Map[String, Boolean]): TagState =
+    copy(enabledBuildings = toggle(bs, enabledBuildings))
+
+  def toggleGovernments(govs: Map[String, Boolean]): TagState =
+    copy(enabledGovernments = toggle(govs, enabledGovernments))
+
+  def toggle(es: Map[String, Boolean], enabled: Set[String]): Set[String] = {
+    val withEnabled = es.filter(_._2).keys.foldLeft(enabled)(_ + _)
+    es.filterNot(_._2).keys.foldLeft(withEnabled)(_ - _)
+  }
+
 
   def setPrimaryCulture(culture: String): TagState = copy(primaryCulture = Option(culture))
 
@@ -226,9 +253,9 @@ case class TagState
 
   def addPriceModifiers(pms: Seq[PriceModifier]): TagState = copy(priceModifiers = priceModifiers ++ pms)
 
-  def addCountryModifier(cm: CountryModifier): TagState = copy(countryModifiers = countryModifiers :+ cm)
+  def addCountryModifier(cm: ActiveModifier): TagState = copy(countryModifiers = countryModifiers :+ cm)
 
-  def addCountryModifier(cms: Seq[CountryModifier]): TagState = copy(countryModifiers = countryModifiers ++ cms)
+  def addCountryModifier(cms: Seq[ActiveModifier]): TagState = copy(countryModifiers = countryModifiers ++ cms)
 
   def addRulerModifier(rm: RulerModifier): TagState = copy(rulerModifiers = rulerModifiers :+ rm)
 
@@ -276,7 +303,7 @@ object TagState extends FromJson[TagState] {
       nextF(update.mercantilism, (s, v: BigDecimal) => s.setMercantilism(v)),
       nextF(update.nationalFocus, (s, v: String) => s.setNationalFocus(v)),
       nextF(update.changePrice, (s, v: Seq[PriceModifier]) => s.addPriceModifiers(v)),
-      nextF(update.addCountryModifier, (s, v: Seq[CountryModifier]) => s.addCountryModifier(v)),
+      nextF(update.addCountryModifier, (s, v: Seq[ActiveModifier]) => s.addCountryModifier(v)),
 
       nextF(update.historicalRival, (s, v: Seq[String]) => s.addHistoricalRivals(v)),
       nextF(update.historicalFriend, (s, v: Seq[String]) => s.addHistoricalFriends(v)),

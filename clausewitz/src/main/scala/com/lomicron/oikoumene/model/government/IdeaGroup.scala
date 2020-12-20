@@ -15,7 +15,7 @@ case class IdeaGroup
   // hits = 404, isOptional = false, sample = "00_basic_ideas.txt"
   sourceFile: String = Entity.UNDEFINED,
   // hits = 384, isOptional = true, sample = {"land_morale":0.1,"core_creation":-0.10}
-  start: Modifier = Modifier.empty,
+  start: Option[Modifier] = None,
   // hits = 404, isOptional = false, sample = [{"id":"noble_knights","modifiers":{"cavalry_power":0.10,"cavalry_cost":-0.10}},{"id":"military_traditions","modifiers":{"mil_tech_cost_modifier":-0.1}},{"id":"local_nobility","modifiers":{"global_autonomy":-0.025,"yearly_absolutism":0.1}},{"id":"serfdom","modifiers":{"global_manpower_modifier":0.33}},{"id":"noble_officers","modifiers":{"army_tradition_decay":-0.01,"navy_tradition_decay":-0.01}},{"id":"international_nobility","modifiers":{"diplomats":1,"free_leader_pool":1}},{"id":"noble_resilience","modifiers":{"possible_mercenaries":0.20}},{"id":"ai_will_do","modifiers":{"factor":0.45,"modifier":{"factor":0.5,"is_subject":true}}}]
   ideas: Seq[Idea] = Seq.empty,
   // hits = 403, isOptional = true, sample = {"leader_siege":1}
@@ -29,6 +29,8 @@ case class IdeaGroup
   // hits = 19, isOptional = true, sample = "MIL"
   category: Option[String] = None,
 ) extends Entity {
+  def startWithId: Option[Modifier] = start.map(_.withId(id))
+  def bonusWithId: Option[Modifier] = bonus.map(_.withId(id))
 }
 
 object IdeaGroup extends FromJson[IdeaGroup]
