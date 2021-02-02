@@ -1,10 +1,11 @@
 package com.lomicron.utils.geometry
 
+import com.lomicron.utils.geometry.Geometry.{halfPI, threeHalfPI, twoPI}
+import com.lomicron.utils.geometry.Point2D.ZERO
+import org.apache.commons.math3.fitting.WeightedObservedPoint
+
 import java.awt.Point
 import java.lang.Math.{PI, abs, atan}
-
-import com.lomicron.utils.geometry.Geometry.{halfPI, threeHalfPI, twoPI}
-import org.apache.commons.math3.fitting.WeightedObservedPoint
 
 case class Point2D(x: Double = 0, y: Double = 0) extends Rotatable[Point2D] { self =>
 
@@ -14,6 +15,10 @@ case class Point2D(x: Double = 0, y: Double = 0) extends Rotatable[Point2D] { se
 
   def +(p: Point2D): Point2D = Point2D(x + p.x, y + p.y)
 
+  def *(m: Double): Point2D = Point2D(x * m, y * m)
+
+  def *(p: Point2D): Double = x * p.x + y * p.y
+
   def toInt: Point = new Point(x.toInt, y.toInt)
 
   def dx(p: Point2D): Double = x - p.x
@@ -22,7 +27,8 @@ case class Point2D(x: Double = 0, y: Double = 0) extends Rotatable[Point2D] { se
   def reflectY(height: Double): Point2D = Point2D(x, height - y)
   def flipXY: Point2D = Point2D(y, x)
 
-  def distance(p: Point2D): Double = Math.sqrt(Math.pow(x - p.x, 2) + Math.pow(y - p.y, 2))
+  def sqrDistance(p: Point2D = ZERO): Double = Math.pow(x - p.x, 2) + Math.pow(y - p.y, 2)
+  def distance(p: Point2D): Double = Math.sqrt(sqrDistance(p))
   def angleTo(p: Point2D): Double = {
     if (x == p.x) { if (p.y >= y) halfPI else threeHalfPI }
     else {
@@ -41,6 +47,11 @@ case class Point2D(x: Double = 0, y: Double = 0) extends Rotatable[Point2D] { se
     val rx = dist * Math.cos(nextAngle) + c.x
     val ry = dist * Math.sin(nextAngle) + c.y
     Point2D(rx, ry)
+  }
+
+  def normalize: Point2D = {
+    val length = distance(ZERO)
+    Point2D(x / length, y / length)
   }
 
 }

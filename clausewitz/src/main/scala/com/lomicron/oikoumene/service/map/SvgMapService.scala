@@ -1,7 +1,5 @@
 package com.lomicron.oikoumene.service.map
 
-import java.lang.Math.PI
-
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.model.provinces.{Province, ProvinceTypes}
@@ -15,6 +13,7 @@ import com.lomicron.utils.geometry._
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
+import java.lang.Math.PI
 import scala.collection.immutable.ListSet
 
 case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
@@ -83,7 +82,8 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
 
   def riverSegmentToSvg(rs: RiverSegment, precision: Int = 1): SvgElement =
     path
-      .copy(path = Svg.pointsToSvgLinearPath(rs.points, precision = precision))
+      .copy(path = Svg.bezierCurvesToPath(SchneidersFitter(rs.points.toVector).fit(1.5)))
+      //.copy(path = Svg.pointsToSvgLinearPath(rs.points, precision = precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
   def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = 1): SvgElement = {
@@ -214,7 +214,8 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     val rp = b.right.flatMap(repos.provinces.findByColor)
     val borderType = borderBetweenProvs(lp, rp)
     path
-      .copy(path = Svg.pointsToSvgLinearPath(b.points, precision = precision))
+//      .copy(path = Svg.pointsToSvgLinearPath(b.points, precision = precision))
+      .copy(path = Svg.bezierCurvesToPath(SchneidersFitter(b.points.toVector).fit(1.5)))
       .addClass(borderType)
   }
 

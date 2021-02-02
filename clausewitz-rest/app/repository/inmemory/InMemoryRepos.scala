@@ -2,11 +2,12 @@ package repository.inmemory
 
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government.IdeaGroupRepository
+import com.lomicron.oikoumene.repository.api.government._
 import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, TagRepository}
+import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
+import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.repository.api.trade.{TradeGoodRepository, TradeNodeRepository}
+import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.oikoumene.repository.fs.FileResourceRepository
 import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
@@ -61,6 +62,22 @@ case class InMemoryRepos() extends RepositoryFactory {
   override def storeToCache: RepositoryFactory = repos.storeToCache
 
   override def loadFromCache: Option[RepositoryFactory] = repos.loadFromCache
+
+  override def rulerPersonalities: RulerPersonalityRepository = repos.rulerPersonalities
+
+  override def governments: GovernmentRepository = repos.governments
+
+  override def governmentReforms: GovernmentReformRepository = repos.governmentReforms
+
+  override def technology: TechnologyRepository = repos.technology
+
+  override def policies: PolicyRepository = repos.policies
+
+  override def stateEdicts: StateEdictRepository = repos.stateEdicts
+
+  override def centersOfTrade: CenterOfTradeRepository = repos.centersOfTrade
+
+  override def modifiers: ModifierRepository = repos.modifiers
 }
 
 object InMemoryReposSingleton {
