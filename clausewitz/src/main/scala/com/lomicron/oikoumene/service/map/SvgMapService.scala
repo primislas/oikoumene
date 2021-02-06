@@ -16,7 +16,8 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint
 import java.lang.Math.PI
 import scala.collection.immutable.ListSet
 
-case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
+case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = SvgMapSettings.default) extends LazyLogging {
+  private val defaultPrecision: Int = settings.pointDecimalPrecision
 
   val provinceGroup: SvgElement = group.copy(
     id = SvgMapClasses.PROVINCE_GROUP,
@@ -41,17 +42,18 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     if (settings.ownWastelands.contains(true))
       worldMap.recalculateWastelandOwners
 
+    val map = worldMap.mercator.recalcCurves
     val precision: Int = settings.decimalPrecision
     val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
     val style = SvgMapStyles.styleOf(settings, repos)
-    val provinces = provinceSvg(worldMap.mercator, settings.mapMode, precision)
-    val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(worldMap.mercator.rivers, precision)).toSeq
+    val provinces = provinceSvg(map, settings.mapMode, precision)
+    val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(map.rivers, precision)).toSeq
     val names = settings.includeNames.filter(_.booleanValue()).toSeq.map(_ => nameSvg(worldMap))
-    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(worldMap.mercator, precision))
+    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
 
     val worldSvg = Svg
       .svgHeader
-      .copy(width = worldMap.mercator.width, height = worldMap.mercator.height)
+      .copy(width = map.width, height = map.height)
       .add(background)
       .add(style)
       .add(provinces)
@@ -62,7 +64,7 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     worldSvg.toSvg
   }
 
-  def riverSvg(rs: Seq[River], precision: Int = 1): SvgElement = {
+  def riverSvg(rs: Seq[River], precision: Int = defaultPrecision): SvgElement = {
     val rsByClass = rs
       .flatMap(riverToSvg(_, precision))
       .groupBy(_.classes.head)
@@ -77,16 +79,15 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     riverGroup.add(rsByClass)
   }
 
-  def riverToSvg(r: River, precision: Int = 1): Seq[SvgElement] =
+  def riverToSvg(r: River, precision: Int = defaultPrecision): Seq[SvgElement] =
     r.path.map(riverSegmentToSvg(_, precision))
 
-  def riverSegmentToSvg(rs: RiverSegment, precision: Int = 1): SvgElement =
+  def riverSegmentToSvg(rs: RiverSegment, precision: Int = defaultPrecision): SvgElement =
     path
-      .copy(path = Svg.bezierCurvesToPath(SchneidersFitter(rs.points.toVector).fit(1.5)))
-      //.copy(path = Svg.pointsToSvgLinearPath(rs.points, precision = precision))
+      .copy(path = Svg.fromPolypath(rs.path, precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = 1): SvgElement = {
+  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
     val psByClass = map.provinces
       .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
@@ -103,13 +104,13 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     provinceGroup.add(groupsByClass)
   }
 
-  def provinceToSvg(shape: Shape, mapMode: String, precision: Int = 1): SvgElement = {
+  def provinceToSvg(shape: Shape, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
     val polygon = shape.polygon.get
     val elem = polygon
       .provinceId
       .map(classesOfProvince(_, mapMode))
-      .map(defaultProvincePolygon(polygon, precision).addClasses(_))
-      .getOrElse(defaultProvincePolygon(polygon, precision))
+      .map(defaultProvincePolygon(polygon, shape.path, precision).addClasses(_))
+      .getOrElse(defaultProvincePolygon(polygon, shape.path, precision))
     polygon
       .provinceId
       .map(buildProvTooltip)
@@ -120,15 +121,15 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
   def classesOfProvince(pId: Int, mapMode: String): Seq[String] =
     repos.provinces.find(pId).toOption.map(SvgMapClasses.ofProvince(_, mapMode)).getOrElse(Seq.empty)
 
-  def defaultProvincePolygon(polygon: Polygon, precision: Int = 1): SvgElement = {
+  def defaultProvincePolygon(polygon: Polygon, polypath: Seq[TPath], precision: Int = defaultPrecision): SvgElement = {
     val isPathClosed = true
     val elem = SvgElement(
       tag = SvgTags.PATH,
       id = polygon.provinceId.map(_.toString),
     )
-    if (polygon.clip.isEmpty) elem.copy(path = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed, precision))
+    if (polygon.clip.isEmpty) elem.copy(path = Svg.fromPolypath(polypath, precision))
     else {
-      val outer = Svg.pointsToSvgLinearPath(polygon.points, isPathClosed, precision)
+      val outer = Svg.fromPolypath(polypath)
       val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed, precision))
       val path = (outer +: inners).mkString(" ")
       elem.copy(path = path, fillRule = "evenodd")
@@ -169,7 +170,7 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
-  def borderSvg(mercatorMap: MercatorMap, precision: Int = 1): SvgElement =
+  def borderSvg(mercatorMap: MercatorMap, precision: Int = defaultPrecision): SvgElement =
     borderSvg(mercatorMap.borders, precision)
 
   def borderSvg(borders: Seq[Border], precision: Int): SvgElement = {
@@ -214,8 +215,7 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     val rp = b.right.flatMap(repos.provinces.findByColor)
     val borderType = borderBetweenProvs(lp, rp)
     path
-//      .copy(path = Svg.pointsToSvgLinearPath(b.points, precision = precision))
-      .copy(path = Svg.bezierCurvesToPath(SchneidersFitter(b.points.toVector).fit(1.5)))
+      .copy(path = Svg.fromPolypath(b.path, precision))
       .addClass(borderType)
   }
 
@@ -328,8 +328,6 @@ case class SvgMapService(repos: RepositoryFactory) extends LazyLogging {
     val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
     if (polygons.isEmpty) {
       // possible in case of mods, where certain vanilla provinces do not exist on the map
-//      val ps = group.map(p => (p.id, p.name))
-//      logger.warn(s"No map polygons for provinces $groupId with provinces $ps")
       Seq.empty
     } else {
 

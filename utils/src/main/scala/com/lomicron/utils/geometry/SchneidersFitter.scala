@@ -1,6 +1,18 @@
 package com.lomicron.utils.geometry
 
+import com.lomicron.utils.geometry.SchneidersFitter.{DEFAULT_EPSILON, DEFAULT_ERROR, WU_BARSKY_COEF}
+import com.lomicron.utils.geometry.TPath.Polypath
+
 import scala.collection.mutable.ArrayBuffer
+
+object SchneidersFitter {
+  val DEFAULT_ERROR = 1.5
+  val WU_BARSKY_COEF = 3.0
+  val DEFAULT_EPSILON = 1.0E-6
+  def apply(points: Seq[Point2D]): SchneidersFitter = SchneidersFitter(points.toVector)
+  def fit(points: Seq[Point2D], error: Double = DEFAULT_ERROR): Polypath =
+    SchneidersFitter(points).fit(error)
+}
 
 case class SchneidersFitter
 (
@@ -11,10 +23,10 @@ case class SchneidersFitter
 
   def size: Int = points.size
 
-  def fit(error: Double): Seq[BezierCurve] = {
+  def fit(error: Double = DEFAULT_ERROR): Polypath = {
     val pSize = size
     if (pSize > 1) {
-      val curves = ArrayBuffer[BezierCurve]()
+      val curves = ArrayBuffer[TPath]()
       val tan1 = (curveAt(1) - curveAt(0)).normalize
       val tan2 = (curveAt(pSize - 2) - curveAt(pSize - 1)).normalize
       fitCubic(curves, error, 0, pSize - 1, tan1, tan2)
@@ -25,36 +37,29 @@ case class SchneidersFitter
 
   def fitCubic
   (
-    curves: ArrayBuffer[BezierCurve],
+    curves: ArrayBuffer[TPath],
     error: Double,
     first: Int,
     last: Int,
     tan1: Point2D,
     tan2: Point2D
-  ): Seq[BezierCurve] = {
+  ): Polypath = {
 
+    // TODO tidy up for idiomatic scala
     /* 2 point case */
     if (last - first == 1) {
-      val pt1 = points(first)
-      val pt2 = points(last)
-      val dist = pt2.distance(pt1)
-      val pta = pt1 + (tan1 * dist)
-      val ptb = pt2 + (tan2 * dist)
-
-      val curve = BezierCurve(pt1, pta, ptb, pt2)
-      curves += curve
+      val p1 = points(first)
+      val p2 = points(last)
+      curves += Polyline(Seq(p1, p2))
       curves.toList
     } else {
-      if (first == 0 && last == 3)
-        println()
-
       /* parameterize points and attempt to fit the curve */
       val uPrime = chordLengthParameterize(first, last)
       var maxError = Math.max(error, error * error)
       var split = -1
       var parametersInOrder = true
 
-      /* 4 iterations */
+      /* 5 iterations */
       val isFitted = (0 to 4)
         .toStream
         .map(_ => {
@@ -75,13 +80,10 @@ case class SchneidersFitter
             }
           }
         })
-        // TODO here: how to take Fitted but not start the next iteration?
         .find(_ != Iterating)
         .contains(Fitted)
 
       if (!isFitted) {
-        if (split < 0)
-          println()
         var tanCenter = points(split - 1) - points(split + 1)
         tanCenter = tanCenter.normalize
         fitCubic(curves, error, first, split, tan1, tanCenter)
@@ -110,9 +112,27 @@ case class SchneidersFitter
     last: Int,
     uPrime: Array[Double],
     tan1: Point2D,
-    tan2: Point2D
+    tan2: Point2D,
+    epsilon: Double = DEFAULT_EPSILON,
   ): BezierCurve = {
-    val epsilon = 1.0E-6
+    val p1 = points(first)
+    val p2 = points(last)
+
+    val (mC, mX) = calculateMatrices(first, last, uPrime, tan1, tan2)
+    val (alpha1, alpha2) = calculateAlphas(mC, mX, epsilon)
+    val (pta, ptb) = calculateControlPoints(p1, p2, tan1, tan2, alpha1, alpha2, epsilon)
+
+    BezierCurve(p1, pta, ptb, p2)
+  }
+
+  def calculateMatrices
+  (
+    first: Int,
+    last: Int,
+    uPrime: Array[Double],
+    tan1: Point2D,
+    tan2: Point2D,
+  ): (Array[Array[Double]], Array[Double]) = {
     val p1 = points(first)
     val p2 = points(last)
 
@@ -139,6 +159,10 @@ case class SchneidersFitter
       X(1) += a2 * tmp
     }
 
+    (C, X)
+  }
+
+  def calculateAlphas(C: Array[Array[Double]], X: Array[Double], epsilon: Double): (Double, Double) = {
     /* determinant of C and X */
     val detC0C1 = C(0)(0) * C(1)(1) - C(1)(0) * C(0)(1)
     val (alpha1, alpha2) = if (Math.abs(detC0C1) > epsilon) {
@@ -160,16 +184,31 @@ case class SchneidersFitter
           0
       (a, a)
     }
+    (alpha1, alpha2)
+  }
+
+  def calculateControlPoints
+  (
+    p1: Point2D,
+    p2: Point2D,
+    tan1: Point2D,
+    tan2: Point2D,
+    alpha1: Double,
+    alpha2: Double,
+    epsilon: Double,
+  ): (Point2D, Point2D) = {
 
     /* If alpha negative, use the Wu/Barsky heuristic
      * (if alpha is 0, you get coincident control points that lead to divide by zero in any subsequent
      * findRoot() call. */
     val segLength = p2.distance(p1)
     val eps = epsilon * segLength
-    val (handle1, handle2) = if (alpha1 < eps || alpha2 < eps)
+    val (handle1, handle2) = if (alpha1 < eps || alpha2 < eps) {
     /* fall back on standard (probably inaccurate) formula, and subdivide further if needed. */
+      /* NOTE: The above comment is from the original cpp lib, however the outcome seems to match
+      *         the outcome for Wu/Barsky heuristic. Either a faulty comment or a faulty execution path? */
       (None, None)
-    else {
+    } else {
       /* Check if the found control points are in the right order when projected onto the line through pt1 and pt2. */
       val line = p2 - p1
       /* Control points 1 and 2 are positioned at alpha distance out on the tangent vectors, left and right, respectively */
@@ -182,11 +221,10 @@ case class SchneidersFitter
         (Some(h1), Some(h2))
     }
 
-    val WuBarskyCoef = 3.0
-    val pta = handle1.map(_ + p1).getOrElse(p1 + tan1 * (alpha1 / WuBarskyCoef))
-    val ptb = handle2.map(_ + p2).getOrElse(p2 + tan2 * (alpha2 / WuBarskyCoef))
+    val pta = handle1.map(_ + p1).getOrElse(p1 + tan1 * (segLength / WU_BARSKY_COEF))
+    val ptb = handle2.map(_ + p2).getOrElse(p2 + tan2 * (segLength / WU_BARSKY_COEF))
 
-    BezierCurve(p1, pta, ptb, p2)
+    (pta, ptb)
   }
 
   def findMaxError(first: Int, last: Int, bezier: BezierCurve, u: Array[Double]): (Double, Int) = {

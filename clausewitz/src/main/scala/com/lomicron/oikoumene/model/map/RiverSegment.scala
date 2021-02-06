@@ -1,21 +1,23 @@
 package com.lomicron.oikoumene.model.map
 
-import java.awt.Point
-
 import com.lomicron.oikoumene.parsers.map.{Direction, Down, Left, Right, Up}
-import com.lomicron.utils.geometry.Point2D
+import com.lomicron.utils.geometry.{Point2D, TPath}
+
+import java.awt.Point
 
 case class RiverSegment
 (
   source: Int,
   width: Int,
-  points: Seq[Point2D] = Seq.empty
+  points: Seq[Point2D] = Seq.empty,
+  path: Seq[TPath] = Seq.empty
 ) {
 
   def isEmpty: Boolean = points.isEmpty
   def nonEmpty: Boolean = points.nonEmpty
   def reverse: RiverSegment = RiverSegment(width, source, points.reverse)
   def withStartingPoint(p: Point): RiverSegment = copy(points = Point2D(p) +: points)
+  def withPath(path: Seq[TPath]): RiverSegment = copy(path = path)
 
   def smooth: RiverSegment = {
     if (points.size < 3) this

@@ -9,6 +9,7 @@ case class Shape
   provId: Option[Int] = None,
   groupId: Option[Int] = None,
   polygon: Option[Polygon] = None,
+  path: Seq[TPath] = Seq.empty,
   clip: Seq[Polygon] = Seq.empty,
 ) extends Emptiable
 {
@@ -36,6 +37,9 @@ case class Shape
       val p = Polygon(outline, provColor.getOrElse(-1), provId, clip)
       copy(polygon = Some(p))
     }
+
+  def withPath(path: Seq[TPath]): Shape =
+    copy(path = path)
 
   def offset(diff: Point2D): Shape = {
     val obs = borders.map(_.offset(diff))

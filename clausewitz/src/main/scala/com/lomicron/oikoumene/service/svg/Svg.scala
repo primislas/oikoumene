@@ -2,7 +2,8 @@ package com.lomicron.oikoumene.service.svg
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.utils.geometry.{BezierCurve, Point2D}
+import com.lomicron.utils.geometry.TPath.Polypath
+import com.lomicron.utils.geometry.{BezierCurve, Point2D, Polyline, TPath}
 
 import java.text.DecimalFormat
 
@@ -75,17 +76,25 @@ object Svg {
     }
   }
 
-  def bezierCurvesToPath(curves: Seq[BezierCurve], precision: Int = 1): String = {
+  def fromPolypath(pp: Polypath, precision: Int = 1): String = {
+    pp match {
+      case h::t => (startPath(h, precision) +: t.map(continuePath(_, precision))).mkString(" ")
+    }
+  }
+
+  def startPath(p: TPath, precision: Int = 1): String = {
     def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
-    curves match {
-      case head :: tail =>
-        //val h = s"M ${head.p1} c ${psvg(head.cp1 - head.p1)}, ${psvg(head.cp2 - head.cp1)}, ${psvg(head.p2 - head.cp2)}"
-        val h = s"M ${psvg(head.p1)} C ${psvg(head.cp1)}, ${psvg(head.cp2)}, ${psvg(head.p2)}"
-        //val t = tail.map(head => s"M ${head.p1} c ${psvg(head.cp1 - head.p1)}, ${psvg(head.cp2 - head.cp1)}, ${psvg(head.p2 - head.cp2)})
-        val t = tail.map(c => s"C ${psvg(c.cp1)}, ${psvg(c.cp2)}, ${psvg(c.p2)}")
-        (h +: t).mkString(" ")
-      case head :: Nil => s"M ${head.p1} C ${psvg(head.cp1)}, ${psvg(head.cp2)}, ${psvg(head.p2)}"
-      case _ => ""
+    p match {
+      case pl: Polyline => pl.points.headOption.map(p => s"M ${psvg(p)} " + continuePath(pl, precision)).getOrElse("")
+      case b: BezierCurve => s"M ${psvg(b.p1)} " + continuePath(b, precision)
+    }
+  }
+
+  def continuePath(p: TPath, precision: Int = 1): String = {
+    def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+    p match {
+      case Polyline(points) => points.sliding(2, 1).flatMap(ps => toPath(ps.head, ps.last)).mkString(" ")
+      case bc: BezierCurve => s"c ${psvg(bc.cp1 - bc.p1)}, ${psvg(bc.cp2 - bc.p1)}, ${psvg(bc.p2 - bc.p1)}"
     }
   }
 

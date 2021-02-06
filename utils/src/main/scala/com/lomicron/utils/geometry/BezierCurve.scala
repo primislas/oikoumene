@@ -6,8 +6,10 @@ case class BezierCurve
   cp1: Point2D = Point2D.ZERO,
   cp2: Point2D = Point2D.ZERO,
   p2: Point2D = Point2D.ZERO,
-) {
-  def toArray: Array[Point2D] = Array(p1, cp1, cp2, p2)
+) extends TPath {
+  override def points: Seq[Point2D] = Seq(p1, cp1, cp2, p2)
+  override def reverse: BezierCurve = copy(p2, cp2, cp1, p1)
+  def toArray: Array[Point2D] = points.toArray
 }
 
 object BezierCurve {
