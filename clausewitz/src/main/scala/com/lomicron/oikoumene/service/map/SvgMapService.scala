@@ -109,8 +109,8 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val elem = polygon
       .provinceId
       .map(classesOfProvince(_, mapMode))
-      .map(defaultProvincePolygon(polygon, shape.path, precision).addClasses(_))
-      .getOrElse(defaultProvincePolygon(polygon, shape.path, precision))
+      .map(defaultProvincePolygon(shape, precision).addClasses(_))
+      .getOrElse(defaultProvincePolygon(shape, precision))
     polygon
       .provinceId
       .map(buildProvTooltip)
@@ -121,16 +121,15 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   def classesOfProvince(pId: Int, mapMode: String): Seq[String] =
     repos.provinces.find(pId).toOption.map(SvgMapClasses.ofProvince(_, mapMode)).getOrElse(Seq.empty)
 
-  def defaultProvincePolygon(polygon: Polygon, polypath: Seq[TPath], precision: Int = defaultPrecision): SvgElement = {
-    val isPathClosed = true
+  def defaultProvincePolygon(shape: Shape, precision: Int = defaultPrecision): SvgElement = {
     val elem = SvgElement(
       tag = SvgTags.PATH,
-      id = polygon.provinceId.map(_.toString),
+      id = shape.provId.map(_.toString),
     )
-    if (polygon.clip.isEmpty) elem.copy(path = Svg.fromPolypath(polypath, precision))
+    if (shape.clip.isEmpty) elem.copy(path = Svg.fromPolypath(shape.path, precision))
     else {
-      val outer = Svg.fromPolypath(polypath)
-      val inners = polygon.clip.map(_.points).map(Svg.pointsToSvgLinearPath(_, isPathClosed, precision))
+      val outer = Svg.fromPolypath(shape.path)
+      val inners = shape.clip.map(_.path).map(Svg.fromPolypath(_, precision))
       val path = (outer +: inners).mkString(" ")
       elem.copy(path = path, fillRule = "evenodd")
     }

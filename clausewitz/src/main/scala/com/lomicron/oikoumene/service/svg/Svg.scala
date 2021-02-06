@@ -79,6 +79,7 @@ object Svg {
   def fromPolypath(pp: Polypath, precision: Int = 1): String = {
     pp match {
       case h::t => (startPath(h, precision) +: t.map(continuePath(_, precision))).mkString(" ")
+      case Nil => ""
     }
   }
 
