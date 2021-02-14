@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.politics
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonIgnore}
 import com.lomicron.oikoumene.model.history.HistState
 import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier}
 import com.lomicron.oikoumene.model.provinces.ProvinceProduction
@@ -30,11 +30,11 @@ case class TagState
   legitimacy: Int = 100,
   prestige: BigDecimal = 0,
 
-  override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
-  override val modifier: Modifier = Modifier(),
-  enabledBuildings: Set[String] = Set.empty,
-  enabledGovernments: Set[String] = Set.empty,
-  production: ProvinceProduction = ProvinceProduction.empty,
+  @JsonIgnore override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
+  @JsonIgnore override val modifier: Modifier = Modifier(),
+  @JsonIgnore enabledBuildings: Set[String] = Set.empty,
+  @JsonIgnore enabledGovernments: Set[String] = Set.empty,
+  @JsonIgnore production: ProvinceProduction = ProvinceProduction.empty,
 
   // hits = 8023, isOptional = true, sample = {"name":"Yusuf","dynasty":"Jaladi","dip":3,"mil":1,"adm":2}
   monarch: Option[Monarch] = None,

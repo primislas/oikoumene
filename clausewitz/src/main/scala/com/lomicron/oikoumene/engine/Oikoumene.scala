@@ -90,7 +90,7 @@ object Oikoumene extends LazyLogging {
     val tradeNodes = TradeNodeParser(repos)
     logger.info(s"Loaded ${tradeNodes.size} trade nodes")
     val centersOfTrade = CenterOfTradeParser(repos)
-    logger.info(s"Loaded ${centersOfTrade.size}")
+    logger.info(s"Loaded ${centersOfTrade.size} center of trade configs")
 
     logger.info("Loading event modifiers...")
     val eventModifiers = ModifierParser(repos)

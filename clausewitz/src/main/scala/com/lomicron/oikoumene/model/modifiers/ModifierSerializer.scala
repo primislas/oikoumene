@@ -10,7 +10,7 @@ class ModifierSerializer extends JsonSerializer[Modifier] {
   override def serialize(m: Modifier, json: JsonGenerator, serializers: SerializerProvider): Unit = {
     val target = JsonMapper.objectNode
     m.id.foreach(target.setEx("id", _))
-    m.localisation.map(JsonMapper.toJsonNode).foreach(target.set("localisation", _))
+    m.localisation.map(JsonMapper.toJsonNode).foreach(target.setEx("localisation", _))
     m.sourceFile.foreach(target.setEx("source_file", _))
     m.conf.entrySeq().foreach(e => target.setEx(e.getKey, e.getValue))
     json.writeObject(target)

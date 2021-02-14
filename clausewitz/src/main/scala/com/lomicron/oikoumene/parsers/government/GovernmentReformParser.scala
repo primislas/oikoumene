@@ -6,7 +6,7 @@ import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.government.GovernmentReformRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, ObjectNodeEx}
 
 object GovernmentReformParser {
 
@@ -36,13 +36,13 @@ object GovernmentReformParser {
     reformRepo
   }
 
-  def parseGovernmenReform(o: ObjectNode): ObjectNode = removeEmptyObjects(o)
-
-  def removeEmptyObjects(o: ObjectNode): ObjectNode = {
-    o.entrySeq()
-      .filter(e => e.getValue.isObject && e.getValue.isEmpty)
-      .foreach(e => o.remove(e.getKey))
+  def parseGovernmenReform(o: ObjectNode): ObjectNode = {
     o
+      .getArray("lock_level_when_selected")
+      .map(_.toSeq)
+      .flatMap(_.lastOption)
+      .foreach(n => o.setEx("lock_level_when_selected", n))
+    ClausewitzParser.removeEmptyObjects(o)
   }
 
 }

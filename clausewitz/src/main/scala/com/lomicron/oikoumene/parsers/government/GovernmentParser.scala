@@ -60,6 +60,7 @@ object GovernmentParser {
       .map(parseReformLevels)
       .map(o.setEx(reformLevels, _))
       .getOrElse(o)
+    ClausewitzParser.removeEmptyObjects(o)
   }
 
   def parseReformLevels(rls: ObjectNode): ArrayNode = {

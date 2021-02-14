@@ -9,6 +9,11 @@ import java.io.IOException;
 
 public class DateSerializer extends StdSerializer<Date> {
 
+    @SuppressWarnings("unused")
+    public DateSerializer() {
+        this(null);
+    }
+
     @SuppressWarnings("WeakerAccess")
     public DateSerializer(Class<Date> t) {
         super(t);
