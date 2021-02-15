@@ -359,4 +359,18 @@ object ClausewitzParser extends LazyLogging {
 
     rec(triggers, Seq.empty)
   }
+
+  def removeEmptyObjects(o: ObjectNode): ObjectNode = {
+    o.entrySeq()
+      .filter(e => e.getValue.isObject && e.getValue.isEmpty)
+      .foreach(e => o.remove(e.getKey))
+    o
+  }
+
+  def selectLastDefinitionFromArray(n: JsonNode): JsonNode =
+    n match {
+      case a: ArrayNode => a.toSeq.last
+      case _ => n
+    }
+
 }

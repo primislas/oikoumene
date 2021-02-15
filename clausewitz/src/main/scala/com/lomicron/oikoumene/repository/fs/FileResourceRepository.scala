@@ -139,7 +139,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   }
 
   private def readDir(relPath: String): Map[String, String] = {
-    val ps = dirFiles(relPath).map(_.toString)
+    val ps = dirFiles(relPath).filterNot(_.toFile.isDirectory).map(_.toString)
     readFiles(ps).toMap
   }
 

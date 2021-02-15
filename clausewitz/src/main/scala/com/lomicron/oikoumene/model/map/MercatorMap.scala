@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.model.map
 
 import com.lomicron.oikoumene.model.map.spherical.SphericalMap
-import com.lomicron.utils.geometry.{Border, Shape}
+import com.lomicron.utils.geometry._
 
 case class MercatorMap
 (

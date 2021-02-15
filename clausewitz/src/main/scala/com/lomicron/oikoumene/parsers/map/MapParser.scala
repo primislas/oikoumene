@@ -1,17 +1,18 @@
 package com.lomicron.oikoumene.parsers.map
 
-import java.awt.image.{BufferedImage, IndexColorModel}
-import java.nio.file.{Path, Paths}
-
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
-import com.lomicron.utils.geometry.Shape
-import com.typesafe.scalalogging.LazyLogging
-import javax.imageio.ImageIO
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
+import com.lomicron.utils.geometry.SchneidersFitter.fit
+import com.lomicron.utils.geometry.TPath.Polypath
+import com.lomicron.utils.geometry.{Border, Polygon, SchneidersFitter, Shape}
+import com.typesafe.scalalogging.LazyLogging
 
+import java.awt.image.{BufferedImage, IndexColorModel}
+import java.nio.file.{Path, Paths}
+import javax.imageio.ImageIO
 import scala.Function.tupled
 import scala.util.Try
 
@@ -29,6 +30,7 @@ object MapParser extends LazyLogging {
       .map(parseRivers)
       .getOrElse(Seq.empty)
       .map(_.smooth)
+      .map(fitRiverCurves)
     g.map.createRivers(rivers)
     logger.info(s"Identified ${rivers.size} rivers")
 
@@ -59,13 +61,16 @@ object MapParser extends LazyLogging {
     logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
     logger.info("Calculating map shapes...")
-    val shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
+    var shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
     logger.info(s"Identified ${shapes.size} map shapes")
-    val borders = shapes.flatMap(_.borders).distinct
+    val borders = shapes.flatMap(_.borders).toSet.map(fitBorderCurves)
+    val bconfigs = borders.toSeq.toMapEx(b => (b, b))
     logger.info(s"Identified ${borders.size} border segments")
+    shapes = shapes.map(fitProvinceCurves(_, bconfigs))
+    logger.info(s"Calculated province curvature")
     val width = provs.map(_.getWidth).getOrElse(0)
     val height = provs.map(_.getHeight).getOrElse(0)
-    val mercator = MercatorMap(shapes, borders, rivers, width, height)
+    val mercator = MercatorMap(shapes, borders.toSeq, rivers, width, height)
     g.map.updateMercator(mercator)
 
     logger.info("Calculating map routes...")
@@ -143,5 +148,32 @@ object MapParser extends LazyLogging {
 
   def fetchMap(path: Path): BufferedImage =
     ImageIO.read(path.toFile)
+
+  def fitBorderCurves(b: Border): Border = {
+    val path = SchneidersFitter.fit(b.points)
+    b.withPath(path)
+  }
+
+  def fitRiverCurves(r: River): River = {
+    val segs = r.path.map(seg => seg.withPath(SchneidersFitter.fit(seg.points)))
+    r.copy(path = segs)
+  }
+
+  def fitProvinceCurves(p: Shape, bconfigs: Map[Border, Border]): Shape = {
+    val path = p.borders.flatMap(getBorderPath(_, bconfigs))
+    val clipPaths = p.clip.map(p => p.withPath(getPolygonPath(p, bconfigs))).filter(_.path.nonEmpty)
+    p.copy(path = path, clip = clipPaths)
+  }
+
+  def getBorderPath(b: Border, bconfigs: Map[Border, Border]): Polypath = {
+    val confPath = bconfigs.get(b).map(_.path).getOrElse(fit(b.points))
+    if (confPath.isEmpty) Seq.empty
+    else if (confPath.head.points.head == b.points.head) confPath
+    else confPath.map(_.reverse).reverse
+  }
+
+  def getPolygonPath(p: Polygon, bconfigs: Map[Border, Border]): Polypath =
+    getBorderPath(Border(p.points), bconfigs)
+
 
 }

@@ -1,8 +1,8 @@
 package com.lomicron.utils.geometry
 
-import java.util.Objects
-
 import com.lomicron.utils.collection.Emptiable
+
+import java.util.Objects
 
 case class Border
 (
@@ -13,10 +13,13 @@ case class Border
   right: Option[Int] = None,
   leftGroup: Option[Int] = None,
   rightGroup: Option[Int] = None,
+  path: Seq[TPath] = Seq.empty,
 ) extends Emptiable
 {
 
   override def isEmpty: Boolean = points.size < 2
+
+  def withPath(path: Seq[TPath]): Border = copy(path = path)
 
   def +(p: BorderPoint): Border = this.+(p.p)
 

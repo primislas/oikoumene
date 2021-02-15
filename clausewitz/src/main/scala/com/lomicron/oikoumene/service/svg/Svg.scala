@@ -1,10 +1,11 @@
 package com.lomicron.oikoumene.service.svg
 
-import java.text.DecimalFormat
-
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.utils.geometry.Point2D
+import com.lomicron.utils.geometry.TPath.Polypath
+import com.lomicron.utils.geometry.{BezierCurve, Point2D, Polyline, TPath}
+
+import java.text.DecimalFormat
 
 object Svg {
 
@@ -66,21 +67,44 @@ object Svg {
     def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
 
     ps match {
-      case p1::p2::p3::p4::tail =>
+      case p1 :: p2 :: p3 :: p4 :: tail =>
         val h = s"M ${psvg(p1)} C ${psvg(p2)}, ${psvg(p3)}, ${psvg(p4)}"
         val t = stringCubicPath(tail, precision)
         (h +: t).mkString(" ")
-      case _::_::_::Nil => pointsToQuadraticPath(ps)
+      case _ :: _ :: _ :: Nil => pointsToQuadraticPath(ps)
       case _ => pointsToSvgLinearPath()
+    }
+  }
+
+  def fromPolypath(pp: Polypath, precision: Int = 1): String = {
+    pp match {
+      case h::t => (startPath(h, precision) +: t.map(continuePath(_, precision))).mkString(" ")
+      case Nil => ""
+    }
+  }
+
+  def startPath(p: TPath, precision: Int = 1): String = {
+    def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+    p match {
+      case pl: Polyline => pl.points.headOption.map(p => s"M ${psvg(p)} " + continuePath(pl, precision)).getOrElse("")
+      case b: BezierCurve => s"M ${psvg(b.p1)} " + continuePath(b, precision)
+    }
+  }
+
+  def continuePath(p: TPath, precision: Int = 1): String = {
+    def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+    p match {
+      case Polyline(points) => points.sliding(2, 1).flatMap(ps => toPath(ps.head, ps.last)).mkString(" ")
+      case bc: BezierCurve => s"c ${psvg(bc.cp1 - bc.p1)}, ${psvg(bc.cp2 - bc.p1)}, ${psvg(bc.p2 - bc.p1)}"
     }
   }
 
   @scala.annotation.tailrec
   def stringCubicPath(ps: Seq[Point2D], precision: Int = 1, stringed: Seq[String] = Seq.empty): Seq[String] = ps match {
-    case p1::p2::tail =>
+    case p1 :: p2 :: tail =>
       val next = s"S ${pointToSvg(p1, " ", precision)}, ${pointToSvg(p2, " ", precision)}"
       stringCubicPath(tail, precision, stringed :+ next)
-    case p1::Nil => stringed :+ s"L ${pointToSvg(p1, " ", precision)}"
+    case p1 :: Nil => stringed :+ s"L ${pointToSvg(p1, " ", precision)}"
     case _ => stringed
   }
 
@@ -156,7 +180,7 @@ object Svg {
     val offsetCoeff =
       if (isConvex) fontSize / 5.0
       else fontSize / 8
-//      else 0
+    //      else 0
     val offset = Point2D(offsetCoeff * dx, offsetCoeff * dy)
 
     curve.map(_ + offset)
@@ -165,9 +189,9 @@ object Svg {
   /**
     * Short names have to be adjusted to look more readable and compact in SVG.
     *
-    * @param tl text length
+    * @param tl   text length
     * @param name adjust name
-    * @param fs font size
+    * @param fs   font size
     * @return text length adjusted to character count
     */
   def adjustNameLengthToTextLength(tl: Double, name: String, fs: Double): Double =
@@ -181,7 +205,7 @@ object Svg {
     } else tl
 
   def effectiveTextLength(t: String): Double =
-    t.map(c => if (c == 'I') 0.5 else  if (c == 'M' || c == 'W') 1.5 else 1.0).sum
+    t.map(c => if (c == 'I') 0.5 else if (c == 'M' || c == 'W') 1.5 else 1.0).sum
 
   def toPath(p1: Point2D, p2: Point2D, precision: Int = 1): Option[String] = {
     if (p1 == p2) Option.empty

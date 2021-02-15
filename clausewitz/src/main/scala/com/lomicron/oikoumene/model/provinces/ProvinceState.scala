@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.provinces
 
-import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonIgnore}
 import com.lomicron.oikoumene.model.WithCumulativeModifier
 import com.lomicron.oikoumene.model.history.HistState
 import com.lomicron.oikoumene.model.modifiers.{ActiveModifier, Modifier}
@@ -14,9 +14,9 @@ case class ProvinceState
   baseProduction: Int = 0,
   baseManpower: Int = 0,
 
-  production: ProvinceProduction = ProvinceProduction.empty,
-  override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
-  override val modifier: Modifier = Modifier(),
+  @JsonIgnore production: ProvinceProduction = ProvinceProduction.empty,
+  @JsonIgnore override val activeModifiers: Map[String, ActiveModifier] = Map.empty,
+  @JsonIgnore override val modifier: Modifier = Modifier(),
 
   discoveredBy: Set[String] = ListSet.empty,
   tradeGood: Option[String] = None,
