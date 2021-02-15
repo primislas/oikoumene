@@ -42,7 +42,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     if (settings.ownWastelands.contains(true))
       worldMap.recalculateWastelandOwners
 
-    val map = worldMap.mercator.recalcCurves
+    val map = worldMap.mercator
     val precision: Int = settings.decimalPrecision
     val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
     val style = SvgMapStyles.styleOf(settings, repos)
