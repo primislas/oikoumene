@@ -161,6 +161,8 @@ object MapParser extends LazyLogging {
 
   def fitProvinceCurves(p: Shape, bconfigs: Map[Border, Border]): Shape = {
     val path = p.borders.flatMap(getBorderPath(_, bconfigs))
+    if (p.provId.contains(4307))
+      println()
     val clipPaths = p.clip.map(p => p.withPath(getPolygonPath(p, bconfigs))).filter(_.path.nonEmpty)
     p.copy(path = path, clip = clipPaths)
   }
@@ -173,7 +175,7 @@ object MapParser extends LazyLogging {
   }
 
   def getPolygonPath(p: Polygon, bconfigs: Map[Border, Border]): Polypath =
-    getBorderPath(Border(p.points), bconfigs)
+    getBorderPath(Border(p.points :+ p.points.head), bconfigs)
 
 
 }
