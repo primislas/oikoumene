@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
-import com.lomicron.utils.collection.CollectionUtils.SeqEx
+import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry.{Border, Polygon, SchneidersFitter, Shape}
@@ -44,19 +44,25 @@ object MapParser extends LazyLogging {
 
     logger.info("Parsing map provinces...")
     val provs = r.getProvinceMap.map(fetchMap)
-    val tiles = for {
+    val terrainByProvOpt = for {
       provinces <- provs
       terrain <- r.getTerrainMap.map(fetchMap)
-      height <- r.getHeightMap.map(fetchMap)
-    } yield parseMapTiles(provinces, terrain, height)
-    logger.info(s"Identified ${tiles.map(_.size).getOrElse(0)} map tiles")
+    } yield parseMapProvinceTerrain(provinces, terrain)
+    val terrainByProv = terrainByProvOpt.getOrElse(Map.empty)
 
-    logger.info("Parsing map terrain...")
-    val terrainByProv = tiles.getOrElse(Seq.empty)
-      .mapBy(_.color)
-      .mapValues(_.terrainColor)
-      .filter(_._2.isDefined)
-      .mapValues(_.get)
+    //    val tiles = for {
+    //      provinces <- provs
+    //      terrain <- r.getTerrainMap.map(fetchMap)
+    //      height <- r.getHeightMap.map(fetchMap)
+    //    } yield parseMapTiles(provinces, terrain, height)
+    //    logger.info(s"Identified ${tiles.map(_.size).getOrElse(0)} map tiles")
+    //
+    //    logger.info("Parsing map terrain...")
+    //    val terrainByProv = tiles.getOrElse(Seq.empty)
+    //      .mapBy(_.color)
+    //      .mapValues(_.terrainColor)
+    //      .filter(_._2.isDefined)
+    //      .mapValues(_.get)
     g.map.setTerrainProvinceColors(terrainByProv)
     logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
@@ -79,6 +85,86 @@ object MapParser extends LazyLogging {
     logger.info("Identified map routes")
 
     g
+  }
+
+  def parseMapProvinceTerrain
+  (
+    provinces: BufferedImage,
+    terrain: BufferedImage
+  ): Map[Color, Color] = {
+    val parallelism = java.lang.Runtime.getRuntime.availableProcessors
+    val step = provinces.getHeight / parallelism
+    val res = (0 until parallelism)
+      .map(i => (i * step, (i + 1) * step))
+      .map(t => if (t._2 > provinces.getHeight) (t._1, provinces.getHeight) else t)
+      .par
+      .map(parseMapProvinceTerrain(provinces, terrain, _))
+      .reduce((m1, m2) => {
+        m2.foreach(e => {
+          val (pColor, pTerrain2) = e
+          val updatedTerrain = m1
+            .get(pColor)
+            .map(pTerrain1 => {
+              pTerrain2
+                .foreach(e => {
+                  val (tColor2, tColorCount2) = e
+                  val tColorCount = pTerrain1.getOrElse(tColor2, 0) + tColorCount2
+                  pTerrain1 += (tColor2 -> tColorCount)
+                })
+              pTerrain1
+            })
+            .getOrElse(pTerrain2)
+          m1 += (pColor -> updatedTerrain)
+        })
+        m1
+      })
+      .mapValues(pColors => Color(pColors.maxBy(_._2)._2))
+      .toMap
+      .mapKeys(Color(_))
+//      .toMap
+//
+//    val terrainColorsByProv: collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = collection.mutable.Map.empty
+//    for {
+//      x <- 0 until width
+//      y <- yFrom until yTo
+//    } {
+//      for {
+//        provColor <- getRGB(provinces, x, y)
+//        terrainColor <- getRGB(terrain, x, y)
+//      } {
+//        val provTerrain = terrainColorsByProv.getOrElse(provColor, collection.mutable.Map.empty)
+//        val tCount = provTerrain.getOrElse(terrainColor, 0) + 1
+//        provTerrain + (terrainColor -> tCount)
+//        terrainColorsByProv + (provColor -> provTerrain)
+//      }
+//    }
+
+//    Map.empty
+    res
+  }
+
+  def parseMapProvinceTerrain
+  (
+    provinces: BufferedImage,
+    terrain: BufferedImage,
+    yRange: (Int, Int)
+  ): collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = {
+    val terrainColorsByProv: collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = collection.mutable.Map.empty
+    for {
+      x <- 0 until provinces.getWidth
+      y <- yRange._1 until yRange._2
+    } {
+      for {
+        provColor <- getRGB(provinces, x, y)
+        terrainColor <- getRGB(terrain, x, y)
+      } {
+        val provTerrain = terrainColorsByProv.getOrElse(provColor, collection.mutable.Map.empty)
+        val tCount = provTerrain.getOrElse(terrainColor, 0) + 1
+        provTerrain += (terrainColor -> tCount)
+        terrainColorsByProv += (provColor -> provTerrain)
+      }
+    }
+    terrainColorsByProv
   }
 
   /**
