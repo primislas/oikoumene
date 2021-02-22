@@ -81,8 +81,9 @@ object MapParser extends LazyLogging {
 
     logger.info("Calculating map routes...")
     val provinceMap = r.getProvinceMap.map(fetchMap)
-    provinceMap.map(parseRoutes).foreach(g.map.updateTileRoutes)
-    logger.info("Identified map routes")
+    val routes = provinceMap.map(parseRoutes).getOrElse(Seq.empty)
+    g.map.updateTileRoutes(routes)
+    logger.info(s"Identified ${routes.size} map routes")
 
     g
   }
@@ -189,19 +190,62 @@ object MapParser extends LazyLogging {
       .toSeq
   }
 
-  def parseRoutes(img: BufferedImage): Seq[TileRoute] = {
-    var routes = Set.empty[TileRoute]
-    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth)
-      routes = routes ++ parseRoutes(img, x, y)
+  def parseRoutes(provinces: BufferedImage): Seq[TileRoute] = {
+    val parallelism = java.lang.Runtime.getRuntime.availableProcessors
+    val step = provinces.getHeight / parallelism
+    (0 until parallelism)
+      .map(i => (i * step, (i + 1) * step))
+      .map(t => if (t._2 > provinces.getHeight) (t._1, provinces.getHeight) else t)
+      .par
+      .map(range => {
+        val routesByProv = collection.mutable.Map.empty[Int, Set[Int]]
+        for {
+          y <- range._1 until range._2
+          x <- 0 until provinces.getWidth
+          routes <- parseRoutes(provinces, x, y)
+        } {
+          if (routes._2.nonEmpty) {
+            val from = routes._1
+            if (routesByProv.contains(from))
+              routesByProv.get(from).foreach(exstTo => routesByProv += from -> (exstTo ++ routes._2))
+            else
+              routesByProv += from -> routes._2.toSet
+          }
+        }
+        routesByProv
+      })
+      .reduce((rs1, rs2) => {
+        rs2.foreach(e => {
+          val (from2, to2) = e
+          if (rs1.contains(from2))
+            rs1.get(from2).foreach(to1 => rs1 += from2 -> (to1 ++ to2))
+          else
+            rs1 += e
+        })
+        rs1
+      })
+      .flatMap(e => {
+        val (from, to) = e
+        to.map(t => TileRoute(from, t))
+      })
+      .toSet
+      .toSeq
 
-    routes.toSeq
+
+//
+//    var routes = Set.empty[TileRoute]
+//    for (y <- 0 until provinces.getHeight; x <- 0 until provinces.getWidth)
+//      routes = routes ++ parseRoutes(provinces, x, y)
+//
+//    routes.toSeq
   }
 
-  def parseRoutes(img: BufferedImage, x: Int, y: Int): Seq[TileRoute] = {
+  def parseRoutes(img: BufferedImage, x: Int, y: Int): Option[(Int, Seq[Int])] = {
     val leftX = if (x > 0) x - 1 else img.getWidth - 1
-    val left = getRoute(Option(img.getRGB(x, y)), Option(img.getRGB(leftX, y)))
-    val top = if (y > 0) getRoute(Option(img.getRGB(x, y)), Option(img.getRGB(x, y - 1))) else None
-    Seq(left, top).flatten
+    val pColor = Option(img.getRGB(x, y))
+    val left = getRoute(pColor, Option(img.getRGB(leftX, y)))
+    val top = if (y > 0) getRoute(pColor, Option(img.getRGB(x, y - 1))) else None
+    pColor.map(c => c -> Seq(left, top).flatten)
   }
 
   def parseTerrainColors(terrain: BufferedImage): Array[Int] = {
@@ -218,14 +262,14 @@ object MapParser extends LazyLogging {
   def getRGB(img: BufferedImage, x: Int, y: Int): Option[Int] =
     Try(img.getRGB(x, y)).toOption
 
-  def getRoute(source: Option[Int], target: Option[Int]): Option[TileRoute] = for {
+  def getRoute(source: Option[Int], target: Option[Int]): Option[Int] = for {
     s <- source
     t <- target
     routeOpt <- getRoute(s, t)
   } yield routeOpt
 
-  def getRoute(source: Int, target: Int): Option[TileRoute] = {
-    if (source != target) Some(TileRoute(source, target))
+  def getRoute(source: Int, target: Int): Option[Int] = {
+    if (source != target) Some(target)
     else None
   }
 
