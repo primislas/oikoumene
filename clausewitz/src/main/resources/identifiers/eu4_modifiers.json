@@ -1,0 +1,3502 @@
+{
+    "army_tradition": {
+        "id": "army_tradition",
+        "value_type": "Integer",
+        "example": "army_tradition = 1",
+        "description": "Adds to the rate of army tradition gained each year.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "army_tradition_decay": {
+        "id": "army_tradition_decay",
+        "value_type": "Float",
+        "example": "army_tradition_decay = -0.01",
+        "description": "Adds to the decay rate of army tradition.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "army_tradition_from_battle": {
+        "id": "army_tradition_from_battle",
+        "value_type": "Float",
+        "example": "army_tradition_from_battle = 0.01",
+        "description": "Modifies the army tradition bonus when gained through battles.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "yearly_army_professionalism": {
+        "id": "yearly_army_professionalism",
+        "value_type": "Float",
+        "example": "yearly_army_professionalism = 0.01",
+        "description": "Modifies the rate of army professionalism gained each year.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "drill_gain_modifier": {
+        "id": "drill_gain_modifier",
+        "value_type": "Float",
+        "example": "drill_gain_modifier = 0.10",
+        "description": "Modifies the army drill gains while drilling",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "drill_decay_modifier": {
+        "id": "drill_decay_modifier",
+        "value_type": "Float",
+        "example": "drill_decay_modifier = -0.10",
+        "description": "Modifies the army drill decay rate per year.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.24",
+        "macro": []
+    },
+    "infantry_cost": {
+        "id": "infantry_cost",
+        "value_type": "Float",
+        "example": "infantry_cost = -0.10",
+        "description": "Modifies the base cost of infantry units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "infantry_power": {
+        "id": "infantry_power",
+        "value_type": "Float",
+        "example": "infantry_power = 0.10",
+        "description": "Modifies the power infantry gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "infantry_fire": {
+        "id": "infantry_fire",
+        "value_type": "Integer",
+        "example": "infantry_fire = 1",
+        "description": "added to infanty fire modifier, a pure multiplier to infantry damage during fire phase",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "infantry_shock": {
+        "id": "infantry_shock",
+        "value_type": "Integer",
+        "example": "infantry_shock = 1",
+        "description": "added to infanty shock modifier, a pure multiplier to infantry damage during shock phase",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "cavalry_cost": {
+        "id": "cavalry_cost",
+        "value_type": "Float",
+        "example": "cavalry_cost = -0.10",
+        "description": "Modifies the base cost of cavalry units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "cavalry_power": {
+        "id": "cavalry_power",
+        "value_type": "Float",
+        "example": "cavalry_power = 0.10",
+        "description": "Modifies the power cavalry gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "cavalry_fire": {
+        "id": "cavalry_fire",
+        "value_type": "Integer",
+        "example": "cavalry_fire = 1",
+        "description": "added to cavalry fire modifier, a pure multiplier to cavalry damage during fire phase",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "cavalry_shock": {
+        "id": "cavalry_shock",
+        "value_type": "Integer",
+        "example": "cavalry_shock = 1",
+        "description": "added to cavalry shock modifier, a pure multiplier to cavalry damage during shock phase",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "artillery_cost": {
+        "id": "artillery_cost",
+        "value_type": "Float",
+        "example": "artillery_cost = -0.10",
+        "description": "Modifies the base cost of artillery units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "artillery_power": {
+        "id": "artillery_power",
+        "value_type": "Float",
+        "example": "artillery_power = 0.10",
+        "description": "Modifies the power artillery gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "artillery_fire": {
+        "id": "artillery_fire",
+        "value_type": "Integer",
+        "example": "artillery_fire = 1",
+        "description": "added to artillery fire modifier, a pure multiplier to artillery damage during fire phase, also for ship cannons",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "artillery_shock": {
+        "id": "artillery_shock",
+        "value_type": "Integer",
+        "example": "artillery_shock = 1",
+        "description": "added to artillery shock modifier, a pure multiplier to artillery damage during shock phase",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "cav_to_inf_ratio": {
+        "id": "cav_to_inf_ratio",
+        "value_type": "Float",
+        "example": "cav_to_inf_ratio = 0.10",
+        "description": "Adds to the ratio required to negate the insufficient support penalty.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "cavalry_flanking": {
+        "id": "cavalry_flanking",
+        "value_type": "Float",
+        "example": "cavalry_flanking = 0.10",
+        "description": "Modifies the effectiveness of cavalry flanking.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "artillery_bonus_vs_fort": {
+        "id": "artillery_bonus_vs_fort",
+        "value_type": "Integer",
+        "example": "artillery_bonus_vs_fort = 1",
+        "description": "Adds to the bonus artillery get versus forts.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "backrow_artillery_damage": {
+        "id": "backrow_artillery_damage",
+        "value_type": "Float",
+        "example": "backrow_artillery_damage = 0.10",
+        "description": "Modifies the bonus damage artillery inflict when in the backrow during combat.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "discipline": {
+        "id": "discipline",
+        "value_type": "Float",
+        "example": "discipline = 0.01",
+        "description": "Modifies the discipline of land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "mercenary_discipline": {
+        "id": "mercenary_discipline",
+        "value_type": "Float",
+        "example": "mercenary_discipline = 0.10",
+        "description": "Modifies the discipline of mercenary units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "land_morale": {
+        "id": "land_morale",
+        "value_type": "Float",
+        "example": "land_morale = 0.10",
+        "description": "Modifies the land morale of land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "defensiveness": {
+        "id": "defensiveness",
+        "value_type": "Float",
+        "example": "defensiveness = 0.10",
+        "description": "Modifies the siege defensiveness that affects siege phase length.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "siege_ability": {
+        "id": "siege_ability",
+        "value_type": "Float",
+        "example": "siege_ability = 0.10",
+        "description": "Modifies the siege ability that affects siege phase length. Reverse concept of defensiveness.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "movement_speed": {
+        "id": "movement_speed",
+        "value_type": "Float",
+        "example": "movement_speed = 0.10",
+        "description": "Modifies the base movement speed for all land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "fire_damage": {
+        "id": "fire_damage",
+        "value_type": "Float",
+        "example": "fire_damage = 0.10",
+        "description": "Modifies the fire damage done by land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "fire_damage_received": {
+        "id": "fire_damage_received",
+        "value_type": "Float",
+        "example": "fire_damage_received = -0.10",
+        "description": "Modifies the fire damage taken by land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "shock_damage": {
+        "id": "shock_damage",
+        "value_type": "Float",
+        "example": "shock_damage = 0.10",
+        "description": "Modifies the shock damage done by land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "shock_damage_received": {
+        "id": "shock_damage_received",
+        "value_type": "Float",
+        "example": "shock_damage_received = -0.10",
+        "description": "Modifies the shock damage taken by land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "recover_army_morale_speed": {
+        "id": "recover_army_morale_speed",
+        "value_type": "Float",
+        "example": "recover_army_morale_speed = 0.10",
+        "description": "Modifies the army morale recovery speed.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "siege_blockade_progress": {
+        "id": "siege_blockade_progress",
+        "value_type": "Integer",
+        "example": "siege_blockade_progress = 1",
+        "description": "Modifies the bonus siege status by blockaded.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "reserves_organisation": {
+        "id": "reserves_organisation",
+        "value_type": "Float",
+        "example": "reserves_organisation = 0.10",
+        "description": "Modifies the morale damage taken by units in reserves (i.e. not in battle, but engaged with another unit)",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "land_attrition": {
+        "id": "land_attrition",
+        "value_type": "Float",
+        "example": "land_attrition = -0.10",
+        "description": "Modifies the attrition taken by land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reinforce_cost_modifier": {
+        "id": "reinforce_cost_modifier",
+        "value_type": "Float",
+        "example": "reinforce_cost_modifier = -0.10",
+        "description": "Modifies the cost of reinforcements when units are reinforced.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.19",
+        "macro": []
+    },
+    "reinforce_speed": {
+        "id": "reinforce_speed",
+        "value_type": "Float",
+        "example": "reinforce_speed = 0.10",
+        "description": "Modifies the rate at which units are reinforced with new men.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "manpower_recovery_speed": {
+        "id": "manpower_recovery_speed",
+        "value_type": "Float",
+        "example": "manpower_recovery_speed = 0.10",
+        "description": "Modifies the rate at which manpower is recovered.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_manpower": {
+        "id": "global_manpower",
+        "value_type": "Integer",
+        "example": "global_manpower = 1",
+        "description": "Adds to the country's total manpower pool. 1 equals 1000 men.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_manpower_modifier": {
+        "id": "global_manpower_modifier",
+        "value_type": "Float",
+        "example": "global_manpower_modifier = 0.10",
+        "description": "Modifies a country's total manpower pool.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_regiment_cost": {
+        "id": "global_regiment_cost",
+        "value_type": "Float",
+        "example": "global_regiment_cost = -0.10",
+        "description": "Modifies the base unit cost for all land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_regiment_recruit_speed": {
+        "id": "global_regiment_recruit_speed",
+        "value_type": "Float",
+        "example": "global_regiment_recruit_speed = -0.10",
+        "description": "Modifies the base speed at which land units are recruited.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_supply_limit_modifier": {
+        "id": "global_supply_limit_modifier",
+        "value_type": "Float",
+        "example": "global_supply_limit_modifier = 0.10",
+        "description": "Modifies the supply limit of provinces",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "land_forcelimit": {
+        "id": "land_forcelimit",
+        "value_type": "Integer",
+        "example": "land_forcelimit = 1",
+        "description": "Adds to a country's force limit.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "land_forcelimit_modifier": {
+        "id": "land_forcelimit_modifier",
+        "value_type": "Float",
+        "example": "land_forcelimit_modifier = 0.10",
+        "description": "Modifies a country's force limit.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "land_maintenance_modifier": {
+        "id": "land_maintenance_modifier",
+        "value_type": "Float",
+        "example": "land_maintenance_modifier = -0.10",
+        "description": "Modifies the maintenance cost of all land units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "mercenary_cost": {
+        "id": "mercenary_cost",
+        "value_type": "Float",
+        "example": "mercenary_cost = -0.10",
+        "description": "Modifies the base cost for mercenary units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "merc_maintenance_modifier": {
+        "id": "merc_maintenance_modifier",
+        "value_type": "Float",
+        "example": "merc_maintenance_modifier = -0.10",
+        "description": "Modifies the maintenance cost of all mercenary units.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "possible_condottieri": {
+        "id": "possible_condottieri",
+        "value_type": "Integer",
+        "example": "possible_condottieri = 1",
+        "description": "Modifies the base condottieri limit.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "hostile_attrition": {
+        "id": "hostile_attrition",
+        "value_type": "Integer",
+        "example": "hostile_attrition = 1",
+        "description": "Adds to the attrition enemies take in a country's provinces.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "garrison_size": {
+        "id": "garrison_size",
+        "value_type": "Float",
+        "example": "garrison_size = 0.10",
+        "description": "Modifies the base garrison size in provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "global_garrison_growth": {
+        "id": "global_garrison_growth",
+        "value_type": "Float",
+        "example": "global_garrison_growth = 0.10",
+        "description": "Modifies the base garrison growth in provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "fort_maintenance_modifier": {
+        "id": "fort_maintenance_modifier",
+        "value_type": "Float",
+        "example": "fort_maintenance_modifier = -0.10",
+        "description": "Modifies the base fort maintenance cost.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "rival_border_fort_maintenance": {
+        "id": "rival_border_fort_maintenance",
+        "value_type": "Float",
+        "example": "rival_border_fort_maintenance = -0.10",
+        "description": "Modifies the base fort maintenance cost for forts in provinces that border rivals.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "war_exhaustion": {
+        "id": "war_exhaustion",
+        "value_type": "Float",
+        "example": "war_exhaustion = -0.10",
+        "description": "Adds to the monthly war exhaustion rate.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "war_exhaustion_cost": {
+        "id": "war_exhaustion_cost",
+        "value_type": "Float",
+        "example": "war_exhaustion_cost = -0.10",
+        "description": "Modifies the diplomatic power cost for reducing war exhaustion.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "leader_land_fire": {
+        "id": "leader_land_fire",
+        "value_type": "Integer",
+        "example": "leader_land_fire = 1",
+        "description": "Adds to the minimum fire pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "leader_land_manuever": {
+        "id": "leader_land_manuever",
+        "value_type": "Integer",
+        "example": "leader_land_manuever = 1",
+        "description": "Adds to the minimum maneuver pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "leader_land_shock": {
+        "id": "leader_land_shock",
+        "value_type": "Integer",
+        "example": "leader_land_shock = 1",
+        "description": "Adds to the minimum shock pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "leader_siege": {
+        "id": "leader_siege",
+        "value_type": "Integer",
+        "example": "leader_siege = 1",
+        "description": "Adds to the minimum siege pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "general_cost": {
+        "id": "general_cost",
+        "value_type": "Float",
+        "example": "general_cost = -0.10",
+        "description": "Modifies the base military power cost for recruiting Generals.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "free_leader_pool": {
+        "id": "free_leader_pool",
+        "value_type": "Integer",
+        "example": "free_leader_pool = 1",
+        "description": "Adds to the maximum amount of free leaders.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "raze_power_gain": {
+        "id": "raze_power_gain",
+        "value_type": "Float",
+        "example": "raze_power_gain = 0.10",
+        "description": "Modifies the amount of monarch power gained from razing.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "loot_amount": {
+        "id": "loot_amount",
+        "value_type": "Float",
+        "example": "loot_amount = 0.10",
+        "description": "Modifies the amount of loot taken at once during looting.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "available_province_loot": {
+        "id": "available_province_loot",
+        "value_type": "Float",
+        "example": "available_province_loot = 0.10",
+        "description": "Modifies the amount of loot available in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "prestige_from_land": {
+        "id": "prestige_from_land",
+        "value_type": "Float",
+        "example": "prestige_from_land = 0.10",
+        "description": "Modifies the prestige bonus from combat.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "amount_of_banners": {
+        "id": "amount_of_banners",
+        "value_type": "Float",
+        "example": "amount_of_banners = 0.10",
+        "description": "Modifies the maximum amount of banners available.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "war_taxes_cost_modifier": {
+        "id": "war_taxes_cost_modifier",
+        "value_type": "Float",
+        "example": "war_taxes_cost_modifier = -0.10",
+        "description": "Modifies the military power cost for raising war taxes.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "leader_cost": {
+        "id": "leader_cost",
+        "value_type": "Float",
+        "example": "leader_cost = -0.10",
+        "description": "Modifies the military power cost for hiring leaders.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "may_recruit_female_generals": {
+        "id": "may_recruit_female_generals",
+        "value_type": "Boolean",
+        "example": "may_recruit_female_generals = yes",
+        "description": "Allows the recruitment of female generals.",
+        "effect_type": "Constant",
+        "version_added": "1.11(Only usable in ideas or religions before 1.30)",
+        "macro": []
+    },
+    "special_unit_forcelimit": {
+        "id": "special_unit_forcelimit",
+        "value_type": "Float",
+        "example": "special_unit_forcelimit= 0.10",
+        "description": "Modifies the allowed forcelimit of special units such as Rajput regiments, etc.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "manpower_in_true_faith_provinces": {
+        "id": "manpower_in_true_faith_provinces",
+        "value_type": "Float",
+        "example": "manpower_in_true_faith_provinces= 0.10",
+        "description": "Modifies the amount of manpower gained from provinces that follow the true faith of a country.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "mercenary_manpower": {
+        "id": "mercenary_manpower",
+        "value_type": "Float",
+        "example": "mercenary_manpower= 0.10",
+        "description": "Modifies the amount of manpower mercenary companies have.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "navy_tradition": {
+        "id": "navy_tradition",
+        "value_type": "Integer",
+        "example": "navy_tradition = 1",
+        "description": "Adds to the yearly navy tradition rate.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "navy_tradition_decay": {
+        "id": "navy_tradition_decay",
+        "value_type": "Float",
+        "example": "navy_tradition_decay = -0.01",
+        "description": "Adds to the decay rate of navy tradition.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "naval_tradition_from_battle": {
+        "id": "naval_tradition_from_battle",
+        "value_type": "Float",
+        "example": "naval_tradition_from_battle = 0.1",
+        "description": "Modifies the base navy tradition gained from battles.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "naval_tradition_from_trade": {
+        "id": "naval_tradition_from_trade",
+        "value_type": "Float",
+        "example": "naval_tradition_from_trade = 0.1",
+        "description": "Modifies the base navy tradition gained from protecting trade.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "heavy_ship_cost": {
+        "id": "heavy_ship_cost",
+        "value_type": "Float",
+        "example": "heavy_ship_cost = -0.1",
+        "description": "Modifies the base cost of heavy ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "heavy_ship_power": {
+        "id": "heavy_ship_power",
+        "value_type": "Float",
+        "example": "heavy_ship_power = 0.1",
+        "description": "Modifies the power heavy ships gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "light_ship_cost": {
+        "id": "light_ship_cost",
+        "value_type": "Float",
+        "example": "light_ship_cost = -0.1",
+        "description": "Modifies the base cost of light ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "light_ship_power": {
+        "id": "light_ship_power",
+        "value_type": "Float",
+        "example": "light_ship_power = 0.1",
+        "description": "Modifies the power light ships gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "galley_cost": {
+        "id": "galley_cost",
+        "value_type": "Float",
+        "example": "galley_cost = -0.1",
+        "description": "Modifies the base cost of galley ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "galley_power": {
+        "id": "galley_power",
+        "value_type": "Float",
+        "example": "galley_power = 0.1",
+        "description": "Modifies the power galley ships gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "transport_cost": {
+        "id": "transport_cost",
+        "value_type": "Float",
+        "example": "transport_cost = -0.1",
+        "description": "Modifies the base cost of transport ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "transport_power": {
+        "id": "transport_power",
+        "value_type": "Float",
+        "example": "transport_power = 0.1",
+        "description": "Modifies the power transport ships gain from unit pips.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_ship_cost": {
+        "id": "global_ship_cost",
+        "value_type": "Float",
+        "example": "global_ship_cost = -0.1",
+        "description": "Modifies the base cost of all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_ship_recruit_speed": {
+        "id": "global_ship_recruit_speed",
+        "value_type": "Float",
+        "example": "global_ship_recruit_speed = -0.1",
+        "description": "Modifies the base recruitmend speed of all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_ship_repair": {
+        "id": "global_ship_repair",
+        "value_type": "Float",
+        "example": "global_ship_repair = 0.1",
+        "description": "Modifies the base repair speed (in port) of all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "naval_forcelimit": {
+        "id": "naval_forcelimit",
+        "value_type": "Integer",
+        "example": "naval_forcelimit = 1",
+        "description": "Adds to a country's naval force limit.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "naval_forcelimit_modifier": {
+        "id": "naval_forcelimit_modifier",
+        "value_type": "Float",
+        "example": "naval_forcelimit_modifier = 0.1",
+        "description": "Modifies a country's naval force limit.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "naval_maintenance_modifier": {
+        "id": "naval_maintenance_modifier",
+        "value_type": "Float",
+        "example": "naval_maintenance_modifier = -0.1",
+        "description": "Modifies the naval maintenance for all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_sailors": {
+        "id": "global_sailors",
+        "value_type": "Integer",
+        "example": "global_sailors = 1000",
+        "description": "Adds to a country's maximum sailor pool.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_sailors_modifier": {
+        "id": "global_sailors_modifier",
+        "value_type": "Float",
+        "example": "global_sailors_modifier = 0.1",
+        "description": "Modifies a country's maximum sailor pool.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "sailor_maintenance_modifer": {
+        "id": "sailor_maintenance_modifer",
+        "value_type": "Float",
+        "example": "sailor_maintenance_modifer = -0.1",
+        "description": "Modifies the sailor maintenance for all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "sailors_recovery_speed": {
+        "id": "sailors_recovery_speed",
+        "value_type": "Float",
+        "example": "sailors_recovery_speed = 0.1",
+        "description": "Modifies the sailor recovery rate for all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "blockade_efficiency": {
+        "id": "blockade_efficiency",
+        "value_type": "Float",
+        "example": "blockade_efficiency = 0.1",
+        "description": "Modifies the efficiency of blockades against enemies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "capture_ship_chance": {
+        "id": "capture_ship_chance",
+        "value_type": "Float",
+        "example": "capture_ship_chance = 0.1",
+        "description": "Adds to the chance for ship capture during naval battles.",
+        "effect_type": "Additive",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "global_naval_engagement_modifier": {
+        "id": "global_naval_engagement_modifier",
+        "value_type": "Float",
+        "example": "global_naval_engagement_modifier = 0.1",
+        "description": "Modifies the maximum naval engagement width.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "naval_attrition": {
+        "id": "naval_attrition",
+        "value_type": "Float",
+        "example": "naval_attrition = -0.1",
+        "description": "Modifies the naval attrition taken by ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "naval_morale": {
+        "id": "naval_morale",
+        "value_type": "Float",
+        "example": "naval_morale = 0.1",
+        "description": "Modifies the naval morale of all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "ship_durability": {
+        "id": "ship_durability",
+        "value_type": "Float",
+        "example": "ship_durability = 0.1",
+        "description": "Modifies the durability of all ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "sunk_ship_morale_hit_recieved": {
+        "id": "sunk_ship_morale_hit_recieved",
+        "value_type": "Float",
+        "example": "sunk_ship_morale_hit_recieved = -0.1",
+        "description": "Modifies the morale damage taken during battle by losing ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "recover_navy_morale_speed": {
+        "id": "recover_navy_morale_speed",
+        "value_type": "Float",
+        "example": "recover_navy_morale_speed = 0.1",
+        "description": "Modifies the morale recovery rate of ships.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "prestige_from_naval": {
+        "id": "prestige_from_naval",
+        "value_type": "Float",
+        "example": "prestige_from_naval = 0.1",
+        "description": "Modifies the prestige gained through naval battles.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "leader_naval_fire": {
+        "id": "leader_naval_fire",
+        "value_type": "Integer",
+        "example": "leader_naval_fire = 1",
+        "description": "Adds to the minimum fire pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "leader_naval_manuever": {
+        "id": "leader_naval_manuever",
+        "value_type": "Integer",
+        "example": "leader_naval_manuever = 1",
+        "description": "Adds to the minimum maneuver pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "leader_naval_shock": {
+        "id": "leader_naval_shock",
+        "value_type": "Integer",
+        "example": "leader_naval_shock = 1",
+        "description": "Adds to the minimum shock pip count a leader can be generated with.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "own_coast_naval_combat_bonus": {
+        "id": "own_coast_naval_combat_bonus",
+        "value_type": "Float",
+        "example": "own_coast_naval_combat_bonus = 1.0",
+        "description": "Modifies the combat bonus navies gain when sailing in coastal tiles that border their home nation.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "admiral_cost": {
+        "id": "admiral_cost",
+        "value_type": "Float",
+        "example": "admiral_cost = -0.1",
+        "description": "Modifies the cost of hiring an admiral.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "movement_speed_onto_off_boat_modifier": {
+        "id": "movement_speed_onto_off_boat_modifier",
+        "value_type": "Float",
+        "example": "movement_speed_onto_off_boat_modifier = -0.1",
+        "description": "Modifies the speed at which troops disembark off ships into provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "global_naval_barrage_cost": {
+        "id": "global_naval_barrage_cost",
+        "value_type": "Float",
+        "example": "global_naval_barrage_cost = -0.1",
+        "description": "Modifies the cost for using the \u2018Naval Barrage\u2019 action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "allowed_marine_fraction": {
+        "id": "allowed_marine_fraction",
+        "value_type": "Float",
+        "example": "allowed_marine_fraction = 0.1",
+        "description": "Modifies the amount of marines allowed to be recruited.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "flagship_cost": {
+        "id": "flagship_cost",
+        "value_type": "Float",
+        "example": "flagship_cost = -0.1",
+        "description": "Modifies the cost of building a flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "may_perform_slave_raid": {
+        "id": "may_perform_slave_raid",
+        "value_type": "Boolean",
+        "example": "may_perform_slave_raid = yes",
+        "description": "Allows ships to perform slave raids.",
+        "effect_type": "Constant",
+        "version_added": "1.16(Only usable in ideas or religions before 1.30)",
+        "macro": []
+    },
+    "may_perform_slave_raid_on_same_religion": {
+        "id": "may_perform_slave_raid_on_same_religion",
+        "value_type": "Boolean",
+        "example": "may_perform_slave_raid_on_same_religion = yes",
+        "description": "Grants the abiliy to conduct slave raids against nations that share the same religion.",
+        "effect_type": "Constant",
+        "version_added": "1.27(Only usable in ideas or religions before 1.30)",
+        "macro": []
+    },
+    "admiral_skill_gain_modifier": {
+        "id": "admiral_skill_gain_modifier",
+        "value_type": "Float",
+        "example": "admiral_skill_gain_modifier = 0.1",
+        "description": "The monthly chance that an admiral gains a pip while he is assigned to a fleet that is on a mission and contains a flagship with this modifier",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "flagship_durability": {
+        "id": "flagship_durability",
+        "value_type": "Integer",
+        "example": "flagship_durability = 1",
+        "description": "Modifies the ship durability for the flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "flagship_morale": {
+        "id": "flagship_morale",
+        "value_type": "Integer",
+        "example": "flagship_morale = 1",
+        "description": "Modifies the naval morale for the flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "flagship_naval_engagement_modifier": {
+        "id": "flagship_naval_engagement_modifier",
+        "value_type": "Integer",
+        "example": "flagship_naval_engagement_modifier = 1",
+        "description": "Modifies the fleet engagement width of the flagship's fleet.",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "flagship_landing_penalty": {
+        "id": "flagship_landing_penalty",
+        "value_type": "Integer",
+        "example": "flagship_landing_penalty = 1",
+        "description": "Modifies the disembarkment penalty for the flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "number_of_cannons_flagship_modifier": {
+        "id": "number_of_cannons_flagship_modifier",
+        "value_type": "Float",
+        "example": "number_of_cannons_flagship_modifier = 0.1",
+        "description": "Modifies the number of cannons for the flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "naval_maintenance_flagship_modifier": {
+        "id": "naval_maintenance_flagship_modifier",
+        "value_type": "Float",
+        "example": "naval_maintenance_flagship_modifier = -0.1",
+        "description": "Modifies the naval maintenance for the flagship.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "trade_power_in_fleet_modifier": {
+        "id": "trade_power_in_fleet_modifier",
+        "value_type": "Integer",
+        "example": "trade_power_in_fleet_modifier = 1",
+        "description": "Modifies the trade power conferred by the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "morale_in_fleet_modifier": {
+        "id": "morale_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "morale_in_fleet_modifier = 0.1",
+        "description": "Modifies the naval morale for the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "blockade_impact_on_siege_in_fleet_modifier": {
+        "id": "blockade_impact_on_siege_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "blockade_impact_on_siege_in_fleet_modifier = 0.1",
+        "description": "Modifies the blockade impact of the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "exploration_mission_range_in_fleet_modifier": {
+        "id": "exploration_mission_range_in_fleet_modifier",
+        "value_type": "Integer",
+        "example": "exploration_mission_range_in_fleet_modifier = 100",
+        "description": "Modifies the exploration mission range for the flagship and all other ships within its fleet.",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "barrage_cost_in_fleet_modifier": {
+        "id": "barrage_cost_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "barrage_cost_in_fleet_modifier = -0.1",
+        "description": "Modifies the \u2018Naval Barrage\u2019 action cost for the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "naval_attrition_in_fleet_modifier": {
+        "id": "naval_attrition_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "naval_attrition_in_fleet_modifier = -0.1",
+        "description": "Modifies the naval attrition suffered by the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "privateering_efficiency_in_fleet_modifier": {
+        "id": "privateering_efficiency_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "privateering_efficiency_in_fleet_modifier = 0.1",
+        "description": "Modifies the privateering efficiency of the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "prestige_from_battles_in_fleet_modifier": {
+        "id": "prestige_from_battles_in_fleet_modifier",
+        "value_type": "Integer",
+        "example": "prestige_from_battles_in_fleet_modifier = 1",
+        "description": "Modifies the amount of prestige gained from battles for the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "naval_tradition_in_fleet_modifier": {
+        "id": "naval_tradition_in_fleet_modifier",
+        "value_type": "Integer",
+        "example": "naval_tradition_in_fleet_modifier = 1",
+        "description": "Modifies the amount of Naval Tradition gained from battles for the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "cannons_for_hunting_pirates_in_fleet": {
+        "id": "cannons_for_hunting_pirates_in_fleet",
+        "value_type": "Integer",
+        "example": "cannons_for_hunting_pirates_in_fleet = 1",
+        "description": "Modifies the amount of cannons for the flagship and all other ships within its fleet whilst on the Hunting Pirates mission.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "movement_speed_in_fleet_modifier": {
+        "id": "movement_speed_in_fleet_modifier",
+        "value_type": "Float",
+        "example": "movement_speed_in_fleet_modifier = 0.1",
+        "description": "Modifies the movement speed for the flagship and all other ships within its fleet.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "diplomats": {
+        "id": "diplomats",
+        "value_type": "Integer",
+        "example": "diplomats = 1",
+        "description": "Adds to a country's diplomat count.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "diplomatic_reputation": {
+        "id": "diplomatic_reputation",
+        "value_type": "Integer",
+        "example": "diplomatic_reputation = 1",
+        "description": "Adds to a country's diplomatic reputation.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "diplomatic_upkeep": {
+        "id": "diplomatic_upkeep",
+        "value_type": "Integer",
+        "example": "diplomatic_upkeep = 1",
+        "description": "Adds to the maximum number of free diplomatic relations.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "envoy_travel_time": {
+        "id": "envoy_travel_time",
+        "value_type": "Float",
+        "example": "envoy_travel_time = -0.2",
+        "description": "Modifies diplomat travel time during actions.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "fabricate_claims_cost": {
+        "id": "fabricate_claims_cost",
+        "value_type": "Float",
+        "example": "fabricate_claims_cost = -0.2",
+        "description": "Modifies spy network cost for fabricating claim.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "improve_relation_modifier": {
+        "id": "improve_relation_modifier",
+        "value_type": "Float",
+        "example": "improve_relation_modifier = 0.2",
+        "description": "Modifies the speed of the \u2018Improve Relations\u2019 diplomatic action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "vassal_forcelimit_bonus": {
+        "id": "vassal_forcelimit_bonus",
+        "value_type": "Float",
+        "example": "vassal_forcelimit_bonus = 0.2",
+        "description": "Modifies the bonus to a country's forcelimit from their subjects.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "vassal_income": {
+        "id": "vassal_income",
+        "value_type": "Float",
+        "example": "vassal_income = 0.2",
+        "description": "Modifies the bonus to a country's income from their subjects.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "ae_impact": {
+        "id": "ae_impact",
+        "value_type": "Float",
+        "example": "ae_impact = -0.2",
+        "description": "Modifies the total size of aggressive expansion gained during actions that confer it.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "claim_duration": {
+        "id": "claim_duration",
+        "value_type": "Float",
+        "example": "claim_duration = 0.2",
+        "description": "Modifies the duration of claims. (not uses in vanilla)",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "diplomatic_annexation_cost": {
+        "id": "diplomatic_annexation_cost",
+        "value_type": "Float",
+        "example": "diplomatic_annexation_cost = -0.2",
+        "description": "Modifies the diplomatic power cost for annexation.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "province_warscore_cost": {
+        "id": "province_warscore_cost",
+        "value_type": "Float",
+        "example": "province_warscore_cost = -0.2",
+        "description": "Modifies the warscore cost for taking provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "unjustified_demands": {
+        "id": "unjustified_demands",
+        "value_type": "Float",
+        "example": "unjustified_demands = -0.2",
+        "description": "Modifies the weighting of demands in peace treaties.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "enemy_core_creation": {
+        "id": "enemy_core_creation",
+        "value_type": "Float",
+        "example": "enemy_core_creation = 0.2",
+        "description": "Modifies the cost of coring provinces for enemies that have your cores.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "rival_change_cost": {
+        "id": "rival_change_cost",
+        "value_type": "Float",
+        "example": "rival_change_cost = -0.2",
+        "description": "Modifies the diplomatic power cost to change rivals.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "justify_trade_conflict_cost": {
+        "id": "justify_trade_conflict_cost",
+        "value_type": "Float",
+        "example": "justify_trade_conflict_cost = -0.2",
+        "description": "Modifies the spy network cost to justify trade conflicts.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "stability_cost_to_declare_war": {
+        "id": "stability_cost_to_declare_war",
+        "value_type": "Integer",
+        "example": "stability_cost_to_declare_war = 1",
+        "description": "Modifies the stability cost to declare war. Default is 0 with a casus belli and no truce.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "accept_vassalization_reasons": {
+        "id": "accept_vassalization_reasons",
+        "value_type": "Integer",
+        "example": "accept_vassalization_reasons = 5",
+        "description": "Gives reasons to accept vassalization.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "transfer_trade_power_reasons": {
+        "id": "transfer_trade_power_reasons",
+        "value_type": "Integer",
+        "example": "transfer_trade_power_reasons = 5",
+        "description": "Gives reasons to transfer trade.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "global_tax_income": {
+        "id": "global_tax_income",
+        "value_type": "Integer",
+        "example": "global_tax_income = 12",
+        "description": "Adds to the base tax income per year (i.e. 12 equals 1 extra per month).",
+        "effect_type": "Additive",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "global_tax_modifier": {
+        "id": "global_tax_modifier",
+        "value_type": "Float",
+        "example": "global_tax_modifier = 0.05",
+        "description": "Modifies the base tax income by a percentage.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "production_efficiency": {
+        "id": "production_efficiency",
+        "value_type": "Float",
+        "example": "production_efficiency = 0.05",
+        "description": "Modifies the base production income by a percentage.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "state_maintenance_modifier": {
+        "id": "state_maintenance_modifier",
+        "value_type": "Float",
+        "example": "state_maintenance_modifier = -0.25",
+        "description": "Modifies the maintenance cost for states.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "inflation_action_cost": {
+        "id": "inflation_action_cost",
+        "value_type": "Float",
+        "example": "inflation_action_cost = -0.1",
+        "description": "Modifies the administrative power cost for reducing inflation.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.2",
+        "macro": []
+    },
+    "inflation_reduction": {
+        "id": "inflation_reduction",
+        "value_type": "Float",
+        "example": "inflation_reduction = 0.1",
+        "description": "Adds to the base yearly inflation reduction rate.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "interest": {
+        "id": "interest",
+        "value_type": "Integer",
+        "example": "interest = -1",
+        "description": "Adds to the base interest rate.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "development_cost": {
+        "id": "development_cost",
+        "value_type": "Float",
+        "example": "development_cost = -0.1",
+        "description": "Modifies the development cost for provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "build_cost": {
+        "id": "build_cost",
+        "value_type": "Float",
+        "example": "build_cost = -0.1",
+        "description": "Modifies all building costs.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "build_time": {
+        "id": "build_time",
+        "value_type": "Float",
+        "example": "build_time = -0.25",
+        "description": "Modifies all building construction times.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "administrative_efficiency": {
+        "id": "administrative_efficiency",
+        "value_type": "Float",
+        "example": "administrative_efficiency = 0.2",
+        "description": "Modifies the base core creation cost, diplo-annexation costs and the impact of province development on overextension and warscore cost.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "core_creation": {
+        "id": "core_creation",
+        "value_type": "Float",
+        "example": "core_creation = -0.1",
+        "description": "Modifies the base core creation cost.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "core_decay_on_your_own": {
+        "id": "core_decay_on_your_own",
+        "value_type": "Float",
+        "example": "core_decay_on_your_own = -0.1",
+        "description": "Modifies the rate at which the cores of a country will decay when under the ownership of a different country.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "<tech>_cost_modifier": {
+        "id": "<tech>_cost_modifier",
+        "value_type": "Float",
+        "example": "adm_tech_cost_modifier = -0.1",
+        "description": "Modifies the monarch power cost of <tech> technologies.\nGenerated automatically for all technology tables in /Europa Universalis IV/common/technology.txt.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": [
+            "tech"
+        ]
+    },
+    "technology_cost": {
+        "id": "technology_cost",
+        "value_type": "Float",
+        "example": "technology_cost = -0.1",
+        "description": "Modifies the monarch power cost of all technologies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "idea_cost": {
+        "id": "idea_cost",
+        "value_type": "Float",
+        "example": "idea_cost = -0.1",
+        "description": "Modifies the monarch power cost of purchasable ideas.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "embracement_cost": {
+        "id": "embracement_cost",
+        "value_type": "Float",
+        "example": "embracement_cost = -0.1",
+        "description": "Modifies the ducat cost for embracing an institution.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "global_institution_spread": {
+        "id": "global_institution_spread",
+        "value_type": "Float",
+        "example": "global_institution_spread = 0.1",
+        "description": "Modifies the rate of spread for institutions in all owned provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "institution_spread_from_true_faith": {
+        "id": "institution_spread_from_true_faith",
+        "value_type": "Float",
+        "example": "institution_spread_from_true_faith = 0.1",
+        "description": "Modifies the rate of spread for institutions in owned provinces following the owner's religion.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "native_advancement_cost": {
+        "id": "native_advancement_cost",
+        "value_type": "Float",
+        "example": "native_advancement_cost = -0.2",
+        "description": "Modifies the monarch power cost of native advancements.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "all_power_cost": {
+        "id": "all_power_cost",
+        "value_type": "Float",
+        "example": "all_power_cost = -0.1",
+        "description": "Modifies the monarch power cost of every action that costs monarch power.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "innovativeness_gain": {
+        "id": "innovativeness_gain",
+        "value_type": "Float",
+        "example": "innovativeness_gain = 0.5",
+        "description": "Modifies the amount of innovativeness gained",
+        "effect_type": "Multiplicative",
+        "version_added": "1.25",
+        "macro": []
+    },
+    "free_adm_policy": {
+        "id": "free_adm_policy",
+        "value_type": "Integer",
+        "example": "free_adm_policy = 1",
+        "description": "Modifies the amount of free administrative policies.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "free_dip_policy": {
+        "id": "free_dip_policy",
+        "value_type": "Integer",
+        "example": "free_dip_policy = 1",
+        "description": "Modifies the amount of free diplomatic policies.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "free_mil_policy": {
+        "id": "free_mil_policy",
+        "value_type": "Integer",
+        "example": "free_mil_policy = 1",
+        "description": "Modifies the amount of free military policies.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "possible_adm_policy": {
+        "id": "possible_adm_policy",
+        "value_type": "Integer",
+        "example": "possible_adm_policy = 1",
+        "description": "Modifies the amount of administrative policy slots.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "possible_dip_policy": {
+        "id": "possible_dip_policy",
+        "value_type": "Integer",
+        "example": "possible_dip_policy = 1",
+        "description": "Modifies the amount of diplomatic policy slots.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "possible_mil_policy": {
+        "id": "possible_mil_policy",
+        "value_type": "Integer",
+        "example": "possible_mil_policy = 1",
+        "description": "Modifies the amount of military policy slots.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "possible_policy": {
+        "id": "possible_policy",
+        "value_type": "Integer",
+        "example": "possible_policy = 1",
+        "description": "Modifies the amount of all policy slots.",
+        "effect_type": "Additive",
+        "version_added": "",
+        "macro": []
+    },
+    "free_policy": {
+        "id": "free_policy",
+        "value_type": "Integer",
+        "example": "free_policy = 1",
+        "description": "Modifies the amount of policy slots.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "country_admin_power": {
+        "id": "country_admin_power",
+        "value_type": "Integer",
+        "example": "country_admin_power = 1",
+        "description": "Modifies the monthly administrative power a country generates.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "country_diplomatic_power": {
+        "id": "country_diplomatic_power",
+        "value_type": "Integer",
+        "example": "country_diplomatic_power = 1",
+        "description": "Modifies the monthly diplomatic power a country generates.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "country_military_power": {
+        "id": "country_military_power",
+        "value_type": "Integer",
+        "example": "country_military_power = 1",
+        "description": "Modifies the monthly military power a country generates.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "prestige": {
+        "id": "prestige",
+        "value_type": "Float",
+        "example": "prestige = 0.5",
+        "description": "Adds to the base yearly rate of prestige.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "prestige_decay": {
+        "id": "prestige_decay",
+        "value_type": "Float",
+        "example": "prestige_decay = -0.01",
+        "description": "Adds to the base rate of prestige decay.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "monthly_splendor": {
+        "id": "monthly_splendor",
+        "value_type": "Integer",
+        "example": "monthly_splendor = 1",
+        "description": "Adds to the monthly rate of splendor points.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "yearly_corruption": {
+        "id": "yearly_corruption",
+        "value_type": "Float",
+        "example": "yearly_corruption = -0.1",
+        "description": "Adds to the yearly rate of corruption.",
+        "effect_type": "Additive",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "advisor_cost": {
+        "id": "advisor_cost",
+        "value_type": "Float",
+        "example": "advisor_cost = -0.25",
+        "description": "Modifies the base cost of advisors.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "advisor_pool": {
+        "id": "advisor_pool",
+        "value_type": "Integer",
+        "example": "advisor_pool = 1",
+        "description": "Adds to the pool size for advisors.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "female_advisor_chance": {
+        "id": "female_advisor_chance",
+        "value_type": "Float",
+        "example": "female_advisor_chance = 0.1",
+        "description": "Modifies the base chance rate for female advisors.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "heir_chance": {
+        "id": "heir_chance",
+        "value_type": "Float",
+        "example": "heir_chance = 0.5",
+        "description": "Modifies the base chance for an heir during the heir generation tick.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "block_introduce_heir": {
+        "id": "block_introduce_heir",
+        "value_type": "Boolean",
+        "example": "block_introduce_heir = yes",
+        "description": "Disallows the country to use the 'Introduce New Heir' interaction.",
+        "effect_type": "Constant",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "monarch_admin_power": {
+        "id": "monarch_admin_power",
+        "value_type": "Integer",
+        "example": "monarch_admin_power = 1",
+        "description": "Adds to the base ADM skill a ruler, heir and consort can be generated with.\nDoes not affect rulers created with fixed = yes.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "monarch_diplomatic_power": {
+        "id": "monarch_diplomatic_power",
+        "value_type": "Integer",
+        "example": "monarch_diplomatic_power = 1",
+        "description": "Adds to the base DIP skill a ruler, heir and consort can be generated with.\nDoes not affect rulers created with fixed = yes.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "monarch_military_power": {
+        "id": "monarch_military_power",
+        "value_type": "Integer",
+        "example": "monarch_military_power = 1",
+        "description": "Adds to the base MIL skill a ruler, heir and consort can be generated with.\nDoes not affect rulers created with fixed = yes.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "adm_advisor_cost": {
+        "id": "adm_advisor_cost",
+        "value_type": "Float",
+        "example": "adm_advisor_cost = -0.1",
+        "description": "Modifies the cost of hiring an administrative advisor.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "dip_advisor_cost": {
+        "id": "dip_advisor_cost",
+        "value_type": "Float",
+        "example": "dip_advisor_cost = -0.1",
+        "description": "Modifies the cost of hiring an diplomatic advisor.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "mil_advisor_cost": {
+        "id": "mil_advisor_cost",
+        "value_type": "Float",
+        "example": "mil_advisor_cost = -0.1",
+        "description": "Modifies the cost of hiring an military advisor.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "monthly_support_heir_gain": {
+        "id": "monthly_support_heir_gain",
+        "value_type": "Float",
+        "example": "monthly_support_heir_gain = 0.1",
+        "description": "Modifies the monthly gain in support for the heir of a country in an country that uses the \u2018Elective Monarchy\u2019 mechanics.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "power_projection_from_insults": {
+        "id": "power_projection_from_insults",
+        "value_type": "Float",
+        "example": "power_projection_from_insults = 0.1",
+        "description": "Modifies the amount of power projection gained when using the \u2018Insult\u2019 diplomatic action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "monarch_lifespan": {
+        "id": "monarch_lifespan",
+        "value_type": "Float",
+        "example": "monarch_lifespan = 0.1",
+        "description": "Modifies the average lifespan of a ruler.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "yearly_absolutism": {
+        "id": "yearly_absolutism",
+        "value_type": "Float",
+        "example": "yearly_absolutism = 0.1",
+        "description": "Adds to the yearly base rate of absolutism.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "max_absolutism": {
+        "id": "max_absolutism",
+        "value_type": "Integer",
+        "example": "max_absolutism = 10",
+        "description": "Adds to the maximum value of absolutism. Internally absolutism bonuses do not scale above 100.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "legitimacy": {
+        "id": "legitimacy",
+        "value_type": "Integer",
+        "example": "legitimacy = 1",
+        "description": "Adds to the yearly rate of legitimacy.\nDoes not appear or have an effect if a country's government does not use legitimacy.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "republican_tradition": {
+        "id": "republican_tradition",
+        "value_type": "Float",
+        "example": "republican_tradition = 0.5",
+        "description": "Adds to the yearly rate of republican tradition.\nDoes not appear or have an effect if a country's government does not use republican tradition.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "devotion": {
+        "id": "devotion",
+        "value_type": "Integer",
+        "example": "devotion = 1",
+        "description": "Adds to the yearly rate of devotion.\nDoes not appear or have an effect if a country's government does not use devotion.",
+        "effect_type": "Additive",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "horde_unity": {
+        "id": "horde_unity",
+        "value_type": "Integer",
+        "example": "horde_unity = 1",
+        "description": "Adds to the yearly rate of horde unity.\nDoes not appear or have an effect if a country's government does not use horde unity.",
+        "effect_type": "Additive",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "meritocracy": {
+        "id": "meritocracy",
+        "value_type": "Integer",
+        "example": "meritocracy = 1",
+        "description": "Adds to the yearly rate of meritocracy. Does not appear or have an effect if a country's government does not use meritocracy.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "monthly_militarized_society": {
+        "id": "monthly_militarized_society",
+        "value_type": "Float",
+        "example": "monthly_militarized_society = 0.05",
+        "description": "Adds to the monthly rate of militarisation for governments with the militarisation mechanic.",
+        "effect_type": "Additive",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "yearly_tribal_allegiance": {
+        "id": "yearly_tribal_allegiance",
+        "value_type": "Float",
+        "example": "yearly_tribal_allegiance = 0.05",
+        "description": "Adds to the yearly rate of tribal allegiance for governments with the tribal allegiance mechanic.",
+        "effect_type": "Additive",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "<faction>_influence": {
+        "id": "<faction>_influence",
+        "value_type": "Float",
+        "example": "<faction>_influence = 0.1",
+        "description": "Adds to the monthly rate of faction influence.\nGenerated automatically for all factions in /Europa Universalis IV/common/factions.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": [
+            "faction"
+        ]
+    },
+    "imperial_mandate": {
+        "id": "imperial_mandate",
+        "value_type": "Float",
+        "example": "imperial_mandate = 0.1",
+        "description": "Adds to the rate of Mandate gained per month.",
+        "effect_type": "Additive",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "election_cycle": {
+        "id": "election_cycle",
+        "value_type": "Integer",
+        "example": "election_cycle = 1",
+        "description": "Adds to the duration of an election cycle for the current nation. Negative values shorten the duration, positive values add to it.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "candidate_random_bonus": {
+        "id": "candidate_random_bonus",
+        "value_type": "Integer",
+        "example": "candidate_random_bonus = 1",
+        "description": "Adds to the randomized stats a republican candidate may receive during elections.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "reelection_cost": {
+        "id": "reelection_cost",
+        "value_type": "Float",
+        "example": "reelection_cost = -0.1",
+        "description": "Modifies the cost in Republican Tradition when re-electing candidates.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "reform_progress_growth": {
+        "id": "reform_progress_growth",
+        "value_type": "Float",
+        "example": "reform_progress_growth = 0.1",
+        "description": "Adds to the rate of government reform progress gain.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "governing_capacity": {
+        "id": "governing_capacity",
+        "value_type": "Integer",
+        "example": "governing_capacity = 100",
+        "description": "Adds to the base governing capacity.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "governing_capacity_modifier": {
+        "id": "governing_capacity_modifier",
+        "value_type": "Float",
+        "example": "governing_capacity_modifier = 0.1",
+        "description": "Modifies the base governing capacity.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "state_governing_cost": {
+        "id": "state_governing_cost",
+        "value_type": "Float",
+        "example": "state_governing_cost = 0.1",
+        "description": "Modifies the governing capacity usage of states.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "trade_company_governing_cost": {
+        "id": "trade_company_governing_cost",
+        "value_type": "Float",
+        "example": "trade_company_governing_cost = 0.1",
+        "description": "Modifies the governing capacity usage of trade companies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "expand_administration_cost": {
+        "id": "expand_administration_cost",
+        "value_type": "Float",
+        "example": "expand_administration_cost = 0.1",
+        "description": "Modifies the cost of the \u2018Expand Administration\u2019 action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "yearly_revolutionary_zeal": {
+        "id": "yearly_revolutionary_zeal",
+        "value_type": "Float",
+        "example": "yearly_revolutionary_zeal = 0.1",
+        "description": "Adds to the yearly base rate of revolutionary zeal.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "max_revolutionary_zeal": {
+        "id": "max_revolutionary_zeal",
+        "value_type": "Integer",
+        "example": "max_revolutionary_zeal= 10",
+        "description": "Adds to the maximum value of revolutionary zeal. Internally revolutionary zeal bonuses do not scale above 100.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "<estate>_influence_modifier": {
+        "id": "<estate>_influence_modifier",
+        "value_type": "Float",
+        "example": "church_influence_modifier = 0.1",
+        "description": "Modifies to the influence of the specified estate.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": [
+            "estate"
+        ]
+    },
+    "<estate>_loyalty_modifier": {
+        "id": "<estate>_loyalty_modifier",
+        "value_type": "Float",
+        "example": "church_loyalty_modifier = 0.1",
+        "description": "Modifies to the loyalty equilibrium of the specified estate.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": [
+            "estate"
+        ]
+    },
+    "imperial_authority": {
+        "id": "imperial_authority",
+        "value_type": "Float",
+        "example": "imperial_authority = 0.05",
+        "description": "Modifies the impact of imperial authority gains.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "imperial_authority_value": {
+        "id": "imperial_authority_value",
+        "value_type": "Float",
+        "example": "imperial_authority_value = 0.1",
+        "description": "Adds to the rate of imperial authority gained per month.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "free_city_imperial_authority": {
+        "id": "free_city_imperial_authority",
+        "value_type": "Float",
+        "example": "free_city_imperial_authority = 0.1",
+        "description": "Adds to the rate of imperial authority gained per month from Free Cities.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "imperial_mercenary_cost": {
+        "id": "imperial_mercenary_cost",
+        "value_type": "Float",
+        "example": "imperial_mercenary_cost = -0.1",
+        "description": "Modifies the cost of mercenary companies for nations within the Holy Roman Empire.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "max_free_cities": {
+        "id": "max_free_cities",
+        "value_type": "Integer",
+        "example": "max_free_cities = 3",
+        "description": "Adds to the maximum number of free cities allowed.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "max_electors": {
+        "id": "max_electors",
+        "value_type": "Integer",
+        "example": "max_electors = 3",
+        "description": "Adds to the maximum number of electors allowed.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "legitimate_subject_elector": {
+        "id": "legitimate_subject_elector",
+        "value_type": "Integer",
+        "example": "legitimate_subject_elector = 50",
+        "description": "Adds to the elector desire for the current country to become Emperor (if they are a valid choice).",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "culture_conversion_cost": {
+        "id": "culture_conversion_cost",
+        "value_type": "Float",
+        "example": "culture_conversion_cost = -0.25",
+        "description": "Modifies the diplomatic power cost for culture conversion in provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "num_accepted_cultures": {
+        "id": "num_accepted_cultures",
+        "value_type": "Integer",
+        "example": "num_accepted_cultures = 1",
+        "description": "Adds to the maximum number of accepted cultures a country can have.",
+        "effect_type": "Additive",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "same_culture_advisor_cost": {
+        "id": "same_culture_advisor_cost",
+        "value_type": "Float",
+        "example": "same_culture_advisor_cost = -0.5",
+        "description": "Modifies the advisor cost for advisors that share the same culture as the country's court they're in.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "promote_culture_cost": {
+        "id": "promote_culture_cost",
+        "value_type": "Float",
+        "example": "promote_culture_cost = -0.25",
+        "description": "Modifies the diplomatic power cost for promoting a culture.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "global_unrest": {
+        "id": "global_unrest",
+        "value_type": "Integer",
+        "example": "global_unrest = -2",
+        "description": "Adds to the base unrest value.",
+        "effect_type": "Additive",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "stability_cost_modifier": {
+        "id": "stability_cost_modifier",
+        "value_type": "Float",
+        "example": "stability_cost_modifier = -0.1",
+        "description": "Modifies the administrative power cost of raising stability.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_autonomy": {
+        "id": "global_autonomy",
+        "value_type": "Float",
+        "example": "global_autonomy = -0.05",
+        "description": "Adds to the monthly rate of autonomy in owned provinces.",
+        "effect_type": "Additive",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "min_autonomy": {
+        "id": "min_autonomy",
+        "value_type": "Integer",
+        "example": "min_autonomy = 50",
+        "description": "Sets the minimum autonomy level allowed in all owned provinces.",
+        "effect_type": "Constant",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "autonomy_change_time": {
+        "id": "autonomy_change_time",
+        "value_type": "Float",
+        "example": "autonomy_change_time = -0.25",
+        "description": "Modifies the cooldown for the autonomy reduction and increase buttons.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "harsh_treatment_cost": {
+        "id": "harsh_treatment_cost",
+        "value_type": "Float",
+        "example": "harsh_treatment_cost = -0.2",
+        "description": "Modifies the military power cost for using harsh treatment.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "years_of_nationalism": {
+        "id": "years_of_nationalism",
+        "value_type": "Integer",
+        "example": "years_of_nationalism = -5",
+        "description": "Adds to the base separatism value of provinces when conquered.",
+        "effect_type": "Additive",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "min_autonomy_in_territories": {
+        "id": "min_autonomy_in_territories",
+        "value_type": "Float",
+        "example": "min_autonomy_in_territories = 0.1",
+        "description": "Modifies the minimum autonomy experienced in territories.",
+        "effect_type": "Additive",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "unrest_catholic_provinces": {
+        "id": "unrest_catholic_provinces",
+        "value_type": "Integer",
+        "example": "unrest_catholic_provinces = -2",
+        "description": "Modifies the local unrest in all provinces of the catholic religion",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "liberty_desire": {
+        "id": "liberty_desire",
+        "value_type": "Integer",
+        "example": "liberty_desire = -10",
+        "description": "Adds to subject liberty desire against their overlord.",
+        "effect_type": "Additive",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "liberty_desire_from_subject_development": {
+        "id": "liberty_desire_from_subject_development",
+        "value_type": "Float",
+        "example": "liberty_desire_from_subject_development = -0.25",
+        "description": "Modifies the subject liberty desire from development against their overlord (Note: Tooltip is bugged as of 1.29. A modifier of -0.2 shows as \"-0.20%\" when it reduces it by 20%).",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "reduced_liberty_desire": {
+        "id": "reduced_liberty_desire",
+        "value_type": "Integer",
+        "example": "reduced_liberty_desire = 10",
+        "description": "Adds to the liberty desire subjects have against their overlord. Applied to the overlord.",
+        "effect_type": "Additive",
+        "version_added": "1.17",
+        "macro": []
+    },
+    "reduced_liberty_desire_on_same_continent": {
+        "id": "reduced_liberty_desire_on_same_continent",
+        "value_type": "Integer",
+        "example": "reduced_liberty_desire_on_same_continent = 10",
+        "description": "Adds to the liberty desire subjects have against their overlord if on the same continent. Applied to the overlord.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "spy_offence": {
+        "id": "spy_offence",
+        "value_type": "Float",
+        "example": "spy_offence = 0.1",
+        "description": "Modifies the base effectiveness of spies against enemies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_spy_defence": {
+        "id": "global_spy_defence",
+        "value_type": "Float",
+        "example": "global_spy_defence = 0.1",
+        "description": "Modifies the base effectiveness of counter-espionage against enemy spies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "discovered_relations_impact": {
+        "id": "discovered_relations_impact",
+        "value_type": "Float",
+        "example": "discovered_relations_impact = -0.1",
+        "description": "Modifies the relations impact applied to a country when discovered committing an espionage action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "rebel_support_efficiency": {
+        "id": "rebel_support_efficiency",
+        "value_type": "Float",
+        "example": "rebel_support_efficiency = 0.5",
+        "description": "Modifies the effectiveness of supported rebels in other countries.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_missionary_strength": {
+        "id": "global_missionary_strength",
+        "value_type": "Float",
+        "example": "global_missionary_strength = 0.03",
+        "description": "Adds to the base missionary strength against all religions.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_heretic_missionary_strength": {
+        "id": "global_heretic_missionary_strength",
+        "value_type": "Float",
+        "example": "global_heretic_missionary_strength = 0.03",
+        "description": "Adds to the base missionary strength against heretic religions.",
+        "effect_type": "Additive",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "missionaries": {
+        "id": "missionaries",
+        "value_type": "Integer",
+        "example": "missionaries = 1",
+        "description": "Adds to the base missionary count for a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "missionary_maintenance_cost": {
+        "id": "missionary_maintenance_cost",
+        "value_type": "Float",
+        "example": "missionary_maintenance_cost = -0.1",
+        "description": "Modifies the cost of missionary maintenance whilst converting provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "religious_unity": {
+        "id": "religious_unity",
+        "value_type": "Float",
+        "example": "religious_unity = 0.5",
+        "description": "Adds to the base religious unity value for a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "tolerance_own": {
+        "id": "tolerance_own",
+        "value_type": "Integer",
+        "example": "tolerance_own = 1",
+        "description": "Adds to the base tolerance for the true faith within a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "tolerance_heretic": {
+        "id": "tolerance_heretic",
+        "value_type": "Integer",
+        "example": "tolerance_heretic = 1",
+        "description": "Adds to the base tolerance for heretics within a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "tolerance_heathen": {
+        "id": "tolerance_heathen",
+        "value_type": "Integer",
+        "example": "tolerance_heathen = 1",
+        "description": "Adds to the base tolerance for heathens within a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "papal_influence": {
+        "id": "papal_influence",
+        "value_type": "Float",
+        "example": "papal_influence = 0.5",
+        "description": "Adds to the rate of papal influence gained per year.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "church_power_modifier": {
+        "id": "church_power_modifier",
+        "value_type": "Float",
+        "example": "church_power_modifier = 0.5",
+        "description": "Modifies the effectiveness of church power gains.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "monthly_fervor_increase": {
+        "id": "monthly_fervor_increase",
+        "value_type": "Integer",
+        "example": "monthly_fervor_increase = 1",
+        "description": "Adds to the rate of fervor gained per month.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "harmonization_speed": {
+        "id": "harmonization_speed",
+        "value_type": "Float",
+        "example": "harmonization_speed = 0.2",
+        "description": "Modifies the rate at which harmonization occurs.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "yearly_harmony": {
+        "id": "yearly_harmony",
+        "value_type": "Integer",
+        "example": "yearly_harmony = 1",
+        "description": "Adds to the rate of harmony gained per year.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "monthly_piety": {
+        "id": "monthly_piety",
+        "value_type": "Float",
+        "example": "monthly_piety = 0.1",
+        "description": "Adds to the rate of piety gained per month.",
+        "effect_type": "Additive",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "monthly_karma": {
+        "id": "monthly_karma",
+        "value_type": "Float",
+        "example": "monthly_karma = 0.1",
+        "description": "Adds to the rate of karma gained per month.",
+        "effect_type": "Additive",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "enforce_religion_cost": {
+        "id": "enforce_religion_cost",
+        "value_type": "Float",
+        "example": "enforce_religion_cost = -0.5",
+        "description": "Modifies the war score cost for the Enforce Religion peace term.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "prestige_per_development_from_conversion": {
+        "id": "prestige_per_development_from_conversion",
+        "value_type": "Float",
+        "example": "prestige_per_development_from_conversion = 0.5",
+        "description": "Adds to the prestige bonus gained per development when successfully converting a province to a state religion.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "warscore_cost_vs_other_religion": {
+        "id": "warscore_cost_vs_other_religion",
+        "value_type": "Float",
+        "example": "warscore_cost_vs_other_religion = -0.25",
+        "description": "Modifies the war score costs for peace terms whilst in war against countries of a different religion.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "establish_order_cost": {
+        "id": "establish_order_cost",
+        "value_type": "Float",
+        "example": "establish_order_cost = -0.1",
+        "description": "Modifies the cost for using the \u2018Establish Order\u2019 action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "global_religious_conversion_resistance": {
+        "id": "global_religious_conversion_resistance",
+        "value_type": "Float",
+        "example": "global_religious_conversion_resistance = -0.1",
+        "description": "Adds to conversion resistance from centres of reformation in all provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "relation_with_heretics": {
+        "id": "relation_with_heretics",
+        "value_type": "Integer",
+        "example": "relation_with_heretics = -20",
+        "description": "Adds to the opinion modifier between a country and heretic countries.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "curia_treasury_contribution": {
+        "id": "curia_treasury_contribution",
+        "value_type": "Float",
+        "example": "curia_treasury_contribution = 0.1",
+        "description": "Modifies the amount of treasury contribution to the Curia.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "curia_powers_cost": {
+        "id": "curia_powers_cost",
+        "value_type": "Float",
+        "example": "curia_powers_cost = 0.1",
+        "description": "Modifies the papal influence cost of the curia actions.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "yearly_patriarch_authority": {
+        "id": "yearly_patriarch_authority",
+        "value_type": "Float",
+        "example": "yearly_patriarch_authority = 0.1",
+        "description": "Adds to the amount of yearly patriarch authority gained.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "cb_on_religious_enemies": {
+        "id": "cb_on_religious_enemies",
+        "value_type": "Boolean",
+        "example": "cb_on_religious_enemies = yes",
+        "description": "Acts a visible script flag. Can be checked in triggers with cb_on_religious_enemies = yes",
+        "effect_type": "Constant",
+        "version_added": "1.1(Only usable in ideas or religions before 1.30)",
+        "macro": []
+    },
+    "global_heathen_missionary_strength": {
+        "id": "global_heathen_missionary_strength",
+        "value_type": "Float",
+        "example": "global_heathen_missionary_strength = 0.03",
+        "description": "Adds to the base missionary strength against heathen religions.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "colonists": {
+        "id": "colonists",
+        "value_type": "Integer",
+        "example": "colonists = 1",
+        "description": "Modifies the base colonist count for a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "colonist_placement_chance": {
+        "id": "colonist_placement_chance",
+        "value_type": "Float",
+        "example": "colonist_placement_chance = 0.05",
+        "description": "Adds to the base colonial placement chance for colonists, which is the chance that additional settlers will be spawned whilst the colonist is present.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_colonial_growth": {
+        "id": "global_colonial_growth",
+        "value_type": "Integer",
+        "example": "global_colonial_growth = 10",
+        "description": "Adds to the base yearly colonial growth gain.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "range": {
+        "id": "range",
+        "value_type": "Float",
+        "example": "range = 0.5",
+        "description": "Modifies the base colonisation range, used for exploration, colonisation and coring province that border sea.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "native_uprising_chance": {
+        "id": "native_uprising_chance",
+        "value_type": "Float",
+        "example": "native_uprising_chance = -0.25",
+        "description": "Adds to the chance of native uprisings in a colony province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "native_assimilation": {
+        "id": "native_assimilation",
+        "value_type": "Float",
+        "example": "native_assimilation = 0.25",
+        "description": "Modifies the bonus from assimilation in colonies. Native assimilation is bonus to goods produced depends on the native population.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "migration_cooldown": {
+        "id": "migration_cooldown",
+        "value_type": "Float",
+        "example": "migration_cooldown = -0.2",
+        "description": "Modifies the cooldown for the migration action for primitive nations that can migrate.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "global_tariffs": {
+        "id": "global_tariffs",
+        "value_type": "Float",
+        "example": "global_tariffs = 0.25",
+        "description": "Modifies the tariff income from colonial nations.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "treasure_fleet_income": {
+        "id": "treasure_fleet_income",
+        "value_type": "Float",
+        "example": "treasure_fleet_income = 0.1",
+        "description": "Modifies the income from treasure fleets sent by colonial nations.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "expel_minorities_cost": {
+        "id": "expel_minorities_cost",
+        "value_type": "Float",
+        "example": "expel_minorities_cost = -0.1",
+        "description": "Modifies the cost of using the \u2018Expel Minorities\u2019 action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "caravan_power": {
+        "id": "caravan_power",
+        "value_type": "Float",
+        "example": "caravan_power = 0.2",
+        "description": "Modifies the bonus trade power inland nodes receive from trade power sources.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "merchants": {
+        "id": "merchants",
+        "value_type": "Integer",
+        "example": "merchants = 1",
+        "description": "Adds to the base merchant count for a country.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "placed_merchant_power": {
+        "id": "placed_merchant_power",
+        "value_type": "Integer",
+        "example": "placed_merchant_power = 3",
+        "description": "Modifies the additional trade power when a merchant present in a trade node.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "global_trade_power": {
+        "id": "global_trade_power",
+        "value_type": "Float",
+        "example": "global_trade_power = 0.1",
+        "description": "Modifies the trade power in all trade nodes for a country.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_foreign_trade_power": {
+        "id": "global_foreign_trade_power",
+        "value_type": "Float",
+        "example": "global_foreign_trade_power = 0.1",
+        "description": "Modifies the trade power for a country in trade nodes that are not domestic.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_own_trade_power": {
+        "id": "global_own_trade_power",
+        "value_type": "Float",
+        "example": "global_own_trade_power = 0.1",
+        "description": "Modifies the trade power for a country in trade nodes that are domestic.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_prov_trade_power_modifier": {
+        "id": "global_prov_trade_power_modifier",
+        "value_type": "Float",
+        "example": "global_prov_trade_power_modifier = 0.1",
+        "description": "Modifies the base trade power of owned provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_trade_goods_size_modifier": {
+        "id": "global_trade_goods_size_modifier",
+        "value_type": "Float",
+        "example": "global_trade_goods_size_modifier = 0.1",
+        "description": "Modifies the base trade good size of owned provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "trade_efficiency": {
+        "id": "trade_efficiency",
+        "value_type": "Float",
+        "example": "trade_efficiency = 0.1",
+        "description": "Modifies a country's trade income. (Maximum is 200%)",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "trade_range_modifier": {
+        "id": "trade_range_modifier",
+        "value_type": "Float",
+        "example": "trade_range_modifier = 0.25",
+        "description": "Modifies the trade range used to determine if a country can place a merchant in a trade node.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "trade_steering": {
+        "id": "trade_steering",
+        "value_type": "Float",
+        "example": "trade_steering = 0.1",
+        "description": "Modifies the bonus to trade power used for steering when determining which outgoing node trade is steered to. If you have a merchant present, it also slightly increases the outgoing value.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "global_ship_trade_power": {
+        "id": "global_ship_trade_power",
+        "value_type": "Float",
+        "example": "global_ship_trade_power = 0.2",
+        "description": "Modifies the trade power ships grant when protecting trade.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "privateer_efficiency": {
+        "id": "privateer_efficiency",
+        "value_type": "Float",
+        "example": "privateer_efficiency = 0.2",
+        "description": "Modifies the effectiveness of privateers in a trade node.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "embargo_efficiency": {
+        "id": "embargo_efficiency",
+        "value_type": "Float",
+        "example": "embargo_efficiency = 0.25",
+        "description": "Modifies the effectiveness of embargoing another country.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "ship_power_propagation": {
+        "id": "ship_power_propagation",
+        "value_type": "Float",
+        "example": "ship_power_propagation = 0.1",
+        "description": "Modifies the propagation of trade power from ships protecting trade.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "center_of_trade_upgrade_cost": {
+        "id": "center_of_trade_upgrade_cost",
+        "value_type": "Float",
+        "example": "center_of_trade_upgrade_cost = -0.1",
+        "description": "Modifies the cost of upgrading a center of trade in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "trade_company_investment_cost": {
+        "id": "trade_company_investment_cost",
+        "value_type": "Float",
+        "example": "trade_company_investment_cost = -0.1",
+        "description": "Modifies the cost of purchasing a trade company investment in a state.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "mercantilism_cost": {
+        "id": "mercantilism_cost",
+        "value_type": "Float",
+        "example": "mercantilism_cost = -0.1",
+        "description": "Modifies the cost of the \u2018Boost Mercantilism\u2019 action.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "institution_growth": {
+        "id": "institution_growth",
+        "value_type": "Integer",
+        "example": "institution_growth = 1",
+        "description": "Modifies the annual growth of all institutions in a province by the specified value. Is not scaled by province development level",
+        "effect_type": "Additive",
+        "version_added": "1.25",
+        "macro": []
+    },
+    "max_attrition": {
+        "id": "max_attrition",
+        "value_type": "Integer",
+        "example": "max_attrition = 5",
+        "description": "Adds to the maximum attrition that can be experienced in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "attrition": {
+        "id": "attrition",
+        "value_type": "Integer",
+        "example": "attrition = 5",
+        "description": "Adds to the base attrition in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_hostile_attrition": {
+        "id": "local_hostile_attrition",
+        "value_type": "Integer",
+        "example": "local_hostile_attrition = 5",
+        "description": "Adds to the base attrition for enemies in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "fort_level": {
+        "id": "fort_level",
+        "value_type": "Integer",
+        "example": "fort_level = 1",
+        "description": "Adds to the fort level in a province, determining how difficult it is to siege.",
+        "effect_type": "Additive",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "garrison_growth": {
+        "id": "garrison_growth",
+        "value_type": "Float",
+        "example": "garrison_growth = 0.05",
+        "description": "Modifies the rate of garrison growth in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_defensiveness": {
+        "id": "local_defensiveness",
+        "value_type": "Float",
+        "example": "local_defensiveness = 0.1",
+        "description": "Modifies the defensiveness of a province, impacting siege phase length.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_friendly_movement_speed": {
+        "id": "local_friendly_movement_speed",
+        "value_type": "Float",
+        "example": "local_friendly_movement_speed = 0.1",
+        "description": "Modifies the movement speed of units in a province that are considered friendly.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "local_hostile_movement_speed": {
+        "id": "local_hostile_movement_speed",
+        "value_type": "Float",
+        "example": "local_hostile_movement_speed = 0.1",
+        "description": "Modifies the movement speed of units in a province that are considered enemies.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "local_manpower": {
+        "id": "local_manpower",
+        "value_type": "Integer",
+        "example": "local_manpower = 1",
+        "description": "Adds to the base manpower value. 1 equals 1000 men.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_manpower_modifier": {
+        "id": "local_manpower_modifier",
+        "value_type": "Float",
+        "example": "local_manpower_modifier = 0.25",
+        "description": "Modifies the manpower efficiency in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_regiment_cost": {
+        "id": "local_regiment_cost",
+        "value_type": "Float",
+        "example": "local_regiment_cost = -0.25",
+        "description": "Modifies the recruitment cost of land units in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "regiment_recruit_speed": {
+        "id": "regiment_recruit_speed",
+        "value_type": "Float",
+        "example": "regiment_recruit_speed = -0.25",
+        "description": "Modifies the recruitment speed of land units in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "supply_limit": {
+        "id": "supply_limit",
+        "value_type": "Integer",
+        "example": "supply_limit = 1",
+        "description": "Adds to the base supply limit of a province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "supply_limit_modifier": {
+        "id": "supply_limit_modifier",
+        "value_type": "Float",
+        "example": "supply_limit_modifier = 0.25",
+        "description": "Modifies the supply limit efficiency of a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_amount_of_banners": {
+        "id": "local_amount_of_banners",
+        "value_type": "Float",
+        "example": "local_amount_of_banners = 0.1",
+        "description": "Modiifes the amount of banners that can be raised from a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "local_naval_engagement_modifier": {
+        "id": "local_naval_engagement_modifier",
+        "value_type": "Float",
+        "example": "local_naval_engagement_modifier = 0.1",
+        "description": "Modifies the naval engagement width in a province. Only usable in sea provinces.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "local_sailors": {
+        "id": "local_sailors",
+        "value_type": "Integer",
+        "example": "local_sailors = 1",
+        "description": "Adds to the sailors value for a province. 1 equals 1 sailor.",
+        "effect_type": "Additive",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "local_sailors_modifier": {
+        "id": "local_sailors_modifier",
+        "value_type": "Float",
+        "example": "local_sailors_modifier = 0.1",
+        "description": "Modifies the sailors efficiency of a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "local_ship_cost": {
+        "id": "local_ship_cost",
+        "value_type": "Float",
+        "example": "local_ship_cost = -0.2",
+        "description": "Modifies the cost of ship recruitment in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_ship_repair": {
+        "id": "local_ship_repair",
+        "value_type": "Float",
+        "example": "local_ship_repair = 0.2",
+        "description": "Modifies the speed of ship repair in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "ship_recruit_speed": {
+        "id": "ship_recruit_speed",
+        "value_type": "Float",
+        "example": "ship_recruit_speed = -0.25",
+        "description": "Modifies the recruitment speed of ships in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "blockade_force_required": {
+        "id": "blockade_force_required",
+        "value_type": "Float",
+        "example": "blockade_force_required = 0.5",
+        "description": "Modifies the number of ships required to fully blockade the province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "hostile_disembark_speed": {
+        "id": "hostile_disembark_speed",
+        "value_type": "Float",
+        "example": "hostile_disembark_speed = 0.5",
+        "description": "Modifies the speed of disembarkation by hostile troops into the province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "hostile_fleet_attrition": {
+        "id": "hostile_fleet_attrition",
+        "value_type": "Integer",
+        "example": "hostile_fleet_attrition = 5",
+        "description": "Modifies the amount of fleet attrition experienced by hostile ships in sea zones adjacent to the province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "local_colonial_growth": {
+        "id": "local_colonial_growth",
+        "value_type": "Integer",
+        "example": "local_colonial_growth = 10",
+        "description": "Adds to the colonial growth in a colony province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_colonist_placement_chance": {
+        "id": "local_colonist_placement_chance",
+        "value_type": "Float",
+        "example": "local_colonist_placement_chance = 0.05",
+        "description": "Adds to the placement chance in a colony province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "inflation_reduction_local": {
+        "id": "inflation_reduction_local",
+        "value_type": "Float",
+        "example": "inflation_reduction_local = 0.1",
+        "description": "Adds to the base yearly inflation value. Requires every province in a country to have the modifier to work however.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_state_maintenance_modifier": {
+        "id": "local_state_maintenance_modifier",
+        "value_type": "Float",
+        "example": "local_state_maintenance_modifier = -0.25",
+        "description": "Modifies the state maintenance cost for the state that a province belongs to.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "local_build_cost": {
+        "id": "local_build_cost",
+        "value_type": "Float",
+        "example": "local_build_cost = -0.25",
+        "description": "Modifies the cost of constructing buildings in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_build_time": {
+        "id": "local_build_time",
+        "value_type": "Float",
+        "example": "local_build_time = -0.25",
+        "description": "Modifies the construction speed of buildings in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_monthly_devastation": {
+        "id": "local_monthly_devastation",
+        "value_type": "Float",
+        "example": "local_monthly_devastation = -0.1",
+        "description": "Adds to the devastation rate in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "local_production_efficiency": {
+        "id": "local_production_efficiency",
+        "value_type": "Float",
+        "example": "local_production_efficiency = 0.1",
+        "description": "Modifies the production efficiency in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_tax_modifier": {
+        "id": "local_tax_modifier",
+        "value_type": "Float",
+        "example": "local_tax_modifier = 0.1",
+        "description": "Modifies the tax efficiency in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "tax_income": {
+        "id": "tax_income",
+        "value_type": "Integer",
+        "example": "tax_income = 12",
+        "description": "Adds to the yearly tax income of a province.",
+        "effect_type": "Additive",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "allowed_num_of_buildings": {
+        "id": "allowed_num_of_buildings",
+        "value_type": "Integer",
+        "example": "allowed_num_of_buildings = 1",
+        "description": "Adds to the maximum number of building slots in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "local_development_cost": {
+        "id": "local_development_cost",
+        "value_type": "Float",
+        "example": "local_development_cost = -0.1",
+        "description": "Modifies the monarch power cost for development in a province.\nConverts to local_tax_modifier in for non-Common Sense owners.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "local_institution_spread": {
+        "id": "local_institution_spread",
+        "value_type": "Float",
+        "example": "local_institution_spread = 0.1",
+        "description": "Modifies the spread of institutions in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "local_core_creation": {
+        "id": "local_core_creation",
+        "value_type": "Float",
+        "example": "local_core_creation = -0.25",
+        "description": "Modifies the cost of coring in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "local_governing_cost": {
+        "id": "local_governing_cost",
+        "value_type": "Float",
+        "example": "local_governing_cost = -0.25",
+        "description": "Modifies the local governing capacity usage of the province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "statewide_governing_cost": {
+        "id": "statewide_governing_cost",
+        "value_type": "Float",
+        "example": "statewide_governing_cost = -0.25",
+        "description": "Modifies the local governing capacity usage of all provinces in the state of the province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "province_trade_power_modifier": {
+        "id": "province_trade_power_modifier",
+        "value_type": "Float",
+        "example": "province_trade_power_modifier = 0.1",
+        "description": "Modifies the trade power efficiency in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "province_trade_power_value": {
+        "id": "province_trade_power_value",
+        "value_type": "Float",
+        "example": "province_trade_power_value = 0.5",
+        "description": "Adds to the trade power in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "trade_goods_size_modifier": {
+        "id": "trade_goods_size_modifier",
+        "value_type": "Float",
+        "example": "trade_goods_size_modifier = 0.25",
+        "description": "Modifies the goods produced efficiency in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "trade_goods_size": {
+        "id": "trade_goods_size",
+        "value_type": "Float",
+        "example": "trade_goods_size = 0.5",
+        "description": "Adds to the trade good size in a province",
+        "effect_type": "Additive",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "trade_value_modifier": {
+        "id": "trade_value_modifier",
+        "value_type": "Float",
+        "example": "trade_value_modifier = 0.1",
+        "description": "Modifies the base trade value in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "trade_value": {
+        "id": "trade_value",
+        "value_type": "Integer",
+        "example": "trade_value = 1",
+        "description": "Adds to the base trade value in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_missionary_strength": {
+        "id": "local_missionary_strength",
+        "value_type": "Float",
+        "example": "local_missionary_strength = 0.01",
+        "description": "Adds to the missionary strength in a province. 1 equals 100% strength.",
+        "effect_type": "Additive",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "local_religious_unity_contribution": {
+        "id": "local_religious_unity_contribution",
+        "value_type": "Float",
+        "example": "local_religious_unity_contribution = 0.1",
+        "description": "Adds to the religious unity contribution made by a province.",
+        "effect_type": "Additive",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "local_missionary_maintenance_cost": {
+        "id": "local_missionary_maintenance_cost",
+        "value_type": "Float",
+        "example": "local_missionary_maintenance_cost = -0.1",
+        "description": "Adds to the missionary maintenance cost for converting a province.",
+        "effect_type": "Additive",
+        "version_added": "1.28",
+        "macro": []
+    },
+    "local_religious_conversion_resistance": {
+        "id": "local_religious_conversion_resistance",
+        "value_type": "Float",
+        "example": "local_religious_conversion_resistance = 0.1",
+        "description": "Adds to conversion resistance from Centres of Reformation.",
+        "effect_type": "Additive",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "local_culture_conversion_cost": {
+        "id": "local_culture_conversion_cost",
+        "value_type": "Float",
+        "example": "local_culture_conversion_cost = -0.25",
+        "description": "Modifies the culture conversion cost in a province.",
+        "effect_type": "Multiplicative",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "local_unrest": {
+        "id": "local_unrest",
+        "value_type": "Integer",
+        "example": "local_unrest = -1",
+        "description": "Adds to the unrest value in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "local_autonomy": {
+        "id": "local_autonomy",
+        "value_type": "Float",
+        "example": "local_autonomy = 0.05",
+        "description": "Adds to the autonomy rate in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "local_years_of_nationalism": {
+        "id": "local_years_of_nationalism",
+        "value_type": "Integer",
+        "example": "local_years_of_nationalism = -5",
+        "description": "Adds to the base nationalism value in a province.",
+        "effect_type": "Additive",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "min_local_autonomy": {
+        "id": "min_local_autonomy",
+        "value_type": "Integer",
+        "example": "min_local_autonomy = 50",
+        "description": "Sets the minimum autonomy value a province can have.",
+        "effect_type": "Constant",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "attack_bonus_in_capital_terrain": {
+        "id": "attack_bonus_in_capital_terrain",
+        "value_type": "Boolean",
+        "example": "attack_bonus_in_capital_terrain = yes",
+        "description": "Grants attack bonus in provinces with the same terrain as capital province.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "can_bypass_forts": {
+        "id": "can_bypass_forts",
+        "value_type": "Boolean",
+        "example": "can_bypass_forts = yes",
+        "description": "Allows units to ignore fort zones of control.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "can_chain_claim": {
+        "id": "can_chain_claim",
+        "value_type": "Boolean",
+        "example": "can_chain_claim = yes",
+        "description": "Allows claims to be enacted through already claimed provinces.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "can_colony_boost_development": {
+        "id": "can_colony_boost_development",
+        "value_type": "Boolean",
+        "example": "can_colony_boost_development = yes",
+        "description": "Grants bonus 1 tax, production and manpower on completed colonies.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "can_transfer_vassal_wargoal": {
+        "id": "can_transfer_vassal_wargoal",
+        "value_type": "Boolean",
+        "example": "can_transfer_vassal_wargoal = yes",
+        "description": "Allows usage of the \u2018Transfer Subject\u2019 peace term at half cost.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "force_march_free": {
+        "id": "force_march_free",
+        "value_type": "Boolean",
+        "example": "force_march_free = yes",
+        "description": "Allows usage of the \u2018Force March\u2019 action for free.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "free_maintenance_on_expl_conq": {
+        "id": "free_maintenance_on_expl_conq",
+        "value_type": "Boolean",
+        "example": "free_maintenance_on_expl_conq = yes",
+        "description": "Removes maintenance cost for explorers and conquisadors.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "ignore_coring_distance": {
+        "id": "ignore_coring_distance",
+        "value_type": "Boolean",
+        "example": "ignore_coring_distance = yes",
+        "description": "Allows coring in any uncored province, regardless of distance.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "cb_on_government_enemies": {
+        "id": "cb_on_government_enemies",
+        "value_type": "Boolean",
+        "example": "cb_on_government_enemies = yes",
+        "description": "Acts a visible script flag. Can be checked in triggers with cb_on_government_enemies = yes",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "cb_on_primitives": {
+        "id": "cb_on_primitives",
+        "value_type": "Boolean",
+        "example": "cb_on_primitives = yes",
+        "description": "Allows claims to be fabricated on overseas provinces in colonial regions.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "cb_on_overseas": {
+        "id": "cb_on_overseas",
+        "value_type": "Boolean",
+        "example": "cb_on_overseas = yes",
+        "description": "Allows claims to be fabricated on overseas provinces in trade company regions.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "idea_claim_colonies": {
+        "id": "idea_claim_colonies",
+        "value_type": "Boolean",
+        "example": "idea_claim_colonies = yes",
+        "description": "Allows claims to be fabricated on overseas provinces in colonial regions that are owned by another nation that is also overseas.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "may_explore": {
+        "id": "may_explore",
+        "value_type": "Boolean",
+        "example": "may_explore = yes",
+        "description": "Allows the recruitment of explorers and conquisadors.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "no_religion_penalty": {
+        "id": "no_religion_penalty",
+        "value_type": "Boolean",
+        "example": "no_religion_penalty = yes",
+        "description": "Removes the penalties associated with negative religious tolerance.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reduced_stab_impacts": {
+        "id": "reduced_stab_impacts",
+        "value_type": "Boolean",
+        "example": "reduced_stab_impacts = yes",
+        "description": "Reduces the stability hits when taking diplomatic actions that cause them (i.e. \u2018Break Marriage\u2019).",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "sea_repair": {
+        "id": "sea_repair",
+        "value_type": "Boolean",
+        "example": "sea_repair = yes",
+        "description": "Allows ships to repair in coastal sea zones adjacent to owned provinces.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "may_establish_frontier": {
+        "id": "may_establish_frontier",
+        "value_type": "Boolean",
+        "example": "may_establish_frontier = yes",
+        "description": "Allows the usage of the Siberean frontier mechanic.",
+        "effect_type": "Constant",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "extra_manpower_at_religious_war": {
+        "id": "extra_manpower_at_religious_war",
+        "value_type": "Boolean",
+        "example": "extra_manpower_at_religious_war = yes",
+        "description": "Grants an increase in manpower recovery by a factor of 3 during religious wars.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "auto_explore_adjacent_to_colony": {
+        "id": "auto_explore_adjacent_to_colony",
+        "value_type": "Boolean",
+        "example": "auto_explore_adjacent_to_colony = yes",
+        "description": "Grants the abiliy to automatically discover undiscovered provinces adjacent to colonies.",
+        "effect_type": "Constant",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "can_fabricate_for_vassals": {
+        "id": "can_fabricate_for_vassals",
+        "value_type": "Boolean",
+        "example": "can_fabricate_for_vassals = yes",
+        "description": "Grants the abiliy to fabricate claims for vassals.",
+        "effect_type": "Constant",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "has_banners": {
+        "id": "has_banners",
+        "value_type": "Integer",
+        "example": "has_banners = 1",
+        "description": "Allows the usage of Manchu banner units. Country scope.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "local_has_banners": {
+        "id": "local_has_banners",
+        "value_type": "Integer",
+        "example": "local_has_banners = 1",
+        "description": "Allows Manchu banner units to be raised in owned provinces. Province scope.",
+        "effect_type": "Constant",
+        "version_added": "1.20",
+        "macro": []
+    }
+}

@@ -1,0 +1,3516 @@
+{
+    "set_global_flag": {
+        "id": "set_global_flag",
+        "parameters": "<flag>\nA unique string to identify the global flag with.",
+        "value_type": "Integer",
+        "example": "set_global_flag = my_flag\nset_global_flag = my_flag@ROOT\nset_global_flag = my_flag@event_target:name",
+        "description": "Defines a global flag.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "clr_global_flag": {
+        "id": "clr_global_flag",
+        "parameters": "<flag>\nThe unique string of a global flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_global_flag = my_flag",
+        "description": "Clears a defined global flag.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "custom_tooltip": {
+        "id": "custom_tooltip",
+        "parameters": "<string>\nAn localized string to display in the tooltip",
+        "value_type": "Integer",
+        "example": "custom_tooltip = my_tooltip_tt",
+        "description": "Displays a localized key in the effect tooltip.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "log": {
+        "id": "log",
+        "parameters": "<string>\nAn string to in the game.log",
+        "value_type": "Float",
+        "example": "log = \"myVariable: [Root.myVariable.GetValue]\"",
+        "description": "Displays a string in the game.log when executed.",
+        "notes": "Accepts all localization commands (i.e. [Root.GetName], etc.)",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "save_event_target_as": {
+        "id": "save_event_target_as",
+        "parameters": "<string>\nA unique string to identify the event target with.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    save_event_target_as = my_province\n}",
+        "description": "Saves the current scope as a key. Is cleared once execution ends (i.e. end of event).",
+        "notes": "Use event_target:<key> to access the scope.",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "save_global_event_target_as": {
+        "id": "save_global_event_target_as",
+        "parameters": "<string>\nA unique string to identify the global event target with.",
+        "value_type": "Integer",
+        "example": "random_country = {\n    save_global_event_target_as = my_country\n}",
+        "description": "Saves the current scope as a key. Persists after execution until cleared via effect.",
+        "notes": "Use event_target:<key> to access the scope.",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "clear_global_event_target": {
+        "id": "clear_global_event_target",
+        "parameters": "<string>\nThe unique string of the global event target to clear.",
+        "value_type": "Integer",
+        "example": "clear_global_event_target = my_country",
+        "description": "Clears a specific global event target.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "clear_global_event_targets": {
+        "id": "clear_global_event_targets",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "clear_global_event_targets = yes",
+        "description": "Clears all global event targets.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "show_ambient_object": {
+        "id": "show_ambient_object",
+        "parameters": "<string>\nThe unique string of the ambient object to show.",
+        "value_type": "Integer",
+        "example": "show_ambient_object = nammi2_hagia_sophia_minarets_entity",
+        "description": "Displays a hidden ambient object from the map/ambient_objects.txt file.",
+        "notes": "",
+        "version_added": "1.19",
+        "macro": []
+    },
+    "hide_ambient_object": {
+        "id": "hide_ambient_object",
+        "parameters": "<string>\nThe unique string of the ambient object to hide.",
+        "value_type": "Integer",
+        "example": "hide_ambient_object = nammi2_hagia_sophia_minarets_entity",
+        "description": "Hides a visible ambient object from the map/ambient_objects.txt file.",
+        "notes": "",
+        "version_added": "1.19",
+        "macro": []
+    },
+    "enable_council": {
+        "id": "enable_council",
+        "parameters": "yes\nBoolean",
+        "value_type": "Boolean",
+        "example": "enable_council = yes",
+        "description": "Starts the Council of Trent.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "finish_council": {
+        "id": "finish_council",
+        "parameters": "yes\nBoolean",
+        "value_type": "Boolean",
+        "example": "finish_council = yes",
+        "description": "Ends the Council of Trent.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "country_event": {
+        "id": "country_event",
+        "parameters": "id = <id>\nThe event id to fire.\ndays = <days>\nOptional. The number of days to wait after the effect is executed to fire the event.\nrandom = <days>\nOptional. The max number of additional days that can be added to the days parameter for randomness.\ntooltip = <string>\nOptional. The tooltip to display in the effect tooltip country_event is used in.",
+        "value_type": "Integer",
+        "example": "country_event = { \n    id = celestial_empire_events.1\n    days = 30\n    random = 15\n    tooltip = CELESTIAL_EMPIRE_TOOLTIP\n}",
+        "description": "Fire a country event for the current country scope.",
+        "notes": "You cannot fire the same event within itself with a delay of 0.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_country_modifier": {
+        "id": "add_country_modifier",
+        "parameters": "name = <name>\nThe event modifier to add.\nduration = <days>\nOptional. The number of days to add the country modifier for.\nhidden = yes\nOptional. Whether the country modifier is hidden in the government view.\ndesc = <string>\nOptional. The string used to override the automatic duration string.",
+        "value_type": "Boolean",
+        "example": "add_country_modifier = { \n    name = the_proper_old_ways\n    duration = -1  \n    desc = PROPER_OLD_WAYS_DESC_TOOLTIP\n    hidden = yes\n}",
+        "description": "Adds an event modifier to the current scope as a country modifier.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_country_modifier": {
+        "id": "remove_country_modifier",
+        "parameters": "<modifier>\nThe event modifier to remove.",
+        "value_type": "Integer",
+        "example": "remove_country_modifier = the_proper_old_ways",
+        "description": "Removes an already assigned country modifier from the current scope.",
+        "notes": "Can also be used to remove ruler modifier.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_country_flag": {
+        "id": "set_country_flag",
+        "parameters": "<flag>\nA unique string to identify the country flag with.",
+        "value_type": "Integer",
+        "example": "set_country_flag = my_flag\nset_country_flag = my_flag@ROOT\nset_country_flag = my_flag@event_target:name",
+        "description": "Defines a country flag for the current scope.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "clr_country_flag": {
+        "id": "clr_country_flag",
+        "parameters": "<flag>\nThe unique string of a country flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_country_flag = my_flag",
+        "description": "Clears a defined country flag for the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_tag": {
+        "id": "change_tag",
+        "parameters": "<scope>\nThe scope to change to.",
+        "value_type": "Integer",
+        "example": "change_tag = FRA\nchange_tag = ROOT\nchange_tag = event_target:my_country",
+        "description": "Changes current scope to <scope> tag.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "switch_tag": {
+        "id": "switch_tag",
+        "parameters": "<scope>\nThe scope to switch to.",
+        "value_type": "Integer",
+        "example": "switch_tag = FRA\nswitch_tag = ROOT\nswitch_tag = event_target:my_country",
+        "description": "Switches the player view to <scope> tag. Original country becomes controlled by AI.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "change_graphical_culture": {
+        "id": "change_graphical_culture",
+        "parameters": "<gfxculture>\nThe graphical culture to assign.",
+        "value_type": "Integer",
+        "example": "change_graphical_culture = westerngfx",
+        "description": "Changes the current scope's graphical culture. Graphical culture determines the unit models, advisor portraits, etc. that a country uses.",
+        "notes": "Graphical cultures are found in /Europa Universalis IV/common/graphicalculturetype.txt.",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "override_country_name": {
+        "id": "override_country_name",
+        "parameters": "<string>\nThe localisation key to assign.",
+        "value_type": "Integer",
+        "example": "override_country_name = KINGDOM_OF_GOD",
+        "description": "Changes the country name of current scope to <string>.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "restore_country_name": {
+        "id": "restore_country_name",
+        "parameters": "<yes>\nBoolean.",
+        "value_type": "Boolean",
+        "example": "restore_country_name = yes",
+        "description": "Restores the country name of current scope to its original.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "add_adm_power": {
+        "id": "add_adm_power",
+        "parameters": "<int>\nThe amount of power to add.",
+        "value_type": "Integer",
+        "example": "add_adm_power = 100",
+        "description": "Adds administrative power to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_dip_power": {
+        "id": "add_dip_power",
+        "parameters": "<int>\nThe amount of power to add.",
+        "value_type": "Integer",
+        "example": "add_dip_power = 100",
+        "description": "Adds diplomatic power to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_mil_power": {
+        "id": "add_mil_power",
+        "parameters": "<int>\nThe amount of power to add.",
+        "value_type": "Integer",
+        "example": "add_mil_power = 100",
+        "description": "Adds military power to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_saved_name": {
+        "id": "set_saved_name",
+        "parameters": "key = <string>\nThe key that holds the name.\ntype = advisor / simple\nThe name generation type. Advisor draws from namelist, simple utilises name parameter.\nname = <string>\nThe name to hold in the key. Only used with the simple type.\nscope = <scope>\nThe country scope to draw the namelist from. Only used with the advisor type.",
+        "value_type": "Integer",
+        "example": "Simple:\nset_saved_name = {\n    key = simple_name\n    type = simple\n    name = \"My Simple Name\"\n}\ndefine_ruler = {\n    name = simple_name\n}\nAdvisor:\nset_saved_name = {\n    key = noble_zealot\n    type = advisor\n    scope = ROOT\n}\nspawn_rebels = {\n    size = 1\n    leader = noble_zealot\n    type = religious_rebels\n}",
+        "description": "Saves a name to a unique key for usage in other effects.",
+        "notes": "Usable with define_admiral, define_explorer, define_conquistador, define_general, define_ruler, define_consort, define_heir, define_advisor and spawn_rebels.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "clear_saved_name": {
+        "id": "clear_saved_name",
+        "parameters": "<key>\nThe name key to clear.",
+        "value_type": "Integer",
+        "example": "clear_saved_name = noble_zealot",
+        "description": "Clears a saved name key.",
+        "notes": "Use this after using the saved name in an effect.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "change_innovativeness": {
+        "id": "change_innovativeness",
+        "parameters": "<int>\nThe amount of innovativeness added.",
+        "value_type": "Integer",
+        "example": "change_innovativeness = 3",
+        "description": "Adds innovativeness to the current scope.",
+        "notes": "Range [-100.0, 100.0]\ncapped to [0.0, 100.0]",
+        "version_added": "1.25",
+        "macro": []
+    },
+    "complete_mission": {
+        "id": "complete_mission",
+        "parameters": "<key>\nThe identifier of the mission.",
+        "value_type": "Integer",
+        "example": "complete_mission = expand_country_mission",
+        "description": "",
+        "notes": "",
+        "version_added": "1.25",
+        "macro": []
+    },
+    "swap_non_generic_missions": {
+        "id": "swap_non_generic_missions",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "swap_non_generic_missions = yes",
+        "description": "Reloads the mission tree. Useful for flag-based mission trees.",
+        "notes": "",
+        "version_added": "?",
+        "macro": []
+    },
+    "add_years_of_income": {
+        "id": "add_years_of_income",
+        "parameters": "<float>\nThe amount of income to add or subtract..",
+        "value_type": "Float",
+        "example": "add_years_of_income = 0.5",
+        "description": "Adds ducats equal to the years of income defined.",
+        "notes": "1 is equal to 1 year of income, based on a country's current monthly income.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_treasury": {
+        "id": "add_treasury",
+        "parameters": "<int>\nThe amount of ducats to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_treasury = 50",
+        "description": "Adds ducats to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_inflation": {
+        "id": "add_inflation",
+        "parameters": "<float>\nThe amount of inflation to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_inflation = 2",
+        "description": "Adds inflation to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_mercantilism": {
+        "id": "add_mercantilism",
+        "parameters": "<int>\nThe amount of mercantilism to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_mercantilism = 2",
+        "description": "Adds mercantilism to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_tariff_value": {
+        "id": "add_tariff_value",
+        "parameters": "<float>\nThe amount of tariff value to add or subtract.",
+        "value_type": "Float",
+        "example": "add_tariff_value = 0.1",
+        "description": "Adds tariff value to the current scope.",
+        "notes": "Tariff value is the ducats sent to an overlord by subjects such as colonial nations.",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "loan_size": {
+        "id": "loan_size",
+        "parameters": "<int>\nThe value to change to.",
+        "value_type": "Integer",
+        "example": "loan_size = 24",
+        "description": "Changes the loan size of the current scope.",
+        "notes": "Size is the number of months in monthly income that a single loan is equal to.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_price": {
+        "id": "change_price",
+        "parameters": "trade_goods = <tradegood>\nThe trade good to change.\nkey = <string>\nThe localisation key to display in the Trade Good's price tooltip.\nvalue = <float>\nThe percentage to change the value by.\nduration = <days>\nThe duration for the value to stay changed for.",
+        "value_type": "Integer",
+        "example": "change_price = {\n    trade_goods = grain\n    key = grain_shortage\n    value = 0.5\n    duration = 3650\n}",
+        "description": "Changes the price of a trade good globally.",
+        "notes": "Tradegood prices are found in /Europa Universalis IV/common/prices/*.txt\nThe new price is the base price + (base price * value)\nduration accepts -1 for unlimited duration.",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "add_loan": {
+        "id": "add_loan",
+        "parameters": "interest_modifier = <value>\nAdditive interest modifier.\nfixed_interest = <boolean>\nyes, interest will never change.\nduration = <integer>\nThe duration in months.",
+        "value_type": "Integer",
+        "example": "add_loan = {\n interest_modifier = -0.5\n fixed_interest = yes\n duration = 60\n}",
+        "description": "Takes a loan for the current scope.",
+        "notes": "",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "add_years_of_owned_provinces_production_income": {
+        "id": "add_years_of_owned_provinces_production_income",
+        "parameters": "years = <value>\nYears of production income to grant.\ntrigger = <scope>\nWhich provinces to include for the production income calculation.\ncustom_tooltip = <string>\nThe tooltip to display for this effect",
+        "value_type": "Integer",
+        "example": "add_years_of_owned_provinces_production_income = {\n    years = 8\n    trigger = {\n        OR = {\n            trade_goods = cloth\n            trade_goods = silk\n        }\n    }\n    custom_tooltip = MONOPOLY_INCOME_CLOTH_DESC\n}",
+        "description": "Grants the current scope immediate ducats based on the production income of the specified provinces over the specified duration.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "add_absolutism": {
+        "id": "add_absolutism",
+        "parameters": "<int>\nThe amount of absolutism to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_absolutism = 10",
+        "description": "Adds absolutism to the current scope.",
+        "notes": "No effect if Absolutism isn't active.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_government_reform": {
+        "id": "add_government_reform",
+        "parameters": "<reform>\nThe name of the reform to enact.",
+        "value_type": "Integer",
+        "example": "add_government_reform = revolutionary_empire_reform",
+        "description": "If Dharma is active, enacts a government reform, replacing any existing reform at the same tier.\nIf Dharma is not active, changes to the legacy government type that this reform has listed as its legacy_equivalent.",
+        "notes": "",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "remove_government_reform": {
+        "id": "remove_government_reform",
+        "parameters": "<reform>\nThe name of the reform to remove.",
+        "value_type": "Integer",
+        "example": "remove_government_reform = revolutionary_empire_reform",
+        "description": "If Dharma is active, removes a government reform. If this reform was not in the highest achieved reform tier, the country can pick a new reform for free.",
+        "notes": "No effect if Dharma isn't active.",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "change_government_reform_progress": {
+        "id": "change_government_reform_progress",
+        "parameters": "<int>\nThe amount of reform progress to add or subtract.",
+        "value_type": "Integer",
+        "example": "change_government_reform_progress = 100",
+        "description": "Adds reform progress to the current scope.",
+        "notes": "",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "add_legitimacy": {
+        "id": "add_legitimacy",
+        "parameters": "<int>\nThe amount of legitimacy to add or subtract.\n<scope>\nThe amount of legitimacy to add or subtract, taking the value from the scope's current value.",
+        "value_type": "Integer",
+        "example": "add_legitimacy = 10\nadd_legitimacy = CAS",
+        "description": "Adds legitimacy to the current scope.",
+        "notes": "No effect if not a government monarchy.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_republican_tradition": {
+        "id": "add_republican_tradition",
+        "parameters": "<int>\nThe amount of republican tradition to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_republican_tradition = 10",
+        "description": "Adds republican tradition to the current scope.",
+        "notes": "No effect if not a government using republic.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_scaled_republican_tradition": {
+        "id": "add_scaled_republican_tradition",
+        "parameters": "<int>\nThe amount of republican tradition to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_scaled_republican_tradition = 10",
+        "description": "Adds republican tradition to the current scope.",
+        "notes": "Scales to the government's election cycle duration.\nNo effect if not a government using republic.",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "add_devotion": {
+        "id": "add_devotion",
+        "parameters": "<int>\nThe amount of devotion to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_devotion = 10",
+        "description": "Adds devotion to the current scope.",
+        "notes": "No effect if not a government using has_devotion.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_horde_unity": {
+        "id": "add_horde_unity",
+        "parameters": "<int>\nThe amount of horde unity to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_horde_unity = 10",
+        "description": "Adds horde unity to the current scope.",
+        "notes": "No effect if not a government using nomad.",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_meritocracy": {
+        "id": "add_meritocracy",
+        "parameters": "<int>\nThe amount of meritocracy to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_meritocracy = 10",
+        "description": "Adds meritocracy to the current scope.",
+        "notes": "No effect if not a government using has_meritocracy.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_meritocracy": {
+        "id": "set_meritocracy",
+        "parameters": "<int>\nThe amount of meritocracy to set.",
+        "value_type": "Integer",
+        "example": "set_meritocracy = 10",
+        "description": "Sets the current meritocracy for the current scope.",
+        "notes": "No effect if not a government using has_meritocracy.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_militarised_society": {
+        "id": "add_militarised_society",
+        "parameters": "<int>\nThe amount of militarisation to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_militarised_society = 10",
+        "description": "Adds militarisation to the current scope.",
+        "notes": "No effect if not a government using militarised_society.",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "add_revolutionary_zeal": {
+        "id": "add_revolutionary_zeal",
+        "parameters": "<int>\nThe amount of revolutionary zeal to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_revolutionary_zeal = 10",
+        "description": "Adds revolutionary zeal to the current scope.",
+        "notes": "No effect if not a government using revolutionary zeal.",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "add_tribal_allegiance": {
+        "id": "add_tribal_allegiance",
+        "parameters": "<int>\nThe amount of tribal allegiance to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_tribal_allegiance = 10",
+        "description": "Adds tribal allegiance to the current scope.",
+        "notes": "No effect if not a government using tribal_federation_mechanic.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "adopt_reform_progress": {
+        "id": "adopt_reform_progress",
+        "parameters": "<country scope>\nAdopts the government reform progress from the target country scope.",
+        "value_type": "Integer",
+        "example": "adopt_reform_progress = FROM",
+        "description": "Adopts the government reform progress from the target country scope.",
+        "notes": "Used when the papal states is released.",
+        "version_added": "???",
+        "macro": []
+    },
+    "change_statists_vs_orangists": {
+        "id": "change_statists_vs_orangists",
+        "parameters": "<int>\nThe amount of swing towards statists or orangists.",
+        "value_type": "Integer",
+        "example": "change_statists_vs_orangists = 10",
+        "description": "Changes the Organist-Statist balance.",
+        "notes": "Positive moves towards Orangist, negative moves towards Statists.",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "change_government": {
+        "id": "change_government",
+        "parameters": "<government>\nThe government to change to.",
+        "value_type": "Integer",
+        "example": "change_government = dictatorship",
+        "description": "Changes the government of the current scope.",
+        "notes": "Governments are found in /Europa Universalis IV/common/governments/*.txt.",
+        "version_added": "1.1 (1.28.3 - will now always refund reform progress)",
+        "macro": []
+    },
+    "set_government_rank": {
+        "id": "set_government_rank",
+        "parameters": "<int>\nThe rank to change to.",
+        "value_type": "Integer",
+        "example": "set_government_rank = 3",
+        "description": "Changes the government rank of the current scope.",
+        "notes": "Default range is 1 to 3.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_government_power": {
+        "id": "add_government_power",
+        "parameters": "government_mechanic = <type>\nWhich government mechanic to add power to.\nwhich = <type>\nWhich pool type to add the power to. ADM, DIP or MIL\namount = <type>\nThe amount of power to add.",
+        "value_type": "Integer",
+        "example": "add_government_power = {\n    government_mechanic = iqta_mechanic\n    which = ADM\n    amount = 10\n}",
+        "description": "Changes the pool size of one of the power pools within a government mechanic.",
+        "notes": "List of government mechanics:\nrussian_mechanic\nfeudal_theocracy_mechanic\ntribal_federation_mechanic\nmamluk_mechanic\niqta_mechanic",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "set_government_and_rank": {
+        "id": "set_government_and_rank",
+        "parameters": "government = <government>\nThe government to change to.\nrank = <int>\nThe rank to change to.",
+        "value_type": "Integer",
+        "example": "set_government_and_rank = { \n    government = celestial_empire\n    rank = 3\n}",
+        "description": "Changes the current scope's government and rank at the same time.",
+        "notes": "Governments are found in /Europa Universalis IV/common/governments/*.txt.\nWill respect that governments have fixed ranks and the maximum ranks for subject types.",
+        "version_added": "1.22 (obsolete as of 1.26?)",
+        "macro": []
+    },
+    "set_legacy_government": {
+        "id": "set_legacy_government",
+        "parameters": "government = <government>\nThe pre-Dharma government type to change to.",
+        "value_type": "Integer",
+        "example": "set_legacy_government = despotic_monarchy",
+        "description": "Switches to the given government type.",
+        "notes": "No effect if Dharma is active. Use add_government_reform or change_government_via_reform instead. Combine this with effects that change government only if Dharma is active, e.g. change_government_via_reform.",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "dissolve_parliament": {
+        "id": "dissolve_parliament",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "dissolve_parliament = yes",
+        "description": "Disables the Parliament mechanic.",
+        "notes": "Only effects governments with has_parliament.",
+        "version_added": "1.15",
+        "macro": []
+    },
+    "reinstate_parliament": {
+        "id": "reinstate_parliament",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "reinstate_parliament = yes",
+        "description": "Re-enables the Parliament mechanic after dissolve_parliament.",
+        "notes": "Only effects governments with has_parliament.",
+        "version_added": "1.15",
+        "macro": []
+    },
+    "add_accepted_culture": {
+        "id": "add_accepted_culture",
+        "parameters": "<culture>\nThe culture to add.\n<scope>\nThe culture to add, derived from the scope.",
+        "value_type": "Integer",
+        "example": "add_accepted_culture = english\nadd_accepted_culture = ENG\nadd_accepted_culture = event_target:my_event_target\nadd_accepted_culture = variable:my_variable",
+        "description": "Adds a new accepted culture to the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt.\nCan utilise Event Scope Values.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_primary_culture": {
+        "id": "change_primary_culture",
+        "parameters": "<culture>\nThe culture to change to, from /Europa Universalis IV/common/cultures/. <scope>\nThe culture to change to, derived from the scope.",
+        "value_type": "Integer",
+        "example": "change_primary_culture = english\nchange_primary_culture = ENG\nchange_primary_culture = event_target:my_event_target\nchange_primary_culture = variable:my_variable",
+        "description": "Changes the primary culture of the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt.\nCan utilise Event Scope Values.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_accepted_culture": {
+        "id": "remove_accepted_culture",
+        "parameters": "<culture>\nThe culture to remove, from /Europa Universalis IV/common/cultures/. <scope>\nThe culture to remove, derived from the scope.",
+        "value_type": "Integer",
+        "example": "remove_accepted_culture = english\nremove_accepted_culture = ENG\nremove_accepted_culture = event_target:my_event_target\nremove_accepted_culture = variable:my_variable",
+        "description": "Removes an accepted culture from the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt.\nCan utilise Event Scope Values.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_religion": {
+        "id": "change_religion",
+        "parameters": "<religion>\nThe religion to change to.\n<scope>\nThe religion to change to, derived from the scope.",
+        "value_type": "Integer",
+        "example": "change_religion = catholic\nchange_religion = CAS\nchange_religion = event_target:my_event_target\nchange_religion = variable:my_variable",
+        "description": "Changes the religion of the current province scope.",
+        "notes": "Religions are found in /Europa Universalis IV/common/religions/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "enable_religion": {
+        "id": "enable_religion",
+        "parameters": "<religion>\nThe religion to change to.",
+        "value_type": "Integer",
+        "example": "enable_religion = reformed",
+        "description": "Enables an religion that has been restricted with the date parameter.",
+        "notes": "Religions are found in /Europa Universalis IV/common/religions/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "force_converted": {
+        "id": "force_converted",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "force_converted = yes",
+        "description": "Sets whether the current scope has been force converted.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_authority": {
+        "id": "add_authority",
+        "parameters": "<int>\nThe amount of authority to add.",
+        "value_type": "Integer",
+        "example": "add_authority = 10",
+        "description": "Adds authority to the current scope. Used in Religious Reforms that use authority.",
+        "notes": "No effect if the country does not hold a religion using authority.",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "add_doom": {
+        "id": "add_doom",
+        "parameters": "<int>\nThe amount of doom to add.",
+        "value_type": "Integer",
+        "example": "add_doom = 10",
+        "description": "Adds doom to the current scope. Used in Religious Reforms that use doom.",
+        "notes": "No effect if the country does not hold a religion using doom.",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "remove_religious_reforms": {
+        "id": "remove_religious_reforms",
+        "parameters": "<int>\nThe amount of religious reforms to remove.",
+        "value_type": "Integer",
+        "example": "remove_religious_reforms = 2",
+        "description": "Removes taken religious reforms from the current scope.",
+        "notes": "No effect if the country does not hold a religion using religious_reforms.",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "add_fervor": {
+        "id": "add_fervor",
+        "parameters": "<int>\nThe amount of fervor to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_fervor = 10",
+        "description": "Adds Fervor to the current scope.",
+        "notes": "No effect if the country does not hold a religion using fervor.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_karma": {
+        "id": "add_karma",
+        "parameters": "<int>\nThe amount of karma to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_karma = 10",
+        "description": "Adds Karma to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_karma.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "set_karma": {
+        "id": "set_karma",
+        "parameters": "<int>\nThe amount of karma to set.",
+        "value_type": "Integer",
+        "example": "set_karma = 10",
+        "description": "Sets the Karma value for the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_karma.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_church_power": {
+        "id": "add_church_power",
+        "parameters": "<int>\nThe amount of church power to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_church_power = 10",
+        "description": "Adds Church Power to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_church_power.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_church_aspect": {
+        "id": "add_church_aspect",
+        "parameters": "<aspect>\nThe church aspect to add.",
+        "value_type": "Integer",
+        "example": "add_church_aspect = adult_baptism_aspect",
+        "description": "Adds the defined aspect to the current scope.",
+        "notes": "Church Aspects are found in /Europa Universalis IV/common/church_aspects/00_church_aspects.txt.\nNo effect if the country does not hold a religion using uses_church_power and the aspect set in aspects.\nDoes not work with Blessings.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "remove_church_aspect": {
+        "id": "remove_church_aspect",
+        "parameters": "<aspect>\nThe church aspect to remove. You can also use random here to pick a random aspect.",
+        "value_type": "Integer",
+        "example": "remove_church_aspect = adult_baptism_aspect",
+        "description": "Removes the defined aspect from the current scope.",
+        "notes": "Church Aspects are found in /Europa Universalis IV/common/church_aspects/00_church_aspects.txt.\nNo effect if the country does not have the aspect.\nDoes not work with Blessings.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_papal_influence": {
+        "id": "add_papal_influence",
+        "parameters": "<int>\nThe amount of papal influence to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_papal_influence = 10",
+        "description": "Adds Papal Influence to the current scope.",
+        "notes": "No effect if the country does not hold a religion using papacy.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_reform_desire": {
+        "id": "add_reform_desire",
+        "parameters": "<float>\nThe amount reform desire to add or subtract.",
+        "value_type": "Float",
+        "example": "add_reform_desire = 0.5",
+        "description": "Adds Reform Desire.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "excommunicate": {
+        "id": "excommunicate",
+        "parameters": "<scope>\nThe scope to excommunicate.",
+        "value_type": "Integer",
+        "example": "excommunicate = FRA",
+        "description": "Excommunicates the defined scope. If already excommunicated, removes excommunication.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "set_papacy_active": {
+        "id": "set_papacy_active",
+        "parameters": "yesno\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_papacy_active = yes",
+        "description": "Enables or disables the Papacy mechanic.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_piety": {
+        "id": "add_piety",
+        "parameters": "<float>\nThe amount of piety to add or subtract.",
+        "value_type": "Float",
+        "example": "add_piety = 0.5",
+        "description": "Adds Piety to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_piety.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_curia_treasury": {
+        "id": "add_curia_treasury",
+        "parameters": "<float>\nThe amount of money to add or subtract to the curia treasury.",
+        "value_type": "Integer",
+        "example": "add_curia_treasury = 100",
+        "description": "Adds money to the curia treasury",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "set_school_opinion": {
+        "id": "set_school_opinion",
+        "parameters": "who = <who>\nWhich country to alter opinion with.\nopinion = <opinion>\nWhich opinion state to change to.",
+        "value_type": "Integer",
+        "example": "set_school_opinion = {\n    who = TUR\n    opinion = -1\n}",
+        "description": "Changes the current scope's school opinion towards the defined scope's school.",
+        "notes": "-1 for negative, 0 for netural and 1 for positive.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "add_patriarch_authority": {
+        "id": "add_patriarch_authority",
+        "parameters": "<float>\nThe amount of patriarch authority to add or subtract.",
+        "value_type": "Float",
+        "example": "add_patriarch_authority = 0.5",
+        "description": "Adds Patriarch Authority to the current scope.",
+        "notes": "No effect if the country does not hold a religion using has_patriarchs.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_personal_deity": {
+        "id": "change_personal_deity",
+        "parameters": "<deity>\nThe personal deity to add.",
+        "value_type": "Integer",
+        "example": "change_personal_deity = odin",
+        "description": "Changes the current personal deity for the current scope.",
+        "notes": "Personal Deities are found in /Europa Universalis IV/common/personal_deities/*.txt.\nNo effect if the country does not hold a religion using personal_deity.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_harmony": {
+        "id": "add_harmony",
+        "parameters": "<int>\nThe amount of harmony to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_harmony = 10",
+        "description": "Adds Harmony to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_harmony.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_harmonized_religion": {
+        "id": "add_harmonized_religion",
+        "parameters": "<religion>\nThe religion to harmonize.",
+        "value_type": "Integer",
+        "example": "add_harmonized_religion = catholic",
+        "description": "Adds a religion to the list of Harmonized religions for the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_harmony.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_harmonization_progress": {
+        "id": "add_harmonization_progress",
+        "parameters": "<int>\nThe amount of progress to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_harmonization_progress = 10",
+        "description": "Adds Harmonization Progress for the current harmonization target to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_harmony.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "unlock_cult": {
+        "id": "unlock_cult",
+        "parameters": "<cult>\nThe cult to unlock.",
+        "value_type": "Integer",
+        "example": "unlock_cult = yemoja_cult",
+        "description": "Adds the defined cult to the current scope.",
+        "notes": "Cults can be found in /Europa Universalis IV/common/fetishist_cults/*.txt.\nNo effect if the country does not hold a religion using fetishist_cult.",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "add_isolationism": {
+        "id": "add_isolationism",
+        "parameters": "<int>\nThe amount of isolationism to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_isolationism = 1",
+        "description": "Adds Isolationism to the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_isolationism.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_isolationism": {
+        "id": "set_isolationism",
+        "parameters": "<int>\nThe amount of isolationism to set.",
+        "value_type": "Integer",
+        "example": "set_isolationism = 2",
+        "description": "Sets Isolationism for the current scope.",
+        "notes": "No effect if the country does not hold a religion using uses_isolationism.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_incident_variable_value": {
+        "id": "add_incident_variable_value",
+        "parameters": "incident = <incident>\nThe incident to change.\nvalue = <int>\nThe amount to add to the incident variable.",
+        "value_type": "Integer",
+        "example": "add_incident_variable_value = {\n    incident = incident_urbanization\n    value = -1\n}",
+        "description": "Changes the value of an Incident for the current scope.",
+        "notes": "Incidents are found in /Europa Universalis IV/common/isolationism/*.txt\nNo effect if the country does not hold a religion using uses_isolationism.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_incident_variable_value": {
+        "id": "set_incident_variable_value",
+        "parameters": "incident = <incident>\nThe incident to change.\nvalue = <int>\nThe amount to set the incident variable to.",
+        "value_type": "Integer",
+        "example": "set_incident_variable_value = {\n    incident = incident_urbanization\n    value = 1\n}",
+        "description": "Sets the value of an Incident for the current scope.",
+        "notes": "Incidents are found in /Europa Universalis IV/common/isolationism/*.txt\nNo effect if the country does not hold a religion using uses_isolationism.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_idea": {
+        "id": "add_idea",
+        "parameters": "<idea>\nThe idea to add.",
+        "value_type": "Integer",
+        "example": "add_idea = military_traditions",
+        "description": "Adds an idea for the current scope.",
+        "notes": "Ideas are found in /Europa Universalis IV/common/ideas/*.txt.\nWon't work if the idea isn't present in a National Idea set or a taken Ideagroups set for the country.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_idea_group": {
+        "id": "add_idea_group",
+        "parameters": "<ideagroup>\nThe ideagroup to add.",
+        "value_type": "Integer",
+        "example": "add_idea_group = aristocracy_ideas",
+        "description": "Adds an ideagroup for the current scope.",
+        "notes": "Ideagroups are found in /Europa Universalis IV/common/ideas/*.txt.\nWon't work if the country doesn't have any free ideagroup slots.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_active_policy": {
+        "id": "add_active_policy",
+        "parameters": "<policy>\nThe policy to add.",
+        "value_type": "Integer",
+        "example": "add_active_policy = the_statute_of_monopolies",
+        "description": "Adds a policy for the current scope.",
+        "notes": "Policies are found in /Europa Universalis IV/common/policies/*.txt.\nWon't work if the policy triggers are not met by the country, or there are no free policy slots.",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "change_technology_group": {
+        "id": "change_technology_group",
+        "parameters": "<technology group>\nThe technology group to change to.",
+        "value_type": "Integer",
+        "example": "change_technology_group = western",
+        "description": "Changes the technology group of the current scope.",
+        "notes": "Technology Groups are found in /Europa Universalis IV/common/technology.txt.\nDoesn't change units, use change_unit_type.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_idea": {
+        "id": "remove_idea",
+        "parameters": "<idea>\nThe idea to remove.",
+        "value_type": "Integer",
+        "example": "remove_idea = military_traditions",
+        "description": "Removes an idea for the current scope.",
+        "notes": "Ideas are found in /Europa Universalis IV/common/ideas/*.txt.\nWon't work if the idea isn't held.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "remove_idea_group": {
+        "id": "remove_idea_group",
+        "parameters": "<ideagroup>\nThe ideagroup to remove.",
+        "value_type": "Integer",
+        "example": "remove_idea_group = military_traditions",
+        "description": "Removes an ideagroup for the current scope.",
+        "notes": "Ideagroups are found in /Europa Universalis IV/common/ideas/*.txt.\nWon't work if the ideagroup isn't held.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "set_primitive": {
+        "id": "set_primitive",
+        "parameters": "<yes><no>\nBoolean.",
+        "value_type": "Integer",
+        "example": "set_primitive = no",
+        "description": "Toggles Primitive status for the current scope.",
+        "notes": "Primitive status controls whether a country has ships and if they can see Primitive-only mechanics, such as Religious Reforms.",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "swap_free_idea_group": {
+        "id": "swap_free_idea_group",
+        "parameters": "<yes>\nBoolean.",
+        "value_type": "Boolean",
+        "example": "swap_free_idea_group = yes",
+        "description": "Re-evaluates the current scope's national idea set assignment, if they match a different set, they will switch to it.",
+        "notes": "Used after tag changes to change Nationa Idea sets.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_next_institution_embracement": {
+        "id": "add_next_institution_embracement",
+        "parameters": "<int>\nThe amount of embracement to add.",
+        "value_type": "Integer",
+        "example": "add_next_institution_embracement = 10",
+        "description": "Adds embracement for the current progressing institution within the current scope.",
+        "notes": "Institutions are found in /Europa Universalis IV/common/institutions/*.txt.",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "add_adm_tech": {
+        "id": "add_adm_tech",
+        "parameters": "<int>\nThe amount of technologies to add.",
+        "value_type": "Integer",
+        "example": "add_adm_tech = 1",
+        "description": "Adds ADM technologies to the current scope.",
+        "notes": "You cannot remove technologies.",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "add_dip_tech": {
+        "id": "add_dip_tech",
+        "parameters": "<int>\nThe amount of technologies to add.",
+        "value_type": "Integer",
+        "example": "add_dip_tech = 1",
+        "description": "Adds DIP technologies to the current scope.",
+        "notes": "You cannot remove technologies.",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "add_mil_tech": {
+        "id": "add_mil_tech",
+        "parameters": "<int>\nThe amount of technologies to add.",
+        "value_type": "Integer",
+        "example": "add_mil_tech = 1",
+        "description": "Adds MIL technologies to the current scope.",
+        "notes": "You cannot remove technologies.",
+        "version_added": "1.21",
+        "macro": []
+    },
+    "add_prestige": {
+        "id": "add_prestige",
+        "parameters": "<float>\nThe amount to add or subtract. <scope>\nThe value to take from scope, to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_prestige = 50",
+        "description": "Adds prestige to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_capital": {
+        "id": "set_capital",
+        "parameters": "<province_id>\nProvince ID of the new capital.",
+        "value_type": "Integer",
+        "example": "set_capital = 118",
+        "description": "Changes the capital of the scoped country to the selected province ID.",
+        "notes": "Can also use the scripted effect move_capital_effect = yes in a province scope nested in a country scope to accomplish the same thing as well as remove province form HRE.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_corruption": {
+        "id": "add_corruption",
+        "parameters": "<float>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_corruption = 2",
+        "description": "Adds corruption to the current scope.",
+        "notes": "",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "add_splendor": {
+        "id": "add_splendor",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_splendor = 2",
+        "description": "Adds splendor to the current scope.",
+        "notes": "Splendor is used to purchase Age abilities.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "create_advisor": {
+        "id": "create_advisor",
+        "parameters": "<advisor>\nThe advisor to add.",
+        "value_type": "Integer",
+        "example": "create_advisor = treasurer",
+        "description": "Adds the defined advisor for the owner of the current province scope.",
+        "notes": "Advisors are found in /Europa Universalis IV/common/advisors/*.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "kill_advisor": {
+        "id": "kill_advisor",
+        "parameters": "<random>\nKill a random advisor.\n<advisor>\nKill a specific advisor type.\n<advisor id>\nKill a specific advisor id.",
+        "value_type": "Integer",
+        "example": "kill_advisor = philosopher\nkill_advisor = random\nkill_advisor = 30",
+        "description": "Kills a hired advisor for the current scope.",
+        "notes": "Advisor types are found in /Europa Universalis IV/common/advisortypes/*.txt\nDisplays the advisor death message box when used.\nOnly works for advisors that have been hired.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_advisor": {
+        "id": "remove_advisor",
+        "parameters": "<random>\nRemove a random advisor. <advisor>\nRemove a specific advisor type\n<advisor id>\nRemove a specific advisor id.",
+        "value_type": "Integer",
+        "example": "remove_advisor = philosopher\nremove_advisor = random\nremove_advisor = 30",
+        "description": "Removes a hired advisor for the current scope.",
+        "notes": "Advisor types are found in /Europa Universalis IV/common/advisortypes/*.txt\nDoes not display the advisor death message box when used.\nOnly works for advisors that have been hired.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_advisor_by_category": {
+        "id": "remove_advisor_by_category",
+        "parameters": "<type>\nRemoves an advisor by monarch power type: ADM, DIP or MIL.",
+        "value_type": "Integer",
+        "example": "remove_advisor_by_category = ADM",
+        "description": "Removes a hired advisor of a monarch power type for the current scope.",
+        "notes": "Only works for advisors that have been hired.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "define_advisor": {
+        "id": "define_advisor",
+        "parameters": "type = <type>\nThe advisor type to create.\nskill = <int>\nThe amount of skill the advisor has. Limited to 3 maximum.\nname = <string>\nOptional. The name to use.\nlocation = <province id>\nOptional. The province that the advisor comes from.\ndiscount = yes\nOptional. If the SCRIPTED_ADVISOR_DISCOUNT cost reduction applies to this advisor.\ncost_multiplier = <int>\nOptional. Modifiers the cost of the advisor.\nfemale = yes\nOptional. Makes this advisor female.\nculture = <culture> / <scope>\nOptional. The culture of this advisor.\nreligion = <religion> / <scope>\nOptional. The religion of this advisor.",
+        "value_type": "Integer",
+        "example": "define_advisor = {\n    type = treasurer\n    name = \"John Smith\"\n    skill = 3\n    culture = english\n    religion = catholic\n}\ndefine_advisor = {\n    type = treasurer\n    name = rising_star_advisor\n    skill = 2\n    culture = event_target:wrong_religion_province\n    religion = event_target:wrong_religion_province\n}\ndefine_advisor = {\n    type = recruitmaster\n    skill = 3\n    discount = yes\n    culture = variable:new_ruler_culture\n}",
+        "description": "Adds the defined advisor to the current scope.",
+        "notes": "Advisor types are found in /Europa Universalis IV/common/advisortypes/*.txt\nCan utilise Event Scope Values for the culture and religion parameters.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_stability": {
+        "id": "add_stability",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_stability = 1",
+        "description": "Adds stability to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_war_exhaustion": {
+        "id": "add_war_exhaustion",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_war_exhaustion = 2",
+        "description": "Adds war exhaustion to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_liberty_desire": {
+        "id": "add_liberty_desire",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_liberty_desire = 10",
+        "description": "Adds liberty desire to the current scope.",
+        "notes": "Used on the subject to raise liberty desire for the overlord.",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "disband_rebels": {
+        "id": "disband_rebels",
+        "parameters": "<type>\nThe rebel type to disband.",
+        "value_type": "Integer",
+        "example": "disband_rebels = anti_tax_rebels",
+        "description": "Disbands all active rebels of the specified type in the provinces of the current scope.",
+        "notes": "Rebel types are found in /Europa Universalis IV/common/rebel_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "collapse_nation": {
+        "id": "collapse_nation",
+        "parameters": "yes\nBoolean",
+        "value_type": "Boolean",
+        "example": "collapse_nation = yes",
+        "description": "Gives a percentage of the current scope's owned provinces to random native countries.",
+        "notes": "",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "add_disaster_modifier": {
+        "id": "add_disaster_modifier",
+        "parameters": "name = <modifier>\nThe event modifier to add.\ndisaster = <disaster>\nThe disaster to apply the modifier to.\nduration = <days>\nThe duration for the modifier to be active for.",
+        "value_type": "Integer",
+        "example": "add_disaster_modifier = {\n    name = \"restrict_serfdom\"\n    duration = -1\n    disaster = internal_conflicts\n}",
+        "description": "Applies an event modifier to the current scope that is removed when the disaster is over, or the duration runs out.",
+        "notes": "Disasters are found in /Europa Universalis IV/common/disasters/*.txt",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "add_disaster_progress": {
+        "id": "add_disaster_progress",
+        "parameters": "disaster = <disaster>\nThe disaster to alter.\nvalue = <int>\nThe amount of progress to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_disaster_progress = {\n    disaster = internal_conflicts\n    value = 10\n}",
+        "description": "Adds progress towards an already declared (conditions for disaster are met since at least a month) disaster",
+        "notes": "Disasters are found in /Europa Universalis IV/common/disasters/*.txt",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "end_disaster": {
+        "id": "end_disaster",
+        "parameters": "<disaster>\nThe disaster to end.",
+        "value_type": "Integer",
+        "example": "end_disaster = internal_conflicts",
+        "description": "Immediately ends an active disaster for the current scope.",
+        "notes": "Disasters are found in /Europa Universalis IV/common/disasters/*.txt",
+        "version_added": "1.9",
+        "macro": []
+    },
+    "add_army_tradition": {
+        "id": "add_army_tradition",
+        "parameters": "<int>\nThe amount of army tradition to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_army_tradition = 10",
+        "description": "Adds Army Tradition to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_navy_tradition": {
+        "id": "add_navy_tradition",
+        "parameters": "<int>\nThe amount of navy tradition to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_navy_tradition = 10",
+        "description": "Adds Navy Tradition to the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_army_professionalism": {
+        "id": "add_army_professionalism",
+        "parameters": "<float>\nThe amount of army professionalism to add or subtract.",
+        "value_type": "Float",
+        "example": "add_army_professionalism = 0.05",
+        "description": "Adds Army Professionalism to the current scope.",
+        "notes": "",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "add_manpower": {
+        "id": "add_manpower",
+        "parameters": "<float>\nThe amount of manpower to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_manpower = 1",
+        "description": "Adds manpower to the current scope.",
+        "notes": "1 is equal to 1000 manpower.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_sailors": {
+        "id": "add_sailors",
+        "parameters": "<int>\nThe amount of sailors to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_sailors = 10",
+        "description": "Adds sailors to the current scope.",
+        "notes": "1 is equal to 1 sailor.",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "add_yearly_manpower": {
+        "id": "add_yearly_manpower",
+        "parameters": "<float>\nThe amount of manpower to add or subtract.",
+        "value_type": "Float",
+        "example": "add_yearly_manpower = 0.5",
+        "description": "Adds manpower to the current scope, as a percentage of total yearly manpower.",
+        "notes": "1 is equal to 100% of total yearly manpower.",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "add_yearly_sailors": {
+        "id": "add_yearly_sailors",
+        "parameters": "<float>\nThe amount of sailors to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_yearly_sailors = 10",
+        "description": "Adds sailors to the current scope, as a percentage of total yearly sailors.",
+        "notes": "1 is equal to 100% of total yearly sailors.",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "create_admiral": {
+        "id": "create_admiral",
+        "parameters": "tradition = <int>\nThe amount of navy tradition to use in generation.\nadd_fire = <int>\n(optional) Additional fire pips.\nadd_shock = <int>\n(optional) Additional shock pips.\nadd_manuever = <int>\n(optional) Additional manuever pips.\nadd_siege = <int>\n(optional) Additional siege pips.\nculture = <identifier>\n(optional) Give the general a random name from the specified culture.",
+        "value_type": "Integer",
+        "example": "create_admiral = { tradition = 50 }",
+        "description": "Generates an new admiral for the current scope.",
+        "notes": "changed with 1.1",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_explorer": {
+        "id": "create_explorer",
+        "parameters": "<int>\nThe amount of navy tradition to use in generation.",
+        "value_type": "Integer",
+        "example": "create_explorer = { tradition = 50 }",
+        "description": "Generates an new explorer for the current scope.",
+        "notes": "",
+        "version_added": "1.3",
+        "macro": []
+    },
+    "create_conquistador": {
+        "id": "create_conquistador",
+        "parameters": "<int>\nThe amount of army tradition to use in generation.",
+        "value_type": "Integer",
+        "example": "create_conquistador = { tradition = 50 }",
+        "description": "Generates an new conquistador for the current scope.",
+        "notes": "",
+        "version_added": "1.3",
+        "macro": []
+    },
+    "create_general": {
+        "id": "create_general",
+        "parameters": "tradition = <int>\nThe amount of army tradition to use in generation.\nadd_fire = <int>\n(optional) Additional fire pips.\nadd_shock = <int>\n(optional) Additional shock pips.\nadd_manuever = <int>\n(optional) Additional manuever pips.\nadd_siege = <int>\n(optional) Additional siege pips.\nculture = <identifier>\n(optional) Give the general a random name from the specified culture.",
+        "value_type": "Integer",
+        "example": "create_general = { tradition = 50 }",
+        "description": "Generates an new general for the current scope.",
+        "notes": "changed with 1.26",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_unit_type": {
+        "id": "change_unit_type",
+        "parameters": "<type>\nThe unit type to change to.",
+        "value_type": "Integer",
+        "example": "change_unit_type = western",
+        "description": "Change the unit type for the current scope.",
+        "notes": "The unit types correspond to the technology groups found in /Europa Universalis IV/common/technology.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "kill_leader": {
+        "id": "kill_leader",
+        "parameters": "<type>\nThe leader type to kill. name is the specific leader name to target.",
+        "value_type": "Integer",
+        "example": "kill_leader = general\nkill_leader = random\nkill_leader = \"John Smith",
+        "description": "Kills a leader in the current province scope if they match the type used.",
+        "notes": "Only works if the leader is assigned to a unit that is stationed in the current province.\nPossible types:\ngeneral\nadmiral\nconquistador\nexplorer\nrandom\n<leader name>",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "define_admiral": {
+        "id": "define_admiral",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.\nname = <string>\nOptional. The name of the leader.\nfemale = yes\nOptional. Makes the leader female.\ntrait = <trait>\nOptional. A trait automatically assigned to the leader.",
+        "value_type": "Integer",
+        "example": "define_admiral = {\n    shock = 2\n    fire = 2\n    manuever = 2\n    siege = 2\n}",
+        "description": "Creates an admiral with the defined attributes for the current scope.",
+        "notes": "Leader traits can be found in /Europa Universalis IV/common/leader_personalities/*.txt.\nSiege improves Blockade Efficiency for admirals.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "define_explorer": {
+        "id": "define_explorer",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.\nname = <string>\nOptional. The name of the leader.\nfemale = yes\nOptional. Makes the leader female.\ntrait = <trait>\nOptional. A trait automatically assigned to the leader.",
+        "value_type": "Integer",
+        "example": "define_explorer = {\n    shock = 2\n    fire = 2\n    manuever = 2\n    siege = 2\n}",
+        "description": "Creates an explorer with the defined attributes for the current scope.",
+        "notes": "Leader traits can be found in /Europa Universalis IV/common/leader_personalities/*.txt.\nSiege improves Blockade Efficiency for explorers.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "define_conquistador": {
+        "id": "define_conquistador",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.\nname = <string>\nOptional. The name of the leader.\nfemale = yes\nOptional. Makes the leader female.\ntrait = <trait>\nOptional. A trait automatically assigned to the leader.",
+        "value_type": "Integer",
+        "example": "define_conquistador = {\n    shock = 2\n    fire = 2\n    manuever = 2\n    siege = 2\n}",
+        "description": "Creates a conquistador with the defined attributes for the current scope.",
+        "notes": "Leader traits can be found in /Europa Universalis IV/common/leader_personalities/*.txt.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "define_general": {
+        "id": "define_general",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.\nname = <string>\nOptional. The name of the leader.\nfemale = yes\nOptional. Makes the leader female.\ntrait = <trait>\nOptional. A trait automatically assigned to the leader.",
+        "value_type": "Integer",
+        "example": "define_general = {\n    shock = 2\n    fire = 2\n    manuever = 2\n    siege = 2\n}",
+        "description": "Creates a general with the defined attributes for the current scope.",
+        "notes": "Leader traits can be found in /Europa Universalis IV/common/leader_personalities/*.txt.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "artillery": {
+        "id": "artillery",
+        "parameters": "<scope>\nThe country scope the artillery belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    artillery = FRA\n}",
+        "description": "Spawns an artillery unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected artillery unit.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "cavalry": {
+        "id": "cavalry",
+        "parameters": "<scope>\nThe country scope the cavalry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    cavalry = FRA\n}",
+        "description": "Spawns an cavalry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected cavalry unit.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "infantry": {
+        "id": "infantry",
+        "parameters": "<scope>\nThe country scope the infantry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    infantry = FRA\n}",
+        "description": "Spawns an infantry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected infantry unit.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "mercenary_infantry": {
+        "id": "mercenary_infantry",
+        "parameters": "<scope>\nThe country scope the mercenary infantry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    mercenary_infantry = FRA\n}",
+        "description": "Spawns an mercenary infantry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected infantry unit.",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "mercenary_cavalry": {
+        "id": "mercenary_cavalry",
+        "parameters": "<scope>\nThe country scope the mercenary cavalry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    mercenary_cavalry = FRA\n}",
+        "description": "Spawns an mercenary cavalry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected cavalry unit.",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "heavy_ship": {
+        "id": "heavy_ship",
+        "parameters": "<scope>\nThe country scope the ship belongs to",
+        "value_type": "Integer",
+        "example": "random_owned_province = {\n    limit = { has_port = yes }\n    heavy_ship = FRA\n}",
+        "description": "Spawns a heavy ship unit in the current province scope for the defined country scope.",
+        "notes": "Uses the defined scope's current heavy ship unit.\nRequires the current province scope to have a port.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_flagship": {
+        "id": "create_flagship",
+        "parameters": "<scope>\nThe province scope in which the flagship spawns. name = \"Vittoria\" type = galley",
+        "value_type": "Integer",
+        "example": "random_owned_province = {\n    limit = { has_port = yes }\n    ROOT = {\n            create_flagship = {    \n                name = \"Vittoria\"\n                type = galley\n            }\n    }\n}",
+        "description": "Spawns a flagship unit for the current scope in the defined province scope.",
+        "notes": "Types light_ship, galley, heavy_ship and transport.\nRequires the province scope to have a port.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "light_ship": {
+        "id": "light_ship",
+        "parameters": "<scope>\nThe country scope the ship belongs to",
+        "value_type": "Integer",
+        "example": "random_owned_province = {\n    limit = { has_port = yes }\n    light_ship = FRA\n}",
+        "description": "Spawns an light ship unit in the current province scope for the defined country scope.",
+        "notes": "Uses the defined scope's current light ship unit.\nRequires the current province scope to have a port.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "galley": {
+        "id": "galley",
+        "parameters": "<scope>\nThe country scope the ship belongs to",
+        "value_type": "Integer",
+        "example": "random_owned_province = {\n    limit = { has_port = yes }\n    galley = FRA\n}",
+        "description": "Spawns an galley ship unit in the current province scope for the defined country scope.",
+        "notes": "Uses the defined scope's current galley ship unit.\nRequires the current province scope to have a port.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "transport": {
+        "id": "transport",
+        "parameters": "<scope>\nThe country scope the ship belongs to",
+        "value_type": "Integer",
+        "example": "random_owned_province = {\n    limit = { has_port = yes }\n    transport = FRA\n}",
+        "description": "Spawns an transport ship unit in the current province scope for the defined country scope.",
+        "notes": "Uses the defined scope's current transport ship unit.\nRequires the current province scope to have a port.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "<unit_name>": {
+        "id": "<unit_name>",
+        "parameters": "<scope>\nThe country scope the unit belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    british_redcoat = FRA\n}",
+        "description": "Spawns a specific unit in the current province scope for the defined country scope.",
+        "notes": "Units can be found in /Europa Universalis IV/common/units/*.txt.",
+        "version_added": "1.1",
+        "macro": [
+            "unit_name"
+        ]
+    },
+    "add_historical_friend": {
+        "id": "add_historical_friend",
+        "parameters": "<scope>\nThe country to add the friendship to.",
+        "value_type": "Integer",
+        "example": "add_historical_friend = FRA",
+        "description": "Makes the defined scope a historical friend of the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_historical_rival": {
+        "id": "add_historical_rival",
+        "parameters": "<scope>\nThe country to add the rivalry to.",
+        "value_type": "Integer",
+        "example": "add_historical_rival = FRA",
+        "description": "Makes the defined scope a historical rival of the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "remove_historical_friend": {
+        "id": "remove_historical_friend",
+        "parameters": "<scope>\nThe country to remove the friendship from.",
+        "value_type": "Integer",
+        "example": "remove_historical_friend = FRA",
+        "description": "Removes the historical friendship between the defined scope and the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "remove_historical_rival": {
+        "id": "remove_historical_rival",
+        "parameters": "<scope>\nThe country to remove the rivalry from.",
+        "value_type": "Integer",
+        "example": "remove_historical_rival = FRA",
+        "description": "Removes the historical rivalry between the defined scope and the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_trust": {
+        "id": "add_trust",
+        "parameters": "who = <scope>\nThe country trust will be added with.\nvalue = <int>\nThe amount of trust to add or subtract.\nmutual = yes\nOptional. Whether to apply the trust change to both countries.",
+        "value_type": "Boolean",
+        "example": "add_trust = {\n    who = FRA\n    value = 25\n    mutual = yes\n}",
+        "description": "Adds trust with the defined scope for the current scope.",
+        "notes": "Used in conjunction with the Diplomatic Feedback mechanic from The Cossacks DLC.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_opinion": {
+        "id": "add_opinion",
+        "parameters": "who = <scope>\nThe country the opinion modifier is for.\nmodifier = <modifier>\nThe opinion modifier to use.\nyears = <int>\nOptional. Whether the modifier expires after a set amount of years.",
+        "value_type": "Integer",
+        "example": "add_opinion = {\n    who = FRA\n    modifier = renounced_as_heretics\n}",
+        "description": "Adds an opinion modifier for the current scope held against the defined scope.",
+        "notes": "Opinion modifiers are found in /Europa Universalis IV/common/opinion_modifiers/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reverse_add_opinion": {
+        "id": "reverse_add_opinion",
+        "parameters": "who = <scope>\nThe country the opinion modifier is added to.\nmodifier = <modifier>\nThe opinion modifier to use.\nyears = <int>\nOptional. Whether the modifier expires after a set amount of years.",
+        "value_type": "Integer",
+        "example": "reverse_add_opinion = {\n    who = FRA\n    modifier = renounced_as_heretics\n}",
+        "description": "Adds an opinion modifier for the defined scope held against the current scope.",
+        "notes": "Opinion modifiers are found in /Europa Universalis IV/common/opinion_modifiers/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_opinion": {
+        "id": "remove_opinion",
+        "parameters": "who = <scope>\nThe country the opinion modifier is held against.\nmodifier = <modifier>\nThe opinion modifier to use.",
+        "value_type": "Integer",
+        "example": "remove_opinion = {\n    who = FRA\n    modifier = renounced_as_heretics\n}",
+        "description": "Removes an opinion modifier for the current scope held against the defined scope.",
+        "notes": "Opinion modifiers are found in /Europa Universalis IV/common/opinion_modifiers/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reverse_remove_opinion": {
+        "id": "reverse_remove_opinion",
+        "parameters": "who = <scope>\nThe country the opinion modifier holds.\nmodifier = <modifier>\nThe opinion modifier to use.",
+        "value_type": "Integer",
+        "example": "reverse_remove_opinion = {\n    who = FRA\n    modifier = renounced_as_heretics\n}",
+        "description": "Removes an opinion modifier for the defined scope held against the current scope.",
+        "notes": "Opinion modifiers are found in /Europa Universalis IV/common/opinion_modifiers/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_alliance": {
+        "id": "create_alliance",
+        "parameters": "<scope>\nThe country to create an alliance with.",
+        "value_type": "Integer",
+        "example": "create_alliance = FRA",
+        "description": "Creates an alliance between the current scope and the defined scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_guarantee": {
+        "id": "create_guarantee",
+        "parameters": "<scope>\nThe country to create an guarantee with.",
+        "value_type": "Integer",
+        "example": "create_guarantee = FRA",
+        "description": "Creates an guarantee over the defined scope for the current scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "create_marriage": {
+        "id": "create_marriage",
+        "parameters": "<scope>\nThe country to create an royal marriage with.",
+        "value_type": "Integer",
+        "example": "create_marriage = FRA",
+        "description": "Creates a royal marriage between the current scope and the defined scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_union": {
+        "id": "create_union",
+        "parameters": "<scope>\nThe country to make into the junior partner.",
+        "value_type": "Integer",
+        "example": "create_union = FRA",
+        "description": "Makes the defined scope a junior partner in a personal union with the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_vassal": {
+        "id": "create_vassal",
+        "parameters": "<scope>\nThe country to create as a vassal.",
+        "value_type": "Integer",
+        "example": "create_vassal = TOU",
+        "description": "Creates the defined vassal out of the scopes territory if possible.",
+        "notes": "Uses the vassal subject type.\nTarget country must not exist. Will be created by this command out of the scopes territory.",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "create_march": {
+        "id": "create_march",
+        "parameters": "<scope>\nThe country to make into a march.",
+        "value_type": "Integer",
+        "example": "create_march = FRA",
+        "description": "Makes the defined scope a march subject of the current scope.",
+        "notes": "Uses the march subject type.\nTarget country must already exist.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "vassalize": {
+        "id": "vassalize",
+        "parameters": "<scope>\nThe country to vassalize.",
+        "value_type": "Integer",
+        "example": "vassalize = FRA",
+        "description": "Makes the defined scope a vassal subject of the current scope.",
+        "notes": "Uses the vassal subject type.\nTarget country must already exist.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_subject": {
+        "id": "create_subject",
+        "parameters": "subject_type = <type>\nThe subject type to use.\nsubject = <scope>\nThe scope to make the subject.",
+        "value_type": "Integer",
+        "example": "create_subject = {\n    subject_type = tributary_state\n    subject = FRA\n}",
+        "description": "Makes the defined scope into the defined subject type under the current scope.",
+        "notes": "Subject types are found in /Europa Universalis IV/common/subject_types/*.txt.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "break_marriage": {
+        "id": "break_marriage",
+        "parameters": "<scope>\nThe country to break the marriage with.",
+        "value_type": "Integer",
+        "example": "break_marriage = FRA",
+        "description": "Breaks the current scope's royal marriage with the defined scope.",
+        "notes": "",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "break_union": {
+        "id": "break_union",
+        "parameters": "<scope>\nThe country to break the union with.",
+        "value_type": "Integer",
+        "example": "break_union = FRA",
+        "description": "Breaks the current scope's union with the defined scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "inherit": {
+        "id": "inherit",
+        "parameters": "<scope>\nThe country to inherit.",
+        "value_type": "Integer",
+        "example": "inherit = FRA",
+        "description": "The current scope inherits all of the defined scope's provinces.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "release": {
+        "id": "release",
+        "parameters": "<scope>\nThe country to release.",
+        "value_type": "Integer",
+        "example": "release = FRA",
+        "description": "The current scope releases all provinces with the defined scope's cores.",
+        "notes": "Target country must not exist. Unlike 'create_vassal' the released country will not be a vassal.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "release_all_subjects": {
+        "id": "release_all_subjects",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "release_all_subjects = yes",
+        "description": "The current scope releases all possible subjects from cores.",
+        "notes": "",
+        "version_added": "1.10",
+        "macro": []
+    },
+    "grant_independence": {
+        "id": "grant_independence",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "grant_independence = yes",
+        "description": "The current scope is granted independence from their overlord.",
+        "notes": "",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "declare_war": {
+        "id": "declare_war",
+        "parameters": "<scope>\nThe country to declare against.",
+        "value_type": "Integer",
+        "example": "declare_war = FRA",
+        "description": "Creates a no casus belli war against the defined scope for the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "declare_war_with_cb": {
+        "id": "declare_war_with_cb",
+        "parameters": "who = <scope>\nThe country declared against.\ncasus_belli = <cb>\nThe casus belli to use.\nwar_goal_province = <province id>\nOptional. Defines the province the war was declared for, if required by the casus belli.",
+        "value_type": "Integer",
+        "example": "declare_war_with_cb = {\n    who = FRA\n    casus_belli = cb_annex\n}",
+        "description": "Declares war for the current scope against the defined scope, using the defined casus belli.",
+        "notes": "Casus belli are found in /Europa Universalis IV/common/cb_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_truce_with": {
+        "id": "add_truce_with",
+        "parameters": "<scope>\nThe country to add a truce against.",
+        "value_type": "Integer",
+        "example": "add_truce_with = FRA",
+        "description": "Creates a truce between the defined scope and the current scope.",
+        "notes": "The truce length is the default white peace truce length.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "white_peace": {
+        "id": "white_peace",
+        "parameters": "<scope>\nThe country to force white peace against.",
+        "value_type": "Integer",
+        "example": "white_peace = FRA",
+        "description": "Forces the defined scope into a white peace truce with the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "form_coalition_against": {
+        "id": "form_coalition_against",
+        "parameters": "<scope>\nThe country to form against.",
+        "value_type": "Integer",
+        "example": "form_coalition_against = FRA",
+        "description": "The current scope creates or joins a coalition against the defined scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_casus_belli": {
+        "id": "add_casus_belli",
+        "parameters": "target = <scope>\nThe country to add the casus belli against.\ntype = <cb>\nThe casus belli to add.\nmonths = <months>\nThe number of months the casus belli lasts for.",
+        "value_type": "Integer",
+        "example": "add_casus_belli = {\n    target = FRA\n    type = cb_annex\n    months = 12\n}",
+        "description": "Adds a casus belli for the current scope against the defined scope.",
+        "notes": "Casus belli are found in /Europa Universalis IV/common/cb_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reverse_add_casus_belli": {
+        "id": "reverse_add_casus_belli",
+        "parameters": "target = <scope>\nThe country to that gains the casus belli.\ntype = <cb>\nThe casus belli to add.\nmonths = <months>\nThe number of months the casus belli lasts for.",
+        "value_type": "Integer",
+        "example": "reverse_add_casus_belli = {\n    target = FRA\n    type = cb_annex\n    months = 12\n}",
+        "description": "Adds a casus belli against the current scope for the defined scope.",
+        "notes": "Casus belli are found in /Europa Universalis IV/common/cb_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_casus_belli": {
+        "id": "remove_casus_belli",
+        "parameters": "target = <scope>\nThe country the casus belli is against.\ntype = <cb>\nThe casus belli to remove.",
+        "value_type": "Integer",
+        "example": "remove_casus_belli = {\n    target = FRA\n    type = cb_annex\n}",
+        "description": "Removes a casus belli held against the defined scope for the current scope.",
+        "notes": "Casus belli are found in /Europa Universalis IV/common/cb_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "reverse_remove_casus_belli": {
+        "id": "reverse_remove_casus_belli",
+        "parameters": "target = <scope>\nThe country that holds the casus belli.\ntype = <cb>\nThe casus belli to remove.",
+        "value_type": "Integer",
+        "example": "reverse_remove_casus_belli = {\n    target = FRA\n    type = cb_annex\n}",
+        "description": "Removes a casus belli held by the defined scope against the current scope.",
+        "notes": "Casus belli are found in /Europa Universalis IV/common/cb_types/*.txt",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_fow": {
+        "id": "remove_fow",
+        "parameters": "<months>\nThe number of months to remove fog of war.",
+        "value_type": "Integer",
+        "example": "random_rival_country = {\n    limit = { war_with = ROOT }\n    remove_fow = 3\n}",
+        "description": "Removes the fog of war in the current scope for the previous scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_spy_network_from": {
+        "id": "add_spy_network_from",
+        "parameters": "who = <scope>\nThe country to add spy network for.\nvalue = <int>\nThe amount of spy network to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_spy_network_from = {\n    who = FRA\n    value = 10\n}",
+        "description": "Adds spy network in the current scope for the defined scope.",
+        "notes": "",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "add_spy_network_in": {
+        "id": "add_spy_network_in",
+        "parameters": "who = <scope>\nThe country to add spy network in.\nvalue = <int>\nThe amount of spy network to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_spy_network_in = {\n    who = FRA\n    value = 10\n}",
+        "description": "Adds spy network for the current scope in the defined scope.",
+        "notes": "",
+        "version_added": "1.16",
+        "macro": []
+    },
+    "join_all_offensive_wars_of": {
+        "id": "join_all_offensive_wars_of",
+        "parameters": "<scope>\nThe country to join the offensive wars of.",
+        "value_type": "Integer",
+        "example": "join_all_offensive_wars_of = NED",
+        "description": "Makes the current scope join all offensive wars of the specified scope.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "join_all_defensive_wars_of": {
+        "id": "join_all_defensive_wars_of",
+        "parameters": "<scope>\nThe country to join the defensive wars of.",
+        "value_type": "Integer",
+        "example": "join_all_defensive_wars_of = NED",
+        "description": "Makes the current scope join all defensive wars of the specified scope.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "create_independent_estate": {
+        "id": "create_independent_estate",
+        "parameters": "<estate>\nThe estate to create the independent nation from.",
+        "value_type": "Integer",
+        "example": "create_independent_estate = estate_cossacks",
+        "description": "Creates an independent nation from provinces owned by the specified estate within the current scope's owned provinces.",
+        "notes": "Estates are found in /Europa Universalis IV/common/estates/*.txt\nThe additional parameters for the independent nation are found within an estate's file.",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "create_independent_estate_from_religion": {
+        "id": "create_independent_estate_from_religion",
+        "parameters": "<estate>\nThe estate to create the independent nation from.",
+        "value_type": "Integer",
+        "example": "create_independent_estate = estate_dhimmi",
+        "description": "Creates an independent nation from provinces owned by the specified estate within the current scope's owned provinces.",
+        "notes": "Estates are found in /Europa Universalis IV/common/estates/*.txt\nCreated with the religion that the majority of the provinces that the defined estate own holds.\nThe additional parameters for the independent nation are found within an estate's file.",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_estate_influence_modifier": {
+        "id": "add_estate_influence_modifier",
+        "parameters": "estate = <estate>\nThe estate to apply the modifier to.\ndesc = <string>\nThe text to display in the Influence tooltip for this modifier.\ninfluence = <int>\nThe amount of influence to add or subtract.\nduration = <days>\nThe duration for which this modifier is active.",
+        "value_type": "Integer",
+        "example": "add_estate_influence_modifier = {\n    estate = estate_nobles\n desc = EST_VAL_FURTHERED_SPOUSES_FAMILY_NOBLES\n    influence = 10\n    duration = 7300\n}",
+        "description": "Adds an influence modifier for the defined estate used by the current scope.",
+        "notes": "Estates are found in /Europa Universalis IV/common/estates/*.txt",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_estate_loyalty": {
+        "id": "add_estate_loyalty",
+        "parameters": "estate = <estate>\nThe estate to apply the loyalty to.\nloyalty = <int>\nThe amount of loyalty to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_estate_loyalty = {\n    estate = estate_nobles\n    loyalty = 10\n}",
+        "description": "Adds loyalty for the defined estate used by the current scope.",
+        "notes": "Estates are found in /Europa Universalis IV/common/estates/*.txt",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_estate_loyalty_modifier": {
+        "id": "add_estate_loyalty_modifier",
+        "parameters": "estate = <estate>\nThe estate to apply the modifier to.\ndesc = <string>\nThe text to display in the Influence tooltip for this modifier.\nloyalty = <int>\nThe amount of loyalty to add or subtract.\nduration = <days>\nThe duration for which this modifier is active.",
+        "value_type": "Integer",
+        "example": "add_estate_loyalty_modifier = {\n    estate = estate_nobles\n desc = EST_VAL_EXAMPLE\n    loyalty = 10\n    duration = 7300\n}",
+        "description": "Adds an loyalty modifier for the defined estate used by the current scope.",
+        "notes": "Estates are found in /Europa Universalis IV/common/estates/*.txt",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_faction": {
+        "id": "add_faction",
+        "parameters": "<faction>\nThe faction to add.",
+        "value_type": "Integer",
+        "example": "add_faction = temples",
+        "description": "Adds a faction to the current scope.",
+        "notes": "Factions are found in /Europa Universalis IV/common/factions/.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_faction": {
+        "id": "remove_faction",
+        "parameters": "<faction>\nThe faction to remove.",
+        "value_type": "Integer",
+        "example": "add_faction = temples",
+        "description": "Removes a faction from the current scope.",
+        "notes": "Factions are found in /Europa Universalis IV/common/factions/.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_faction_influence": {
+        "id": "add_faction_influence",
+        "parameters": "faction = <faction>\nThe faction to add influence to.\ninfluence = <int>\nThe amount of influence to add.",
+        "value_type": "Integer",
+        "example": "add_faction_influence = {\n    faction = temples\n    influence = 10\n}",
+        "description": "Adds influence for the defined faction.",
+        "notes": "Mimics the influence boost from pressing the button in the faction window.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_estate_privilege": {
+        "id": "set_estate_privilege",
+        "parameters": "<privilege>\nThe estate privilege to add.",
+        "value_type": "Integer",
+        "example": "set_estate_privilege = estate_burghers_monopoly_of_textiles",
+        "description": "Adds the specified estate privilege for the current scope.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "remove_estate_privilege": {
+        "id": "remove_estate_privilege",
+        "parameters": "<privilege>\nThe estate privilege to remove.",
+        "value_type": "Integer",
+        "example": "remove_estate_privilege= estate_burghers_monopoly_of_textiles",
+        "description": "Removes the specified estate privilege for the current scope.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "change_estate_land_share": {
+        "id": "change_estate_land_share",
+        "parameters": "estate = <estate>\nThe estate to modify land share for.\nshare = <float>\nThe amount of land share to change by.",
+        "value_type": "Integer",
+        "example": "change_estate_land_share = {\n    estate = estate_church\n    share = 5\n}",
+        "description": "Modifies the current land share percentage for the specified estate in the current scope.",
+        "notes": "",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "change_adm": {
+        "id": "change_adm",
+        "parameters": "<int>\nThe amount to add or subtract from the ruler's ADM skill.",
+        "value_type": "Integer",
+        "example": "change_adm = 1",
+        "description": "Adds ADM skill to the current ruler.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_dip": {
+        "id": "change_dip",
+        "parameters": "<int>\nThe amount to add or subtract from the ruler's DIP skill.",
+        "value_type": "Integer",
+        "example": "change_dip = 1",
+        "description": "Adds DIP skill to the current ruler.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_mil": {
+        "id": "change_mil",
+        "parameters": "<int>\nThe amount to add or subtract from the ruler's MIL skill.",
+        "value_type": "Integer",
+        "example": "change_mil = 1",
+        "description": "Adds MIL skill to the current ruler.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_ruler_personality": {
+        "id": "add_ruler_personality",
+        "parameters": "<personality>\nThe ruler personality to add.",
+        "value_type": "Integer",
+        "example": "add_ruler_personality = righteous_personality",
+        "description": "Adds the defined personality to the current ruler.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "remove_ruler_personality": {
+        "id": "remove_ruler_personality",
+        "parameters": "<personality>\nThe ruler personality to remove.",
+        "value_type": "Integer",
+        "example": "remove_ruler_personality = righteous_personality",
+        "description": "Removes the defined personality from the current ruler.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "set_ruler_flag": {
+        "id": "set_ruler_flag",
+        "parameters": "<flag>\nA unique string to identify the ruler flag with.",
+        "value_type": "Integer",
+        "example": "set_ruler_flag = my_flag\nset_ruler_flag = my_flag@ROOT\nset_ruler_flag = my_flag@event_target:name",
+        "description": "Defines a ruler flag for the current scope's ruler.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "clr_ruler_flag": {
+        "id": "clr_ruler_flag",
+        "parameters": "<flag>\nThe unique string of the flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_ruler_flag = my_flag",
+        "description": "Clears a ruler flag for the current scope's ruler.",
+        "notes": "",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "set_dynasty": {
+        "id": "set_dynasty",
+        "parameters": "<string> / <scope> / original_dynasty\nThe dynasty to set.",
+        "value_type": "Integer",
+        "example": "set_dynasty = \"Smith\"\nset_dynasty = FRA\nset_dynasty = original_dynasty",
+        "description": "Sets the dynasty of the current scope's ruler.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_ruler_culture": {
+        "id": "set_ruler_culture",
+        "parameters": "<culture>\nThe culture to change to.",
+        "value_type": "Integer",
+        "example": "set_ruler_culture = english\nset_ruler_culture = CAS\nset_ruler_culture = event_target:my_event_target\nset_ruler_culture = variable:my_variable",
+        "description": "Changes the ruler culture of the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "set_ruler_religion": {
+        "id": "set_ruler_religion",
+        "parameters": "<religion>\nThe religion to change to.",
+        "value_type": "Integer",
+        "example": "set_ruler_religion = catholic\nset_ruler_religion = CAS\nset_ruler_religion = event_target:my_event_target\nset_ruler_religion = variable:my_variable",
+        "description": "Changes the ruler religion of the current scope.",
+        "notes": "Religions are found in /Europa Universalis IV/common/religions/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "exile_ruler_as": {
+        "id": "exile_ruler_as",
+        "parameters": "<string>\nThe unique string to identify the exiled ruler with.",
+        "value_type": "Integer",
+        "example": "exile_ruler_as = my_exiled_ruler",
+        "description": "Removes the current ruler of the current scope, saving them to the unique string.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "set_ruler": {
+        "id": "set_ruler",
+        "parameters": "<string>\nThe unique string of an exiled ruler.",
+        "value_type": "Integer",
+        "example": "set_ruler = my_exiled_ruler",
+        "description": "Makes the exiled ruler the ruler of the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "kill_ruler": {
+        "id": "kill_ruler",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "kill_ruler = yes",
+        "description": "Kills the ruler of the current scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "convert_female_ruler_to_general": {
+        "id": "convert_female_ruler_to_general",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "convert_female_ruler_to_general = yes",
+        "description": "Converts a female ruler into a general.",
+        "notes": "",
+        "version_added": "1.15",
+        "macro": []
+    },
+    "convert_ruler_to_general": {
+        "id": "convert_ruler_to_general",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "convert_ruler_to_general = yes",
+        "description": "Converts a male ruler into a general.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "add_ruler_modifier": {
+        "id": "add_ruler_modifier",
+        "parameters": "name = <name>\nThe event modifier to add.\nduration = <days>\nOptional. The number of days to add the ruler modifier for.\nhidden = yes\nOptional. Whether the ruler modifier is hidden in the government view.\ndesc = <string\nOptional. The string used to override the automatic duration string.",
+        "value_type": "Boolean",
+        "example": "add_ruler_modifier = { \n    name = mad_and_bad\n    duration = -1  \n    desc = MAD_AND_BAD_DESC\n    hidden = yes\n}",
+        "description": "Adds an event modifier to the current scope as a ruler modifier.",
+        "notes": "Ruler modifiers are cleared when the ruler dies.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "define_ruler_to_general": {
+        "id": "define_ruler_to_general",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.",
+        "value_type": "Integer",
+        "example": "define_ruler_to_general = {\n    fire = 3\n    shock = 3\n    manuever = 3\n    siege = 3\n}",
+        "description": "Creates a general from the ruler for the current scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "define_leader_to_ruler": {
+        "id": "define_leader_to_ruler",
+        "parameters": "type = general / conquistador / admiral / explorer\nThe leader type to pick a leader from.\nname = <string>\nThe specific leader to use. Used instead of the type parameter.\nclaim = <int>\nOptional. The starting legitimacy of the ruler.\nadm = <int>\nOptional. The minimum ADM skill roll for the ruler.\ndip = <int>\nOptional. The minimum DIP skill roll for the ruler.\nmil = <int>\nOptional. The minimum MIL skill roll for the ruler.\nfixed = yes\nOptional. Makes the ruler skill roll fixed to the defined minimums.",
+        "value_type": "Integer",
+        "example": "define_leader_to_ruler = {\n    type = general\n    adm = 3\n    dip = 3\n    mil = 3\n    fixed = yes\n    claim = 100\n}\ndefine_leader_to_ruler = {\n    name = \"John Smith\"\n}",
+        "description": "Creates a ruler from a leader for the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "define_ruler": {
+        "id": "define_ruler",
+        "parameters": "name = <string>\nOptional. The name of the ruler.\ndynasty = <string> / <scope> / original_dynasty\nOptional. The dynasty of the ruler.\nage = <years>\nOptional. The age of the ruler.\nmin_age = <int>\nOptional. The minimum age of the ruler.\nmax_age = <int>\nOptional. The maximum age of the ruler.\nclaim = <int>\nOptional. The starting legitimacy of the ruler.\nadm = <int>\nOptional. The minimum ADM skill roll for the ruler.\ndip = <int>\nOptional. The minimum DIP skill roll for the ruler.\nmil = <int>\nOptional. The minimum MIL skill roll for the ruler.\nfixed = yes\nOptional. Makes the ruler skill roll fixed to the defined minimums.\nmax_random_adm = <int>\nOptional. The maximum ADM skill roll for the ruler.\nmax_random_dip = <int>\nOptional. The maximum DIP skill roll for the ruler.\nmax_random_mil = <int>\nOptional. The maximum MIL skill roll for the ruler.\nhide_skills = yes\nOptional. Hides the skill values for this ruler. regency = yes\nOptional. Makes this ruler as a regent. attach_leader = <string>\nOptional. The name of the leader to generate with the ruler.\nfemale = yes\nOptional. Forces the ruler to be female.\nmale = yes\nOptional. Forces the ruler to be male.\nculture = <culture> / <scope>\nOptional. The culture of the ruler.\nreligion = <religion> / <scope>\nOptional. The religion of the ruler.",
+        "value_type": "Boolean",
+        "example": "define_ruler = {\n    name = \"Ntare I Kivimira\"\n    dynasty = \"Cambarantama\"\n    adm = 5\n    dip = 4\n    mil = 4\n    age = 20\n    claim = 95\n}\ndefine_ruler = {\n    culture = event_target:first_ruler_alternative_province\n    hide_skills = yes\n    age = 30\n}\ndefine_ruler = {\n    dynasty = ROOT\n    culture = ROOT\n    religion = ROOT\n}\ndefine_ruler = {\n    dip = 4\n    adm = 1\n    mil = 1     \n    fixed = yes\n}",
+        "description": "Creates the defined ruler for the current scope.",
+        "notes": "The culture and religion attributes can utilise Event Scope Values.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_queen_personality": {
+        "id": "add_queen_personality",
+        "parameters": "<personality>\nThe consort personality to add.",
+        "value_type": "Integer",
+        "example": "add_queen_personality = righteous_personality",
+        "description": "Adds the defined personality to the current consort.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "remove_queen_personality": {
+        "id": "remove_queen_personality",
+        "parameters": "<personality>\nThe consort personality to remove.",
+        "value_type": "Integer",
+        "example": "remove_queen_personality = righteous_personality",
+        "description": "Removes the defined personality from the current consort.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "set_consort_flag": {
+        "id": "set_consort_flag",
+        "parameters": "<flag>\nA unique string to identify the consort flag with.",
+        "value_type": "Integer",
+        "example": "set_consort_flag = my_flag\nset_consort_flag = my_flag@ROOT\nset_consort_flag = my_flag@event_target:name",
+        "description": "Defines a consort flag for the current scope's consort.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "clr_consort_flag": {
+        "id": "clr_consort_flag",
+        "parameters": "<flag>\nThe unique string of the flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_consort_flag = my_flag",
+        "description": "Clears a consort flag for the current scope's consort.",
+        "notes": "",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "set_consort_culture": {
+        "id": "set_consort_culture",
+        "parameters": "<culture>\nThe culture to change to.",
+        "value_type": "Integer",
+        "example": "set_consort_culture = english\nset_consort_culture = CAS\nset_consort_culture = event_target:my_event_target\nset_consort_culture = variable:my_variable",
+        "description": "Changes the consort culture for the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "set_consort_religion": {
+        "id": "set_consort_religion",
+        "parameters": "<religion>\nThe religion to change to.",
+        "value_type": "Integer",
+        "example": "set_consort_religion = catholic\nset_consort_religion = CAS\nset_consort_religion = event_target:my_event_target\nset_consort_religion = variable:my_variable",
+        "description": "Changes the consort religion for the current scope.",
+        "notes": "Religions are found in /Europa Universalis IV/common/religions/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "change_consort_regent_to_ruler": {
+        "id": "change_consort_regent_to_ruler",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "change_consort_regent_to_ruler = yes",
+        "description": "Makes a consort regent into the current ruler for the current scope.",
+        "notes": "",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "remove_consort": {
+        "id": "remove_consort",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "remove_consort = yes",
+        "description": "Removes the current consort for the current scope.",
+        "notes": "",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "define_consort": {
+        "id": "define_consort",
+        "parameters": "name = <string>\nOptional. The name of the consort.\ncountry_of_origin = <scope>\nOptional. The origin country of the consort.\ndynasty = <string> / <scope> / original_dynasty\nOptional. The dynasty of the consort.\nage = <years>\nOptional. The age of the consort.\nadm = <int>\nOptional. The ADM skill for the consort.\ndip = <int>\nOptional. The DIP skill for the consort.\nmil = <int>\nOptional. The MIL skill for the consort.\nhide_skills = yes\nOptional. Hides the skill values for this consort. female = yes\nOptional. Forces the consort to be female.\nmale = yes\nOptional. Forces the consort to be male.\nculture = <culture> / <scope>\nOptional. The culture of the consort.\nreligion = <religion> / <scope>\nOptional. The religion of the consort.",
+        "value_type": "Boolean",
+        "example": "define_consort = {\n    country_of_origin = ROOT\n    religion = ROOT\n    culture = ROOT\n}\ndefine_consort = {\n    name = \"K\u00f6sem Sultan\"\n    culture = greek\n    adm = 5\n    dip = 4\n    mil = 5\n    female = yes\n}",
+        "description": "Creates the defined consort for the current scope.",
+        "notes": "The skill values are not rolled for consorts, meaning the values set are the exact values a consort gets.\nThe culture and religion attributes can utilise Event Scope Values.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "change_heir_adm": {
+        "id": "change_heir_adm",
+        "parameters": "<int>\nThe amount to add or subtract from the heir's ADM skill.",
+        "value_type": "Integer",
+        "example": "change_heir_adm = 1",
+        "description": "Adds ADM skill to the current heir.",
+        "notes": "",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "change_heir_dip": {
+        "id": "change_heir_dip",
+        "parameters": "<int>\nThe amount to add or subtract from the heir's DIP skill.",
+        "value_type": "Integer",
+        "example": "change_heir_dip = 1",
+        "description": "Adds DIP skill to the current heir.",
+        "notes": "",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "change_heir_mil": {
+        "id": "change_heir_mil",
+        "parameters": "<int>\nThe amount to add or subtract from the heir's MIL skill.",
+        "value_type": "Integer",
+        "example": "change_heir_mil = 1",
+        "description": "Adds MIL skill to the current heir.",
+        "notes": "",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_heir_personality": {
+        "id": "add_heir_personality",
+        "parameters": "<personality>\nThe heir personality to add.",
+        "value_type": "Integer",
+        "example": "add_heir_personality = righteous_personality",
+        "description": "Adds the defined personality to the current heir.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "remove_heir_personality": {
+        "id": "remove_heir_personality",
+        "parameters": "<personality>\nThe heir personality to remove.",
+        "value_type": "Integer",
+        "example": "remove_heir_personality = righteous_personality",
+        "description": "Removes the defined personality from the current heir.",
+        "notes": "Ruler personalities are found in /Europa Universalis IV/common/ruler_personalities/00_core.txt",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "set_heir_flag": {
+        "id": "set_heir_flag",
+        "parameters": "<flag>\nA unique string to identify the heir flag with.",
+        "value_type": "Integer",
+        "example": "set_heir_flag = my_flag\nset_heir_flag = my_flag@ROOT\nset_heir_flag = my_flag@event_target:name",
+        "description": "Defines an heir flag for the current scope's heir.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "clr_heir_flag": {
+        "id": "clr_heir_flag",
+        "parameters": "<flag>\nThe unique string of the flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_heir_flag = my_flag",
+        "description": "Clears an heir flag for the current scope's heir.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_heir_claim": {
+        "id": "add_heir_claim",
+        "parameters": "<int>\nThe amount to add or subtract from the claim.",
+        "value_type": "Integer",
+        "example": "add_heir_claim = 10",
+        "description": "Adds to the current scope's heir claim.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_heir_support": {
+        "id": "add_heir_support",
+        "parameters": "<int>\nThe amount of support to add or subtract to the local heir",
+        "value_type": "Integer",
+        "example": "add_heir_support = 10",
+        "description": "Adds to the local heir's support in an Elective Monarchy.",
+        "notes": "",
+        "version_added": "1.7",
+        "macro": []
+    },
+    "set_heir_culture": {
+        "id": "set_heir_culture",
+        "parameters": "<culture>\nThe culture to change to.",
+        "value_type": "Integer",
+        "example": "set_heir_culture = english\nset_heir_culture = CAS\nset_heir_culture = event_target:my_event_target\nset_heir_culture = variable:my_variable",
+        "description": "Changes the heir culture of the current scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "set_heir_religion": {
+        "id": "set_heir_religion",
+        "parameters": "<religion>\nThe religion to change to.",
+        "value_type": "Integer",
+        "example": "set_heir_religion = catholic\nset_heir_religion = CAS\nset_heir_religion = event_target:my_event_target\nset_heir_religion = variable:my_variable",
+        "description": "Changes the heir religion of the current scope.",
+        "notes": "Religions are found in /Europa Universalis IV/common/religions/*.txt\nCan utilise Event Scope Values.",
+        "version_added": "1.23",
+        "macro": []
+    },
+    "exile_heir_as": {
+        "id": "exile_heir_as",
+        "parameters": "<string>\nThe unique string to identify the exiled heir with.",
+        "value_type": "Integer",
+        "example": "exile_heir_as = my_exiled_heir",
+        "description": "Removes the current heir of the current scope, saving them to the unique string.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "set_heir": {
+        "id": "set_heir",
+        "parameters": "<string>\nThe unique string of an exiled heir.",
+        "value_type": "Integer",
+        "example": "set_heir = my_exiled_heir",
+        "description": "Makes the exiled heir the ruler of the current scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "kill_heir": {
+        "id": "kill_heir",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "kill_heir = yes",
+        "description": "Kills the heir of the current scope.",
+        "notes": "Displays heir death message.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_heir": {
+        "id": "remove_heir",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "remove_heir = yes",
+        "description": "Removes the heir of the current scope.",
+        "notes": "Does not display the heir death message.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "convert_female_heir_to_general": {
+        "id": "convert_female_heir_to_general",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "convert_female_heir_to_general = yes",
+        "description": "Converts a female heir into a general.",
+        "notes": "",
+        "version_added": "1.15",
+        "macro": []
+    },
+    "convert_heir_to_general": {
+        "id": "convert_heir_to_general",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "convert_heir_to_general = yes",
+        "description": "Converts a male heir into a general.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "define_heir_to_general": {
+        "id": "define_heir_to_general",
+        "parameters": "shock = <int>\nThe shock pips of the leader.\nfire = <int>\nThe fire pips of the leader.\nmanuever = <int>\nThe maneuver pips of the leader.\nsiege = <int>\nThe siege pips of the leader.",
+        "value_type": "Integer",
+        "example": "define_heir_to_general = {\n    fire = 3\n    shock = 3\n    manuever = 3\n    siege = 3\n}",
+        "description": "Creates a general from the heir of the current scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "define_heir": {
+        "id": "define_heir",
+        "parameters": "name = <string>\nOptional. The name of the heir.\ndynasty = <string> / <scope> / original_dynasty\nOptional. The dynasty of the heir.\nage = <years>\nOptional. The age of the heir.\nbirth_date = <date>\nOptional. The birth date of the heir. Can be used instead of the age parameter.\nclaim = <int>\nOptional. The starting legitimacy of the heir.\nadm = <int>\nOptional. The minimum ADM skill roll for the heir.\ndip = <int>\nOptional. The minimum DIP skill roll for the heir.\nmil = <int>\nOptional. The minimum MIL skill roll for the heir.\nmax_random_adm = <int>\nOptional. The maximum ADM skill roll for the heir.\nmax_random_dip = <int>\nOptional. The maximum DIP skill roll for the heir.\nmax_random_mil = <int>\nOptional. The maximum MIL skill roll for the heir.\nhide_skills = yes\nOptional. Hides the skill values for this heir. hidden = yes\nOptional. Hides the skill values for this heir. Legacy version of hide_skills. no_consort_with_heir = yes\nOptional. Makes the heir a child not of the consort, i.e. a bastard female = yes\nOptional. Forces the heir to be female.\nmale = yes\nOptional. Forces the heir to be male.\nculture = <culture> / <scope>\nOptional. The culture of the heir.\nreligion = <religion> / <scope>\nOptional. The religion of the heir.",
+        "value_type": "Boolean",
+        "example": "define_heir = {\n    dynasty = \"Kamegere\"\n    claim = 100  \n}\ndefine_heir = {\n    male = yes\n    dynasty = ROOT\n    name = \"Viracocha\"\n    claim = 100\n    adm = 6\n}\ndefine_heir = {\n    dynasty = ROOT\n    age = 13\n    adm = 3\n    dip = 3\n    mil = 3\n    claim = 50\n    female = yes\n    no_consort_with_heir = yes\n}",
+        "description": "Creates the defined heir for the current scope.",
+        "notes": "The culture and religion attributes can utilise Event Scope Values.\nThe name parameter can accept a saved name variable, see set_saved_name for more context.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_imperial_influence": {
+        "id": "add_imperial_influence",
+        "parameters": "<int>\nThe amount of influence to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_imperial_influence = 10",
+        "description": "Adds Imperial Influence for the current scope.",
+        "notes": "No effect if not emperor.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_scaled_imperial_influence": {
+        "id": "add_scaled_imperial_influence",
+        "parameters": "<int>\nThe amount of influence to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_scaled_imperial_influence = 10",
+        "description": "Adds Imperial Influence for the current scope, scaled by the current Imperial Authority value.",
+        "notes": "No effect if not emperor.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "elector": {
+        "id": "elector",
+        "parameters": "<scope>\nThe country to make elector.\nyes / no\nBoolean.",
+        "value_type": "Boolean",
+        "example": "elector = FRA\nelector = yes",
+        "description": "Makes the defined scope an elector of the Holy Roman Empire.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "revoke_reform": {
+        "id": "revoke_reform",
+        "parameters": "<reform>\nThe reform to remove.",
+        "value_type": "Integer",
+        "example": "revoke_reform = reichsreform",
+        "description": "Removes an Imperial Reform.",
+        "notes": "Imperial Reforms are found in /Europa Universalis IV/common/imperial_reforms/00_hre.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_in_empire": {
+        "id": "set_in_empire",
+        "parameters": "yes / no\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_in_empire = yes",
+        "description": "Places the current province scope in the Holy Roman Empire.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "hre_inheritable": {
+        "id": "hre_inheritable",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "hre_inheritable = yes",
+        "description": "Makes the seat of the Emperor inheritable.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "imperial_ban_allowed": {
+        "id": "imperial_ban_allowed",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "imperial_ban_allowed = yes",
+        "description": "Enables the Imperial Ban casus belli.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "internal_hre_cb": {
+        "id": "internal_hre_cb",
+        "parameters": "no\nBoolean.",
+        "value_type": "Integer",
+        "example": "internal_hre_cb = no",
+        "description": "Disables casus belli creation for HRE members against one another.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_allow_female_emperor": {
+        "id": "set_allow_female_emperor",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_allow_female_emperor = yes",
+        "description": "Enables female rulers to become emperor.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "dismantle_hre": {
+        "id": "dismantle_hre",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "dismantle_hre = yes",
+        "description": "Disbands the HRE and removes all members from it.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "enable_hre_leagues": {
+        "id": "enable_hre_leagues",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "enable_hre_leagues = yes",
+        "description": "Enables the Religious Leagues.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_hre_religion": {
+        "id": "set_hre_religion",
+        "parameters": "<religion>\nWhich religion to set.",
+        "value_type": "Integer",
+        "example": "set_hre_religion = catholic",
+        "description": "Makes the defined religion the official religion of the HRE.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_hre_heretic_religion": {
+        "id": "set_hre_heretic_religion",
+        "parameters": "<religion>\nWhich religion to set.",
+        "value_type": "Integer",
+        "example": "set_hre_heretic_religion = catholic",
+        "description": "Makes the defined religion the heretic religion of the HRE.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_hre_religion_locked": {
+        "id": "set_hre_religion_locked",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_hre_religion_locked = yes",
+        "description": "Locks the official and heretic religion assignments, ending the Religious Leagues.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_hre_religion_treaty": {
+        "id": "set_hre_religion_treaty",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_hre_religion_treaty = yes",
+        "description": "Ends the Religious Leagues with no set religions.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "join_league": {
+        "id": "join_league",
+        "parameters": "<scope>\nWhich league to join.",
+        "value_type": "Integer",
+        "example": "join_league = FRA",
+        "description": "Makes the current scope join the League that the defined scope belongs to.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "leave_league": {
+        "id": "leave_league",
+        "parameters": "<scope>\nWhich league to leave.",
+        "value_type": "Integer",
+        "example": "leave_league = FRA",
+        "description": "Makes the current scope leave the League that the defined scope belongs to.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "dismantle_empire_of_china": {
+        "id": "dismantle_empire_of_china",
+        "parameters": "<yes> / <no>\nBoolean.",
+        "value_type": "Boolean",
+        "example": "dismantle_empire_of_china = yes",
+        "description": "Removes the Empire of China and the Mandate system.",
+        "notes": "",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_emperor_of_china": {
+        "id": "set_emperor_of_china",
+        "parameters": "<scope>\nWhich country to set.",
+        "value_type": "Integer",
+        "example": "set_emperor_of_china = MNG",
+        "description": "Sets the current Emperor of China.",
+        "notes": "",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_mandate": {
+        "id": "add_mandate",
+        "parameters": "<int>\nThe amount of mandate to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_mandate = 10",
+        "description": "Adds mandate to the current scope.",
+        "notes": "No effect if not the emperor of china.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_mandate": {
+        "id": "set_mandate",
+        "parameters": "<int>\nThe amount of mandate to set.",
+        "value_type": "Integer",
+        "example": "set_mandate = 10",
+        "description": "Sets the mandate value for the current scope.",
+        "notes": "No effect if not the emperor of china.",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "set_revolution_target": {
+        "id": "set_revolution_target",
+        "parameters": "<scope>\nThe country to set.",
+        "value_type": "Integer",
+        "example": "set_revolution_target = FRA",
+        "description": "Makes the defined scope the new revolutionary target.",
+        "notes": "Use --- to remove the target and not reassign.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_ai_personality": {
+        "id": "set_ai_personality",
+        "parameters": "personality = <type>\nThe personality to use.\nlocked = <yes> / <no>\nWhether the personality can be re-evaluated and changed.",
+        "value_type": "Boolean",
+        "example": "set_ai_personality = {\n    personality = ai_capitalist\n    locked = yes\n}",
+        "description": "Makes the current scope (if AI) the defined personality.",
+        "notes": "AI personalities are found in /Europa Universalis IV/common/ai_personalities/00_ai_personalities.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "set_ai_attitude": {
+        "id": "set_ai_attitude",
+        "parameters": "attitude = <type>\nThe attitude to use.\nwho = <scope>\nWho the attitude is directed against.\nlocked = <yes> / <no>\nWhether the attitude can be re-evaluated and changed.",
+        "value_type": "Boolean",
+        "example": "set_ai_attitude = {\n    attitude = attitude_friendly\n    who = FRA\n    locked = yes\n}",
+        "description": "Makes the current scope (if AI) have the defined attitude against the defined scope.",
+        "notes": "AI attitudes are found in /Europa Universalis IV/common/ai_attitudes/00_ai_attitudes.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "province_event": {
+        "id": "province_event",
+        "parameters": "id = <id>\nThe event id to fire.\ndays = <days>\nOptional. The number of days to wait after the effect is executed to fire the event.\nrandom = <days>\nOptional. The max number of additional days that can be added to the days parameter for randomness.\ntooltip = <string>\nOptional. The tooltip to display in the effect tooltip country_event is used in.",
+        "value_type": "Integer",
+        "example": "province_event = { \n    id = uprising.1\n    days = 30\n    random = 15\n    tooltip = UPRISING_TOOLTIP\n}",
+        "description": "Fire a province event for the current province scope. Appears for the owner of the province scope.",
+        "notes": "You cannot fire the same event within itself with a delay of 0.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_province_modifier": {
+        "id": "add_province_modifier",
+        "parameters": "name = <name>\nThe event modifier to add.\nduration = <days>\nOptional. The number of days to add the province modifier for.\nhidden = yes\nOptional. Whether the province modifier is hidden in the province view.\ndesc = <string>\nOptional. The string used to override the automatic duration string.",
+        "value_type": "Boolean",
+        "example": "add_province_modifier = { \n    name = annoyed_people\n    duration = -1  \n    desc = annoyed_people_tooltip\n    hidden = yes\n}",
+        "description": "Adds an event modifier to the current province scope as a province modifier.",
+        "notes": "Modifiers added with this effect are cleared automatically when the province changes ownership.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_permanent_province_modifier": {
+        "id": "add_permanent_province_modifier",
+        "parameters": "name = <name>\nThe event modifier to add.\nduration = <days>\nOptional. The number of days to add the province modifier for.\nhidden = yes\nOptional. Whether the province modifier is hidden in the province view.\ndesc = <string>\nOptional. The string used to override the automatic duration string.",
+        "value_type": "Boolean",
+        "example": "add_permanent_province_modifier = { \n    name = annoyed_people\n    duration = -1  \n    desc = annoyed_people_tooltip\n    hidden = yes\n}",
+        "description": "Adds an event modifier to the current province scope as a province modifier.",
+        "notes": "Modifiers added with this effect persist through ownership changes.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "extend_province_modifier": {
+        "id": "extend_province_modifier",
+        "parameters": "name = <name>\nThe event modifier to extend.\nduration = <days>",
+        "value_type": "Integer",
+        "example": "extend_province_modifier = { \n    name = annoyed_people\n    duration = 365\n}",
+        "description": "Extends the duration of an existing province modifier held by the current province scope.",
+        "notes": "Modifiers added with this effect persist through ownership changes.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_province_modifier": {
+        "id": "remove_province_modifier",
+        "parameters": "<modifier>\nThe event modifier to remove.",
+        "value_type": "Integer",
+        "example": "remove_province_modifier = annoyed_people",
+        "description": "Removes an already assigned province modifier from the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_province_triggered_modifier": {
+        "id": "add_province_triggered_modifier",
+        "parameters": "<modifier>\nThe province triggered modifier to add.",
+        "value_type": "Integer",
+        "example": "add_province_triggered_modifier = test_modifier",
+        "description": "Adds a province triggered modifier to the current province scope.",
+        "notes": "",
+        "version_added": "1.24",
+        "macro": []
+    },
+    "remove_province_triggered_modifier": {
+        "id": "remove_province_triggered_modifier",
+        "parameters": "<modifier>\nThe province triggered modifier to remove.",
+        "value_type": "Integer",
+        "example": "remove_province_triggered_modifier = test_modifier",
+        "description": "Removes a province triggered modifier from the current province scope.",
+        "notes": "",
+        "version_added": "1.24",
+        "macro": []
+    },
+    "set_province_flag": {
+        "id": "set_province_flag",
+        "parameters": "<flag>\nA unique string to identify the province flag with.",
+        "value_type": "Integer",
+        "example": "set_province_flag = my_flag\nset_province_flag = my_flag@ROOT\nset_province_flag = my_flag@event_target:name",
+        "description": "Defines a province flag for the current province scope.",
+        "notes": "Flags can be appended with scopes or event targets",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "clr_province_flag": {
+        "id": "clr_province_flag",
+        "parameters": "<flag>\nThe unique string of a province flag to clear.",
+        "value_type": "Integer",
+        "example": "clr_province_flag = my_flag",
+        "description": "Clears a defined province flag for the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_province_name": {
+        "id": "change_province_name",
+        "parameters": "<string>\nThe name to change to.",
+        "value_type": "Integer",
+        "example": "change_province_name = \"Paris\"",
+        "description": "Changes the province name of the current province scope to the defined name.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "rename_capital": {
+        "id": "rename_capital",
+        "parameters": "<string>\nThe name to change to.",
+        "value_type": "Integer",
+        "example": "rename_capital = \"Paris\"",
+        "description": "Changes the capital name of the current province scope to the defined name.",
+        "notes": "The capital name is the second name that appears under the province name within the province window.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_base_tax": {
+        "id": "add_base_tax",
+        "parameters": "<int>\nThe amount of base tax to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_base_tax = 1",
+        "description": "Adds base tax to the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_base_production": {
+        "id": "add_base_production",
+        "parameters": "<int>\nThe amount of base production to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_base_production = 1",
+        "description": "Adds base production to the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_base_manpower": {
+        "id": "add_base_manpower",
+        "parameters": "<int>\nThe amount of base manpower to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_base_manpower = 1",
+        "description": "Adds base manpower to the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_prosperity": {
+        "id": "add_prosperity",
+        "parameters": "<int>\nThe amount of prosperity to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_prosperity = 1",
+        "description": "Adds prosperity to the current province scope.",
+        "notes": "",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_devastation": {
+        "id": "add_devastation",
+        "parameters": "<int>\nThe amount of devastation to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_devastation = 1",
+        "description": "Adds devastation to the current province scope.",
+        "notes": "",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "add_local_autonomy": {
+        "id": "add_local_autonomy",
+        "parameters": "<int>\nThe amount of local autonomy to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_local_autonomy = 10",
+        "description": "Adds local autonomy to the current province scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_local_autonomy": {
+        "id": "set_local_autonomy",
+        "parameters": "<int>\nThe amount of local autonomy to set.",
+        "value_type": "Integer",
+        "example": "set_local_autonomy = 50",
+        "description": "Sets local autonomy for the current province scope.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "change_trade_goods": {
+        "id": "change_trade_goods",
+        "parameters": "<good>\nThe trade good to set.",
+        "value_type": "Integer",
+        "example": "change_trade_goods = grain",
+        "description": "Sets the trade good for the current province scope.",
+        "notes": "Trade Goods are found in /Europa Universalis IV/common/tradegoods/*.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_scaled_local_adm_power": {
+        "id": "add_scaled_local_adm_power",
+        "parameters": "<int>\nThe amount of administrative power to add.",
+        "value_type": "Integer",
+        "example": "add_scaled_local_adm_power = 10",
+        "description": "Adds Administrative power to the owner of the current province scope, scaling with the base tax.",
+        "notes": "1 power per point of yearly base tax.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_scaled_local_dip_power": {
+        "id": "add_scaled_local_dip_power",
+        "parameters": "<int>\nThe amount of diplomatic power to add.",
+        "value_type": "Integer",
+        "example": "add_scaled_local_dip_power = 10",
+        "description": "Adds Diplomatic power to the owner of the current province scope, scaling with the base production.",
+        "notes": "1 power per point of yearly base production.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_scaled_local_mil_power": {
+        "id": "add_scaled_local_mil_power",
+        "parameters": "<int>\nThe amount of military power to add.",
+        "value_type": "Integer",
+        "example": "add_scaled_local_mil_power = 10",
+        "description": "Adds Military power to the owner of the current province scope, scaling with the base manpower.",
+        "notes": "1 power per point of yearly base manpower.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "cancel_construction": {
+        "id": "cancel_construction",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "cancel_construction = yes",
+        "description": "Cancels any construction ongoing in the current province scope.",
+        "notes": "Constructions are coring, religious conversion, cultural conversion, buildings and great projects.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_great_project": {
+        "id": "add_great_project",
+        "parameters": "<project>\nThe great project to add.",
+        "value_type": "Integer",
+        "example": "add_great_project = kiel_canal",
+        "description": "Starts construction of a great project in the current province scope.",
+        "notes": "Great projects are found in /Europa Universalis IV/common/great_projects/*.txt.",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_construction_progress": {
+        "id": "add_construction_progress",
+        "parameters": "<float>\nThe amount of progress to add or subtract.",
+        "value_type": "Float",
+        "example": "add_construction_progress = 0.05",
+        "description": "Changes the construction progress of a great project in the current province scope.",
+        "notes": "",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "add_building": {
+        "id": "add_building",
+        "parameters": "<building>\nThe building to add.",
+        "value_type": "Integer",
+        "example": "add_building = temple",
+        "description": "Adds the defined building to the current province scope.",
+        "notes": "Buildings are found in /Europa Universalis IV/common/buildings/*.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_building": {
+        "id": "remove_building",
+        "parameters": "<building>\nThe building to remove.",
+        "value_type": "Integer",
+        "example": "remove_building = temple",
+        "description": "Removes the defined building to the current province scope.",
+        "notes": "Buildings are found in /Europa Universalis IV/common/buildings/*.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_building_construction": {
+        "id": "add_building_construction",
+        "parameters": "building = <building>\nThe building to construct.\nspeed = <float>\nThe speed percentage of the base building speed to use.\ncost = <float>\nThe cost percentage of the base building cost to use.",
+        "value_type": "Float",
+        "example": "add_building_construction = {\n    building = temple\n    speed = 0.5\n    cost = 0.5\n}",
+        "description": "Starts building construction in the current province scope.",
+        "notes": "cost and speed are a percentage of the base value, i.e. 0.5 is 50% of the base value.",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "set_seat_in_parliament": {
+        "id": "set_seat_in_parliament",
+        "parameters": "yes / no\nBoolean.",
+        "value_type": "Boolean",
+        "example": "set_seat_in_parliament = yes",
+        "description": "Adds the current province scope to Parliament.",
+        "notes": "No effect if the owner of the province does not have a government using has_parliament.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "back_current_issue": {
+        "id": "back_current_issue",
+        "parameters": "yes / no\nBoolean.",
+        "value_type": "Boolean",
+        "example": "back_current_issue = yes",
+        "description": "Backs or blocks the current issue in Parliament, if the current province scope has a seat.",
+        "notes": "No effect if the owner of the province does not have a government using has_parliament.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "change_culture": {
+        "id": "change_culture",
+        "parameters": "<culture>\nThe culture to change to.",
+        "value_type": "Integer",
+        "example": "change_culture = english\nchange_culture = ENG\nchange_culture = event_target:my_event_target\nchange_culture = variable:my_variable",
+        "description": "Changes the culture of the current province scope.",
+        "notes": "Cultures are found in /Europa Universalis IV/common/cultures/*.txt.\nCan utilise Event Scope Values.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_culture_construction": {
+        "id": "add_culture_construction",
+        "parameters": "yes\nBoolean.\nspeed = <float>\nThe speed percentage of the base conversion speed to use.\ncost = <float>\nThe cost percentage of the base conversion cost to use.",
+        "value_type": "Float",
+        "example": "add_culture_construction = yes\nadd_culture_construction = {\n    speed = 0.5\n    cost = 0.5\n}",
+        "description": "Starts culture conversion in the current province scope, for the current owner. Target culture is always(?) the primary culture.",
+        "notes": "Attention: Uses ADM power instead of DIP power.\ncost and speed are a percentage of the base value, i.e. 0.5 is 50% of the base value.",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "change_to_secondary_religion": {
+        "id": "change_to_secondary_religion",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "change_to_secondary_religion = yes",
+        "description": "Changes the religion in the current province scope to the syncretic religion of its owner.",
+        "notes": "",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "send_missionary": {
+        "id": "send_missionary",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "send_missionary = yes",
+        "description": "Starts religious conversion in the current province scope, for the current owner.",
+        "notes": "",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_cardinal": {
+        "id": "add_cardinal",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "add_cardinal = yes",
+        "description": "Adds a Cardinal to the current province scope, for the current owner.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "remove_cardinal": {
+        "id": "remove_cardinal",
+        "parameters": "yes\nBoolean.",
+        "value_type": "Boolean",
+        "example": "remove_cardinal = yes",
+        "description": "Removes a Cardinal in the current province scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "add_reform_center": {
+        "id": "add_reform_center",
+        "parameters": "<religion>\nThe religion to use.",
+        "value_type": "Integer",
+        "example": "add_reform_center = reformed",
+        "description": "Adds a Center of Reformation for the defined religion in the current province scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "remove_reform_center": {
+        "id": "remove_reform_center",
+        "parameters": "<religion>\nThe religion to use.",
+        "value_type": "Integer",
+        "example": "remove_reform_center = reformed",
+        "description": "Removes the Center of Reformation for the defined religion in the current province scope.",
+        "notes": "",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "set_estate": {
+        "id": "set_estate",
+        "parameters": "<estate>\nWhich estate to use.",
+        "value_type": "Integer",
+        "example": "set_estate = estate_nobles",
+        "description": "Adds an estate to the current province scope.",
+        "notes": "Will override a previous estate.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_estate": {
+        "id": "remove_estate",
+        "parameters": "<estate>\nWhich estate to remove.",
+        "value_type": "Integer",
+        "example": "remove_estate = estate_nobles",
+        "description": "Removes an estate in the current province scope.",
+        "notes": "Does not produce a tooltip.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_institution_embracement": {
+        "id": "add_institution_embracement",
+        "parameters": "which = <institution>\nThe institution to add to.\nvalue = <int>\nThe amount of embracement to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_institution_embracement = {\n    which = feudalism\n    value = 10\n}",
+        "description": "Adds institution embracement progress for the defined institution in the current province scope.",
+        "notes": "The defined institution must be enabled for the owner of the province first.",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "add_nationalism": {
+        "id": "add_nationalism",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_nationalism = 10",
+        "description": "Adds Nationalism to the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_unrest": {
+        "id": "add_unrest",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_unrest = 10",
+        "description": "Adds Local Unrest to the current province scope.",
+        "notes": "Appears under Base Unrest.",
+        "version_added": "1.8",
+        "macro": []
+    },
+    "create_native": {
+        "id": "create_native",
+        "parameters": "<int>\nThe multiplier to use.",
+        "value_type": "Integer",
+        "example": "create_native = 1",
+        "description": "Spawns (native population * multiplier) natives in the current province scope, rounded up to nearest 1k stack.",
+        "notes": "Only useful in colonies; will immediately disappear in cities or uncolonized provinces.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_pirate": {
+        "id": "create_pirate",
+        "parameters": "<int>\nThe size to use.",
+        "value_type": "Integer",
+        "example": "create_pirate = 1",
+        "description": "Spawns pirates in the current province scope.",
+        "notes": "Only spawnable in sea zones and land provinces with ports.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_revolt": {
+        "id": "create_revolt",
+        "parameters": "<int>\nThe size to use.",
+        "value_type": "Integer",
+        "example": "create_revolt = 1",
+        "description": "Spawns the most likely rebel type in the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "<rebel_type>": {
+        "id": "<rebel_type>",
+        "parameters": "<int>\nThe size to use.",
+        "value_type": "Integer",
+        "example": "anti_tax_rebels = 1",
+        "description": "Spawns the defined rebel type in the current province scope.",
+        "notes": "Rebel types found in /Europa Universalis IV/common/rebel_types/*.txt.",
+        "version_added": "1.1",
+        "macro": [
+            "rebel_type"
+        ]
+    },
+    "spawn_rebels": {
+        "id": "spawn_rebels",
+        "parameters": "type = <type>\nThe size type to use.\nsize = <int>\nThe size to use.\nculture = <culture> / <scope>\nOptional. The culture the rebels belong to.\nreligion = <religion> / <scope>\nOptional. The religion the rebels belong to.\nunrest = <int>\nOptional. Adds this amount of unrest to the province the rebels spawn in.\nwin = yes\nOptional. Changes control of the province the rebels spawn in to the rebels.\nfriend = <scope>\nOptional. Associate a country with the rebels.\nleader = <string>\nOptional. Assigns the rebel leader a specific name. Can use set_saved_name.\nleader_dynasty = <string>\nOptional. Assigns the rebel leader a specific dynasty.\nfemale = yes\nOptional. Makes the rebel leader female.\nuse_heir_as_leader = yes\nOptional. Makes the owner's heir the rebel leader. Removes heir.\nuse_consort_as_leader = yes\nOptional. Makes the owner's consort the rebel leader. Removes consort.",
+        "value_type": "Integer",
+        "example": "spawn_rebels = {\n    type = noble_rebels\n    size = 1\n}\nspawn_rebels = {\n    type = pretender_rebels\n    size = 2\n    leader = rebel_preacher\n}\nspawn_rebels = {\n    type = catholic_rebels\n    size = 2\n    friend = FROM\n}",
+        "description": "Spawns the defined rebels in the current province scope.",
+        "notes": "Rebel types found in /Europa Universalis IV/common/rebel_types/*.txt.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "create_colony": {
+        "id": "create_colony",
+        "parameters": "<int>\nThe initial size of the colony.",
+        "value_type": "Integer",
+        "example": "random_empty_neighbor_province = {\n    create_colony = 200\n}",
+        "description": "Starts a colony belonging to the owner of the ROOT province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_colonysize": {
+        "id": "add_colonysize",
+        "parameters": "<int>\nThe amount of settlers to add.",
+        "value_type": "Integer",
+        "example": "add_colonysize = 10",
+        "description": "Adds settlers to the current province scope if a colony.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "multiply_colonysize": {
+        "id": "multiply_colonysize",
+        "parameters": "<float>\nThe multiplier to use.",
+        "value_type": "Integer",
+        "example": "multiply_colonysize = 2",
+        "description": "Multiplies the settler count in the current province scope if a colony.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_siberian_construction": {
+        "id": "add_siberian_construction",
+        "parameters": "<int>\nThe initial size of the colony.",
+        "value_type": "Integer",
+        "example": "add_siberian_construction = 400",
+        "description": "Starts a siberian colony in the current province scope.",
+        "notes": "",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "change_native_ferocity": {
+        "id": "change_native_ferocity",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "change_native_ferocity = 5",
+        "description": "Adds to the Native Ferocity within an uncolonized province.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_native_hostileness": {
+        "id": "change_native_hostileness",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "change_native_hostileness = 5",
+        "description": "Adds to the Native Hostileness within an uncolonized province.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_native_size": {
+        "id": "change_native_size",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "change_native_size = 50",
+        "description": "Adds to the amount of natives within an uncolonized province.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "discover_country": {
+        "id": "discover_country",
+        "parameters": "<scope>\nThe country that gains vision.",
+        "value_type": "Integer",
+        "example": "upper_peru_region = {\n    discover_country = FRA\n}",
+        "description": "The defined scope gains vision over the current province scope.",
+        "notes": "Best used within areas, regions, etc. to add vision.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "undiscover_country": {
+        "id": "undiscover_country",
+        "parameters": "<scope>\nThe country that loses vision.",
+        "value_type": "Integer",
+        "example": "upper_peru_region = {\n    undiscover_country = FRA\n}",
+        "description": "The defined scope loses vision over the current province scope.",
+        "notes": "Best used within areas, regions, etc. to remove vision.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_claim": {
+        "id": "add_claim",
+        "parameters": "<scope>\nThe country that gains the claim.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    add_claim = FRA\n}",
+        "description": "The defined scope gains a claim on the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_core": {
+        "id": "add_core",
+        "parameters": "<scope>\nThe country that gains the core.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    add_core = FRA\n}",
+        "description": "The defined scope gains a core on the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_core_construction": {
+        "id": "add_core_construction",
+        "parameters": "yes\nBoolean.\nspeed = <float>\nThe speed percentage of the base coring speed to use.\ncost = <float>\nThe cost percentage of the base coring cost to use.",
+        "value_type": "Integer",
+        "example": "add_core_construction = yes\nadd_core_construction = {\n    speed = 0.5\n    cost = 1\n}",
+        "description": "Starts core construction in the current province scope, for the current owner.\nSecond instance starts core construction at double the speed and full coring cost.",
+        "notes": "Minimum core construction time is 1 month",
+        "version_added": "1.11",
+        "macro": []
+    },
+    "add_permanent_claim": {
+        "id": "add_permanent_claim",
+        "parameters": "<scope>\nThe country that gains the permanent claim.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    add_permanent_claim = FRA\n}",
+        "description": "The defined scope gains a permanent claim on the current province scope.",
+        "notes": "",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "add_territorial_core": {
+        "id": "add_territorial_core",
+        "parameters": "<scope>\nThe country that gains the territorial core.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    add_territorial_core = FRA\n}",
+        "description": "The defined scope gains a territorial core on the current province scope.",
+        "notes": "",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "cede_province": {
+        "id": "cede_province",
+        "parameters": "<scope>\nThe country that gains ownership.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    cede_province = FRA\n}",
+        "description": "The defined scope gains ownership of the current province scope.",
+        "notes": "previous_owner can be used to cede ownership to the last previous owner of a province.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "change_controller": {
+        "id": "change_controller",
+        "parameters": "<scope>\nThe country that gains control.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    change_controller = FRA\n}",
+        "description": "The defined scope gains control over the current province scope.",
+        "notes": "Control here means occupation, not ownership.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_claim": {
+        "id": "remove_claim",
+        "parameters": "<scope>\nThe country that loses their claim.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    remove_claim = FRA\n}",
+        "description": "The defined scope loses their claim on the current province scope.",
+        "notes": "Works for both types of claims.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_core": {
+        "id": "remove_core",
+        "parameters": "<scope>\nThe country that loses their core.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    remove_core = FRA\n}",
+        "description": "The defined scope loses their core on the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_territorial_core": {
+        "id": "remove_territorial_core",
+        "parameters": "<scope>\nThe country that loses their territorial core.",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    remove_territorial_core = FRA\n}",
+        "description": "The defined scope loses their territorial core on the current province scope.",
+        "notes": "",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "streltsy_infantry": {
+        "id": "streltsy_infantry",
+        "parameters": "<scope>\nThe country scope the streltsy infantry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    streltsy_infantry = FRA\n}",
+        "description": "Spawns an streltsy infantry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected infantry unit.",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "cossack_cavalry": {
+        "id": "cossack_cavalry",
+        "parameters": "<scope>\nThe country scope the cossack cavalry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    cossack_cavalry = FRA\n}",
+        "description": "Spawns an cossack cavalry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected cavalry unit.",
+        "version_added": "1.22",
+        "macro": []
+    },
+    "marine_infantry": {
+        "id": "marine_infantry",
+        "parameters": "<scope>\nThe country scope the marine infantry belongs to",
+        "value_type": "Integer",
+        "example": "capital_scope = {\n    marine_infantry = FRA\n}",
+        "description": "Spawns a marine infantry unit in the current province scope for the defined country scope.",
+        "notes": "Uses the currently selected infantry unit.",
+        "version_added": "1.30",
+        "macro": []
+    },
+    "kill_units": {
+        "id": "kill_units",
+        "parameters": "who = <scope>\nOptional. Which country scopes should be affected.\ntype = <type>\nOptional. Which type of units that should be affected.\namount = <int>\nOptional. The specific amount to kill.",
+        "value_type": "Integer",
+        "example": "kill_units = {\n    who = enemy\n}\nkill_units = {\n    who = owner\n    type = infantry\n}\nkill_units = {\n    who = controller\n    type = artillery\n    amount = 5\n}",
+        "description": "Kills units following the defined parameters in the current province scope.",
+        "notes": "In the who parameter, you can use enemy, owner and controller.\nWhen used with no parameters, will kill all units within the current province scope.\nPossible types:\ninfantry\ncavalry\nartillery\nheavy_ship\nlight_ship\ngalley\ntransport\n<unit_name>",
+        "version_added": "1.12",
+        "macro": []
+    },
+    "add_unit_construction": {
+        "id": "add_unit_construction",
+        "parameters": "type = <type>\nWhich type of unit to build.\namount = <int>\nThe amount to build.\nspeed = <float>\nThe speed percentage of the base unit construction speed to use.\ncost = <float>\nThe cost percentage of the base unit construction cost to use.\nmercenary = yes\nOptional. Makes the constructed units mercenaries.",
+        "value_type": "Integer",
+        "example": "add_unit_construction = {\n    type = light_ship\n    amount = 20\n    speed = 0.1\n    cost = 0\n}",
+        "description": "Constructs the defined units in the current province scope.",
+        "notes": "Possible types:\ninfantry\ncavalry\nartillery\nheavy_ship\nlight_ship\ngalley\ntransport\n<unit_name>",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "build_to_forcelimit": {
+        "id": "build_to_forcelimit",
+        "parameters": "<type> = <float>\nThe type is any of the base unit types. The value is the percentage of forcelimit.",
+        "value_type": "Float",
+        "example": "build_to_forcelimit = {\n    heavy_ship = 0.3\n    light_ship = 0.3\n    transport = 0.2\n}",
+        "description": "Builds the defined units as a percentage of the owner's forcelimit in the current province scope.",
+        "notes": "1 is equal to 100% of the owner's forcelimit.\nPossible types:\ninfantry\ncavalry\nartillery\nheavy_ship\nlight_ship\ngalley\ntransport\n<unit_name>",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_loot": {
+        "id": "remove_loot",
+        "parameters": "who = <scope>\nThe country scope that receives the loot.\namount = <int>\nThe amount of loot to take.",
+        "value_type": "Integer",
+        "example": "remove_loot = {\n    who = ROOT\n    amount = 5\n}",
+        "description": "Removes loot from the current province scope and grants it to the defined country scope.",
+        "notes": "The who parameter accepts enemy, which distributes the loot to all current enemies of the province owner.",
+        "version_added": "1.15",
+        "macro": []
+    },
+    "change_siege": {
+        "id": "change_siege",
+        "parameters": "<int>\nThe process adjustment to add or subtract.",
+        "value_type": "Integer",
+        "example": "change_siege = 5",
+        "description": "Changes the siege progress in the current province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "recall_merchant": {
+        "id": "recall_merchant",
+        "parameters": "<scope>\nThe country scope to use.",
+        "value_type": "Integer",
+        "example": "recall_merchant = FRA",
+        "description": "Recalls a placed merchant in the current tradenode province scope.",
+        "notes": "Only works when the current province scope is the location of a tradenode center.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_trade_node_income": {
+        "id": "add_trade_node_income",
+        "parameters": "<int>\nThe amount to add or subtract.",
+        "value_type": "Integer",
+        "example": "add_trade_node_income = 10",
+        "description": "Adds income to the current tradenode province scope.",
+        "notes": "Only works when the current province scope is the location of a tradenode center.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "add_trade_modifier": {
+        "id": "add_trade_modifier",
+        "parameters": "who = <scope>\nThe country scope that receives the modifier.\nduration = <days>\nThe duration of the modifier.\npower = <float>\nThe amount of trade power to add or subtract.\nkey = <string>\nThe key to display as the modifier in the tooltip.",
+        "value_type": "Integer",
+        "example": "add_trade_modifier = {\n    who = ROOT\n    duration = 5475\n    power = 15\n    key = STRONG_MERCHANTS\n}",
+        "description": "Adds a trade modifier for the defined country scope in the current tradenode province scope.",
+        "notes": "Can be added to any province within a tradenode.",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "remove_trade_modifier": {
+        "id": "remove_trade_modifier",
+        "parameters": "who = <scope>\nThe country scope that has the trade modifier.\nname = <string>\nThe trade modifier to remove.",
+        "value_type": "Integer",
+        "example": "remove_trade_modifier = {\n    who = ROOT\n    key = STRONG_MERCHANTS\n}",
+        "description": "Removes a trade modifier for the defined country scope in the current tradenode province scope.",
+        "notes": "",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "center_of_trade": {
+        "id": "center_of_trade",
+        "parameters": "<int>\nCenter of trade level.",
+        "value_type": "Integer",
+        "example": "center_of_trade = 2",
+        "description": "Creates a center of trade in the province. Only works if there is no existing center of trade.",
+        "notes": "",
+        "version_added": "1.27",
+        "macro": []
+    },
+    "add_center_of_trade_level": {
+        "id": "add_center_of_trade_level",
+        "parameters": "<int>\nAmount to increase center of trade level.",
+        "value_type": "Integer",
+        "example": "add_center_of_trade_level = 1",
+        "description": "Increases the level of a center of trade in the province.",
+        "notes": "",
+        "version_added": "1.27",
+        "macro": []
+    }
+}

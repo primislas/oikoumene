@@ -1,0 +1,1192 @@
+{
+    "<province_id>": {
+        "id": "<province_id>",
+        "example": "110 = { }",
+        "description": "Refers to the province ids listed /Europa Universalis IV/map/definition.csv",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": [
+            "province_id"
+        ]
+    },
+    "<tag>": {
+        "id": "<tag>",
+        "example": "FRA = { }",
+        "description": "Refers to the country tags listed /Europa Universalis IV/common/country_tags",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": [
+            "tag"
+        ]
+    },
+    "<area>": {
+        "id": "<area>",
+        "example": "western_mediterrenean_area = { }",
+        "description": "Refers to any area found in /Europa Universalis IV/map/area.txt",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.14",
+        "macro": [
+            "area"
+        ]
+    },
+    "<region>": {
+        "id": "<region>",
+        "example": "france_region = { }",
+        "description": "Refers to any region found in /Europa Universalis IV/map/region.txt",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": [
+            "region"
+        ]
+    },
+    "<superregion>": {
+        "id": "<superregion>",
+        "example": "india_superregion = { }",
+        "description": "Refers to any superregion found in /Europa Universalis IV/map/superregion.txt",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.14 (1.15 for trigger)",
+        "macro": [
+            "superregion"
+        ]
+    },
+    "<provincegroup>": {
+        "id": "<provincegroup>",
+        "example": "my_prov_group = { }",
+        "description": "Refers to any province group found in /Europa Universalis IV/map/provincegroup.txt",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.14 (1.15 for trigger)",
+        "macro": [
+            "provincegroup"
+        ]
+    },
+    "<continent>": {
+        "id": "<continent>",
+        "example": "europe = { }",
+        "description": "Refers to any continent found in /Europa Universalis IV/map/continent.txt",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": [
+            "continent"
+        ]
+    },
+    "<trade_company>": {
+        "id": "<trade_company>",
+        "example": "trade_company_west_africa = { }",
+        "description": "Refers to any trade company found in /Europa Universalis IV/common/trade_companies/",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.6",
+        "macro": [
+            "trade_company"
+        ]
+    },
+    "<colonial_region>": {
+        "id": "<colonial_region>",
+        "example": "colonial_alaska = { }",
+        "description": "Refers to any colonial region found in /Europa Universalis IV/common/colonial_regions/",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.4",
+        "macro": [
+            "colonial_region"
+        ]
+    },
+    "<event_target>": {
+        "id": "<event_target>",
+        "example": "event_target:my_event_target_name = { }",
+        "description": "Refers to the saved event target scope. Potentially can be any scope internally.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Any",
+        "version_added": "1.8",
+        "macro": [
+            "event_target"
+        ]
+    },
+    "emperor": {
+        "id": "emperor",
+        "example": "emperor = { }",
+        "description": "Refers to the country (if it exists) that is currently the Holy Roman Emperor.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "revolution_target": {
+        "id": "revolution_target",
+        "example": "revolution_target = { }",
+        "description": "Refers to the country (if it exists) that is the current revolution target.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "crusade_target": {
+        "id": "crusade_target",
+        "example": "crusade_target = { }",
+        "description": "Refers to the country (if it exists) that is the current crusade target.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "colonial_parent": {
+        "id": "colonial_parent",
+        "example": "colonial_parent = { }",
+        "description": "Refers to the country (if it exists) that is the colonial parent of the current country scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "overlord": {
+        "id": "overlord",
+        "example": "overlord = { }",
+        "description": "Refers to the country (if it exists) that is the overlord of the current country scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "capital_scope": {
+        "id": "capital_scope",
+        "example": "capital_scope = { }",
+        "description": "Refers to the capital province of the current country scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "owner": {
+        "id": "owner",
+        "example": "owner = { }",
+        "description": "Refers to the country that owns the current province scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "controller": {
+        "id": "controller",
+        "example": "controller = { }",
+        "description": "Refers to the country that controls the current province scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "sea_zone": {
+        "id": "sea_zone",
+        "example": "sea_zone = { }",
+        "description": "Refers to the sea province on which the current land province scope has a port.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "most_province_trade_power": {
+        "id": "most_province_trade_power",
+        "example": "most_province_trade_power = { }",
+        "description": "The country in the trade node that generates the most trade power from provinces.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "strongest_trade_power": {
+        "id": "strongest_trade_power",
+        "example": "strongest_trade_power = { }",
+        "description": "The country with the most trade power in the node.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_ally": {
+        "id": "every_ally",
+        "example": "every_ally = { }",
+        "description": "Scopes to all valid countries that meet the triggers in the limit.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_coalition_member": {
+        "id": "every_coalition_member",
+        "example": "every_coalition_member = { }",
+        "description": "Scopes to all members of the coalition against the current scope (if any).",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_country": {
+        "id": "every_country",
+        "example": "every_country = { }",
+        "description": "Scopes to all countries in the world. Avoid this if you can use something more specific.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_elector": {
+        "id": "every_elector",
+        "example": "every_elector = { }",
+        "description": "Scopes to all electors of the HRE.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_enemy_country": {
+        "id": "every_enemy_country",
+        "example": "every_enemy_country = { }",
+        "description": "Scopes to all valid countries that meet the triggers in the limit.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_known_country": {
+        "id": "every_known_country",
+        "example": "every_known_country = { }",
+        "description": "Scopes to all countries that have been discovered by the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_local_enemy": {
+        "id": "every_local_enemy",
+        "example": "every_local_enemy = { }",
+        "description": "Scopes to all valid countries that meet the triggers in the limit.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_neighbor_country": {
+        "id": "every_neighbor_country",
+        "example": "every_neighbor_country = { }",
+        "description": "Scopes to all countries that share a border (or sea zone?) with the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_rival_country": {
+        "id": "every_rival_country",
+        "example": "every_rival_country = { }",
+        "description": "Scopes to all valid countries that meet the triggers in the limit.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_subject_country": {
+        "id": "every_subject_country",
+        "example": "every_subject_country = { }",
+        "description": "Scopes to all subject nations under the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "random_ally": {
+        "id": "random_ally",
+        "example": "random_ally = { }",
+        "description": "Scopes to one valid country that meet the triggers in the limit.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_coalition_member": {
+        "id": "random_coalition_member",
+        "example": "random_coalition_member = { }",
+        "description": "Scopes to one random member of the coalition against the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_country": {
+        "id": "random_country",
+        "example": "random_country = { }",
+        "description": "Scopes to one random country among all countries in the world. Avoid this if you can use something more specific.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_elector": {
+        "id": "random_elector",
+        "example": "random_elector = { }",
+        "description": "Scopes to one random elector of the HRE.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_enemy_country": {
+        "id": "random_enemy_country",
+        "example": "random_enemy_country = { }",
+        "description": "Scopes to one valid country that meet the triggers in the limit.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_known_country": {
+        "id": "random_known_country",
+        "example": "random_known_country = { }",
+        "description": "Scopes to one random country that has been discovered by the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_local_enemy": {
+        "id": "random_local_enemy",
+        "example": "random_local_enemy = { }",
+        "description": "Scopes to one valid country that meet the triggers in the limit.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_neighbor_country": {
+        "id": "random_neighbor_country",
+        "example": "random_neighbor_country = { }",
+        "description": "Scopes to one random country that shares a border (or sea zone?) with the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_rival_country": {
+        "id": "random_rival_country",
+        "example": "random_rival_country = { }",
+        "description": "Scopes to one valid country that meet the triggers in the limit.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_subject_country": {
+        "id": "random_subject_country",
+        "example": "random_subject_country = { }",
+        "description": "Scopes to one random subject country under the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "every_core_province": {
+        "id": "every_core_province",
+        "example": "every_core_province = { }",
+        "description": "Scopes to all provinces that this country has a core on, whether owned or not.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_heretic_province": {
+        "id": "every_heretic_province",
+        "example": "every_heretic_province = { }",
+        "description": "Scopes to all provinces whose religion is heretic to the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_owned_province": {
+        "id": "every_owned_province",
+        "example": "every_owned_province = { }",
+        "description": "Scopes to all provinces the current scope owns.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_province": {
+        "id": "every_province",
+        "example": "every_province = { }",
+        "description": "Scopes to all provinces in the world.\nNote: executing effects on every province without a limit will cause slowdown in game. Use something more specific if you can.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_core_province": {
+        "id": "random_core_province",
+        "example": "random_core_province = { }",
+        "description": "Scopes to one random province that the current scope has a core on, whether owned or not.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_heretic_province": {
+        "id": "random_heretic_province",
+        "example": "random_heretic_province = { }",
+        "description": "Scopes to one random province whose religion is heretic to the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_owned_area": {
+        "id": "random_owned_area",
+        "example": "random_owned_area = { }",
+        "description": "Scopes to one valid area that meet the triggers in the limit.\nYou can use type = all to scope to all valid areas.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "random_owned_province": {
+        "id": "random_owned_province",
+        "example": "random_owned_province = { }",
+        "description": "Scopes to one random province the current scope owns.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_trade_node": {
+        "id": "every_trade_node",
+        "example": "every_trade_node = { }",
+        "description": "Scopes to all trade nodes.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_active_trade_node": {
+        "id": "random_active_trade_node",
+        "example": "random_active_trade_node = { }",
+        "description": "Scopes to one valid tradenode (province) that meet the triggers in the limit.\nActive means the current scope is interacting with the trade node in some way.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "random_trade_node": {
+        "id": "random_trade_node",
+        "example": "random_trade_node = { }",
+        "description": "Scopes to one random trade node.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "home_trade_node_effect_scope": {
+        "id": "home_trade_node_effect_scope",
+        "example": "home_trade_node_effect_scope = { }",
+        "description": "Scopes to the trade node where the country has its main trading port.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "",
+        "macro": []
+    },
+    "every_empty_neighbor_province": {
+        "id": "every_empty_neighbor_province",
+        "example": "every_empty_neighbor_province = { }",
+        "description": "Scopes to all provinces sharing a border (or sea zone?) with the current scope that are colonizable and uncolonized.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_neighbor_province": {
+        "id": "every_neighbor_province",
+        "example": "every_neighbor_province = { }",
+        "description": "Scopes to all provinces sharing a border (or sea zone?) with the current scope.\nDoes not include empty provinces.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_province_in_state": {
+        "id": "every_province_in_state",
+        "example": "every_province_in_state = { }",
+        "description": "Scopes to all provinces in the same state (Does not apply to provinces in territories, if you want to apply in territories, then use area = { ... }).",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "random_empty_neighbor_province": {
+        "id": "random_empty_neighbor_province",
+        "example": "random_empty_neighbor_province = { }",
+        "description": "Scopes to one random province sharing a border (or sea zone?) with the current scope that is colonizable and uncolonized.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_neighbor_province": {
+        "id": "random_neighbor_province",
+        "example": "random_neighbor_province = { }",
+        "description": "Scopes to one random province sharing a border(or sea zone?) with the current scope.\nDoes not include empty provinces.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_province_in_state": {
+        "id": "random_province_in_state",
+        "example": "random_province_in_state = { }",
+        "description": "Scopes to one random province in the same state as the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "random_province": {
+        "id": "random_province",
+        "example": "random_province = { }",
+        "description": "Scopes to one random province among all provinces in the world.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_core_country": {
+        "id": "every_core_country",
+        "example": "every_core_country = { }",
+        "description": "Scopes to all countries that have a core on the current scope, whether existing or not.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_core_country": {
+        "id": "random_core_country",
+        "example": "random_core_country = { }",
+        "description": "Scopes to one random country that has a core on the current scope, whether existing or not.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "area": {
+        "id": "area",
+        "example": "area = { }",
+        "description": "Refers to all provinces in the area that the current province scope is in.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "region": {
+        "id": "region",
+        "example": "region = { }",
+        "description": "Refers to all provinces in the region that the current province scope is in.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "every_privateering_country": {
+        "id": "every_privateering_country",
+        "example": "every_privateering_country = { }",
+        "description": "Scopes to all countries that are sending privateers to the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "random_privateering_country": {
+        "id": "random_privateering_country",
+        "example": "random_privateering_country = { }",
+        "description": "Scopes to one random country that is sending privateers to the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "every_trade_node_member_country": {
+        "id": "every_trade_node_member_country",
+        "example": "every_trade_node_member_country = { }",
+        "description": "Scopes to all countries that own a province in the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_trade_node_member_country": {
+        "id": "random_trade_node_member_country",
+        "example": "random_trade_node_member_country = { }",
+        "description": "Scopes to one random country that owns a province in the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_trade_node_member_province": {
+        "id": "every_trade_node_member_province",
+        "example": "every_trade_node_member_province = { }",
+        "description": "Scopes to all provinces in the current trade node.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_trade_node_member_province": {
+        "id": "random_trade_node_member_province",
+        "example": "random_trade_node_member_province = { }",
+        "description": "Scopes to one random province in the current trade node.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "unit_owner": {
+        "id": "unit_owner",
+        "example": "unit_owner = { }",
+        "description": "Returns the unit's owner country scope.\nUsable from on_battle_won_unit and on_battle_lost_unit on actions.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "every_target_province": {
+        "id": "every_target_province",
+        "example": "every_target_province = { }",
+        "description": "Scopes to all provinces among those specified as targets in the mission.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "random_target_province": {
+        "id": "random_target_province",
+        "example": "random_target_province = { }",
+        "description": "Scopes to one random province among those specified as targets in the mission.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_army": {
+        "id": "any_army",
+        "example": "any_army = { }",
+        "description": "Scopes to all armies currently fielded by the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Unit",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_ally": {
+        "id": "all_ally",
+        "example": "all_ally = { }",
+        "description": "Scopes to all valid countries that meet the triggers.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_coalition_member": {
+        "id": "all_coalition_member",
+        "example": "all_coalition_member = { }",
+        "description": "Scopes to all members of the coalition against the current scope (if any).",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_country": {
+        "id": "all_country",
+        "example": "all_country = { }",
+        "description": "Scopes to all countries in the world excluding your own country. Avoid this if you can use something more specific.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_countries_including_self": {
+        "id": "all_countries_including_self",
+        "example": "all_countries_including_self = { }",
+        "description": "Scopes to all countries in the world including your own country. Avoid this if you can use something more specific.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.26",
+        "macro": []
+    },
+    "all_elector": {
+        "id": "all_elector",
+        "example": "all_elector = { }",
+        "description": "Scopes to all electors of the HRE",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_enemy_country": {
+        "id": "all_enemy_country",
+        "example": "all_enemy_country = { }",
+        "description": "Scopes to all valid countries that meet the triggers.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_known_country": {
+        "id": "all_known_country",
+        "example": "all_known_country = { }",
+        "description": "Scopes to all countries that have been discovered by the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_local_enemy": {
+        "id": "all_local_enemy",
+        "example": "all_local_enemy = { }",
+        "description": "Scopes to all valid countries that meet the triggers.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_neighbor_country": {
+        "id": "all_neighbor_country",
+        "example": "all_neighbor_country = { }",
+        "description": "Scopes to all countries that own a province that shares a border (or sea zone?) with a province owned by the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_rival_country": {
+        "id": "all_rival_country",
+        "example": "all_rival_country = { }",
+        "description": "Scopes to all valid countries that meet the triggers.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_subject_country": {
+        "id": "all_subject_country",
+        "example": "all_subject_country = { }",
+        "description": "Scopes to all subject countries under the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "all_core_province": {
+        "id": "all_core_province",
+        "example": "all_core_province = { }",
+        "description": "Scopes to all provinces that the current scope has a core on, whether owned or not.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_heretic_province": {
+        "id": "all_heretic_province",
+        "example": "all_heretic_province = { }",
+        "description": "Scopes to all provinces whose religion is heretic to the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_owned_province": {
+        "id": "all_owned_province",
+        "example": "all_owned_province = { }",
+        "description": "Scopes to all provinces owned by the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_province": {
+        "id": "all_province",
+        "example": "all_province = { }",
+        "description": "Scopes to all provinces in the world. Avoid this if you can use something more specific.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_state_province": {
+        "id": "all_state_province",
+        "example": "all_state_province = { }",
+        "description": "Scopes to all provinces in states of the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "all_states": {
+        "id": "all_states",
+        "example": "all_states = { }",
+        "description": "Scopes to all states of the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "all_active_trade_node": {
+        "id": "all_active_trade_node",
+        "example": "all_active_trade_node = { }",
+        "description": "Scopes to all active trade nodes.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "all_trade_node": {
+        "id": "all_trade_node",
+        "example": "all_trade_node = { }",
+        "description": "Scopes to all trade nodes.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_ally": {
+        "id": "any_ally",
+        "example": "any_ally = { }",
+        "description": "Scopes to one valid country that meet the triggers.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_coalition_member": {
+        "id": "any_coalition_member",
+        "example": "any_coalition_member = { }",
+        "description": "Scopes to one member of the coalition against the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_country": {
+        "id": "any_country",
+        "example": "any_country = { }",
+        "description": "Scopes to one country among all countries in the world. Avoid this if you can use something more specific.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_elector": {
+        "id": "any_elector",
+        "example": "any_elector = { }",
+        "description": "Scopes to one elector of the HRE.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_enemy_country": {
+        "id": "any_enemy_country",
+        "example": "any_enemy_country = { }",
+        "description": "Scopes to one valid country that meet the triggers.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_known_country": {
+        "id": "any_known_country",
+        "example": "any_known_country = { }",
+        "description": "Scopes to one country that has been discovered by the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_local_enemy": {
+        "id": "any_local_enemy",
+        "example": "any_local_enemy = { }",
+        "description": "Scopes to one valid country that meet the triggers.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_neighbor_country": {
+        "id": "any_neighbor_country",
+        "example": "any_neighbor_country = { }",
+        "description": "Scopes to one country sharing a border (or sea zone?) with the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_rival_country": {
+        "id": "any_rival_country",
+        "example": "any_rival_country = { }",
+        "description": "Scopes to one valid country that meet the triggers.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_subject_country": {
+        "id": "any_subject_country",
+        "example": "any_subject_country = { }",
+        "description": "Scopes to one subject country under the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.4",
+        "macro": []
+    },
+    "any_core_province": {
+        "id": "any_core_province",
+        "example": "any_core_province = { }",
+        "description": "Scopes to one province that the current scope has a core on, whether owned or not.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_heretic_province": {
+        "id": "any_heretic_province",
+        "example": "any_heretic_province = { }",
+        "description": "Scopes to one province whose religion is heretic to the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_owned_province": {
+        "id": "any_owned_province",
+        "example": "any_owned_province = { }",
+        "description": "Scopes to one province owned by the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_province": {
+        "id": "any_province",
+        "example": "any_province = { }",
+        "description": "Scopes to one province among all provinces in the world. Avoid this if you can use something more specific.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_state": {
+        "id": "any_state",
+        "example": "any_state = { }",
+        "description": "Scopes to one state of the current country.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "any_active_trade_node": {
+        "id": "any_active_trade_node",
+        "example": "any_active_trade_node = { }",
+        "description": "Scopes to one valid tradenode (province) that meet the triggers.\nNote: will return true if a merchant is placed, even without explicit triggers.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "any_trade_node": {
+        "id": "any_trade_node",
+        "example": "any_trade_node = { }",
+        "description": "Scopes to one trade node among all trade nodes in the world.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "home_trade_node": {
+        "id": "home_trade_node",
+        "example": "home_trade_node = { }",
+        "description": "Scopes to the trade node containing the current scope's main trade port.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_empty_neighbor_province": {
+        "id": "all_empty_neighbor_province",
+        "example": "all_empty_neighbor_province = { }",
+        "description": "Scopes to all provinces sharing a border (or sea zone?) with the current scope that are colonizable and uncolonized.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_province_in_state": {
+        "id": "all_province_in_state",
+        "example": "all_province_in_state = { }",
+        "description": "Scopes to all provinces in the same state as the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "all_neighbor_province": {
+        "id": "all_neighbor_province",
+        "example": "all_neighbor_province = { }",
+        "description": "Scopes to all provinces sharing a border (or sea zone?) with the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_empty_neighbor_province": {
+        "id": "any_empty_neighbor_province",
+        "example": "any_empty_neighbor_province = { }",
+        "description": "Scopes to one province sharing a border (or sea zone?) with the current scope that is colonizable and uncolonized.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_province_in_state": {
+        "id": "any_province_in_state",
+        "example": "any_province_in_state = { }",
+        "description": "Scopes to one province in the same state as the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.20",
+        "macro": []
+    },
+    "any_friendly_coast_border_province": {
+        "id": "any_friendly_coast_border_province",
+        "example": "any_friendly_coast_border_province = { }",
+        "description": "Scopes to one province that shares a border or sea zone with the current scope that is friendly to the current scope (meaning its owner is the same or has positive relations).",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.18",
+        "macro": []
+    },
+    "any_neighbor_province": {
+        "id": "any_neighbor_province",
+        "example": "any_neighbor_province = { }",
+        "description": "Scopes to one province that shares a border with the current scope.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_core_country": {
+        "id": "all_core_country",
+        "example": "all_core_country = { }",
+        "description": "Scopes to all countries that have a core on the current scope, whether existing or not.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_core_country": {
+        "id": "any_core_country",
+        "example": "any_core_country = { }",
+        "description": "Scopes to one country that has a core on the current scope, whether existing or not.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "area_for_scope_province": {
+        "id": "area_for_scope_province",
+        "example": "area_for_scope_province = { }",
+        "description": "Scopes to the area that the current province scope is in.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "region_for_scope_province": {
+        "id": "region_for_scope_province",
+        "example": "region_for_scope_province = { }",
+        "description": "Scopes to the region that the current province scope is in.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.14",
+        "macro": []
+    },
+    "all_privateering_country": {
+        "id": "all_privateering_country",
+        "example": "all_privateering_country = { }",
+        "description": "Scopes to all countries that are sending privateers to the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "all_trade_node_member_country": {
+        "id": "all_trade_node_member_country",
+        "example": "all_trade_node_member_country = { }",
+        "description": "Scopes to all countries that own a province in the current trade node.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_privateering_country": {
+        "id": "any_privateering_country",
+        "example": "any_privateering_country = { }",
+        "description": "Scopes to one country that is sending privateers to the current scope.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.6",
+        "macro": []
+    },
+    "any_trade_node_member_country": {
+        "id": "any_trade_node_member_country",
+        "example": "any_trade_node_member_country = { }",
+        "description": "Scopes to one country that owns a province in the current trade node.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Country",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_trade_node_member_province": {
+        "id": "all_trade_node_member_province",
+        "example": "all_trade_node_member_province = { }",
+        "description": "Scopes to 'all provinces in the current trade node.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_trade_node_member_province": {
+        "id": "any_trade_node_member_province",
+        "example": "any_trade_node_member_province = { }",
+        "description": "Scopes to one province in the current trade node.",
+        "multiple_scopes": false,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "all_target_province": {
+        "id": "all_target_province",
+        "example": "all_target_province = { }",
+        "description": "Scopes to all provinces specified as a target in the mission.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    },
+    "any_target_province": {
+        "id": "any_target_province",
+        "example": "any_target_province = { }",
+        "description": "Scopes to one province specified as a target in the mission.",
+        "multiple_scopes": true,
+        "changes_scope_to": "Province",
+        "version_added": "1.1",
+        "macro": []
+    }
+}
