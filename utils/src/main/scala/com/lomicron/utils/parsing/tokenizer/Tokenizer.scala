@@ -20,7 +20,7 @@ object Tokenizer {
   // TODO - remove escaped quotation marks from these patterns?
   val stringPat: Regex = """"(.*)"""".r
   val charPat: Regex = """'(.*)'""".r
-  val identifierPat: Regex = """(\w+[_\d*\w*[\u00C0-\u00FF]**]*)""".r
+  val identifierPat: Regex = """(\w+[_\d\w\u00C0-\u00FF]*)""".r
   val numberPat: Regex = """(-*\d+(?:.\d*)?)""".r
   val datePat: Regex = """(\d+)\.(\d+)\.(\d+)""".r
   val booleanPat: Regex = """(yes|no)""".r
