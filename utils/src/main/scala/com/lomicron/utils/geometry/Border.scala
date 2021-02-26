@@ -46,8 +46,8 @@ case class Border
       else if (right.isEmpty) false
       else if (left.exists(l => right.exists(r => l < r))) true
       else false
-    if (leftIsSmaller) Objects.hash(left, right, points.size.underlying())
-    else Objects.hash(right, left, points.size.underlying())
+    if (leftIsSmaller) Objects.hash(left, right, points.size)
+    else Objects.hash(right, left, points.size)
   }
 
   override def equals(obj: Any): Boolean = obj match {

@@ -19,7 +19,7 @@ class TokenizerSpec extends Specification {
   }
 
   "Tokenizer#readComment" should {
-    val validInput = "###this is a comment string\n".toStream
+    val validInput = "###this is a comment string\n".to(LazyList)
 
     "- return a comment token from a stream" >> {
       val (_, comment) = Tokenizer.readComment(validInput)

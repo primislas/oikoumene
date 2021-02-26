@@ -1,7 +1,6 @@
 package com.lomicron.utils.json
 
 import java.util.Map.Entry
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
 import com.fasterxml.jackson.core.`type`.TypeReference
@@ -84,7 +83,7 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
 
   def numericNode(double: Double): NumericNode = DoubleNode.valueOf(double)
 
-  def numericNode(bigDecimal: BigDecimal): NumericNode = DoubleNode.valueOf(bigDecimal.doubleValue())
+  def numericNode(bigDecimal: BigDecimal): NumericNode = DoubleNode.valueOf(bigDecimal.doubleValue)
 
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =

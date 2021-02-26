@@ -42,7 +42,7 @@ case class Modifier
     copy(conf = c)
   }
   def *(coef: Double): Modifier = multiply(coef)
-  def *(coef: BigDecimal): Modifier = multiply(coef.doubleValue())
+  def *(coef: BigDecimal): Modifier = multiply(coef.doubleValue)
 
   // hits = 339, isOptional = true, sample = 0.5
   def prestige: Option[BigDecimal] = conf.getBigDecimal("prestige")

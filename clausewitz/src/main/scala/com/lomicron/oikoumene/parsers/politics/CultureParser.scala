@@ -31,14 +31,14 @@ object CultureParser extends LazyLogging {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing cultures: ${o._2}")
         o._1.fields.toStream
       })
-      .getOrElse(Stream.empty)
+      .getOrElse(LazyList.empty)
       .map(e => e.getKey -> e.getValue).toMap
       .filterKeyValue((id, n) => {
         if (!n.isInstanceOf[ObjectNode])
           logger.warn(s"Expected culture group ObjectNode but at '$id' encountered ${n.toString}")
         n.isInstanceOf[ObjectNode]
       })
-      .mapValues(_.asInstanceOf[ObjectNode])
+      .mapValuesEx(_.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, religionGroup) => patchFieldValue(religionGroup, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq
@@ -66,7 +66,7 @@ object CultureParser extends LazyLogging {
     val cultures = cultureGroup.fields.toStream
       .map(e => e.getKey -> e.getValue).toMap
       .filterKeyValue((f, _) => isCultureField(f))
-      .mapValues(culture => culture.asInstanceOf[ObjectNode])
+      .mapValuesEx(culture => culture.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, culture) => patchFieldValue(culture, idKey, TextNode.valueOf(id)))
       .values
       .map(culture => patchFieldValue(culture, "culture_group_id", cultureGroup.get("id")))

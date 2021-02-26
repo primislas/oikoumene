@@ -10,7 +10,7 @@ import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
 import com.lomicron.utils.parsing.scopes.ParsingError
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait Deserializer {
   def run(obj: ObjectNode): (JsonNode, Seq[ParsingError])
@@ -83,12 +83,12 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
                                         errors: Seq[ParsingError] = Seq.empty)
   : (JsonNode, List[String], Seq[ParsingError]) = {
 
-    val objFieldsToDeserialize = o.fields().asScala.to[Seq]
+    val objFieldsToDeserialize = o.fields().asScala.to(Seq)
       .filter(arrayKey != _.getKey)
       .filter(_.getValue.isInstanceOf[ObjectNode])
       .map(e => DeserializedObject(e.getKey, e.getValue.asInstanceOf[ObjectNode], path :+ e.getKey))
 
-    val arrObjsToDeserialize = o.fields().asScala.to[Seq]
+    val arrObjsToDeserialize = o.fields().asScala.to(Seq)
       .filter(_.getValue.isInstanceOf[ArrayNode])
       .flatMap(e => {
         val key = e.getKey

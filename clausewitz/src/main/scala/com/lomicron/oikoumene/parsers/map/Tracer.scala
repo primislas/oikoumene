@@ -1,34 +1,57 @@
 package com.lomicron.oikoumene.parsers.map
 
-import java.awt.Point
-import java.awt.image.BufferedImage
-
 import com.lomicron.oikoumene.parsers.map.Tracer.MAX_MAP_BORDER_LINE_LENGTH
 import com.lomicron.utils.collection.CollectionUtils.{OptionEx, toOption}
-import com.lomicron.utils.geometry.{Border, BorderPoint, Geometry, Point2D, Polygon, Shape}
+import com.lomicron.utils.geometry._
+import com.typesafe.scalalogging.LazyLogging
 
-object Tracer {
+import java.awt.Point
+import java.awt.image.BufferedImage
+import scala.collection.parallel.CollectionConverters._
+
+object Tracer extends LazyLogging {
+  type Labels = Array[Array[Int]]
 
   val MAX_MAP_BORDER_LINE_LENGTH = 10
 
   def trace(img: BufferedImage): Seq[Shape] = {
-    var shapes = Seq.empty[Shape]
-    val groups = BitmapGrouper.toGroups(img)
-    var tracedGroups = Set.empty[Int]
-
-    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
-      val group = groups(x)(y)
-      if (!tracedGroups.contains(group)) {
-        val startingPoint = new Point(x, y)
-        val tracer = Tracer(img, startingPoint, groups)
-        val shape = tracer.trace().copy(groupId = group)
-
-        shapes = shapes :+ shape
-        tracedGroups = tracedGroups + group
-      }
-    }
+    logger.info("Labeling map components...")
+    val labeledImg = BitmapRegionScanner.labelRegions(img)
+    logger.info(s"Identified ${labeledImg.size} map components")
+    val shapes = traceShapes(labeledImg)
+    logger.info(s"Traced ${shapes.size} shapes")
 
     clipShapes(shapes)
+  }
+
+  def traceShapes(labeledImage: LabeledImage): Seq[Shape] = {
+//    var shapes = Seq.empty[Shape]
+//    val img = labeledImage.img
+//    val groups = labeledImage.labels
+//    var tracedGroups = Set.empty[Int]
+//
+//    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
+//      val group = groups(x)(y)
+//      if (!tracedGroups.contains(group)) {
+//        val startingPoint = new Point(x, y)
+//        val tracer = Tracer(img, startingPoint, groups)
+//        val shape = tracer.trace().copy(groupId = group)
+//
+//        shapes = shapes :+ shape
+//        tracedGroups = tracedGroups + group
+//      }
+//    }
+//    shapes
+
+    labeledImage
+      .regions
+      .par
+      .map(group => {
+        val startingPoint = new Point(group.x, group.y)
+        val tracer = Tracer(labeledImage.img, startingPoint, labeledImage.labels)
+        tracer.trace().copy(groupId = group.id)
+      })
+      .seq
   }
 
   def clipShapes(ss: Seq[Shape]): Seq[Shape] = {
@@ -57,14 +80,14 @@ object Tracer {
 
 }
 
-case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Direction = Right) extends BitmapWalker {
+case class Tracer(img: BufferedImage, p: Point, labels: Array[Array[Int]], d: Direction = Right) extends BitmapWalker {
 
   val maxHeight: Int = img.getHeight - 1
   val maxWidth: Int = img.getWidth - 1
   private var currentPoint: Point = p
   private var currentDirection: Direction = d
-  private var currentNeighbor: Option[Int] = neighborGroup(p, d.rBackward)
-  private val group: Int = groupOf(p)
+  private var currentNeighbor: Option[Int] = neighborRegion(p, d.rBackward)
+  private val group: Int = regionOf(p)
 
   def trace(): Shape = {
     val startingPoint = p
@@ -107,17 +130,17 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
 
     def isLongBorderLine: Boolean = pixelLine == MAX_MAP_BORDER_LINE_LENGTH && (cp.y == 0 || cp.y == maxHeight || cp.x == 0 || cp.x == maxWidth)
 
-    def rotationNeighbor: Option[Int] = if (nextD == currentDirection.rBackward) currentNeighbor else neighborGroup(cp, nextD.rBackward)
+    def rotationNeighbor: Option[Int] = if (nextD == currentDirection.rBackward) currentNeighbor else neighborRegion(cp, nextD.rBackward)
 
     while (sameDirection && sameNeighbor(cg) && !isLongBorderLine) {
       cp = neighbor(cp, nextD).get
-      cg = neighborGroup(cp, nextD.rBackward)
+      cg = neighborRegion(cp, nextD.rBackward)
       nextD = nextDirection(cp, cd, group)
       pixelLine += 1
     }
 
     if (nextD == cd.rBackward)
-      if (neighborGroup(cp, nextD).contains(group))
+      if (neighborRegion(cp, nextD).contains(group))
         cp = neighbor(cp, nextD).get
       else cp = diagNeighbor(cp, nextD.rForward).get
 
@@ -148,7 +171,7 @@ case class Tracer(img: BufferedImage, p: Point, groups: Array[Array[Int]], d: Di
 
     val bps = if (diffNeighbor.nonEmpty) {
       val tColor = neighborColor(cp, currentDirection.rBackward)
-      val tGroup = neighborGroup(cp, currentDirection.rBackward)
+      val tGroup = neighborRegion(cp, currentDirection.rBackward)
       BorderPoint(ps.head, currentColor, currentNeighbor) +: ps.drop(1).map(BorderPoint(_, tColor, tGroup))
     } else ps.map(BorderPoint(_, currentColor, currentNeighbor))
 

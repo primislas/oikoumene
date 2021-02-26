@@ -14,6 +14,8 @@ import java.awt.image.{BufferedImage, IndexColorModel}
 import java.nio.file.{Path, Paths}
 import javax.imageio.ImageIO
 import scala.Function.tupled
+import scala.collection.parallel.CollectionConverters._
+import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 
 object MapParser extends LazyLogging {
@@ -88,17 +90,21 @@ object MapParser extends LazyLogging {
     g
   }
 
+  def parallelizeImage(img: BufferedImage): ParSeq[(Int, Int)] = {
+    val parallelism = java.lang.Runtime.getRuntime.availableProcessors
+    val step = img.getHeight / parallelism
+    (0 until parallelism)
+      .par
+      .map(i => (i * step, (i + 1) * step))
+      .map(t => if (t._2 > img.getHeight) (t._1, img.getHeight) else t)
+  }
+
   def parseMapProvinceTerrain
   (
     provinces: BufferedImage,
     terrain: BufferedImage
   ): Map[Color, Color] = {
-    val parallelism = java.lang.Runtime.getRuntime.availableProcessors
-    val step = provinces.getHeight / parallelism
-    val res = (0 until parallelism)
-      .map(i => (i * step, (i + 1) * step))
-      .map(t => if (t._2 > provinces.getHeight) (t._1, provinces.getHeight) else t)
-      .par
+    parallelizeImage(provinces)
       .map(parseMapProvinceTerrain(provinces, terrain, _))
       .reduce((m1, m2) => {
         m2.foreach(e => {
@@ -119,8 +125,8 @@ object MapParser extends LazyLogging {
         })
         m1
       })
-      .mapValues(pColors => Color(pColors.maxBy(_._2)._2))
       .toMap
+      .mapValuesEx(pColors => Color(pColors.maxBy(_._2)._2))
       .mapKeys(Color(_))
 //      .toMap
 //
@@ -141,7 +147,7 @@ object MapParser extends LazyLogging {
 //    }
 
 //    Map.empty
-    res
+//    res
   }
 
   def parseMapProvinceTerrain
@@ -191,12 +197,7 @@ object MapParser extends LazyLogging {
   }
 
   def parseRoutes(provinces: BufferedImage): Seq[TileRoute] = {
-    val parallelism = java.lang.Runtime.getRuntime.availableProcessors
-    val step = provinces.getHeight / parallelism
-    (0 until parallelism)
-      .map(i => (i * step, (i + 1) * step))
-      .map(t => if (t._2 > provinces.getHeight) (t._1, provinces.getHeight) else t)
-      .par
+    parallelizeImage(provinces)
       .map(range => {
         val routesByProv = collection.mutable.Map.empty[Int, Set[Int]]
         for {

@@ -11,6 +11,7 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.immutable.ListMap
+import scala.collection.parallel.CollectionConverters._
 import scala.util.matching.Regex
 
 case class FileResourceRepository(settings: GameFilesSettings)
@@ -192,7 +193,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
       .map(_.toString)
       .filter(_.matches(s".*_l_$language\\.yml$$"))
       .map(IO.readTextFile(_, StandardCharsets.UTF_8))
-      .flatMap(_.lines)
+      .flatMap(_.linesIterator)
       .flatMap(LocalisationEntry.fromString)
       .seq
   }
@@ -263,7 +264,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
     readFiles(ps).toMap
       .mapKVtoValue(FileNameAndContent)
       .mapKeys(idFromProvHistFileName)
-      .filterKeys(_.isDefined)
+      .filterKeysEx(_.isDefined)
       .mapKeys(_.get)
   }
 

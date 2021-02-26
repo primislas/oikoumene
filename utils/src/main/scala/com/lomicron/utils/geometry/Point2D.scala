@@ -108,8 +108,8 @@ class Point2DSerializer extends JsonSerializer[Point2D] {
 
   override def serialize(p: Point2D, json: JsonGenerator, serializers: SerializerProvider): Unit = {
     json.writeStartArray()
-    json.writeNumber(BigDecimal(p.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).doubleValue())
-    json.writeNumber(BigDecimal(p.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+    json.writeNumber(BigDecimal(p.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).doubleValue)
+    json.writeNumber(BigDecimal(p.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).doubleValue)
     json.writeEndArray()
   }
 

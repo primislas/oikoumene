@@ -33,15 +33,15 @@ object ColonialRegionParser extends LazyLogging {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing terrain: ${o._2}")
         o._1.fields.toStream
       })
-      .getOrElse(Stream.empty)
+      .getOrElse(LazyList.empty)
       .map(e => e.getKey -> e.getValue).toMap
       .filterValues(n => {
         if (!n.isInstanceOf[ObjectNode])
           logger.warn(s"Expected colonial region ObjectNodes but encountered ${n.toString}")
         n.isInstanceOf[ObjectNode]
       })
-      .mapValues(_.asInstanceOf[ObjectNode])
-      .mapValues(JsonMapper.renameField(_, "provinces", provinceIdsKey))
+      .mapValuesEx(_.asInstanceOf[ObjectNode])
+      .mapValuesEx(JsonMapper.renameField(_, "provinces", provinceIdsKey))
       .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq

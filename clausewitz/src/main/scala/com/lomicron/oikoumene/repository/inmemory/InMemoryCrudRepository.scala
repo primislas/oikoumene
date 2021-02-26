@@ -33,7 +33,7 @@ abstract class InMemoryCrudRepository[K: Ordering, V](val keyOf: V => Option[K])
     toTry(entities.get(key), s"No entity with key $key found.")
 
   override def findAll: Seq[V] =
-    entities.values.to[Seq]
+    entities.values.to(Seq)
 
   override def remove(key: K): Try[V] =
     toTry(entities.remove(key), s"Failed to remove an entity with key $key.")

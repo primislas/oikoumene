@@ -5,7 +5,7 @@ import scalaz.State
 import scala.util.matching.Regex
 
 object Tokenizer {
-  type Chars = Stream[Char]
+  type Chars = LazyList[Char]
   type ParsingState = State[Chars, Token]
 
   val newLine = '\n'
@@ -25,9 +25,9 @@ object Tokenizer {
   val datePat: Regex = """(\d+)\.(\d+)\.(\d+)""".r
   val booleanPat: Regex = """(yes|no)""".r
 
-  def tokenize(s: String): Seq[Token] = tokenize(s.toStream)
+  def tokenize(s: String): Seq[Token] = tokenize(s.to(LazyList))
 
-  def tokenize(s: Stream[Char]): Seq[Token] = {
+  def tokenize(s: LazyList[Char]): Seq[Token] = {
     @annotation.tailrec
     def parseAll(chars: Chars, tokens: Vector[Token]): (Chars, Seq[Token]) = {
       val (nextChars, token) = nextToken(chars)
@@ -58,13 +58,13 @@ object Tokenizer {
     case default => throw new RuntimeException(s"Parsing exception: encountered unknown bracket $default")
   }
 
-  val readComment: Stream[Char] => (Chars, Token) = s => {
+  val readComment: LazyList[Char] => (Chars, Token) = s => {
     val notCommentEnd: Char => Boolean = !commentEnds.contains(_)
     val c = s.takeWhile(notCommentEnd).mkString
     (s.drop(c.length), Comment(c.dropWhile(_ == '#').trim))
   }
 
-  val readWord: Stream[Char] => (Chars, Token) = cs => {
+  val readWord: LazyList[Char] => (Chars, Token) = cs => {
     val word = StringAccumulator(cs).mkString
     (cs.drop(word.length), parseWord(word))
   }
@@ -95,7 +95,7 @@ object Tokenizer {
 
       upds match {
         case c #:: _     => readBasedOnHead(c)
-        case Stream.Empty => (upds, EOF)
+        case LazyList() => (upds, EOF)
       }
     }
   }
@@ -118,7 +118,7 @@ object Tokenizer {
       true
     }
 
-    def chars: Chars = cs.toStream
+    def chars: Chars = cs.to(LazyList)
   }
 
   object StringAccumulator {

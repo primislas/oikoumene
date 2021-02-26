@@ -31,16 +31,16 @@ object ContinentParser extends LazyLogging {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing superregions: ${o._2}")
         o._1.fields.toStream
       })
-      .getOrElse(Stream.empty)
+      .getOrElse(LazyList.empty)
       .map(e => e.getKey -> e.getValue).toMap
-      .mapValues(ClausewitzParser.objToEmptyArray)
+      .mapValuesEx(ClausewitzParser.objToEmptyArray)
       .filterValues(n => {
         if (!n.isInstanceOf[ArrayNode])
           logger.warn(s"Expected super-region ArrayNodes but encountered ${n.toString}")
         n.isInstanceOf[ArrayNode]
       })
-      .mapValues(_.asInstanceOf[ArrayNode])
-      .mapValues(objectNode.set(provinceIdsKey, _).asInstanceOf[ObjectNode])
+      .mapValuesEx(_.asInstanceOf[ArrayNode])
+      .mapValuesEx(objectNode.set(provinceIdsKey, _).asInstanceOf[ObjectNode])
       .mapKVtoValue((id, sRegion) => patchFieldValue(sRegion, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq

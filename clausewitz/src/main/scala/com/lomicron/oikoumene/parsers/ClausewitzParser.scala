@@ -144,7 +144,7 @@ object ClausewitzParser extends LazyLogging {
   def mapEntityFilesToFileNames(filesByName: Map[String, String]): Map[String, ObjectNode] =
     parseFilesByFileNames(filesByName, o => Seq(o))
       .filterValues(_.nonEmpty)
-      .mapValues(_.head)
+      .mapValuesEx(_.head)
 
   def parseFilesAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, o => Seq(o))
@@ -177,7 +177,7 @@ object ClausewitzParser extends LazyLogging {
    fileParser: ObjectNode => Seq[ObjectNode])
   : Map[String, Seq[ObjectNode]] =
     filesByName
-      .mapValues(parse)
+      .mapValuesEx(parse)
       .mapKVtoValue((filename, o) => {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing $filename: ${o._2}")
         fileParser(o._1)

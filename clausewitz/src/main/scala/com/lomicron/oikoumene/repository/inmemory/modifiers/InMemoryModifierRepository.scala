@@ -18,7 +18,7 @@ case class InMemoryModifierRepository()
     val m = find(keys)
       .filter(keyOf(_).isDefined)
       .groupBy(keyOf(_).get)
-      .mapValues(_.head)
+      .mapValuesEx(_.head)
       .flatMapValues(v => v.localisation.flatMap(_.name).orElse(v.id))
     SortedMap[String, String]() ++ m
   }

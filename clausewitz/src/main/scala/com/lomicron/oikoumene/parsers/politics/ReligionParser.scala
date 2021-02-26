@@ -48,7 +48,7 @@ object ReligionParser extends LazyLogging {
     val religions = religionGroup.fields.toStream
       .map(e => e.getKey -> e.getValue).foldLeft(ListMap[String, JsonNode]())(_ + _)
       .filterKeyValue((_, v) => isReligion(v))
-      .mapValues(religion => religion.asInstanceOf[ObjectNode])
+      .mapValuesEx(religion => religion.asInstanceOf[ObjectNode])
       .mapKVtoValue((id, religion) => religion.setEx(idKey, id))
       .values
       .map(religion => religion.setEx("religion_group", religionGroup.get("id")))

@@ -26,15 +26,15 @@ object JsonParser {
 
   def parse(ts: Seq[Token], deserializer: Deserializer): (JsonNode, Seq[ParsingError]) = {
     @annotation.tailrec
-    def rec(scope: ParsingScope, ts: Stream[Token]): ObjectScope =
+    def rec(scope: ParsingScope, ts: LazyList[Token]): ObjectScope =
       ts match {
-        case Stream.Empty => scope.objectScope.get
+        case LazyList() => scope.objectScope.get
         case h #:: t =>
           val (nextScope, _) = scope.nextScope(h)
           rec(nextScope, t)
       }
 
-    val scope = rec(ObjectScope(rootKey, None), ts.toStream)
+    val scope = rec(ObjectScope(rootKey, None), ts.to(LazyList))
     val (node, errors) = deserializer.run(scope.parsedObject)
     (node, scope.errors ++ errors)
   }

@@ -98,7 +98,7 @@ object Oikoumene extends LazyLogging {
 
     logger.info("Loading map...")
     val geography = MapParser(repos)
-    logger.info(s"Loaded ${geography.map.tileRoutes.map(_.source).distinct.size} map provinces")
+    logger.info(s"Loaded ${geography.map.mercator.provinces.size} map provinces")
 
     logger.info("Loading province configs...")
     val provinces = ProvinceParser(repos)
