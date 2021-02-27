@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
+import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
@@ -28,62 +29,37 @@ object MapParser extends LazyLogging {
     val g = repos.geography
 
     logger.info("Parsing rivers...")
-    val rivers = r.getRiversMap.map(fetchMap)
-      .map(parseRivers)
-      .getOrElse(Seq.empty)
-      .map(_.smooth)
-      .map(fitRiverCurves)
-    g.map.createRivers(rivers)
+    val rivers = parseRivers(r, g)
     logger.info(s"Identified ${rivers.size} rivers")
 
     logger.info("Parsing terrain...")
-    val terrainMap = r.getTerrainMap.map(fetchMap)
-    terrainMap
-      .map(parseTerrainColors)
-      .map(cs => cs.map(Color(_)))
-      .foreach(colors => g.map.rebuildTerrainColors(colors))
-    logger.info("Identified terrain colors...")
+    val terrainColors = parseTerrainColors(r, g)
+    logger.info(s"Identified terrain ${terrainColors.length} colors")
 
     logger.info("Parsing map provinces...")
     val provs = r.getProvinceMap.map(fetchMap)
-    val terrainByProvOpt = for {
-      provinces <- provs
-      terrain <- r.getTerrainMap.map(fetchMap)
-    } yield parseMapProvinceTerrain(provinces, terrain)
-    val terrainByProv = terrainByProvOpt.getOrElse(Map.empty)
-
-    //    val tiles = for {
-    //      provinces <- provs
-    //      terrain <- r.getTerrainMap.map(fetchMap)
-    //      height <- r.getHeightMap.map(fetchMap)
-    //    } yield parseMapTiles(provinces, terrain, height)
-    //    logger.info(s"Identified ${tiles.map(_.size).getOrElse(0)} map tiles")
-    //
-    //    logger.info("Parsing map terrain...")
-    //    val terrainByProv = tiles.getOrElse(Seq.empty)
-    //      .mapBy(_.color)
-    //      .mapValues(_.terrainColor)
-    //      .filter(_._2.isDefined)
-    //      .mapValues(_.get)
-    g.map.setTerrainProvinceColors(terrainByProv)
+    val terrainByProv = parseProvinceTerrain(provs, r, g)
     logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
     logger.info("Calculating map shapes...")
     var shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
     logger.info(s"Identified ${shapes.size} map shapes")
-    val borders = shapes.flatMap(_.borders).toSet.map(fitBorderCurves)
-    val bconfigs = borders.toSeq.toMapEx(b => (b, b))
-    logger.info(s"Identified ${borders.size} border segments")
+    val allBorders = shapes.flatMap(_.borders)
+    logger.info(s"Identified ${allBorders.size} border segments")
+    // TODO: .distinct and .toSet produce different results; why? how? investigate
+    val borders = allBorders.distinct.map(fitBorderCurves)
+    val bconfigs = borders.toMapEx(b => (b, b))
+    logger.info(s"Identified ${borders.size} unique border segments")
     shapes = shapes.map(fitProvinceCurves(_, bconfigs))
     logger.info(s"Calculated province curvature")
+
     val width = provs.map(_.getWidth).getOrElse(0)
     val height = provs.map(_.getHeight).getOrElse(0)
-    val mercator = MercatorMap(shapes, borders.toSeq, rivers, width, height)
+    val mercator = MercatorMap(shapes, borders, rivers, width, height)
     g.map.updateMercator(mercator)
 
     logger.info("Calculating map routes...")
-    val provinceMap = r.getProvinceMap.map(fetchMap)
-    val routes = provinceMap.map(parseRoutes).getOrElse(Seq.empty)
+    val routes = provs.map(parseRoutes).getOrElse(Seq.empty)
     g.map.updateTileRoutes(routes)
     logger.info(s"Identified ${routes.size} map routes")
 
@@ -97,6 +73,39 @@ object MapParser extends LazyLogging {
       .par
       .map(i => (i * step, (i + 1) * step))
       .map(t => if (t._2 > img.getHeight) (t._1, img.getHeight) else t)
+  }
+
+  def parseRivers(r: ResourceRepository, g: GeographicRepository): Seq[River] = {
+    val rivers = r.getRiversMap.map(fetchMap)
+      .map(parseRivers)
+      .getOrElse(Seq.empty)
+      .map(_.smooth)
+      .map(fitRiverCurves)
+    g.map.createRivers(rivers)
+    rivers
+  }
+
+  def parseTerrainColors(r: ResourceRepository, g: GeographicRepository): Array[Color] = {
+    val terrainMap = r.getTerrainMap.map(fetchMap)
+    val colors = terrainMap.map(parseTerrainColors).map(cs => cs.map(Color(_)))
+    colors.foreach(colors => g.map.rebuildTerrainColors(colors))
+    colors.getOrElse(Array.empty)
+  }
+
+  def parseProvinceTerrain
+  (
+    provinces: Option[BufferedImage],
+    r : ResourceRepository,
+    g: GeographicRepository
+  ): Map[Color, Color] = {
+    val terrainByProvOpt = for {
+      provs <- provinces
+      terrain <- r.getTerrainMap.map(fetchMap)
+    } yield parseMapProvinceTerrain(provs, terrain)
+    val terrainByProv = terrainByProvOpt.getOrElse(Map.empty)
+
+    g.map.setTerrainProvinceColors(terrainByProv)
+    terrainByProv
   }
 
   def parseMapProvinceTerrain
@@ -128,26 +137,6 @@ object MapParser extends LazyLogging {
       .toMap
       .mapValuesEx(pColors => Color(pColors.maxBy(_._2)._2))
       .mapKeys(Color(_))
-//      .toMap
-//
-//    val terrainColorsByProv: collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = collection.mutable.Map.empty
-//    for {
-//      x <- 0 until width
-//      y <- yFrom until yTo
-//    } {
-//      for {
-//        provColor <- getRGB(provinces, x, y)
-//        terrainColor <- getRGB(terrain, x, y)
-//      } {
-//        val provTerrain = terrainColorsByProv.getOrElse(provColor, collection.mutable.Map.empty)
-//        val tCount = provTerrain.getOrElse(terrainColor, 0) + 1
-//        provTerrain + (terrainColor -> tCount)
-//        terrainColorsByProv + (provColor -> provTerrain)
-//      }
-//    }
-
-//    Map.empty
-//    res
   }
 
   def parseMapProvinceTerrain
@@ -231,14 +220,6 @@ object MapParser extends LazyLogging {
       })
       .toSet
       .toSeq
-
-
-//
-//    var routes = Set.empty[TileRoute]
-//    for (y <- 0 until provinces.getHeight; x <- 0 until provinces.getWidth)
-//      routes = routes ++ parseRoutes(provinces, x, y)
-//
-//    routes.toSeq
   }
 
   def parseRoutes(img: BufferedImage, x: Int, y: Int): Option[(Int, Seq[Int])] = {
@@ -305,6 +286,5 @@ object MapParser extends LazyLogging {
 
   def getPolygonPath(p: Polygon, bconfigs: Map[Border, Border]): Polypath =
     getBorderPath(Border(p.points :+ p.points.head), bconfigs)
-
 
 }

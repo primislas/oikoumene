@@ -24,25 +24,7 @@ object Tracer extends LazyLogging {
     clipShapes(shapes)
   }
 
-  def traceShapes(labeledImage: LabeledImage): Seq[Shape] = {
-//    var shapes = Seq.empty[Shape]
-//    val img = labeledImage.img
-//    val groups = labeledImage.labels
-//    var tracedGroups = Set.empty[Int]
-//
-//    for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
-//      val group = groups(x)(y)
-//      if (!tracedGroups.contains(group)) {
-//        val startingPoint = new Point(x, y)
-//        val tracer = Tracer(img, startingPoint, groups)
-//        val shape = tracer.trace().copy(groupId = group)
-//
-//        shapes = shapes :+ shape
-//        tracedGroups = tracedGroups + group
-//      }
-//    }
-//    shapes
-
+  def traceShapes(labeledImage: LabeledImage): Seq[Shape] =
     labeledImage
       .regions
       .par
@@ -52,7 +34,6 @@ object Tracer extends LazyLogging {
         tracer.trace().copy(groupId = group.id)
       })
       .seq
-  }
 
   def clipShapes(ss: Seq[Shape]): Seq[Shape] = {
     val bs = ss.flatMap(_.borders)

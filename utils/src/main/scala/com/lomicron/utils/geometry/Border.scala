@@ -2,8 +2,6 @@ package com.lomicron.utils.geometry
 
 import com.lomicron.utils.collection.Emptiable
 
-import java.util.Objects
-
 case class Border
 (
   points: Seq[Point2D] = Seq.empty,
@@ -44,10 +42,20 @@ case class Border
     val leftIsSmaller =
       if (left.isEmpty) true
       else if (right.isEmpty) false
-      else if (left.exists(l => right.exists(r => l < r))) true
-      else false
-    if (leftIsSmaller) Objects.hash(left, right, points.size)
-    else Objects.hash(right, left, points.size)
+      else left.exists(l => right.exists(r => l < r))
+    None.hashCode()
+    if (leftIsSmaller) hashCodeOf(left, right, points.size)
+    else hashCodeOf(right, left, points.size)
+  }
+
+  def hashCodeOf(a: Option[Int], b: Option[Int], size: Int): Int = {
+    var res = 1
+    val aInt = a.getOrElse(0)
+    val bInt = b.getOrElse(0)
+    res = 31 * res + aInt
+    res = 31 * res + bInt
+    res = 31 * res + size
+    res
   }
 
   override def equals(obj: Any): Boolean = obj match {

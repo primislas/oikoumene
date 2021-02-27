@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage
 import scala.collection.mutable
 
 
-
 object BitmapRegionScanner extends LazyLogging {
   type RegionStarts = collection.mutable.Map[Int, BitmapRegion]
 
@@ -18,11 +17,13 @@ object BitmapRegionScanner extends LazyLogging {
     val regionStarts = collection.mutable.Map.empty[Int, BitmapRegion]
     val scanner = BitmapRegionScanner(img, labels, regionStarts)
 
+    // labeling first pass:
+    //    * assigning labels row by row
+    //    * marking labels belonging to same regions
     val mgr = MapParser
       .parallelizeImage(img)
-      .map(fromTo => scanner.scan(fromTo._1, fromTo._2))
+      .map(fromTo => scanner.label(fromTo._1, fromTo._2))
       .reduce(_ add _)
-    logger.info("Scanner first pass: OK")
 
     MapParser
       .parallelizeImage(img)
@@ -32,9 +33,9 @@ object BitmapRegionScanner extends LazyLogging {
         for (x <- 0 until img.getWidth)
           scanner.mergeRegionsVertically(x, y, mgr)
       })
+    logger.info("Labeling first pass: Done")
 
-//    val mgr = scanner.scan(0, img.getHeight)
-
+    // merging labels belong to the same region
     for (y <- 0 until img.getHeight; x <- 0 until img.getWidth) {
       val id = labels(x)(y)
       val gid = mgr.regionLabelOf(id).getOrElse(id)
@@ -65,13 +66,15 @@ case class BitmapRegionScanner(img: BufferedImage, labels: Labels, regionStarts:
   def topNeighborColorMatches(x: Int, y: Int, c: Int, yFrom: Int = 0): Boolean =
     y > yFrom && getRGB(img, x, y - 1).contains(c)
 
-  def scan(yFrom: Int, yUntil: Int): RegionMgr = {
+  def label(yFrom: Int, yUntil: Int): RegionMgr = {
     logger.info(s"Scanning map from $yFrom until $yUntil")
     var labelSeq = img.getWidth * yFrom
+
     def nextId(): Int = {
       labelSeq = labelSeq + 1
       labelSeq
     }
+
     val mgr = RegionMgr()
 
     for (y <- yFrom until yUntil; x <- 0 until img.getWidth) {
@@ -83,7 +86,6 @@ case class BitmapRegionScanner(img: BufferedImage, labels: Labels, regionStarts:
       }
     }
 
-    logger.info(s"Scanned map from $yFrom until $yUntil: ${mgr.regionLabels.size} regions")
     mgr
   }
 
@@ -107,13 +109,6 @@ case class BitmapRegionScanner(img: BufferedImage, labels: Labels, regionStarts:
           val minLabel = Math.min(leftLabel, topLabel)
           setLabel(minLabel)
         }
-
-//        val leftLabel = leftNeighborLabel(x, y).get
-//        val topLabel = topNeighborLabel(x, y).get
-//        if (leftLabel != topLabel)
-//          mgr.add(leftLabel, topLabel)
-//        val minLabel = Math.min(leftLabel, topLabel)
-//        setLabel(minLabel)
       } else
         leftNeighborLabel(x, y).foreach(setLabel)
     } else if (isTopRegion)
@@ -183,14 +178,6 @@ case class RegionMgr() {
   }
 
   def add(a: Int, b: Int): Int = {
-    // TODO most likely could be optimized considerably,
-    //  look here if willing to squeeze extra performance
-//    val exstA = ids.getOrElse(a, SameGroup().add(a))
-//    val exstB = ids.getOrElse(b, SameGroup().add(b))
-//    val merged = exstA.add(exstB)
-//    merged.getIds.foreach(ids.put(_, merged))
-//    exstA.id
-
     val merged =
       if (labels.contains(a)) {
         val agrp = labels(a)
