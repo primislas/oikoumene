@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class Idea
 (
   // hits = 2823, isOptional = false, sample = "noble_knights"
@@ -14,8 +15,6 @@ case class Idea
   localisation: Localisation = Localisation.empty,
   // hits = 2823, isOptional = false, sample = {"cavalry_power":0.10,"cavalry_cost":-0.10}
   modifier: Modifier = Modifier.empty,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object Idea extends FromJson[Idea]

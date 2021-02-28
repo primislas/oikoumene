@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TradeGood
 (
   // hits = 31, isOptional = false, sample = "grain"
@@ -37,7 +38,6 @@ case class TradeGood
   trigger: Option[ProvinceCondition] = None,
 
 ) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
   def withPrice(p: BigDecimal): TradeGood = copy(price = p)
 }
 

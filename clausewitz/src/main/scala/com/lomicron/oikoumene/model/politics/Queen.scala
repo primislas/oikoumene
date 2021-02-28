@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class Queen
 (
   // hits = 274, isOptional = false, sample = "Tenagne"
@@ -32,7 +33,6 @@ case class Queen
 
   personalities: Seq[String] = Seq.empty
 ) {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
 
   def clearPersonalities: Queen = copy(personalities = Seq.empty)
 

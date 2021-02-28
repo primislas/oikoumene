@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.{FromJson, JsonMapper}
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class TagSave
 (
   // hits = 1179, isOptional = false, sample = "---"
@@ -638,8 +639,6 @@ case class TagSave
   //  vitalProvinces: Seq[Int] = Seq.empty,
   //  // hits = 1, isOptional = true, sample = true
   //  wasPlayer: Boolean = false,
-) {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+)
 
 object TagSave extends FromJson[TagSave]

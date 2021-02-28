@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.{FromJson, JsonMapper}
 
+@JsonCreator
 case class StateEdict
 (
   // hits = 10, isOptional = false, sample = "edict_defensive_edict"
@@ -24,8 +25,6 @@ case class StateEdict
   allow: ObjectNode = JsonMapper.objectNode,
   // hits = 10, isOptional = false, sample = {"factor":0}
   aiWillDo: ObjectNode = JsonMapper.objectNode,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object StateEdict extends FromJson[StateEdict]

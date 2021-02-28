@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper.JsonMap
 
+@JsonCreator
 case class ColonialRegion
 (// hits = 31, isOptional = false, sample = "colonial_alaska"
  id: String = Entity.UNDEFINED,
@@ -30,8 +31,6 @@ case class ColonialRegion
  taxIncome: Option[Int] = None,
  // hits = 11, isOptional = true, sample = {"fur":10,"fish":3,"naval_supplies":2,"gold":2}
  tradeGoods: Option[JsonMap] = None,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object ColonialRegion extends FromJson[ColonialRegion]

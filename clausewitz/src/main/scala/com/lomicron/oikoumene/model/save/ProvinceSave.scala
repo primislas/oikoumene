@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class ProvinceSave
 (
   // hits = 4650, isOptional = false, sample = 1
@@ -182,8 +183,6 @@ case class ProvinceSave
   fortFlipperProv: Option[Int] = None,
   // hits = 1, isOptional = true, sample = true
   userChangedName: Boolean = false,
-) {
-  @JsonCreator def this() = this(0)
-}
+)
 
 object ProvinceSave extends FromJson[ProvinceSave]

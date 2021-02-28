@@ -8,6 +8,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class Terrain
 (// hits = 20, isOptional = false, sample = "coastal_desert"
  id: String = Entity.UNDEFINED,
@@ -27,8 +28,6 @@ case class Terrain
 
  modifier: Option[Modifier] = None
 ) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-
   def hasProvince(provinceId: Int): Boolean = provinceIds.contains(provinceId)
 }
 

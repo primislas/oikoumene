@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.events
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TagCondition
 (
   // hits = 20, isOptional = true, sample = {"truce_with":"FROM","num_of_cities":2,"FROM":{"num_of_cities":2}}
@@ -165,8 +166,6 @@ case class TagCondition
   // hits = 1, isOptional = true, sample = 1490
   isYear: Option[Int] = None,
 
-) {
-  @JsonCreator def this() = this(None)
-}
+)
 
 object TagCondition extends FromJson[TagCondition]

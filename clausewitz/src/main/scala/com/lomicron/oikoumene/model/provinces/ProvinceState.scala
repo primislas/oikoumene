@@ -8,6 +8,7 @@ import com.lomicron.oikoumene.model.provinces.ProvinceState.updatedFieldsFrom
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class ProvinceState
 (
   baseTax: Int = 0,
@@ -54,8 +55,6 @@ case class ProvinceState
   tradeCompanyInvestment: Option[TradeCompanyInvestment] = None
 ) extends HistState[ProvinceState, ProvinceUpdate] with WithCumulativeModifier[ProvinceState] {
   self =>
-
-  @JsonCreator def this() = this(0)
 
   override def next(update: ProvinceUpdate): ProvinceState =
     updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))

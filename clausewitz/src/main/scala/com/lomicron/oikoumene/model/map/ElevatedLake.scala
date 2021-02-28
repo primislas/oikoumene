@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.geometry.Point2D
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class ElevatedLake(triangleStrip: Seq[Int] = Seq.empty, height: Int = 0)
   extends FromJson[ElevatedLake]
 {
-
-  @JsonCreator def this() = this(Seq.empty)
 
   def asPolygon(mapHeight: Option[Int] = None): Seq[Point2D] = {
     val (head, tail) = triangleStrip

@@ -68,8 +68,10 @@ object MapParser extends LazyLogging {
 
   def parallelizeImage(img: BufferedImage): ParSeq[(Int, Int)] = {
     val parallelism = java.lang.Runtime.getRuntime.availableProcessors
-    val step = img.getHeight / parallelism
-    (0 until parallelism)
+    val parStep = img.getHeight / parallelism
+    val effectiveParallelism = if (parStep <= 512) 1 else parallelism
+    val step = if (parStep <= 512) img.getHeight else parStep
+    (0 until effectiveParallelism)
       .par
       .map(i => (i * step, (i + 1) * step))
       .map(t => if (t._2 > img.getHeight) (t._1, img.getHeight) else t)

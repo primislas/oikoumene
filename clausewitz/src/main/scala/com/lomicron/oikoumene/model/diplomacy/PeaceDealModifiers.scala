@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.events.ProvinceCondition
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class PeaceDealModifiers
 (
   // hits = 44, isOptional = false, sample = ["po_become_vassal","po_demand_provinces","po_revoke_cores","po_release_vassals","po_release_annexed","po_change_religion","po_gold","po_annul_treaties"]
@@ -20,8 +21,6 @@ case class PeaceDealModifiers
   provDesc: Option[String] = None,
   // hits = 16, isOptional = true, sample = "ALL_CGROUP_COUNTRIES"
   countryDesc: Option[String] = None,
-) {
-  @JsonCreator def this() = this(Seq.empty)
-}
+)
 
 object PeaceDealModifiers extends FromJson[PeaceDealModifiers]

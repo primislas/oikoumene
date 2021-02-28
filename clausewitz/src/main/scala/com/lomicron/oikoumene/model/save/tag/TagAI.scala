@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class TagAI
 (
   // hits = 1179, isOptional = false, sample = false
@@ -66,9 +67,7 @@ case class TagAI
   estateInfluence: Seq[JsonNode] = Seq.empty,
   // hits = 1, isOptional = true, sample = [{"id":"SUK","value":154},{"id":"MAM","value":128},{"id":"FRA","value":104},{"id":"SPA","value":94},{"id":"BRT","value":66},{"id":"BHA","value":61},{"id":"TID","value":32},{"id":"HAB","value":30},{"id":"SHY","value":27},{"id":"KZH","value":24},{"id":"TIM","value":22},{"id":"NOG","value":21},{"id":"PRM","value":19},{"id":"GBR","value":10}]
   tributaryState: Seq[JsonNode] = Seq.empty,
-) {
-  @JsonCreator def this() = this(None)
-}
+)
 
 object TagAI extends FromJson[TagAI] {
   val empty: TagAI = new TagAI()

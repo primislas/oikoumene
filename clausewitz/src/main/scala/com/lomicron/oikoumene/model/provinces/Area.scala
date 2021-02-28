@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class Area
 (// hits = 831, isOptional = false, sample = "adamawa_plateau_area"
  id: String = Entity.UNDEFINED,
@@ -14,10 +15,6 @@ case class Area
  provinceIds: Seq[Int] = Seq.empty,
  // hits = 46, isOptional = true, sample = [92,200,92]
  color: Option[Color] = None,
-) extends Entity {
-
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-
-}
+) extends Entity
 
 object Area extends FromJson[Area]

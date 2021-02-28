@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.{FromJson, JsonMapper}
 
+@JsonCreator
 case class Policy
 (
   // hits = 120, isOptional = false, sample = "the_combination_act"
@@ -22,8 +23,6 @@ case class Policy
   monarchPower: String = Entity.UNDEFINED,
   // hits = 120, isOptional = false, sample = {"has_idea_group":["aristocracy_ideas","innovativeness_ideas"]}
   potential: ObjectNode = JsonMapper.objectNode,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object Policy extends FromJson[Policy]

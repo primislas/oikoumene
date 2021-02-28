@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TagColors
 (
   // hits = 1179, isOptional = false, sample = [150,150,150]
@@ -14,9 +15,7 @@ case class TagColors
   revolutionaryColors: Vector[Int] = Vector.empty,
   // hits = 6, isOptional = true, sample = {"flag":53,"color":6,"symbol_index":79,"flag_colors":[0,6,6]}
   customColors: Option[TagCustomColors] = None,
-) {
-  @JsonCreator def this() = this(Color.black)
-}
+)
 
 object TagColors extends FromJson[TagColors] {
   val empty: TagColors = new TagColors()

@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class TagUpdate
 (
   // hits = 13270, isOptional = true, sample = {"year":1730,"month":1,"day":1}
@@ -117,9 +118,7 @@ case class TagUpdate
   hideAmbientObject: Option[String] = None,
   // hits = 1, isOptional = true, sample = "hagia_sophia_minarets"
   showAmbientObject: Option[String] = None,
-) extends HistEvent {
-  @JsonCreator def this() = this(None)
-}
+) extends HistEvent
 
 object TagUpdate extends FromJson[TagUpdate] {
   val empty: TagUpdate = TagUpdate()

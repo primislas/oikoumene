@@ -67,7 +67,6 @@ case class BitmapRegionScanner(img: BufferedImage, labels: Labels, regionStarts:
     y > yFrom && getRGB(img, x, y - 1).contains(c)
 
   def label(yFrom: Int, yUntil: Int): RegionMgr = {
-    logger.info(s"Scanning map from $yFrom until $yUntil")
     var labelSeq = img.getWidth * yFrom
 
     def nextId(): Int = {

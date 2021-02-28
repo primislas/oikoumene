@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.oikoumene.model.trade.CenterOfTrade.Types
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class CenterOfTrade
 (
   id: String = Entity.UNDEFINED,
@@ -18,9 +19,7 @@ case class CenterOfTrade
   provinceModifiers: Option[Modifier] = None,
   stateModifiers: Option[Modifier] = None,
   globalModifiers: Option[Modifier] = None,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object CenterOfTrade extends FromJson[CenterOfTrade] {
   object Types {

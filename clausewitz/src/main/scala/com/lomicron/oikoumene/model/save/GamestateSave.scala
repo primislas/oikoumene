@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.save.tag.TagSave
 import com.lomicron.utils.json.{FromJson, JsonMapper}
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class GamestateSave
 (
   // hits = 1, isOptional = false, sample = {"id":549015,"type":4713}
@@ -125,8 +126,6 @@ case class GamestateSave
   unitTemplateId: Int = 0,
   // hits = 1, isOptional = false, sample = ["Caraibas","Rio da Prata","Castilian Brazil","Portuguese Mexico","Thirteen Colonies","Spanish Canada","Portuguese Louisiana","French Colombia","Florida","Kildarean West Indies","Tierra Austral","California","British Colombia","Portuguese Peru","Tula","Cascadia","Alaska","Portuguese Brazil","French Peru","French Canada","Baluchistan ","Afghanistan ","Yarkent","French Louisiana","British Mexico"]
   usedClientNames: Seq[String] = Seq.empty,
-) {
-  @JsonCreator def this() = this(JsonMapper.objectNode)
-}
+)
 
 object GamestateSave extends FromJson[GamestateSave]

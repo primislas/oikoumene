@@ -7,6 +7,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class Government
 (
   // hits = 5, isOptional = false, sample = "monarchy"
@@ -25,8 +26,6 @@ case class Government
   reformLevels: IndexedSeq[ReformLevel] = IndexedSeq.empty,
   // hits = 2, isOptional = true, sample = ["iqta","indian_sultanate_reform","mamluk_government","tsardom","principality","parliamentary_reform","english_monarchy","states_general_reform","military_dictatorship_reform","protectorate_parliament_reform","prussian_republic_reform","admiralty_reform","nepotism_reform","lottery_reform","dutch_republic","mamluk_government","feudal_theocracy","states_general_reform","mughal_government","ottoman_government","revolutionary_empire_reform","prussian_monarchy","elective_monarchy","celestial_empire",
   exclusiveReforms: Seq[ListSet[String]] = Seq.empty,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object Government extends FromJson[Government]
