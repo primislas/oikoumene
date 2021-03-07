@@ -17,7 +17,7 @@ object ProvinceTypeParser {
    geography: GeographicRepository,
    evalEntityFields: Boolean): GeographicRepository = {
 
-    val provinceTypes = files.getProvinceTypes // default.map
+    val provinceTypes = files.getProvinceTypes.toSeq // default.map
     val types = ClausewitzParser.parseFilesAsEntities(provinceTypes)
 
     if (evalEntityFields)

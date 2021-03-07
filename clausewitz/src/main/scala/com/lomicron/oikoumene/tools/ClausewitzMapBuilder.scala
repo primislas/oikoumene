@@ -255,7 +255,7 @@ object ClausewitzMapBuilder extends LazyLogging {
     FileResourceRepository(settings.fileSettings)
 
   def getProvincesBmp(repo: ResourceRepository): Path =
-    repo.getProvinceMap.get
+    repo.getProvinceMap.get.path
 
   def parseProvinceShapes(inputFile: Path, includeBorders: Boolean)
   : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) = {

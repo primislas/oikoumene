@@ -38,18 +38,24 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     settingOverrides: MapBuilderSettings = MapBuilderSettings.default,
   ): String = {
 
+    logger.info("Building svg map...")
     val settings = MapModes.settingsOf(settingOverrides.mapMode, settingOverrides)
     if (settings.ownWastelands.contains(true))
       worldMap.recalculateWastelandOwners
+    logger.info("Wasteland owners: OK")
 
     val map = worldMap.mercator
     val precision: Int = settings.decimalPrecision
     val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
     val style = SvgMapStyles.styleOf(settings, repos)
     val provinces = provinceSvg(map, settings.mapMode, precision)
+    logger.info("Provinces: OK")
     val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(map.rivers, precision)).toSeq
+    logger.info("Rivers: OK")
     val names = settings.includeNames.filter(_.booleanValue()).toSeq.map(_ => nameSvg(worldMap))
+    logger.info("Names: OK")
     val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
+    logger.info("Borders: OK")
 
     val worldSvg = Svg
       .svgHeader
@@ -304,11 +310,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   def nameSvg(worldMap: WorldMap): SvgElement = {
     val names = worldMap
       .ownerGroups
-      .zipWithIndex.toList
+      .zipWithIndex
       .flatMap(gi => provinceGroupName(worldMap, gi._1, s"n${gi._2}"))
       .grouped(2).toList
       .sortBy(pp => textLength(pp.last))
-      .flatten
+      .flatten(_.toSeq)
 
     group.copy(id = "tag-names").add(names)
   }
@@ -402,7 +408,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val borders = worldMap.mercator.provinces
       .filter(_.provId.exists(ids.contains))
       .flatMap(_.borders)
-    val provColors = borders.flatMap(b => Seq(b.left, b.right).flatten).toSet
+    val provColors = borders.flatMap(b => Seq(b.left, b.right).flatten(_.toSeq)).toSet
     val ownersByColor = provColors
       .flatMap(repos.provinces.findByColor(_))
       .groupBy(_.color.toInt)

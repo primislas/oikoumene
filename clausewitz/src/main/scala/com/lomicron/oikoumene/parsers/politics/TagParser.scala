@@ -1,19 +1,20 @@
 package com.lomicron.oikoumene.parsers.politics
 
-import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.oikoumene.io.FileNameAndContent
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.politics.Tag
-import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse}
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.politics.TagRepository
-import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.repository.api.politics.TagRepository
+import com.lomicron.oikoumene.repository.api.resources.{GameFile, LocalisationRepository, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, patchFieldValue}
+import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, textNode}
 import com.typesafe.scalalogging.LazyLogging
 
+import java.nio.file.Paths
 import scala.collection.immutable.TreeMap
+import scala.collection.parallel.CollectionConverters.seqIsParallelizable
 
 object TagParser extends LazyLogging {
 
@@ -29,127 +30,98 @@ object TagParser extends LazyLogging {
    evalEntityFields: Boolean
   ): TagRepository = {
 
-    val filesByTags = files
-      .getCountryTags
-      .map(contentsByFile => ClausewitzParser.parse(contentsByFile._2)._1)
-      .flatMap(obj => obj.fields.toStream.map(e => (e.getKey, e.getValue.asText)))
-      .map(kv => (kv._1, s"common/${kv._2}"))
-      .foldLeft(TreeMap[String, String]())(_ + _)
-    val countries = files.getCountries(filesByTags)
-    val histories = files.getCountryHistory
-    val names = localisation.fetchTags
-    val parsedTagNodes = TagParser(filesByTags, countries, histories, names)
+    val filesByTags = parseTagFileMapping(files)
+    val tagConfs = files.getCountryConfigs(filesByTags)
+    val parsedTagNodes = tagConfs.par.map(parseTag(_, files, localisation)).to(Seq)
 
-    if (evalEntityFields) {
-      val tagEvents = parsedTagNodes.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
-      val monarchs = tagEvents.flatMap(_.getObject("monarch"))
-      val queens = tagEvents.flatMap(_.getObject("queen"))
-      val heirs = tagEvents.flatMap(_.getObject("heir"))
-      val leaders = tagEvents.flatMap(_.getObject("leader"))
-      val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
-      val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
-      val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
-      ConfigField.printCaseClass("TagUpdate", tagEvents)
-      ConfigField.printCaseClass("Monarch", monarchs)
-      ConfigField.printCaseClass("Queen", queens)
-      ConfigField.printCaseClass("Heir", heirs)
-      ConfigField.printCaseClass("Leader", leaders)
-      ConfigField.printCaseClass("CountryModifier", countryModifiers)
-      ConfigField.printCaseClass("RulerModifier", rulerModifiers)
-      ConfigField.printCaseClass("PriceModifier", priceModifiers)
-      ConfigField.printCaseClass("Tag", parsedTagNodes)
-    }
+    if (evalEntityFields) printClassDefinitions(parsedTagNodes)
 
     parsedTagNodes
+      .par
       .map(Tag.fromJson)
       .map(_.atStart)
+      .to(Seq)
       .foreach(tags.create)
 
     tags
   }
 
+  def parseTagFileMapping(files: ResourceRepository): Map[String, GameFile] =
+    files
+      .getCountryTags
+      .flatMap(fc => fc.content.map(ClausewitzParser.parse).map(_._1))
+      .flatMap(obj => obj.fields.toStream.map(e => (e.getKey, e.getValue.asText)))
+      .map(kv => (kv._1, historyGameFile(kv._2)))
+      .foldLeft(TreeMap[String, GameFile]())(_ + _)
 
-  def apply
-  (tags: Map[String, String],
-   countries: Map[String, String],
-   histories: Map[String, FileNameAndContent],
-   names: Map[String, ObjectNode]):
-  Seq[ObjectNode] = {
-
-    val countryByTag = parseCountries(tags, countries)
-    val historyByTag = parseCountryHistories(tags, histories)
-    val parsedTags = countryByTag
-      .mapKVtoValue((tag, country) => historyByTag
-        .get(tag)
-        .map(country.setEx(Fields.history, _))
-//        .map(history => Seq(history) ++ parseEvents(history))
-//        .map(JsonMapper.arrayNodeOf)
-//        .map(patchFieldValue(country, "history", _))
-        .getOrElse(country))
-      .mapKVtoValue((tag, country) => names
-        .get(tag)
-        .map(patchFieldValue(country, "localisation", _))
-        .getOrElse(country))
-      .mapKVtoValue((id, tag) => tag.setEx(idKey, TextNode.valueOf(id)))
-      .values.toList
-
-    parsedTags
+  private def historyGameFile(path: String): GameFile = {
+    val commonPath = Paths.get(s"common/$path")
+    val relDir = commonPath.getParent.toString
+    GameFile.of(commonPath, relDir)
   }
 
-  def parseCountries
-  (tags: Map[String, String],
-   countries: Map[String, String]):
-  Map[String, ObjectNode] = {
+  def parseTag(conf: TagConf, resources: ResourceRepository, localisation: LocalisationRepository): ObjectNode = {
+    val country = parseCountryConf(conf, resources)
+    val history = parseCountryHistory(conf, resources)
+    history.foreach(country.setEx(Fields.history, _))
+    val mergedTagConf = localisation.findAndSetAsLocName(conf.tag, country)
 
-    def tagToCoutry(tag: String) = {
-      countries.get(tag).map(parse)
-    }
+    mergedTagConf
+  }
 
-    tags
-      .mapKeyToValue(tagToCoutry)
-      .filterKeyValue((tag, opt) => {
-        if (opt.isEmpty)
-          logger.warn(s"Tag $tag has no country configuration")
-        opt.nonEmpty
-      })
-      .mapValuesEx(_.get)
-      .mapKVtoValue((tag, t2) => {
-        val errors = t2._2
+  def parseCountryConf(conf: TagConf, resources: ResourceRepository): ObjectNode = {
+    if (conf.country.isEmpty) logger.warn(s"Tag ${conf.tag} has no country configuration")
+    conf
+      .country
+      .map(resources.getResource)
+      .flatMap(fc => fc.content.flatMap(parse(_)))
+      .map(parsingRes => {
+        val errors = parsingRes._2
         if (errors.nonEmpty)
-          logger.warn(s"Encountered errors parsing country configuration for tag '$tag': $errors")
-        t2._1
+          logger.warn(s"Encountered errors parsing country configuration for tag '${conf.tag}': $errors")
+        parsingRes._1
       })
-      .mapKVtoValue((tag, o) => {
-        val emptyObjects = o.entries().filter(e => e._2.isObject && e._2.isEmpty())
-        emptyObjects.foreach(eo => {
-          // TODO instead it would be more reliable to prepare a list of array keys and convert to
-          //  empty array based on it; also note that an empty obj / array might mean a reset
-          logger.warn(s"Removing empty object for key ${eo._1} from tag $tag")
-          o.removeEx(eo._1)
-        })
-        o
+      .map(o => o.setEx(Fields.idKey, textNode(conf.tag)))
+      .map(ClausewitzParser.removeEmptyObjects)
+      .getOrElse(JsonMapper.objectNode)
+  }
+
+  def parseCountryHistory(conf: TagConf, resources: ResourceRepository): Option[ObjectNode] =
+    conf
+      .history
+      .map(resources.getResource)
+      .flatMap(parseCountryHistory)
+
+  def parseCountryHistory(fc: GameFile): Option[ObjectNode] = {
+    fc
+      .content
+      .map(c => {
+        val fname = fc.name
+        val (unparsedHist, errors) = parse(c)
+        if (errors.nonEmpty)
+          logger.warn(s"Encountered errors parsing country history '$fname': $errors")
+        ClausewitzParser.parseHistory(unparsedHist, fname)
       })
   }
 
-  def parseCountryHistories
-  (tags: Map[String, String],
-   histories: Map[String, FileNameAndContent]
-  ): Map[String, ObjectNode]
-  = tags
-    .mapKeyToValue(histories.get(_).map(parseHistory))
-    .filterKeyValue((tag, hist) => {
-      if (hist.isEmpty)
-        logger.warn(s"Tag $tag has no history configuration")
-      hist.nonEmpty
-    })
-    .mapValuesEx(_.get)
-
-  def parseHistory(fc: FileNameAndContent): ObjectNode = {
-    val fname = fc.name
-    val (unparsedHist, errors) = parse(fc.content)
-    if (errors.nonEmpty)
-      logger.warn(s"Encountered errors parsing country history '$fname': $errors")
-    ClausewitzParser.parseHistory(unparsedHist, fname)
+  def printClassDefinitions(tags: Seq[ObjectNode]): Unit = {
+    val tagEvents = tags.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
+    val monarchs = tagEvents.flatMap(_.getObject("monarch"))
+    val queens = tagEvents.flatMap(_.getObject("queen"))
+    val heirs = tagEvents.flatMap(_.getObject("heir"))
+    val leaders = tagEvents.flatMap(_.getObject("leader"))
+    val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
+    val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
+    val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
+    ConfigField.printCaseClass("TagUpdate", tagEvents)
+    ConfigField.printCaseClass("Monarch", monarchs)
+    ConfigField.printCaseClass("Queen", queens)
+    ConfigField.printCaseClass("Heir", heirs)
+    ConfigField.printCaseClass("Leader", leaders)
+    ConfigField.printCaseClass("CountryModifier", countryModifiers)
+    ConfigField.printCaseClass("RulerModifier", rulerModifiers)
+    ConfigField.printCaseClass("PriceModifier", priceModifiers)
+    ConfigField.printCaseClass("Tag", tags)
   }
 
 }

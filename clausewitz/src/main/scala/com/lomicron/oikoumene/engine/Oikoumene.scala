@@ -104,14 +104,23 @@ object Oikoumene extends LazyLogging {
     val provinces = ProvinceParser(repos)
     logger.info(s"Loaded ${provinces.size} province configs")
 
+    logger.info(s"Configs loaded")
+    repos
+  }
+
+  def initModifiers(repos: RepositoryFactory): RepositoryFactory = {
     val tagService = TagService(repos)
+    val tags = repos.tags
     tags.findAll.map(tagService.init).foreach(tags.update)
+    logger.info("Tag modifiers initialized")
+
+    val provinces = repos.provinces
     val provService = ProvinceService(repos)
     provinces.findAll
       .map(provService.init)
       .foreach(provinces.update)
+    logger.info("Province modifiers initialized")
 
-    logger.info(s"Configs loaded")
     repos
   }
 

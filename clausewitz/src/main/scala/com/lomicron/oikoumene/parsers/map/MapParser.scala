@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.GeographicRepository
-import com.lomicron.oikoumene.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.repository.api.resources.{GameFile, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
@@ -37,7 +37,7 @@ object MapParser extends LazyLogging {
     logger.info(s"Identified terrain ${terrainColors.length} colors")
 
     logger.info("Parsing map provinces...")
-    val provs = r.getProvinceMap.map(fetchMap)
+    val provs = r.getProvinceMap.map(gf => fetchMap(gf.path))
     val terrainByProv = parseProvinceTerrain(provs, r, g)
     logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
@@ -78,7 +78,8 @@ object MapParser extends LazyLogging {
   }
 
   def parseRivers(r: ResourceRepository, g: GeographicRepository): Seq[River] = {
-    val rivers = r.getRiversMap.map(fetchMap)
+    val rivers = r.getRiversMap
+      .map(gf => fetchMap(gf.path))
       .map(parseRivers)
       .getOrElse(Seq.empty)
       .map(_.smooth)
@@ -256,6 +257,9 @@ object MapParser extends LazyLogging {
     if (source != target) Some(target)
     else None
   }
+
+  def fetchMap(gf: GameFile): BufferedImage =
+    fetchMap(gf.path)
 
   def fetchMap(path: String): BufferedImage =
     fetchMap(Paths.get(path))

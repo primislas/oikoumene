@@ -133,7 +133,7 @@ case class InMemoryProvinceRepository()
       .find(_.localisation.name.contains(name))
 
   override def findByName(names: Seq[String]): Seq[Province] =
-    names.flatMap(findByName(_))
+    names.flatMap(findByName)
 
   override def findByColor(c: Color): Option[Province] = findByColor(c.toInt)
 

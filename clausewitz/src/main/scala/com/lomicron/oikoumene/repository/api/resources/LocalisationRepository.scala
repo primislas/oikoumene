@@ -20,6 +20,8 @@ trait LocalisationRepository {
 
   def fetchTags: Map[String, ObjectNode]
 
+  def fetchProvince(provId: Int): Option[ObjectNode]
+
   def fetchProvinces: Map[Int, ObjectNode]
 
   def findAndSetAsLocName(key: String, target: ObjectNode): ObjectNode =
