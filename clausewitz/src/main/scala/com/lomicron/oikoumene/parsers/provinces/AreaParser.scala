@@ -33,11 +33,11 @@ object AreaParser extends LazyLogging {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing areas: ${o._2}")
         o._1.fields.toStream
       })
-      .getOrElse(Stream.empty)
+      .getOrElse(LazyList.empty)
       .map(e => e.getKey -> e.getValue)
       .toMap
       .filterValues(_.size() > 0)
-      .mapValues {
+      .mapValuesEx {
         case o@(_: ArrayNode) =>
           objectNode.setEx(provinceIdsKey, o)
         case area: ObjectNode =>

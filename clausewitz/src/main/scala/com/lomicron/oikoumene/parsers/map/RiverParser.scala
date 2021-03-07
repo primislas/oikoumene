@@ -26,7 +26,7 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
 
   import RiverParser._
   import RiverTypes._
-  val groups: Array[Array[Int]] = Array.empty
+  val labels: Array[Array[Int]] = Array.empty
 
   def trace: Seq[River] = {
     val riverSources = identifyRiverSources(img)

@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.events.{ProvinceCondition, TagCondition}
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class CasusBelli
 (
   // hits = 59, isOptional = false, sample = "cb_restore_personal_union"
@@ -42,8 +43,6 @@ case class CasusBelli
   noOpinionHit: Boolean = false,
   // hits = 1, isOptional = true, sample = true
   supportRebels: Boolean = false,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object CasusBelli extends FromJson[CasusBelli]

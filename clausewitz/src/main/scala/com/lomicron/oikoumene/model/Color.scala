@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper._
 
+@JsonCreator
 case class Color
 (r: Int = 0,
  g: Int = 0,
  b: Int = 0)
 extends Ordered[Color]
 {
-
-  @JsonCreator def this() = this(0)
 
   override def compare(that: Color): Int = toInt - that.toInt
 

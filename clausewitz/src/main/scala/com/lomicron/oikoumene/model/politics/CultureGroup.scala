@@ -8,6 +8,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class CultureGroup
 (id: String = UNDEFINED,
  localisation: Localisation = Localisation.empty,
@@ -17,8 +18,6 @@ case class CultureGroup
  femaleNames: Seq[String] = Seq.empty,
  dynastyNames: Seq[String] = Seq.empty
 ) extends Entity {
-
-  @JsonCreator def this() = this(UNDEFINED)
 
   def hasCulture(cultureId: String): Boolean = cultureIds.contains(cultureId)
 

@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.parsers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper._
@@ -144,10 +145,34 @@ object ClausewitzParser extends LazyLogging {
   def mapEntityFilesToFileNames(filesByName: Map[String, String]): Map[String, ObjectNode] =
     parseFilesByFileNames(filesByName, o => Seq(o))
       .filterValues(_.nonEmpty)
-      .mapValues(_.head)
+      .mapValuesEx(_.head)
 
   def parseFilesAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, o => Seq(o))
+
+  def parseFilesAsEntities(files: Seq[GameFile]): Seq[ObjectNode] =
+    files.flatMap(parseFile)
+
+  def parseFileFieldsAsEntities(files: Seq[GameFile]): Seq[ObjectNode] =
+    files.flatMap(parseFileFieldsAsEntities)
+
+  def parseFileFieldsAsEntities(file: GameFile): Seq[ObjectNode] =
+    parseFile(file)
+      .map(parseValuesAsEntities)
+      .getOrElse(Seq.empty)
+
+  def parseFile(gf: GameFile): Option[ObjectNode] =
+    gf.content
+      .map(parse)
+      .map(reportParsingErrors(_, gf.name))
+      .map(_.setEx(Fields.sourceFile, gf.name))
+
+  def reportParsingErrors(res: (ObjectNode, Seq[ParsingError]), filename: String): ObjectNode = {
+    if (res._2.nonEmpty)
+      logger.warn(s"Encountered ${res._2.size} errors while parsing $filename: ${res._2}")
+    res._1
+  }
+
 
   def parseFileFieldsAsEntities(filesByName: Map[String, String]): Seq[ObjectNode] =
     parseFiles(filesByName, parseValuesAsEntities)
@@ -177,7 +202,7 @@ object ClausewitzParser extends LazyLogging {
    fileParser: ObjectNode => Seq[ObjectNode])
   : Map[String, Seq[ObjectNode]] =
     filesByName
-      .mapValues(parse)
+      .mapValuesEx(parse)
       .mapKVtoValue((filename, o) => {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing $filename: ${o._2}")
         fileParser(o._1)
@@ -363,7 +388,10 @@ object ClausewitzParser extends LazyLogging {
   def removeEmptyObjects(o: ObjectNode): ObjectNode = {
     o.entrySeq()
       .filter(e => e.getValue.isObject && e.getValue.isEmpty)
-      .foreach(e => o.remove(e.getKey))
+      .foreach(e => {
+        logger.warn(s"Removing empty object ${e.getKey}")
+        o.remove(e.getKey)
+      })
     o
   }
 

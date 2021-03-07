@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TechGroup
 (
   // hits = 15, isOptional = false, sample = "western"
@@ -23,8 +24,6 @@ case class TechGroup
   nationDesignerUnitType: Option[String] = None,
   // hits = 2, isOptional = true, sample = {"has_reform":"steppe_horde"}
   nationDesignerTrigger: Option[ObjectNode] = None,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object TechGroup extends FromJson[TechGroup]

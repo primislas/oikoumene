@@ -40,12 +40,12 @@ class ParsingScopeSpec extends Specification {
     "- move up object scope stack and copy parsing errors if any upon receiving a '}' token" >> {
       val tokens = Seq(OpenBrace, Equals)
       @tailrec
-      def rec(s: ParsingScope, ts: Stream[Token]): ParsingScope = ts match {
+      def rec(s: ParsingScope, ts: LazyList[Token]): ParsingScope = ts match {
         case h #:: t      => rec(s.addParsingError(h)._1, t)
-        case Stream.Empty => s
+        case LazyList() => s
       }
 
-      val scope = rec(objectScope, tokens.toStream)
+      val scope = rec(objectScope, tokens.to(LazyList))
       val errseq = scope.scopeErrors
       errseq.length must_== tokens.length
 

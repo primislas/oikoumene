@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.history.HistEvent
 import com.lomicron.oikoumene.model.modifiers.ActiveModifier
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class ProvinceUpdate
 (
   override val date: Option[Date] = None,
@@ -94,8 +95,6 @@ case class ProvinceUpdate
   // hits = 8, isOptional = true, sample = true
   addJainsOrBurghersEffect: Option[Boolean] = None,
 ) extends HistEvent {
-
-  @JsonCreator def this() = this(controller = None)
 
   def addCoreCp(core: String): ProvinceUpdate = {
     val cores = addCore.map(_ :+ core).map(_.distinct).orElse(Some(Seq(core)))

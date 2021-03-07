@@ -81,10 +81,10 @@ object ClausewitzMapBuilder extends LazyLogging {
         |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\""
         |
         |generate a province outline map:
-        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_base_game\" -svg eu4 -mode province_outlines"
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_base_game\" -svg eu4 -mode province_outline"
         |
         |generate a political map from a save:
-        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -md \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod\" -m rus -m balkans -m anatolia -m mashriq -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_my_mods\" -svg eu4 -mode province_outlines -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/autosave.eu4\""
+        |sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \"D:/Steam/steamapps/common/Europa Universalis IV\" -md \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod\" -m rus -m balkans -m anatolia -m mashriq -cd \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/map_rendering/cmb_cache_my_mods\" -svg eu4 -mode province_outline -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/autosave.eu4\""
         |
         |""".stripMargin
     logger.info(help)
@@ -255,7 +255,7 @@ object ClausewitzMapBuilder extends LazyLogging {
     FileResourceRepository(settings.fileSettings)
 
   def getProvincesBmp(repo: ResourceRepository): Path =
-    repo.getProvinceMap.get
+    repo.getProvinceMap.get.path
 
   def parseProvinceShapes(inputFile: Path, includeBorders: Boolean)
   : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) = {

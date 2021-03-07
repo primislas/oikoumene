@@ -11,6 +11,7 @@ import com.softwaremill.quicklens.ModifyPimp
 
 import scala.collection.immutable.ListMap
 
+@JsonCreator
 case class Tag
 (
   // hits = 793, isOptional = false, sample = "GLE"
@@ -54,8 +55,6 @@ case class Tag
   // hits = 1, isOptional = true, sample = true
   rightToBearArms: Boolean = false,
 ) extends Entity { self =>
-
-  @JsonCreator def this() = this(Entity.UNDEFINED)
 
   def state: TagState = history.state
   def withState(ts: TagState): Tag = self.modify(_.history.state).setTo(ts)

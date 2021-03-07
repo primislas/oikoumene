@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class Technology
 (
   id: String = defaultId,
@@ -16,9 +17,7 @@ case class Technology
   aheadOfTime: Option[Modifier] = None,
   @JsonProperty("technology")
   levels: IndexedSeq[TechLevel] = IndexedSeq.empty
-) extends Entity {
-  @JsonCreator def this() = this(defaultId)
-}
+) extends Entity
 
 object Technology extends FromJson[Technology] {
   val defaultLevel: Int = 1000

@@ -2,7 +2,6 @@ package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
-import com.lomicron.oikoumene.model.MapClassTemplate
 import com.lomicron.oikoumene.parsers.ConfigField.ValueTypes
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.{JsonMapper, ToJson}
@@ -74,14 +73,14 @@ object ConfigField extends LazyLogging {
       .flatMap(_.fields.toStream)
       .map(ConfigField(_))
       .groupBy(_.field)
-      .mapValues(cfs => cfs.map(cf => if (cfs.size == entities.size) cf.copy(isOptional = false) else cf))
+      .mapValuesEx(cfs => cfs.map(cf => if (cfs.size == entities.size) cf.copy(isOptional = false) else cf))
       .mapKVtoValue(aggregateFieldMetadata)
       .values.toSeq
       .sorted
   }
 
   def groupById(entities: Seq[ObjectNode]): mutable.Map[String, ConfigField] =
-    apply(entities).foldLeft[mutable.Map[String, ConfigField]](mutable.LinkedHashMap[String, ConfigField]())((acc, e) => acc + (e.field -> e))
+    apply(entities).foldLeft[mutable.Map[String, ConfigField]](mutable.LinkedHashMap[String, ConfigField]())((acc, e) => acc.concat(e.field -> e))
 
   def printCaseClass(entities: Seq[ObjectNode]): Unit =
     printCaseClass("ClassName", entities)
@@ -326,7 +325,7 @@ object ConfigField extends LazyLogging {
   private val typesWithEmptyObjects = Set("Localisation", "Color")
 
   private def getMostFrequentValueType(cfs: Seq[ConfigField]): String = {
-    val countsByType = cfs.map(_.valueType).groupBy(identity).mapValues(_.size)
+    val countsByType = cfs.map(_.valueType).groupBy(identity).mapValuesEx(_.size)
     countsByType.keys.foldLeft("undefined")((res, k) => {
       val isGreater = for {
         curr <- countsByType.get(res)

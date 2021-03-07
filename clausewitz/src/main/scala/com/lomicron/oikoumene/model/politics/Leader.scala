@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class Leader
 (
   // hits = 844, isOptional = false, sample = "Zheng He"
@@ -25,8 +26,6 @@ case class Leader
   // hits = 1, isOptional = true, sample = true
   female: Boolean = false,
 ) {
-
-  @JsonCreator def this() = this(Entity.UNDEFINED)
 
   def clearPersonalities: Leader = copy(personality = None)
 

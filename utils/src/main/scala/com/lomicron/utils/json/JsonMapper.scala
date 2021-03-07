@@ -1,7 +1,5 @@
 package com.lomicron.utils.json
 
-import java.util.Map.Entry
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
 import com.fasterxml.jackson.core.`type`.TypeReference
@@ -9,12 +7,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature.{ACCEPT_SINGLE_VALU
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node._
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging
 
+import java.util.Map.Entry
 import scala.util.Try
 
 case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyLogging {
@@ -84,7 +82,7 @@ case class JsonMapper(mapper: ObjectMapper with ScalaObjectMapper) extends LazyL
 
   def numericNode(double: Double): NumericNode = DoubleNode.valueOf(double)
 
-  def numericNode(bigDecimal: BigDecimal): NumericNode = DoubleNode.valueOf(bigDecimal.doubleValue())
+  def numericNode(bigDecimal: BigDecimal): NumericNode = DoubleNode.valueOf(bigDecimal.doubleValue)
 
   def patch[T <: AnyRef, P <: AnyRef]
   (target: T, update: P): T =
@@ -253,7 +251,7 @@ object JsonMapper {
       // sometimes JSON fields contain single object where accepting class
       // expects a list; this feature allows jackson to deserialize such fields
       .configure(ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-      .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+      .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
       // omits 'empty' (null or empty collections/objects) fields from output
       .setSerializationInclusion(NON_EMPTY)
       .registerModule(customSerializers)
@@ -261,9 +259,10 @@ object JsonMapper {
     m
   }
 
-  def apply(): JsonMapper = new JsonMapper(defaultObjectMapper())
+  private val jacksonMapper = defaultObjectMapper()
+  private val defaultMapper = JsonMapper(jacksonMapper)
 
-  private val defaultMapper = JsonMapper()
+  def apply(): JsonMapper = defaultMapper
 
   def toJson(obj: AnyRef): String = defaultMapper.toJson(obj)
 

@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper.JsonMap
 
+@JsonCreator
 case class Culture
 (id: String = UNDEFINED,
  localisation: Localisation = Localisation.empty,
@@ -20,7 +21,8 @@ case class Culture
  province: JsonMap = Map.empty
 ) extends Entity {
 
-  @JsonCreator def this() = this(UNDEFINED)
+//  @JsonCreator def this() = this(UNDEFINED)
+//  @JsonCreator def this(@JsonProperty("primary") primaryTag: Option[String]) = this(UNDEFINED, primaryTag = primaryTag)
 
 }
 

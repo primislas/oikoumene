@@ -32,13 +32,13 @@ object ClimateParser extends LazyLogging {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing climate: ${o._2}")
         o._1.fields.toStream
       })
-      .getOrElse(Stream.empty)
+      .getOrElse(LazyList.empty)
       .map(e => e.getKey -> e.getValue).toMap
 
     val jsonNodes = climateSettings
       .filterValues(_.isInstanceOf[ArrayNode])
-      .mapValues(_.asInstanceOf[ArrayNode])
-      .mapValues(patchFieldValue(objectNode, provinceIdsKey, _))
+      .mapValuesEx(_.asInstanceOf[ArrayNode])
+      .mapValuesEx(patchFieldValue(objectNode, provinceIdsKey, _))
       .mapKVtoValue((id, region) => region.setEx(idKey, id))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq

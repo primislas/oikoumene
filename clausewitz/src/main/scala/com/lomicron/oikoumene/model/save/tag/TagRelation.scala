@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class TagRelation
 (
   // hits = 129153, isOptional = true, sample = true
@@ -53,8 +54,6 @@ case class TagRelation
   lastWarStatus: Option[Int] = None,
   // hits = 4, isOptional = true, sample = 2
   playerAttitude: Option[Int] = None,
-) {
-  @JsonCreator def this() = this(false)
-}
+)
 
 object TagRelation extends FromJson[TagRelation]

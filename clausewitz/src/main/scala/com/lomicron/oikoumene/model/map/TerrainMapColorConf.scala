@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TerrainMapColorConf
 (
   id: String,
@@ -11,8 +12,6 @@ case class TerrainMapColorConf
   @JsonProperty("color") colorIndex: Int = 0,
   @JsonProperty("rgbColor") color: Option[Color] = None,
 ) {
-
-  @JsonCreator def this() = this(Entity.UNDEFINED, Entity.UNDEFINED)
 
   def withColor(c: Color): TerrainMapColorConf = copy(color = Option(c))
 

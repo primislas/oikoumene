@@ -25,12 +25,15 @@ case class InMemoryLocalisationRepository() extends LocalisationRepository { sel
     localisation.values.toSeq
 
   override def searchEntries(keyPattern: String): Seq[LocalisationEntry] =
-    localisation.filterKeys(_.matches(keyPattern)).values.toSeq
+    localisation.view.filterKeys(_.matches(keyPattern)).values.toSeq
 
   override def findTag(key: String): Option[ObjectNode] =
     tags.get(key)
 
   override def fetchTags: Map[String, ObjectNode] = tags
+
+  override def fetchProvince(provId: Int): Option[ObjectNode] =
+    provinces.get(provId)
 
   override def fetchProvinces: Map[Int, ObjectNode] = provinces
 

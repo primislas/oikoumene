@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.repository.api.politics
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.repository.api.search.SearchConf
 
+@JsonCreator
 case class TagSearchConf
 (
   override val page: Int = 0,
@@ -15,7 +16,6 @@ case class TagSearchConf
   religion: Option[String] = None,
 
 ) extends SearchConf {
-  @JsonCreator def this() = this(0)
   def ofTag(tag: String): TagSearchConf = copy(id = Some(tag))
   def ofName(name: String): TagSearchConf = copy(name = Option(name))
 }

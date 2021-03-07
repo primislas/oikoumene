@@ -1,6 +1,6 @@
 package com.lomicron.utils.collection
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 object CollectionUtils {
@@ -22,6 +22,9 @@ object CollectionUtils {
     def mapKeyToValue[R](f: K => R): Map[K, R] =
       m.map(kv => (kv._1, f(kv._1)))
 
+    def filterKeysEx(p: K => Boolean): Map[K, V] =
+      m.filter(kv => p(kv._1))
+
     def filterKeyValue(p: (K, V) => Boolean): Map[K, V] =
       m.filter(kv => p(kv._1, kv._2))
 
@@ -36,7 +39,7 @@ object CollectionUtils {
   }
 
   implicit class IteratorEx[T](it: java.util.Iterator[T]) {
-    def toStream: Stream[T] = it.asScala.toStream
+    def toStream: LazyList[T] = it.asScala.to(LazyList)
 
     def toSeq: Seq[T] = it.asScala.toList
   }

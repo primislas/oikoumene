@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.model.map.spherical.SphericalMap
 import com.lomicron.oikoumene.model.provinces.Province
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.map.ProvinceRepository
-import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx, toOption}
+import com.lomicron.utils.collection.CollectionUtils.{MapEx, toOption}
 import com.lomicron.utils.geometry.SphericalCoord
 import com.softwaremill.quicklens._
 
@@ -104,7 +104,7 @@ case class WorldMap
         val ownershipThreshold = totalNeighbors / 2
         val owners = neighbors
           .groupBy(_.state.owner)
-          .mapValues(_.size)
+          .mapValuesEx(_.size)
           .filterValues(_ >= ownershipThreshold)
           .keySet
 

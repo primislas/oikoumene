@@ -102,8 +102,8 @@ object Polygon {
   def groupBordersIntoShapes(bs: Seq[Border], ps: Seq[Polygon] = Seq.empty): Seq[Polygon] = {
     if (bs.isEmpty) ps
     else bs match {
-      case h :: Nil => ps ++ Shape(Seq(h)).withPolygon.polygon.toSeq
-      case h :: t =>
+      case Seq(h) => ps ++ Shape(Seq(h)).withPolygon.polygon.toSeq
+      case h +: t =>
         val startPoint = h.points.head
         var currentPoint = h.points.last
         var remainingBorders: Seq[Border] = t

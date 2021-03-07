@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.history.History
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TagHistory
 (
   override val init: TagUpdate = TagUpdate.empty,
@@ -12,11 +13,10 @@ case class TagHistory
   override val sourceFile: Option[String] = None,
 
 ) extends History[TagHistory, TagState, TagUpdate] {
-  @JsonCreator def this() = this(TagUpdate.empty)
 
   override def withState(state: TagState): TagHistory = copy(state = state)
-
   override def addEvent(e: TagUpdate): TagHistory = copy(events = events :+ e)
+
 }
 
 object TagHistory extends FromJson[TagHistory] {

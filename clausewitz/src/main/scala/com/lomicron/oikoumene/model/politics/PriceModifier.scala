@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class PriceModifier
 (
   // hits = 10, isOptional = false, sample = "gems"
@@ -15,8 +16,6 @@ case class PriceModifier
   duration: BigDecimal = BigDecimal(0),
   // hits = 10, isOptional = false, sample = 0.25
   value: BigDecimal = BigDecimal(0),
-) {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+)
 
 object PriceModifier extends FromJson[PriceModifier]

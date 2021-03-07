@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper.JsonMap
 
+@JsonCreator
 case class Religion
 (// hits = 26, isOptional = false, sample = "anglican"
  id: String = Entity.UNDEFINED,
@@ -91,8 +92,6 @@ case class Religion
  usesHarmony: Option[Boolean] = None,
  // hits = 1, isOptional = true, sample = true
  usesIsolationism: Option[Boolean] = None,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object Religion extends FromJson[Religion]

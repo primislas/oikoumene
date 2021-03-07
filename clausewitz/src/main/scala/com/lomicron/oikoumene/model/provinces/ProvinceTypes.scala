@@ -5,6 +5,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class ProvinceTypes
 (width: Int = 0,
  height: Int = 0,
@@ -14,8 +15,6 @@ case class ProvinceTypes
  lakes: Set[Int] = Set.empty,
  forceCoastal: Set[Int] = Set.empty,
  canalDefinition: Seq[CanalDefinition] = Seq.empty) {
-
-  @JsonCreator def this() = this(0)
 
   def identifyType(provinceId: Int): String =
     if (seaStarts.contains(provinceId)) ProvinceTypes.sea

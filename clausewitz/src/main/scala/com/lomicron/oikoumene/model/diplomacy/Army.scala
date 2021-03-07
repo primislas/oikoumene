@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class Army
 (
   id: Option[Int] = None,
@@ -25,9 +26,7 @@ case class Army
   lightShip: Option[Int] = None,
   // hits = 12, isOptional = true, sample = 80
   galley: Option[Int] = None,
-) {
-  @JsonCreator def this() = this(None)
-}
+)
 
 object Army extends FromJson[Army] {
   def empty: Army = new Army()

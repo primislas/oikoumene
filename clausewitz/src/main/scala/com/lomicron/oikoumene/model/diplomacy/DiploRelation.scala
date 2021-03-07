@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.parsing.tokenizer.Date
 
+@JsonCreator
 case class DiploRelation
 (
   id: Option[Int] = None,
@@ -23,8 +24,6 @@ case class DiploRelation
   tradeLeague: Option[Int] = None,
   sourceFile: Option[String] = None,
 ) {
-
-  @JsonCreator def this() = this(None, DiploRelationType.undefined, Tag.undefined, Date.zero)
 
   def isActiveAt(date: Date): Boolean = startDate <= date && (endDate.exists(_ > date) || endDate.isEmpty)
 

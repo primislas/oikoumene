@@ -1,11 +1,11 @@
 package com.lomicron.oikoumene.repository.api.resources
 
-import com.lomicron.oikoumene.io.FileNameAndContent
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-
-import java.nio.file.Path
+import com.lomicron.oikoumene.parsers.politics.TagConf
 
 trait ResourceRepository {
+
+  def getResource(fileConf: GameFile): GameFile
 
   def getLocalisation: Seq[LocalisationEntry] =
     getLocalisation(SupportedLanguages.english)
@@ -16,66 +16,68 @@ trait ResourceRepository {
     *
     * @return country files by country tags
     */
-  def getCountryTags: Map[String, String]
+  def getCountryTags: Seq[GameFile]
   /**
     *
     * @return country file content by country tag
     */
-  def getCountries(filesByTags: Map[String, String]): Map[String, String]
+  def getCountries(filesByTags: Map[String, GameFile]): Map[String, GameFile]
   /**
     *
     *
     * @return country history by country tag
     */
-  def getCountryHistory: Map[String, FileNameAndContent]
-  def getRulerPersonalities: Map[String, String]
+  def getCountryHistory: Map[String, GameFile]
+  def getCountryConfigs(filesByTag: Map[String, GameFile]): Seq[TagConf]
+  def getRulerPersonalities: Seq[GameFile]
 
-  def getDiplomaticRelations: Map[String, String]
-  def getWarHistory: Map[String, String]
-  def getCasusBelliTypes: Map[String, String]
-  def getWarGoalTypes: Map[String, String]
+  def getDiplomaticRelations: Seq[GameFile]
+  def getWarHistory: Seq[GameFile]
+  def getCasusBelliTypes: Seq[GameFile]
+  def getWarGoalTypes: Seq[GameFile]
 
   def getProvinceDefinitions: Option[String]
   def getAdjacencies: Option[String]
-  def getProvinceHistory: Map[Int, FileNameAndContent]
-  def getBuildings: Map[String, String]
+  def getProvinceHistoryResources: Map[Int, GameFile]
+  def getProvinceHistory: Map[Int, GameFile]
+  def getBuildings: Seq[GameFile]
 
-  def getProvinceTypes: Map[String, String]
+  def getProvinceTypes: Option[GameFile]
   def getProvincePositions: Option[String]
   def getAreas: Option[String]
   def getRegions: Option[String]
   def getSuperregions: Option[String]
   def getContinents: Option[String]
   def getColonialRegions: Option[String]
-  def getTerrain: Map[String, String]
+  def getTerrain: Option[GameFile]
   def getClimate: Option[String]
-  def getElevatedLakes: Map[String, String]
-  def getProvinceMap: Option[Path]
-  def getTerrainMap: Option[Path]
-  def getHeightMap: Option[Path]
-  def getRiversMap: Option[Path]
-  def getBackground(season: String): Option[Path]
+  def getElevatedLakes: Seq[GameFile]
+  def getProvinceMap: Option[GameFile]
+  def getTerrainMap: Option[GameFile]
+  def getHeightMap: Option[GameFile]
+  def getRiversMap: Option[GameFile]
+  def getBackground(season: String): Option[GameFile]
   def isMapModded: Boolean
 
   def getCultures: Option[String]
-  def getReligions: Map[String, String]
+  def getReligions: Seq[GameFile]
 
-  def getGovernments: Map[String, String]
-  def getGovernmentRanks: Map[String, String]
-  def getGovernmentReforms: Map[String, String]
-  def getTechnologies: Map[String, String]
+  def getGovernments: Seq[GameFile]
+  def getGovernmentRanks: Seq[GameFile]
+  def getGovernmentReforms: Seq[GameFile]
+  def getTechnologies: Seq[GameFile]
   def getTechGroupConfig: Option[String]
-  def getIdeas: Map[String, String]
-  def getPolicies: Map[String, String]
-  def getStateEdicts: Map[String, String]
+  def getIdeas: Seq[GameFile]
+  def getPolicies: Seq[GameFile]
+  def getStateEdicts: Seq[GameFile]
 
-  def getTradeGoods: Map[String, String]
-  def getPrices: Map[String, String]
-  def getTradeNodes: Map[String, String]
-  def getCentersOfTrade: Map[String, String]
+  def getTradeGoods: Seq[GameFile]
+  def getPrices: Seq[GameFile]
+  def getTradeNodes: Seq[GameFile]
+  def getCentersOfTrade: Seq[GameFile]
 
-  def getEventModifiers: Map[String, String]
-  def getStaticModifiers: Map[String, String]
+  def getEventModifiers: Seq[GameFile]
+  def getStaticModifiers: Seq[GameFile]
 
   object SupportedLanguages {
     val english = "english"

@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.provinces.ProvinceProduction
 import com.lomicron.oikoumene.model.{Entity, WithCumulativeModifier}
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TagState
 (
   // hits = 793, isOptional = false, sample = "east_african"
@@ -102,8 +103,6 @@ case class TagState
   ambientObjects: Seq[String] = Seq.empty,
 
 ) extends HistState[TagState, TagUpdate] with WithCumulativeModifier[TagState] { self =>
-
-  @JsonCreator def this() = this(Entity.UNDEFINED)
 
   override def next(update: TagUpdate): TagState =
     TagState.updatedFieldsFrom(update).foldLeft(self)((acc, f) => f(acc))

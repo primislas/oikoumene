@@ -4,6 +4,7 @@ import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.map.{MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
+import com.lomicron.utils.collection.CollectionUtils.MapEx
 
 import scala.collection.immutable.SortedMap
 import scala.util.Try
@@ -46,7 +47,7 @@ case class InMemoryMapRepository()
   override def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
     this.terrainColors = terrainColors
     this.terrainById = this.terrainById
-      .mapValues(mt => Try(this.terrainColors(mt.colorIndex)).map(mt.withColor).getOrElse(mt))
+      .mapValuesEx(mt => Try(this.terrainColors(mt.colorIndex)).map(mt.withColor).getOrElse(mt))
     terrainByColor = this.terrainById.values.filter(_.color.isDefined).map(t => (t.color.get, t)).toMap
     this
   }
@@ -139,7 +140,7 @@ case class InMemoryMapRepository()
   override def lakes: Seq[ElevatedLake] = this._lakes
 
   override def updatePositions(positions: Seq[ProvincePositions]): MapRepository = {
-    this._positions = positions.groupBy(_.id).mapValues(_.head)
+    this._positions = positions.groupBy(_.id).mapValuesEx(_.head)
     this
   }
 

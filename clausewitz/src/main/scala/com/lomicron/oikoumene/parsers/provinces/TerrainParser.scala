@@ -32,7 +32,7 @@ object TerrainParser extends LazyLogging {
    evalEntityFields: Boolean)
   : GeographicRepository = {
 
-    val confs = files.getTerrain
+    val confs = files.getTerrain.toSeq
     val cs = parseFilesAsEntities(confs)
 
     val terrainColorConfs = cs

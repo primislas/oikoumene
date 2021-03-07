@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.save.tag
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TagCustomColors
 (
   // hits = 6, isOptional = false, sample = 6
@@ -13,8 +14,6 @@ case class TagCustomColors
   flagColors: Vector[Int] = Vector.empty,
   // hits = 6, isOptional = false, sample = 79
   symbolIndex: Int = 0,
-) {
-  @JsonCreator def this() = this(0)
-}
+)
 
 object TagCustomColors extends FromJson[TagCustomColors]

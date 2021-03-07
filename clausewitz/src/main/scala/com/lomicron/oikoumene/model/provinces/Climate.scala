@@ -7,6 +7,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class Climate
 (// hits = 10, isOptional = false, sample = "arctic"
  id: String = Entity.UNDEFINED,
@@ -15,8 +16,6 @@ case class Climate
  // hits = 9, isOptional = true, sample = {"name":"Arctic"}
  localisation: Localisation = Localisation.empty,
 ) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-
   def hasProvince(provinceId: Int): Boolean = provinceIds.contains(provinceId)
 }
 

@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.model.events
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class ProvinceCondition
 (
   not: Option[ProvinceCondition] = None,
@@ -30,8 +31,6 @@ case class ProvinceCondition
   // hits = 1, isOptional = true, sample = "ROOT"
   previousOwner: Option[String] = None,
 
-) {
-  @JsonCreator def this() = this(None)
-}
+)
 
 object ProvinceCondition extends FromJson[ProvinceCondition]

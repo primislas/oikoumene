@@ -5,6 +5,7 @@ import com.lomicron.oikoumene.model.Entity
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class Region
 (// hits = 92, isOptional = false, sample = "american_east_coast_region"
  id: String = Entity.UNDEFINED,
@@ -14,8 +15,6 @@ case class Region
  localisation: Localisation = Localisation.empty,
  // hits = 31, isOptional = true, sample = ["0.10.1","00.12.30","0.1.1","00.03.30"]
  monsoon: Seq[Seq[String]] = Seq.empty,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object Region extends FromJson[Region]

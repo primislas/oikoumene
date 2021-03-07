@@ -12,6 +12,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class GovernmentReform
 (
   // hits = 274, isOptional = false, sample = "tribe_mechanic"
@@ -172,8 +173,6 @@ case class GovernmentReform
   // hits = 1, isOptional = true, sample = ""
   tradeCityReform: Option[String] = None,
 ) extends Entity with WithModifier {
-
-  @JsonCreator def this() = this(Entity.UNDEFINED)
 
   override def modifierId: String = id
   override def modifier: Option[Modifier] = modifiers

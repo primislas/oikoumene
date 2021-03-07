@@ -3,6 +3,7 @@ package com.lomicron.oikoumene.repository.api.map
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.repository.api.search.SearchConf
 
+@JsonCreator
 case class ProvinceSearchConf
 (
   override val page: Int = 0,
@@ -39,7 +40,6 @@ case class ProvinceSearchConf
     */
   excludeFields: Set[String] = Set.empty,
 ) extends SearchConf {
-  @JsonCreator def this() = this(0)
   def ofName(name: String): ProvinceSearchConf = copy(name = Option(name))
   def ofOwner(tag: String): ProvinceSearchConf = copy(owner = Option(tag))
   def ofCulture(culture: String): ProvinceSearchConf = copy(culture = Option(culture))

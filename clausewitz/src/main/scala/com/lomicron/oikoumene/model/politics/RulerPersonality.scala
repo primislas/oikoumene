@@ -7,6 +7,7 @@ import com.lomicron.oikoumene.model.modifiers.Modifier
 import com.lomicron.oikoumene.model.{Entity, EntityWithModifier}
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class RulerPersonality
 (
   // hits = 48, isOptional = false, sample = "just_personality"
@@ -32,8 +33,6 @@ case class RulerPersonality
   giftChance: Option[BigDecimal] = None,
   // hits = 6, isOptional = true, sample = "AI_RULER_PICK_IDEA_GROUPS"
   customAiExplanation: Option[String] = None,
-) extends EntityWithModifier {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends EntityWithModifier
 
 object RulerPersonality extends FromJson[RulerPersonality]

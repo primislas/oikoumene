@@ -5,6 +5,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.SortedMap
 
+@JsonCreator
 case class SearchDictionary
 (
   tag: SortedMap[String, String] = SortedMap.empty,
@@ -22,9 +23,7 @@ case class SearchDictionary
   region: SortedMap[String, String] = SortedMap.empty,
   superRegion: SortedMap[String, String] = SortedMap.empty,
   continent: SortedMap[String, String] = SortedMap.empty,
-) {
-  @JsonCreator def this() = this(SortedMap.empty)
-}
+)
 
 object SearchDictionary extends FromJson[SearchDictionary] {
   val empty: SearchDictionary = SearchDictionary()

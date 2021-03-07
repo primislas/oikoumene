@@ -7,6 +7,7 @@ import com.lomicron.utils.json.FromJson
 
 import scala.collection.immutable.ListSet
 
+@JsonCreator
 case class TradeNode
 (
   // hits = 77, isOptional = false, sample = "african_great_lakes"
@@ -29,8 +30,6 @@ case class TradeNode
   aiWillPropagateThroughTrade: Boolean = false,
   // hits = 3, isOptional = true, sample = true
   end: Boolean = false,
-) extends Entity {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+) extends Entity
 
 object TradeNode extends FromJson[TradeNode]

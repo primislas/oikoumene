@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class TradeNodeRoute
 (
   // hits = 141, isOptional = false, sample = "zanzibar"
@@ -12,8 +13,6 @@ case class TradeNodeRoute
   control: Seq[BigDecimal] = Seq.empty,
   // hits = 141, isOptional = false, sample = [1273,1202]
   path: Seq[Int] = Seq.empty,
-) {
-  @JsonCreator def this() = this(Entity.UNDEFINED)
-}
+)
 
 object TradeNodeRoute extends FromJson[TradeNodeRoute]

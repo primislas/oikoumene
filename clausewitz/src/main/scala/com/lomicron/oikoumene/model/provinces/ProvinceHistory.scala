@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.history.History
 import com.lomicron.utils.json.FromJson
 
+@JsonCreator
 case class ProvinceHistory
 (
   override val init: ProvinceUpdate = ProvinceUpdate.empty,
@@ -11,8 +12,6 @@ case class ProvinceHistory
   override val state: ProvinceState = ProvinceState.empty,
   override val sourceFile: Option[String] = None,
 ) extends History[ProvinceHistory, ProvinceState, ProvinceUpdate] {
-
-  @JsonCreator def this() = this(ProvinceUpdate.empty)
 
   def withState(state: ProvinceState): ProvinceHistory = copy(state = state)
 
