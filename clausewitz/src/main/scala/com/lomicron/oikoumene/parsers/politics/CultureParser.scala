@@ -79,7 +79,7 @@ object CultureParser extends LazyLogging {
 
   private val cultureGroupFields = Set("id", "localisation",
     "culture_ids", "graphical_culture", "male_names",
-    "female_names", "dynasty_names")
+    "female_names", "dynasty_names", "second_graphical_culture")
 
   private def isCultureField(field: String) = !cultureGroupFields.contains(field)
 
