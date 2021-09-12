@@ -143,7 +143,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
 
   def buildProvTooltip(pId: Int): String =
     repos.provinces.find(pId).toOption
-      .map(p => p.localisation.name.map(n => s"$n (#${p.id})").getOrElse(s"#${p.id}"))
+      .map(p => {
+        val id = p.localisation.name.map(n => s"$n (#${p.id})").orElse(s"#${p.id}")
+        val tag = p.state.owner.flatMap(repos.tags.find(_).toOption).map(t => t.localisation.name.map(n => s"$n (${t.id})").getOrElse(s"${t.id}"))
+        Seq(id, tag).flatten.mkString(", ")
+      })
       .map(_.replaceAll("&", "&amp;"))
       .getOrElse("UNDEFINED PROV")
 

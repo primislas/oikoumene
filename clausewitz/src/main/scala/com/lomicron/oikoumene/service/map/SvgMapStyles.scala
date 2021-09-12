@@ -14,6 +14,10 @@ object SvgMapStyles {
   val lakeColor: Color = Color(135, 248, 250)
   val riverColor: Color = Color(50, 180, 220)
 
+  val wikiSeaColor: Color = Color(68, 107, 163)
+  val wikiUncolonizedColor: Color = Color(150, 150, 150)
+  val wikiWastelandColor: Color = Color(94, 94, 94)
+
   val bgWater = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-water.png"
   val bgAutumn = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-autumn-nowater.png"
   val bgWinter = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-winter-nowater.png"
@@ -85,6 +89,13 @@ object SvgMapStyles {
        |.sea { fill:${Svg.colorToSvg(oceanColor)}; }
        |.lake { fill:${Svg.colorToSvg(lakeColor)}; }
        |.elevated-lake { fill:${Svg.colorToSvg(lakeColor)}; }""".stripMargin
+  val wikiProvinceStyle: String =
+    s""".province { stroke:black; stroke-width:0.5; opacity:1; }
+       |.wasteland { fill:${Svg.colorToSvg(wikiWastelandColor)}; }
+       |.uncolonized { fill:${Svg.colorToSvg(wikiUncolonizedColor)}; }
+       |.sea { fill:${Svg.colorToSvg(wikiSeaColor)}; }
+       |.lake { fill:${Svg.colorToSvg(wikiSeaColor)}; }
+       |.elevated-lake { fill:${Svg.colorToSvg(wikiSeaColor)}; }""".stripMargin
   val terrainProvinceStyle: String =
     s""".province {
        |  stroke: black;
@@ -111,6 +122,7 @@ object SvgMapStyles {
     val provStyle = settings.mapMode match {
       case MapModes.PROVINCE_OUTLINE => outlineProvinceStyle
       case MapModes.TERRAIN => terrainProvinceStyle
+      case MapModes.WIKI => wikiProvinceStyle
       case _ => politicalProvinceStyle
     }
     style = style.addContent(provStyle)
@@ -119,6 +131,7 @@ object SvgMapStyles {
 
     val modeStyle = settings.mapMode match {
       case MapModes.POLITICAL => buildTagStyles(repos)
+      case MapModes.WIKI => buildTagStyles(repos)
       case MapModes.SIMPLE_TERRAIN => buildTerrainStyles(repos)
       case _ => ""
     }

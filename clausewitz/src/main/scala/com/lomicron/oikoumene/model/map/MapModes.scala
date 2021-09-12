@@ -9,6 +9,7 @@ object MapModes {
   val PROVINCE_OUTLINE: String = "province_outline"
   val SIMPLE_TERRAIN: String = "simple_terrain"
   val TRADE_NODES: String = "trade_nodes"
+  val WIKI: String = "wiki"
 
   val politicalSettings: MapBuilderSettings =
     MapBuilderSettings(
@@ -19,16 +20,16 @@ object MapModes {
       ownWastelands = true,
       svgBackground = Seasons.SUMMER,
     )
-
   val terrainSettings: MapBuilderSettings = politicalSettings.copy(mapMode = TERRAIN)
-
   val provOutlinesSettings: MapBuilderSettings = MapBuilderSettings(mapMode = PROVINCE_OUTLINE)
+  val wikiSettings: MapBuilderSettings = MapBuilderSettings(mapMode = WIKI)
 
   def defaultSettings(mode: String): Option[MapBuilderSettings] =
     mode match {
       case POLITICAL => politicalSettings
       case TERRAIN => terrainSettings
       case PROVINCE_OUTLINE => provOutlinesSettings
+      case WIKI => wikiSettings
       case _ => None
     }
 
