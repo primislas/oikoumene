@@ -54,7 +54,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     logger.info("Rivers: OK")
     val names = settings.includeNames.filter(_.booleanValue()).toSeq.map(_ => nameSvg(worldMap))
     logger.info("Names: OK")
-    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
+    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvgFromMap(map, precision))
     logger.info("Borders: OK")
 
     val worldSvg = Svg
@@ -175,10 +175,10 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
-  def borderSvg(mercatorMap: MercatorMap, precision: Int = defaultPrecision): SvgElement =
+  def borderSvgFromMap(mercatorMap: MercatorMap, precision: Int = defaultPrecision): SvgElement =
     borderSvg(mercatorMap.borders, precision)
 
-  def borderSvg(borders: Seq[Border], precision: Int): SvgElement = {
+  def borderSvg(borders: Seq[Border], precision: Int = defaultPrecision): SvgElement = {
     val bordsByClass = borders.map(borderSvg(_, precision)).groupBy(_.classes.head)
 
     def bordsOfType(t: String): SvgElement = {
@@ -216,85 +216,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   }
 
   def borderSvg(b: Border, precision: Int): SvgElement = {
-    val lp = b.left.flatMap(repos.provinces.findByColor)
-    val rp = b.right.flatMap(repos.provinces.findByColor)
-    val borderType = borderBetweenProvs(lp, rp)
-    path
-      .copy(path = Svg.fromPolypath(b.path, precision))
-      .addClass(borderType)
+    val res = path.copy(path = Svg.fromPolypath(b.path, precision))
+    b.`type`.map(res.addClass).getOrElse(res)
   }
 
-  def borderBetweenProvIds(p1: Option[Int], p2: Option[Int]): String =
-    borderBetweenProvs(
-      p1.flatMap(repos.provinces.find(_).toOption),
-      p2.flatMap(repos.provinces.find(_).toOption)
-    )
 
-  def borderBetweenProvs(p1: Option[Province], p2: Option[Province]): String = {
-    val borderTypeOpt = for {
-      lProv <- p1
-      rProv <- p2
-    } yield borderBetween(lProv, rProv)
-
-    if (p1.isDefined || p2.isDefined)
-      borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
-    else
-      BorderTypes.UNDEFINED
-  }
-
-  def borderBetween(a: Province, b: Province): String = {
-    if (isCountryBorder(a, b)) BorderTypes.COUNTRY
-    else if (isLandBorder(a, b))
-      if (isAreaBorder(a, b)) BorderTypes.LAND_AREA
-      else BorderTypes.LAND
-    else if (isSeaBorder(a, b))
-      if (isAreaBorder(a, b)) BorderTypes.SEA_AREA
-      else BorderTypes.SEA
-    else if (isSeaShoreBorder(a, b))
-      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
-      else BorderTypes.SEA_SHORE
-    else if (isLakeShoreBorder(a, b))
-      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
-      else BorderTypes.LAKE_SHORE
-    else if (isLakeBorder(a, b)) BorderTypes.LAKE
-    else BorderTypes.UNDEFINED
-  }
-
-  def isCountryBorder(a: Province, b: Province): Boolean =
-    isLandBorder(a, b) &&
-      anyHasOwner(a, b) &&
-      (a.state.owner != b.state.owner || (
-        (a.geography.isImpassable || b.geography.isImpassable)
-          && (!a.geography.isImpassable || !b.geography.isImpassable))
-        )
-
-  def isLandBorder(a: Province, b: Province): Boolean =
-    a.isLand && b.isLand
-
-  def isLandAreaBorder(a: Province, b: Province): Boolean =
-    isLandBorder(a, b) && isAreaBorder(a, b)
-
-  def anyHasOwner(a: Province, b: Province): Boolean =
-    a.state.owner.isDefined || b.state.owner.isDefined
-
-  def isSeaBorder(a: Province, b: Province): Boolean =
-    a.`type` == ProvinceTypes.sea && b.`type` == ProvinceTypes.sea
-
-  def isSeaAreaBorder(a: Province, b: Province): Boolean =
-    isSeaBorder(a, b) && isAreaBorder(a, b)
-
-  def isSeaShoreBorder(a: Province, b: Province): Boolean =
-    (a.isLand && b.`type` == ProvinceTypes.sea) || (b.isLand && a.`type` == ProvinceTypes.sea)
-
-  def isLakeBorder(a: Province, b: Province): Boolean =
-    a.`type` == ProvinceTypes.lake && b.`type` == ProvinceTypes.lake
-
-  def isLakeShoreBorder(a: Province, b: Province): Boolean =
-    (a.isLand && b.`type` == ProvinceTypes.lake) || (b.isLand && a.`type` == ProvinceTypes.lake)
-
-  def isAreaBorder(a: Province, b: Province): Boolean =
-    (a.geography.area.isDefined || b.geography.area.isDefined) &&
-      a.geography.area != b.geography.area
 
   def lakeSvg(lakes: Seq[ElevatedLake], mapHeight: Option[Int] = None): SvgElement = {
     val svgLakes = lakes
@@ -418,6 +344,85 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
     Polygon.groupBordersIntoShapes(countryBorders)
   }
+
+  def setBorderType(b: Border): Border = {
+    val lp = b.left.flatMap(repos.provinces.findByColor)
+    val rp = b.right.flatMap(repos.provinces.findByColor)
+    val borderType = borderBetweenProvs(lp, rp)
+    b.withType(borderType)
+  }
+
+  def borderBetweenProvIds(p1: Option[Int], p2: Option[Int]): String =
+    borderBetweenProvs(
+      p1.flatMap(repos.provinces.find(_).toOption),
+      p2.flatMap(repos.provinces.find(_).toOption)
+    )
+
+  def borderBetweenProvs(p1: Option[Province], p2: Option[Province]): String = {
+    val borderTypeOpt = for {
+      lProv <- p1
+      rProv <- p2
+    } yield borderBetween(lProv, rProv)
+
+    if (p1.isDefined || p2.isDefined)
+      borderTypeOpt.getOrElse(BorderTypes.MAP_BORDER)
+    else
+      BorderTypes.UNDEFINED
+  }
+
+  def borderBetween(a: Province, b: Province): String = {
+    if (isCountryBorder(a, b)) BorderTypes.COUNTRY
+    else if (isLandBorder(a, b))
+      if (isAreaBorder(a, b)) BorderTypes.LAND_AREA
+      else BorderTypes.LAND
+    else if (isSeaBorder(a, b))
+      if (isAreaBorder(a, b)) BorderTypes.SEA_AREA
+      else BorderTypes.SEA
+    else if (isSeaShoreBorder(a, b))
+      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
+      else BorderTypes.SEA_SHORE
+    else if (isLakeShoreBorder(a, b))
+      if (anyHasOwner(a, b)) BorderTypes.COUNTRY_SHORE
+      else BorderTypes.LAKE_SHORE
+    else if (isLakeBorder(a, b)) BorderTypes.LAKE
+    else BorderTypes.UNDEFINED
+  }
+
+  def isCountryBorder(a: Province, b: Province): Boolean =
+    isLandBorder(a, b) &&
+      anyHasOwner(a, b) &&
+      (a.state.owner != b.state.owner || (
+        (a.geography.isImpassable || b.geography.isImpassable)
+          && (!a.geography.isImpassable || !b.geography.isImpassable))
+        )
+
+  def isLandBorder(a: Province, b: Province): Boolean =
+    a.isLand && b.isLand
+
+  def isLandAreaBorder(a: Province, b: Province): Boolean =
+    isLandBorder(a, b) && isAreaBorder(a, b)
+
+  def anyHasOwner(a: Province, b: Province): Boolean =
+    a.state.owner.isDefined || b.state.owner.isDefined
+
+  def isSeaBorder(a: Province, b: Province): Boolean =
+    a.`type` == ProvinceTypes.sea && b.`type` == ProvinceTypes.sea
+
+  def isSeaAreaBorder(a: Province, b: Province): Boolean =
+    isSeaBorder(a, b) && isAreaBorder(a, b)
+
+  def isSeaShoreBorder(a: Province, b: Province): Boolean =
+    (a.isLand && b.`type` == ProvinceTypes.sea) || (b.isLand && a.`type` == ProvinceTypes.sea)
+
+  def isLakeBorder(a: Province, b: Province): Boolean =
+    a.`type` == ProvinceTypes.lake && b.`type` == ProvinceTypes.lake
+
+  def isLakeShoreBorder(a: Province, b: Province): Boolean =
+    (a.isLand && b.`type` == ProvinceTypes.lake) || (b.isLand && a.`type` == ProvinceTypes.lake)
+
+  def isAreaBorder(a: Province, b: Province): Boolean =
+    (a.geography.area.isDefined || b.geography.area.isDefined) &&
+      a.geography.area != b.geography.area
 
   def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {
     val segmented = Geometry.groupSegments(segments).sortBy(_.x)

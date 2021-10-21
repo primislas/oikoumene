@@ -27,4 +27,12 @@ class MapController @Inject()
       }
   }
 
+  def socket3D: WebSocket = WebSocket.accept[String, String] {
+    //noinspection ScalaUnusedSymbol
+    request =>
+      ActorFlow.actorRef { out =>
+        Map3DSocketActor.props(out, mapService)
+      }
+  }
+
 }

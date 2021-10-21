@@ -39,6 +39,23 @@ class TokenizerSpec extends Specification {
       val (stream, _) = Tokenizer.readComment(validInput)
       stream.head must beEqualTo('\n')
     }
+
+    "- verify that brackets are balanced" >> {
+      val brackets = "([{}[]])"
+      def bracketsMatch(a: Char, b: Char): Boolean =
+        (a == '(' && b == ')') || (a == '{' && b == '}') || (a == '[' && b == ']')
+
+      val res = brackets
+        .foldLeft(List.empty[Char])((stack, c) => c match {
+          case ob @ ('(' | '[' | '{') => ob :: stack
+          case cb @ (')' | ']' | '}') => stack match {
+            case br :: tail => if (bracketsMatch(br, cb)) tail else stack
+            case Nil => cb :: stack
+          }
+        })
+
+      res.length mustEqual(0)
+    }
   }
 
 }

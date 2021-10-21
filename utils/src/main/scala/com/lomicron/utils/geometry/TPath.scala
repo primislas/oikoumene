@@ -11,7 +11,10 @@ import com.typesafe.scalalogging.LazyLogging
 @JsonDeserialize(using = classOf[TPathDeserializer])
 trait TPath {
   def points: Seq[Point2D]
-  def reverse: TPath
+  def setPoints(ps: Seq[Point2D]): TPath
+
+  def reverse: TPath = setPoints(points.reverse)
+  def reflectY(height: Double): TPath = setPoints(points.map(_.reflectY(height)))
 }
 
 object TPath {

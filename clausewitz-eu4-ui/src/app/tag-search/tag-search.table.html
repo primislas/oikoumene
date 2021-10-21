@@ -1,4 +1,4 @@
-<table class="table  table-sm table-striped table-hover" [mfData]="page.searchResult.entities"  #mf="mfDataTable">
+<table class="table  table-sm table-striped table-hover">
     <thead class="thead-dark">
     <tr>
         <td *ngIf="selector">Select</td>
@@ -17,7 +17,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let t of mf.data">
+    <tr *ngFor="let t of page.searchResult.entities">
         <td *ngIf="selector">
             <button class="btn btn-sm" (click)="selector.select(t)" title="Select {{t.name}}">
                 <i class="fa fa-hand-pointer-o"></i>

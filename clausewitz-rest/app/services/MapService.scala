@@ -3,12 +3,11 @@ package services
 import com.lomicron.oikoumene.model.map.{MapModes, WorldMap}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.service.map.{MapBuilderSettings, SvgMapService, SvgMapStyles}
-import com.lomicron.oikoumene.service.svg.{SvgElement, SvgElements, SvgTags}
+import com.lomicron.oikoumene.service.svg.{SvgElement, SvgTags}
 import com.lomicron.oikoumene.tools.map.MapBuilder
 import com.lomicron.oikoumene.tools.model.metadata.ProvinceMetadata
-import javax.inject.{Inject, Singleton}
-import com.lomicron.utils.collection.CollectionUtils.OptionEx
 
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 
 @Singleton
@@ -18,6 +17,15 @@ class MapService @Inject
   private val service = SvgMapService(repos)
   private val world = WorldMap(repos)
   type JsonMap = Map[String, Any]
+
+  def provinces: Seq[Map[String, AnyRef]] = world
+    .mercator
+    .provinces
+    .map(p => ListMap(
+      "provId" -> p.provId,
+      "path" -> p.path.map(_.reflectY(2048)),
+      "clip" -> p.clip.map(_.path).map(_.map(_.reflectY(2048))),
+    ))
 
   def fetchMapSvg: String = {
       MapBuilder.buildMap(repos)
@@ -30,7 +38,7 @@ class MapService @Inject
       .customContent.getOrElse("")
   }
 
-  def provinces: Seq[Map[String, AnyRef]] =
+  def svgProvinces: Seq[Map[String, AnyRef]] =
     world.mercator
       .provinces
       .map(service.provinceToSvg(_, MapModes.PROVINCE_OUTLINE))
@@ -43,8 +51,9 @@ class MapService @Inject
   def rivers: Seq[SvgElement] =
     world.mercator.rivers.flatMap(service.riverToSvg(_))
 
-  def borders: Seq[Map[String, AnyRef]] = {
-    service.borderSvg(world.mercator).children
+  def svgBorders: Seq[Map[String, AnyRef]] = {
+    val bordersWithType = world.mercator.borders.map(service.setBorderType)
+    service.borderSvg(bordersWithType).children
       .filter(_.children.nonEmpty)
       .flatMap(bGroup => {
         if (bGroup.children.headOption.exists(_.tag == SvgTags.PATH)) Seq(bGroup)
@@ -57,6 +66,17 @@ class MapService @Inject
           "paths" -> bGroup.children.map(_.path).filter(_.isDefined)
         )
       })
+  }
+
+  def borders: Seq[Map[String, AnyRef]] = {
+    world
+      .mercator
+      .borders
+      .map(service.setBorderType)
+      .map(b => ListMap(
+        "paths" -> b.path,
+        "type" -> b.`type`,
+      ))
   }
 
   def names: Seq[Map[String, Any]] =

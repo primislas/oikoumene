@@ -5,7 +5,6 @@ import {HttpClientModule} from '@angular/common/http';
 
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
-import {DataTableModule} from 'angular-6-datatable';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ProvinceSearchComponent} from './province-search/province-search.component';
@@ -15,6 +14,8 @@ import {TagSearchTableComponent} from './tag-search/tag-search.table.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { MapComponent } from './map/map.component';
 import {WebsocketService} from "./services/web-socket.service";
+import {DataTablesModule} from "angular-datatables";
+import { MapThreeDComponent } from './map-three-d/map-three-d.component';
 
 @NgModule({
     declarations: [
@@ -25,13 +26,14 @@ import {WebsocketService} from "./services/web-socket.service";
         TagSearchModalComponent,
         PaginationComponent,
         MapComponent,
+        MapThreeDComponent,
     ],
     imports: [
         BrowserModule,
         FormsModule,
         HttpClientModule,
         AppRoutingModule,
-        DataTableModule,
+        DataTablesModule,
         Ng2SmartTableModule,
         NgbModule,
     ],

@@ -51,8 +51,7 @@
                 </div>
             </div>
 
-            <table class="table table-sm table-striped table-hover" [mfData]="provinces" #mf="mfDataTable"
-                   [mfRowsOnPage]="pagination.size">
+            <table class="table table-sm table-striped table-hover">
                 <thead class="thead-dark">
                 <tr>
                     <th></th>
@@ -66,7 +65,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let p of mf.data">
+                <tr *ngFor="let p of provinces">
                     <td>
                         <button class="btn btn-sm btn-outline-dark" (click)="editProvince(p)">
                             <i class="fa fa-edit"></i>

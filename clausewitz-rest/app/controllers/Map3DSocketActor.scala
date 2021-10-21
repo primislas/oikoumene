@@ -11,22 +11,11 @@ import services.MapService
 import scala.concurrent.Future
 
 
-object MapSocketActor {
-  def props(out: ActorRef, mapService: MapService): Props = Props(new MapSocketActor(out, mapService))
+object Map3DSocketActor {
+  def props(out: ActorRef, mapService: MapService): Props = Props(new Map3DSocketActor(out, mapService))
 }
 
-object MapEvents {
-  val LoadMap: String = "loadMap"
-  val Metadata = "mapMetadata"
-  val ProvinceShapes = "provinceShapes"
-  val Borders = "mapBorders"
-  val Rivers = "mapRivers"
-  val Names = "names"
-  val Provinces = "provinces"
-  val Tags = "tags"
-}
-
-class MapSocketActor(out: ActorRef, mapService: MapService) extends Actor with LazyLogging {
+class Map3DSocketActor(out: ActorRef, mapService: MapService) extends Actor with LazyLogging {
 
   def receive: Receive = {
     case msg: String =>
@@ -43,6 +32,7 @@ class MapSocketActor(out: ActorRef, mapService: MapService) extends Actor with L
     node
       .getString("event")
       .map(e => {
+        logger.info(s"Handling a '$e' event")
         val data = node.getObject("data").getOrElse(JsonMapper.objectNode)
         WSMsg(e, data)
       })
@@ -61,20 +51,11 @@ class MapSocketActor(out: ActorRef, mapService: MapService) extends Actor with L
 
     val meta = Future{ reply("mapMetadata", MapMetadata()) }
     val provinces = Future { reply("mapProvinceShapes", mapService.provinces) }
-    //    val rivers = Future { reply("mapRivers", mapService.rivers) }
-        val borders = Future { reply("mapBorders", mapService.borders) }
-    //    val names = Future { reply("mapNames", mapService.names) }
+//    val rivers = Future { reply("mapRivers", mapService.rivers) }
+//    val borders = Future { reply("mapBorders", mapService.borders) }
+//    val names = Future { reply("mapNames", mapService.names) }
     val tags = futureReply("tagMetadata", mapService.tags)
     val provMeta = futureReply("provinceMetadata", mapService.provinceMeta)
-
-//    val meta = Future{ reply("mapMetadata", MapMetadata()) }
-//    val style = Future { reply("mapStyle", mapService.style) }
-//    val provinces = Future { reply("mapProvinceShapes", mapService.svgProvinces) }
-//    val rivers = Future { reply("mapRivers", mapService.rivers) }
-//    val borders = Future { reply("mapBorders", mapService.svgBorders) }
-//    val names = Future { reply("mapNames", mapService.names) }
-//    val tags = futureReply("tagMetadata", mapService.tags)
-//    val provMeta = futureReply("provinceMetadata", mapService.provinceMeta)
   }
 
   def emitMessage[T <: AnyRef](sender: ActorRef, event: String, data: T): Unit = {
@@ -83,13 +64,3 @@ class MapSocketActor(out: ActorRef, mapService: MapService) extends Actor with L
 
 
 }
-
-case class WSMsg(event: String, data: ObjectNode)
-case class MapMetadata
-(
-  width: Int = 5632,
-  height: Int = 2048,
-  style: String = "",
-  waterBackground: Option[String] = None,
-  terrainBackground: Option[String] = None,
-)

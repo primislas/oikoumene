@@ -12,6 +12,7 @@ case class Border
   leftGroup: Option[Int] = None,
   rightGroup: Option[Int] = None,
   path: Seq[TPath] = Seq.empty,
+  `type`: Option[String] = None,
 ) extends Emptiable
 {
 
@@ -26,6 +27,8 @@ case class Border
   def +(ps: Seq[Point2D]): Border = copy(points = points ++ ps)
 
   def +(b: Border): Border = copy(points = points ++ b.points)
+
+  def withType(t: String): Border = copy(`type` = Some(t))
 
   def identicalNeighbors(b: Border): Boolean =
     left == b.left && right == b.right

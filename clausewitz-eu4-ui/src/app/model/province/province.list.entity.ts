@@ -11,6 +11,8 @@ export class ProvinceListEntity {
     tradeGood: string;
     tradeNode: string;
 
+    type: string;
+
     static fromJsonObj(obj) {
         return Object.assign(new ProvinceListEntity(), obj);
     }

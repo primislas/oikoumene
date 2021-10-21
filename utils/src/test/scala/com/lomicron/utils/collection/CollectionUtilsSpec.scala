@@ -14,6 +14,9 @@ class CollectionUtilsSpec extends Specification {
       val jsonNode: JsonNode = JsonMapper.objectNode
       val objOpt = Option(jsonNode).cast[ObjectNode]
       objOpt.isEmpty mustEqual false
+
+
+
       objOpt.get.getNodeType must be equalTo JsonNodeType.OBJECT
     }
 
