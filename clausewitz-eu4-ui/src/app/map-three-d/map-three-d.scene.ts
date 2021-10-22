@@ -5,16 +5,12 @@ import {River} from "../model/map/river";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {TagMetadata} from "../map/tag.metadata";
 import {Shape3d} from "./shape.3d";
-import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, Mesh, Geometry, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Vector2, Vector3, Color} from "three"
+import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, Geometry, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Vector2, Vector3, Color} from "three"
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import {GUI} from 'three/examples/jsm/libs/dat.gui.module'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
-
-
-import * as AdaptiveBezier from 'adaptive-bezier-curve'
-import { MeshLine, MeshLineMaterial } from 'meshline';
 
 
 
@@ -49,18 +45,24 @@ export class MapThreeDScene {
 
     private MAP_WIDTH = 5632;
     private MAP_HEIGHT = 2048;
+    private BEZIER_SCALE = 25;
     private TERRAIN_TEXTURE = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-summer-nowater.png";
     private WATER_TEXTURE = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-water.png";
-    private PROVINCE_OPACITY = 0.5;
+    private PROVINCE_OPACITY = 0.35;
     private WATER_OPACITY = 0.2;
     private DEFAULT_PROVINCE_MATERIAL: Material = new MeshStandardMaterial({
         color: "rgb(200,200,200)",
         opacity: this.PROVINCE_OPACITY,
     });
-    private DEFAULT_BORDER_MATERIAL: Material = new MeshLineMaterial({
-        color: new Color("rgb(200, 0, 0)").getHex(),
-        lineWidth: 20,
-        opacity: 0,
+    private DEFAULT_BORDER_MATERIAL: Material = new LineMaterial({
+        linewidth: 1,
+        color: 0x000000,
+        worldUnits: true,
+        // opacity: opacity,
+        // transparent: true,
+        vertexColors: false,
+        dashed: false,
+        alphaToCoverage: true,
         resolution: this.resolution,
     });
 
@@ -79,6 +81,7 @@ export class MapThreeDScene {
 
         const renderer = new WebGLRenderer({
             canvas: this.canvas,
+            antialias: true,
         });
         renderer.setSize(this.resolution.width, this.resolution.height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -127,10 +130,10 @@ export class MapThreeDScene {
         const waterMaterial = new MeshStandardMaterial({map: waterTexture, transparent: true});
 
         const water = new Mesh(waterPlane, waterMaterial);
-        water.position.set(this.width / 2, this.height / 2, -1);
+        water.position.set(this.width / 2, this.height / 2, -0.02);
 
         const background = new Mesh(plane, material);
-        background.position.set(this.width / 2, this.height / 2, -0.5);
+        background.position.set(this.width / 2, this.height / 2, -0.01);
 
         this.scene.add( water );
         this.scene.add( background );
@@ -145,25 +148,25 @@ export class MapThreeDScene {
         this.materials.set("river", new MeshStandardMaterial({color: "rgb(50, 180, 220)", opacity: this.WATER_OPACITY, transparent: true}));
 
         this.addBorderMaterial("border", 1, new Color("rgb(50,50,50)"), 0.1);
-        this.addBorderMaterial("border-land", 1, new Color("rgb(50,50,50)"), 0.1);
+        this.addBorderMaterial("border-land", 1, new Color("rgb(65,65,65)"), 0.1);
         this.addBorderMaterial("border-map", 0, new Color("rgb(100,50,0)"), 0.4);
-        this.addBorderMaterial("border-country", 60, new Color("rgb(50,50,50)"), 0);
-        this.addBorderMaterial("border-country-shore", 1, new Color("rgb(50,175,200)"), 0.4);
-        this.addBorderMaterial("border-land-area", 1, new Color("rgb(50,50,50)"), 0.2);
+        this.addBorderMaterial("border-country", 3, new Color("rgb(50,50,50)"), 0);
+        this.addBorderMaterial("border-country-shore", 2, new Color("rgb(50,175,200)"), 0.4);
+        this.addBorderMaterial("border-land-area", 1.5, new Color("rgb(50,50,50)"), 0.2);
         this.addBorderMaterial("border-sea", 1, new Color("rgb(0,0,50)"), 0.1);
         this.addBorderMaterial("border-sea-area", 1, new Color("rgb(0,0,50)"), 0.2);
-        this.addBorderMaterial("border-sea-shore", 1, new Color("rgb(50,175,200)"), 0.4);
-        this.addBorderMaterial("border-lake-shore", 1, new Color("rgb(50,200,200)"), 0.4);
+        this.addBorderMaterial("border-sea-shore", 2, new Color("rgb(50,175,200)"), 0.4);
+        this.addBorderMaterial("border-lake-shore", 2, new Color("rgb(50,200,200)"), 0.4);
     }
 
     addBorderMaterial(id: string, lineWidth: number, color: Color, opacity: number) {
         // const mat = new MeshLineMaterial({
         const mat = new LineMaterial({
-            lineWidth: lineWidth,
+            linewidth: lineWidth,
             color: color,
-            worldUnits: true,
-            opacity: opacity,
-            transparent: true,
+            worldUnits: false,
+            // opacity: opacity,
+            // transparent: true,
             vertexColors: false,
             dashed: false,
             alphaToCoverage: true,
@@ -307,49 +310,29 @@ export class MapThreeDScene {
 
     }
 
-    addBorders(borders: any[]) {
+    addBorders(borders: Border[]) {
         this.borders = borders
-            .filter(b => b.type === "border-country")
+            // .filter(b => b.type === "border-country")
             // .slice(0, 50)
             .map(b => {
-                const vertices = (b.paths || [])
-                    .map(path => {
-                        if (path.polyline)
-                            return path.polyline
-                        else if (path.bezier) {
-                            console.log(`Converting to bezier: ${path.bezier}`);
-                            const [s, cp1, cp2, e] = path.bezier;
-                            const bezier = AdaptiveBezier(s, cp1, cp2, e);
-                            console.log(`Bezier points: ${bezier}`);
-                            return bezier;
-                        } else
-                            return [];
-                    })
-                    .reduce((acc, a) => acc.concat(a))
-                    .map(([x, y]) => new Vector3(x, this.MAP_HEIGHT - y, 1));
-
-                // const line = new MeshLine();
-                // line.setPoints(vertices);
-                // const material = this.materials.get(b.type) || this.DEFAULT_BORDER_MATERIAL;
-                // b.mesh = new Mesh(line, material);
+                const vertices = Border
+                    .asPoints(b, this.BEZIER_SCALE)
+                    .map(p => new Vector3(p[0], this.MAP_HEIGHT - p[1], 0.01));
 
                 const g = new LineGeometry();
                 const positions = vertices.map(v => [v.x, v.y, v.z]).reduce((acc, a) => acc.concat(a), []);
-                console.log(`positions: ${positions}`);
                 g.setPositions(positions);
-                // g.setColors([200, 0, 0]);
                 const material = this.materials.get(b.type) || this.DEFAULT_BORDER_MATERIAL;
                 const line = new Line2(g, material);
                 line.computeLineDistances();
-                // line.scale.set( 1, 1, 1 );
-                b.mesh = line;
 
+                b.mesh = line;
                 return b;
             });
 
         this.borders
             .filter(b => b.mesh)
-            .filter(b => b.type === "border-country")
+            // .filter(b => b.type === "border-country")
             .forEach(b => this.scene.add(b.mesh));
 
         return this;
