@@ -5,7 +5,7 @@ import {River} from "../model/map/river";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {TagMetadata} from "../map/tag.metadata";
 import {ProvinceShape3d} from "./province-shape-3d";
-import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, Geometry, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
+import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import {GUI} from 'three/examples/jsm/libs/dat.gui.module'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
