@@ -5,7 +5,7 @@ import {River} from "../model/map/river";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {TagMetadata} from "../map/tag.metadata";
 import {ProvinceShape3d} from "./province-shape-3d";
-import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
+import {Renderer, WebGLRenderer, TextureLoader, Texture, LinearFilter, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import {GUI} from 'three/examples/jsm/libs/dat.gui.module'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
@@ -31,6 +31,20 @@ export class MapThreeDScene {
     provinces: Map<number, ProvinceListEntity> = new Map<number, ProvinceListEntity>();
     inhabitable: ProvinceShape[] = [];
     tags: Map<string, TagMetadata> = new Map<string, TagMetadata>();
+
+    private zoomLevel = 0;
+    private zoomLevels = [
+        {camera: {position: {z: 10}, rotation: {z: 0.785398}}},
+        {camera: {position: {z: 25}, rotation: {z: 0.3926991}}},
+        {camera: {position: {z: 50}, rotation: {z: 0.19634954}}},
+        {camera: {position: {z: 100}, rotation: {z: 0.0872665}}},
+        {camera: {position: {z: 150}, rotation: {z: 0}}},
+        {camera: {position: {z: 300}, rotation: {z: 0}}},
+        {camera: {position: {z: 500}, rotation: {z: 0}}},
+        {camera: {position: {z: 750}, rotation: {z: 0}}},
+        {camera: {position: {z: 1000}, rotation: {z: 0}}},
+        {camera: {position: {z: 1500}, rotation: {z: 0}}},
+    ];
 
     resolution: Vector2 = new Vector2(100, 100);
     // sizes: any = {width: 100, height: 100};
@@ -124,12 +138,16 @@ export class MapThreeDScene {
         const texture = this.textureLoader.load( this.TERRAIN_TEXTURE );
         texture.wrapS = RepeatWrapping;
         texture.wrapT = RepeatWrapping;
+        texture.minFilter = LinearFilter;
+        texture.magFilter = LinearFilter;
         const material = new MeshStandardMaterial({map: texture, transparent: true});
 
         const waterPlane = new PlaneGeometry(this.width, this.height);
         const waterTexture = this.textureLoader.load( this.WATER_TEXTURE );
         waterTexture.wrapS = RepeatWrapping;
         waterTexture.wrapT = RepeatWrapping;
+        waterTexture.minFilter = LinearFilter;
+        waterTexture.magFilter = LinearFilter;
         const waterMaterial = new MeshStandardMaterial({map: waterTexture, transparent: true});
 
         const water = new Mesh(waterPlane, waterMaterial);
@@ -140,7 +158,8 @@ export class MapThreeDScene {
 
         this.scene.add( water );
         this.scene.add( background );
-        this.render();
+        this.changeZoomLevel(4);
+        // this.render();
     }
 
     setupDefaultMaterials() {
@@ -182,8 +201,8 @@ export class MapThreeDScene {
         console.log("Rendering the world...");
         console.log(`\t${this.provinceShapes.length} province shapes`);
         console.log(`\t${this.tags.size} tags`);
-        this.renderer.setClearColor( 0x222222, 1 );
-        this.renderer.clearDepth(); // important!
+        // this.renderer.setClearColor( 0x222222, 1 );
+        // this.renderer.clearDepth(); // important!
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -233,6 +252,21 @@ export class MapThreeDScene {
 
     onMouseWheelScroll(event): void {
         console.log(event.deltaY);
+        const zoomLevel = Math.sign(event.deltaY) + this.zoomLevel;
+        this.changeZoomLevel(zoomLevel);
+    }
+
+    changeZoomLevel(zoomLevel) {
+        if ( zoomLevel == undefined || zoomLevel === this.zoomLevel || zoomLevel < 0 || zoomLevel > 9 )
+            return;
+
+        console.log(`Zoom level = ${zoomLevel}`);
+        this.zoomLevel = zoomLevel;
+        const cam = this.zoomLevels[zoomLevel].camera;
+        this.camera.position.z = cam.position.z;
+        // this.camera.rotation.z = cam.rotation.z;
+        this.camera.setRotationFromAxisAngle(new Vector3(1, 0, 0), cam.rotation.z);
+        this.render();
     }
 
     shapeToMesh(prov: ProvinceShape3d): Mesh {
