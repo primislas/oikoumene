@@ -3,6 +3,7 @@ export class ProvinceListEntity {
     name: string;
     owner: string;
     cores: string[] = [];
+    is_city: boolean;
 
     religion: string;
     culture: string;
@@ -11,6 +12,7 @@ export class ProvinceListEntity {
     tradeGood: string;
     tradeNode: string;
 
+    climate: string[] = [];
     type: string;
 
     static fromJsonObj(obj) {

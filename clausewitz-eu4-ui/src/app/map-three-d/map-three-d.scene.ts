@@ -4,13 +4,14 @@ import {NameCurve} from "../model/map/name.curve";
 import {River} from "../model/map/river";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {TagMetadata} from "../map/tag.metadata";
-import {Shape3d} from "./shape.3d";
-import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, Geometry, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Vector2, Vector3, Color} from "three"
+import {ProvinceShape3d} from "./province-shape-3d";
+import {Renderer, WebGLRenderer, TextureLoader, Texture, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, Geometry, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import {GUI} from 'three/examples/jsm/libs/dat.gui.module'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import {Path} from "../model/map/Path";
 
 
 
@@ -22,7 +23,7 @@ export class MapThreeDScene {
 
     riverClasses = ["river-narrowest", "river-narrow", "river-wide", "river-widest"];
 
-    provinceShapes: Shape3d[] = [];
+    provinceShapes: ProvinceShape3d[] = [];
     borders: Border[] = [];
     names: NameCurve[] = [];
     riversByClass: Map<string, River[]> = new Map<string, River[]>();
@@ -49,7 +50,7 @@ export class MapThreeDScene {
     private TERRAIN_TEXTURE = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-summer-nowater.png";
     private WATER_TEXTURE = "https://raw.githubusercontent.com/primislas/eu4-svg-map/master/resources/colormap-water.png";
     private PROVINCE_OPACITY = 0.35;
-    private WATER_OPACITY = 0.2;
+    private WATER_OPACITY = 0.1;
     private DEFAULT_PROVINCE_MATERIAL: Material = new MeshStandardMaterial({
         color: "rgb(200,200,200)",
         opacity: this.PROVINCE_OPACITY,
@@ -76,7 +77,8 @@ export class MapThreeDScene {
     }
 
     setupScene() {
-        this.canvas = document.querySelector('canvas.webgl');
+        const canvas = document.querySelector('canvas.webgl');
+        this.canvas = canvas;
         this.resolution.set(window.innerWidth, window.innerHeight);
 
         const renderer = new WebGLRenderer({
@@ -91,6 +93,7 @@ export class MapThreeDScene {
 
         this.scene = new Scene();
         window.addEventListener('resize', () => this.onResize());
+        canvas.addEventListener('wheel', (e) => this.onMouseWheelScroll(e));
 
         return this.scene;
     }
@@ -141,8 +144,8 @@ export class MapThreeDScene {
     }
 
     setupDefaultMaterials() {
-        this.materials.set("uncolonized", new MeshStandardMaterial({color: "rgb(165, 152, 144)", opacity: this.PROVINCE_OPACITY, transparent: true}));
-        this.materials.set("wasteland", new MeshStandardMaterial({color: "rgb(145, 132, 124)", opacity: this.PROVINCE_OPACITY, transparent: true}));
+        this.materials.set("uncolonized", new MeshStandardMaterial({color: "rgb(165, 152, 144)", opacity: 0.2, transparent: true}));
+        this.materials.set("wasteland", new MeshStandardMaterial({color: "rgb(145, 132, 124)", opacity: 0, transparent: true}));
         this.materials.set("sea", new MeshStandardMaterial({color: "rgb(157, 239, 254)", opacity: this.WATER_OPACITY, transparent: true}));
         this.materials.set("lake", new MeshStandardMaterial({color: "rgb(135, 248, 250)", opacity: this.WATER_OPACITY, transparent: true}));
         this.materials.set("river", new MeshStandardMaterial({color: "rgb(50, 180, 220)", opacity: this.WATER_OPACITY, transparent: true}));
@@ -223,35 +226,55 @@ export class MapThreeDScene {
         this.materials.forEach((mat, id) => {
             if (id.startsWith("border"))
                 mat.resolution.set(this.resolution.width, this.resolution.height);
-        })
+        });
 
         this.render();
     }
 
-    shapeToMesh(prov): Mesh {
-        const startingPath = prov.path[0];
-        const [startX, startY] = (startingPath.polyline || startingPath.bezier)[0];
-        const shape = new Shape();
-        shape.moveTo(startX, startY);
+    onMouseWheelScroll(event): void {
+        console.log(event.deltaY);
+    }
 
-        prov
-            .path
-            .forEach(elem => {
-                (elem.polyline || elem.bezier || []).shift();
-                if (elem.polyline) {
-                    elem.polyline.forEach(([x, y]) => shape.lineTo(x, y));
-                } else if (elem.bezier) {
-                    const [cp1, cp2, ep] = elem.bezier;
-                    shape.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ep[0], ep[1]);
-                }
-            });
-
+    shapeToMesh(prov: ProvinceShape3d): Mesh {
+        const shape = this.provinceToShape(prov);
+        shape.holes = this.provinceClipPaths(prov);
         const material = this.DEFAULT_PROVINCE_MATERIAL;
         const geom = new ShapeGeometry(shape);
         return new Mesh(geom, material);
     }
 
-    addShapes(shapes: Shape3d[]) {
+    provinceToShape(prov: ProvinceShape3d): Shape {
+        const startingPath = prov.path[0];
+        const startP = (startingPath.polyline || startingPath.bezier)[0];
+        const [startX, startY] = [startP[0], startP[1]];
+        const points = prov.path
+            .map(elem => Path.asPoints(elem, this.BEZIER_SCALE).slice(1))
+            .reduce((acc, a) => acc.concat(a), []);
+
+        const shape = new Shape();
+        shape.moveTo(startX, startY);
+        points.forEach(p => shape.lineTo(p[0], p[1]));
+
+        return shape;
+    }
+
+    provinceClipPaths(prov: ProvinceShape3d): ThreePath[] {
+        return (prov.clip || [])
+            .map(curve => {
+                const start = (curve[0].bezier || curve[0].polyline)[0];
+                const points = curve
+                    .map(segment => Path.asPoints(segment, this.BEZIER_SCALE))
+                    .map(segment => segment.slice(1))
+                    .reduce((acc, a) => acc.concat(a), []);
+
+                const hole = new ThreePath();
+                hole.moveTo(start[0], start[1]);
+                points.forEach(p => hole.lineTo(p[0], p[1]));
+                return hole;
+            });
+    }
+
+    addShapes(shapes: ProvinceShape3d[]) {
         const shapesWithMesh = shapes
             .map(shape => {
                 shape.mesh = this.shapeToMesh(shape);
@@ -338,12 +361,12 @@ export class MapThreeDScene {
         return this;
     }
 
-    private addNewProvinceMetadataToShapes(shapes: Shape3d[], provinces: ProvinceListEntity[]) {
+    private addNewProvinceMetadataToShapes(shapes: ProvinceShape3d[], provinces: ProvinceListEntity[]) {
         // TODO: optimize to only iterate by new provinces
         return this.mergeProvinceMetadata();
     }
 
-    private addProvinceMetadataToNewShapes(shapes: Shape3d[], provinces: Map<number, ProvinceListEntity>) {
+    private addProvinceMetadataToNewShapes(shapes: ProvinceShape3d[], provinces: Map<number, ProvinceListEntity>) {
         // TODO: optimize to only iterate by new provinces
         return this.mergeProvinceMetadata();
     }
@@ -359,7 +382,14 @@ export class MapThreeDScene {
                         shape.mesh.material = ownerMat;
                 } else if (shape.metadata.type) {
                     const type = shape.metadata.type;
-                    const mat = this.materials.get(type);
+                    let mat;
+                    if (type === "province") {
+                        if ((shape.metadata.climate || []).find(c => c === "impassable"))
+                            mat = this.materials.get("wasteland");
+                        else if (shape.metadata.is_city === false)
+                            mat = this.materials.get("uncolonized");
+                    } else
+                        mat = this.materials.get(type);
                     if (mat)
                         shape.mesh.material = mat;
                 }
@@ -371,9 +401,9 @@ export class MapThreeDScene {
     }
 
     private addShapeMetadata(
-        shape: Shape3d,
+        shape: ProvinceShape3d,
         provinces: Map<number, ProvinceListEntity> = new Map<number, ProvinceListEntity>()
-    ): Shape3d {
+    ): ProvinceShape3d {
         shape.metadata = provinces.get(shape.provId);
         return shape;
     }

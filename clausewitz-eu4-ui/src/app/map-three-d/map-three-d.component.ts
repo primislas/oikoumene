@@ -6,7 +6,7 @@ import {Border} from "../model/map/border";
 import {TagMetadata} from "../map/tag.metadata";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {NameCurve} from "../model/map/name.curve";
-import {Shape3d} from "./shape.3d";
+import {ProvinceShape3d} from "./province-shape-3d";
 
 @Component({
   selector: 'app-map-three-d',
@@ -63,7 +63,7 @@ export class MapThreeDComponent implements OnInit {
   }
 
   onMapProvinceShape = (data, map: MapThreeDScene) => {
-    const shapes = <Shape3d[]>(data || []);
+    const shapes = <ProvinceShape3d[]>(data || []);
     return map.addShapes(shapes)
   }
 

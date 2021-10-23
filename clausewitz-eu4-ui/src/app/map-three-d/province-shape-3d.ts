@@ -1,11 +1,12 @@
-import {Curve} from "./curve";
 import {Color} from "../model/map/color";
 import {Mesh} from "three"
 import {ProvinceListEntity} from "../model/province/province.list.entity";
+import {Path} from "../model/map/Path";
 
-export class Shape3d {
+export class ProvinceShape3d {
     provId: number;
-    path: Curve[];
+    path: Path[];
+    clip: Path[][];
     color: Color;
     mesh: Mesh;
 
