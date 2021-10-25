@@ -1,7 +1,36 @@
-.webgl
+.map-container
 {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.world-map
+{
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  //position: fixed;
+  //top: 0;
+  //left: 0;
   outline: none;
+}
+
+.province-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 100px;
+  text-align: center;
+  padding: 5px 12px;
+  font-family: monospace;
+  background: #a0c020;
+  opacity: 0;
+  display: none;
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.5s linear;
+  border-radius: 3px;
 }

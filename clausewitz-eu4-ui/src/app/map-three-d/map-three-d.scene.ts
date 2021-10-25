@@ -5,7 +5,7 @@ import {River} from "../model/map/river";
 import {ProvinceListEntity} from "../model/province/province.list.entity";
 import {TagMetadata} from "../map/tag.metadata";
 import {ProvinceShape3d} from "./province-shape-3d";
-import {Renderer, WebGLRenderer, TextureLoader, Texture, LinearFilter, RepeatWrapping, Scene, Light, AmbientLight, Camera, PerspectiveCamera, OrthographicCamera, Mesh, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
+import {Renderer, WebGLRenderer, TextureLoader, Texture, LinearFilter, RepeatWrapping, Scene, Light, AmbientLight, Camera, Raycaster, PerspectiveCamera, OrthographicCamera, Mesh, PlaneGeometry, ShapeGeometry, Material, MeshStandardMaterial, Shape, Path as ThreePath, Vector2, Vector3, Color} from "three"
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
 import {GUI} from 'three/examples/jsm/libs/dat.gui.module'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
@@ -50,11 +50,15 @@ export class MapThreeDScene {
     // sizes: any = {width: 100, height: 100};
     canvas: Element;
     renderer: Renderer;
+    raycaster: Raycaster;
     scene: Scene;
     light: Light;
     camera: Camera;
     textureLoader: TextureLoader;
     guiControls: GUI;
+
+    mouse = { coords: new Vector2(0, 0), latestProjection: undefined };
+    provinceTooltip = { element: undefined, provId: undefined, displayTimeout: undefined };
 
     materials: Map<string, Material> = new Map<string, Material>();
 
@@ -91,7 +95,7 @@ export class MapThreeDScene {
     }
 
     setupScene() {
-        const canvas = document.querySelector('canvas.webgl');
+        const canvas = document.querySelector('canvas.world-map');
         this.canvas = canvas;
         this.resolution.set(window.innerWidth, window.innerHeight);
 
@@ -105,9 +109,12 @@ export class MapThreeDScene {
 
         this.textureLoader = new TextureLoader();
 
+        this.provinceTooltip.element = $("#province-tooltip");
+
         this.scene = new Scene();
         window.addEventListener('resize', () => this.onResize());
         canvas.addEventListener('wheel', (e) => this.onMouseWheelScroll(e));
+        canvas.addEventListener('mousemove', e => this.onMouseMove(e), false);
 
         return this.scene;
     }
@@ -129,6 +136,8 @@ export class MapThreeDScene {
         camera.position.z = 1000;
         this.camera = camera;
         scene.add( this.camera );
+
+        this.raycaster = new Raycaster();
 
         return camera;
     }
@@ -256,6 +265,61 @@ export class MapThreeDScene {
         this.changeZoomLevel(zoomLevel);
     }
 
+    onDocumentMouseMove(event) {
+        // the following line would stop any other event handler from firing
+        // (such as the mouse's TrackballControls)
+        // event.preventDefault();
+
+        // update the mouse variable
+        const mouse = this.mouse.coords;
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+        // create a Ray with origin at the mouse position
+        //   and direction into the scene (camera direction)
+        const camera = this.camera;
+        const scene = this.scene;
+
+        // const vector = new Vector3( mouse.x, mouse.y, 1 );
+        // const ray = new Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+        const raycaster = new Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        // create an array containing all objects in the scene with which the ray intersects
+        const intersects = raycaster.intersectObjects( scene.children );
+
+        // INTERSECTED = the object in the scene currently closest to the camera
+        //		and intersected by the Ray projected from the mouse position
+
+        // if there is one (or more) intersections
+        const e = this.provinceTooltip.element;
+        if ( intersects.length > 0 ) {
+            const provId = intersects[0].object.provId;
+            if (provId) {
+                const provMeta = this.provinces.get(provId);
+                if (provMeta) {
+                    const tooltip = `${provMeta.name} (#${provId})`;
+                    // const metrics = e.measureText(tooltip);
+                    // const tooltipWidth = metrics.width + 8;
+                    // const tooltipHeight = 28;
+                    e.text("");
+                    e.css({display: "block", left: mouse.x, top: mouse.y});
+                    e.text(tooltip);
+                    console.log(`Rendering tooltip at (${mouse.x}, ${mouse.y}): '${tooltip}'`);
+                }
+            }
+            else {
+                console.log("Hiding tooltip");
+                e.css({display: "none"});
+            }
+        }
+        else {
+            console.log("Hiding tooltip");
+            e.css({display: "none"});
+        }
+    }
+
+
     changeZoomLevel(zoomLevel) {
         if ( zoomLevel == undefined || zoomLevel === this.zoomLevel || zoomLevel < 0 || zoomLevel > 9 )
             return;
@@ -274,7 +338,10 @@ export class MapThreeDScene {
         shape.holes = this.provinceClipPaths(prov);
         const material = this.DEFAULT_PROVINCE_MATERIAL;
         const geom = new ShapeGeometry(shape);
-        return new Mesh(geom, material);
+        const mesh = new Mesh(geom, material);
+        mesh.provId = prov.provId;
+
+        return mesh;
     }
 
     provinceToShape(prov: ProvinceShape3d): Shape {
@@ -393,6 +460,109 @@ export class MapThreeDScene {
             .forEach(b => this.scene.add(b.mesh));
 
         return this;
+    }
+
+    // This will move tooltip to the current mouse position and show it by timer.
+    private showTooltip() {
+        const renderer = this.renderer;
+        const camera = this.camera;
+        const conf = this.provinceTooltip;
+        const elem = conf.element;
+        // const elem = $("#province-tooltip");
+        // console.log(`${elem.}`)
+        const mouse = this.mouse;
+
+        if (elem && mouse.latestProjection) {
+            elem.css({
+                display: "block",
+                opacity: 0.0
+            });
+
+            const canvasHalfWidth = renderer.domElement.offsetWidth / 2;
+            const canvasHalfHeight = renderer.domElement.offsetHeight / 2;
+
+            const tooltipPosition = mouse.latestProjection.clone().project(camera);
+            tooltipPosition.x = (tooltipPosition.x * canvasHalfWidth) + canvasHalfWidth + renderer.domElement.offsetLeft;
+            tooltipPosition.y = -(tooltipPosition.y * canvasHalfHeight) + canvasHalfHeight;// + renderer.domElement.offsetTop;
+
+            const tootipWidth = elem[0].offsetWidth;
+            const tootipHeight = elem[0].offsetHeight;
+
+            const positionLeft = tooltipPosition.x; // - tootipWidth/2;
+            const positionTop = tooltipPosition.y; // - tootipHeight - 10; // - tootipHeight - 5;
+            // const positionLeft = tooltipPosition.x;
+            // const positionTop = tooltipPosition.y;
+            elem.css({
+                left: `${positionLeft}px`,
+                top: `${positionTop}px`
+            });
+
+            const provId = conf.provId;
+            if (provId) {
+                const provMeta = this.provinces.get(provId);
+                if (provMeta) {
+                    const tooltip = `${provMeta.name} (#${provId})`;
+                    elem.text(tooltip);
+                    console.log(`Rendering tooltip at (${positionLeft}, ${positionTop}): '${tooltip}'`);
+                }
+            }
+
+            setTimeout(function() {
+                elem.css({
+                    opacity: 1.0
+                });
+            }, 25);
+        }
+    }
+
+    // This will immediately hide tooltip.
+    private hideTooltip() {
+        const elem = this.provinceTooltip.element;
+        if (elem)
+            elem.css({ display: "none" });
+    }
+
+    // Following two functions will convert mouse coordinates
+    // from screen to three.js system (where [0,0] is in the middle of the screen)
+    private updateMouseCoords(event, coordsObj) {
+        coordsObj.x = ((event.clientX - this.renderer.domElement.offsetLeft + 0.5) / window.innerWidth) * 2 - 1;
+        coordsObj.y = -((event.clientY - this.renderer.domElement.offsetTop + 0.5) / window.innerHeight) * 2 + 1;
+    }
+
+    private handleManipulationUpdate() {
+        const mouse = this.mouse;
+        const conf = this.provinceTooltip;
+        this.raycaster.setFromCamera(mouse.coords, this.camera);
+
+        // TODO: tooltip eabled objects:
+        //      var intersects = this.raycaster.intersectObjects(tooltipEnabledObjects);
+        const intersects = this.raycaster.intersectObjects( this.scene.children );
+        if (intersects.length > 0) {
+            mouse.latestProjection = intersects[0].point;
+            const obj = intersects[0].object || {};
+            conf.provId = obj.provId;
+        }
+
+        if (conf.displayTimeout || !mouse.latestProjection) {
+            clearTimeout(conf.displayTimeout);
+            conf.displayTimeout = undefined;
+            this.hideTooltip();
+        }
+
+        if (!conf.displayTimeout && mouse.latestProjection) {
+            conf.displayTimeout = setTimeout(() => {
+                conf.displayTimeout = undefined;
+                this.showTooltip();
+            }, 330);
+        }
+    }
+
+    private onMouseMove(event) {
+        const mouse = this.mouse;
+        this.updateMouseCoords(event, mouse.coords);
+        mouse.latestProjection = undefined;
+        this.provinceTooltip.provId = undefined;
+        this.handleManipulationUpdate();
     }
 
     private addNewProvinceMetadataToShapes(shapes: ProvinceShape3d[], provinces: ProvinceListEntity[]) {
