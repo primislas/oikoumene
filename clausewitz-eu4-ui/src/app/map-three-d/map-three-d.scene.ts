@@ -115,6 +115,7 @@ export class MapThreeDScene {
         window.addEventListener('resize', () => this.onResize());
         canvas.addEventListener('wheel', (e) => this.onMouseWheelScroll(e));
         canvas.addEventListener('mousemove', e => this.onMouseMove(e), false);
+        canvas.addEventListener('mouseleave', () => this.onMouseLeave(), false);
 
         return this.scene;
     }
@@ -488,8 +489,8 @@ export class MapThreeDScene {
             const tootipWidth = elem[0].offsetWidth;
             const tootipHeight = elem[0].offsetHeight;
 
-            const positionLeft = tooltipPosition.x; // - tootipWidth/2;
-            const positionTop = tooltipPosition.y; // - tootipHeight - 10; // - tootipHeight - 5;
+            const positionLeft = tooltipPosition.x + 10; // - tootipWidth/2;
+            const positionTop = tooltipPosition.y + 10; // - tootipHeight - 10; // - tootipHeight - 5;
             // const positionLeft = tooltipPosition.x;
             // const positionTop = tooltipPosition.y;
             elem.css({
@@ -515,6 +516,10 @@ export class MapThreeDScene {
         }
     }
 
+    private onMouseLeave() {
+        console.log(`onMouseLeave triggered`);
+    }
+
     // This will immediately hide tooltip.
     private hideTooltip() {
         const elem = this.provinceTooltip.element;
@@ -525,8 +530,8 @@ export class MapThreeDScene {
     // Following two functions will convert mouse coordinates
     // from screen to three.js system (where [0,0] is in the middle of the screen)
     private updateMouseCoords(event, coordsObj) {
-        coordsObj.x = ((event.clientX - this.renderer.domElement.offsetLeft + 0.5) / window.innerWidth) * 2 - 1;
-        coordsObj.y = -((event.clientY - this.renderer.domElement.offsetTop + 0.5) / window.innerHeight) * 2 + 1;
+        coordsObj.x = ((event.offsetX - this.renderer.domElement.offsetLeft + 0.5) / window.innerWidth) * 2 - 1;
+        coordsObj.y = -((event.offsetY - this.renderer.domElement.offsetTop + 0.5) / window.innerHeight) * 2 + 1;
     }
 
     private handleManipulationUpdate() {
