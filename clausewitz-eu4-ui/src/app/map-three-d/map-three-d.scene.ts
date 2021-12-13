@@ -57,7 +57,7 @@ export class MapThreeDScene {
     textureLoader: TextureLoader;
     guiControls: GUI;
 
-    mouse = { coords: new Vector2(0, 0), latestProjection: undefined };
+    mouse = { coords: new Vector2(0, 0), latestProjection: undefined, isActive: true };
     provinceTooltip = { element: undefined, provId: undefined, displayTimeout: undefined };
 
     materials: Map<string, Material> = new Map<string, Material>();
@@ -465,6 +465,9 @@ export class MapThreeDScene {
 
     // This will move tooltip to the current mouse position and show it by timer.
     private showTooltip() {
+        if (!this.mouse.isActive)
+            return;
+
         const renderer = this.renderer;
         const camera = this.camera;
         const conf = this.provinceTooltip;
@@ -486,11 +489,16 @@ export class MapThreeDScene {
             tooltipPosition.x = (tooltipPosition.x * canvasHalfWidth) + canvasHalfWidth + renderer.domElement.offsetLeft;
             tooltipPosition.y = -(tooltipPosition.y * canvasHalfHeight) + canvasHalfHeight;// + renderer.domElement.offsetTop;
 
-            const tootipWidth = elem[0].offsetWidth;
-            const tootipHeight = elem[0].offsetHeight;
+            const tooltipWidth = elem[0].offsetWidth;
+            const tooltipHeight = elem[0].offsetHeight;
 
-            const positionLeft = tooltipPosition.x + 10; // - tootipWidth/2;
-            const positionTop = tooltipPosition.y + 10; // - tootipHeight - 10; // - tootipHeight - 5;
+            let positionLeft = tooltipPosition.x + 10; // - tootipWidth/2;
+            let positionTop = tooltipPosition.y + 10; // - tootipHeight - 10; // - tootipHeight - 5;
+
+            if (positionLeft + tooltipWidth > renderer.domElement.offsetWidth)
+                positionLeft = positionLeft - tooltipWidth - 10;
+            if (positionTop + tooltipHeight > renderer.domElement.offsetHeight)
+                positionTop = positionTop - tooltipHeight + 10;
             // const positionLeft = tooltipPosition.x;
             // const positionTop = tooltipPosition.y;
             elem.css({
@@ -518,6 +526,8 @@ export class MapThreeDScene {
 
     private onMouseLeave() {
         console.log(`onMouseLeave triggered`);
+        this.mouse.isActive = false;
+        this.hideTooltip();
     }
 
     // This will immediately hide tooltip.
@@ -534,7 +544,7 @@ export class MapThreeDScene {
         coordsObj.y = -((event.offsetY - this.renderer.domElement.offsetTop + 0.5) / window.innerHeight) * 2 + 1;
     }
 
-    private handleManipulationUpdate() {
+    private toggleTooltip() {
         const mouse = this.mouse;
         const conf = this.provinceTooltip;
         this.raycaster.setFromCamera(mouse.coords, this.camera);
@@ -557,7 +567,8 @@ export class MapThreeDScene {
         if (!conf.displayTimeout && mouse.latestProjection) {
             conf.displayTimeout = setTimeout(() => {
                 conf.displayTimeout = undefined;
-                this.showTooltip();
+                if (this.mouse.isActive)
+                    this.showTooltip();
             }, 330);
         }
     }
@@ -567,7 +578,8 @@ export class MapThreeDScene {
         this.updateMouseCoords(event, mouse.coords);
         mouse.latestProjection = undefined;
         this.provinceTooltip.provId = undefined;
-        this.handleManipulationUpdate();
+        mouse.isActive = true;
+        this.toggleTooltip();
     }
 
     private addNewProvinceMetadataToShapes(shapes: ProvinceShape3d[], provinces: ProvinceListEntity[]) {
