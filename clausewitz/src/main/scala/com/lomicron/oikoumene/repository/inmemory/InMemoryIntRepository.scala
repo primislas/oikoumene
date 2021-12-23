@@ -1,4 +1,5 @@
 package com.lomicron.oikoumene.repository.inmemory
+
 import scala.collection.immutable.SortedMap
 
 abstract class InMemoryIntRepository[T](f: T => Option[Int]) extends InMemoryCrudRepository[Int, T](f) {

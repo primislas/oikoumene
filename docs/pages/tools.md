@@ -41,13 +41,13 @@ You have two options from the project directory:
 to modify and most likely escape (screen) your commands. For example:
 > sbt -J-Xmx3G -J-Xss3M
 
-> runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd "D:/Steam/steamapps/common/Europa Universalis IV" -md "C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod" -m cool_map -m best_tags -m expanded_timeline
+> runMain com.lomicron.eu4.tools.ClausewitzMapBuilder -gd "D:/Steam/steamapps/common/Europa Universalis IV" -md "C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod" -m cool_map -m best_tags -m expanded_timeline
 
 or
-> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder -gd \\"D:/Steam/steamapps/common/Europa Universalis IV\\" -md \\"C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod\\" -m cool_map -m best_tags -m expanded_timeline"
+> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.eu4.tools.ClausewitzMapBuilder -gd \\"D:/Steam/steamapps/common/Europa Universalis IV\\" -md \\"C:/Users/primislas/Documents/Paradox Interactive/Europa Universalis IV/mod\\" -m cool_map -m best_tags -m expanded_timeline"
 
 To invoke the tracer, execute the following in sbt REPL with necessary options
-> runMain com.lomicron.oikoumene.tools.ClausewitzMapBuilder
+> runMain com.lomicron.eu4.tools.ClausewitzMapBuilder
 * --game-dir|-gd <game_dir_path> - provide the path to game dir, e.g. 
 > -gd "D:/Steam/steamapps/common/Europa Universalis IV"
 * --mod-dir|-md <mod_dir_path> - provide the path to mod dir (root directory containing all the mods),
@@ -161,4 +161,4 @@ output directory named after the save file (e.g. BBB.eu4 will generate a BBB fol
 multiple json files so as to make them more digestible. (Most editors would struggle with a single huge text file.)
 
 Navigate to oikoumene project folder and run
-> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.oikoumene.tools.SaveGameToJson -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/My Campaign.eu4\" -od \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/save_editor\""
+> sbt -J-Xmx3G -J-Xss3M "runMain com.lomicron.eu4.tools.SaveGameToJson -save \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/save games/My Campaign.eu4\" -od \"C:/Users/username/Documents/Paradox Interactive/Europa Universalis IV/mod/save_editor\""

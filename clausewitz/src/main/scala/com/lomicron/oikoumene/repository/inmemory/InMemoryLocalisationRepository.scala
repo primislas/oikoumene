@@ -1,11 +1,12 @@
 package com.lomicron.oikoumene.repository.inmemory
 
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lomicron.eu4.parsers.localisation.LocalisationParser
+import com.lomicron.eu4.repository.api.resources.LocalisationRepository
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
-import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 
-case class InMemoryLocalisationRepository() extends LocalisationRepository { self =>
+case class InMemoryLocalisationRepository() extends LocalisationRepository {
+  self =>
 
   private var localisation = Map[String, LocalisationEntry]()
   private var tags = Map[String, ObjectNode]()

@@ -1,5 +1,7 @@
 package com.lomicron.oikoumene.repository.api.search
 
+import com.lomicron.eu4.repository.api.search.SearchDictionary
+
 case class SearchResult[T]
 (
   page: Int = 1,

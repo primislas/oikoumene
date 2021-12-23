@@ -1,6 +1,6 @@
 package services
 
-import com.lomicron.oikoumene.model.provinces.Province
+import com.lomicron.eu4.model.provinces.Province
 
 import scala.collection.immutable.SortedSet
 

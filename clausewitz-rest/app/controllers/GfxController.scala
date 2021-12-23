@@ -3,7 +3,7 @@ package controllers
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.eu4.repository.api.RepositoryFactory
 import javax.imageio.ImageIO
 import javax.inject.{Inject, Singleton}
 import play.api.mvc._

@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.eu4.repository.api.RepositoryFactory
 import net.codingwell.scalaguice.ScalaModule
 import repository.inmemory.InMemoryRepos
 

@@ -1,6 +1,6 @@
-import com.lomicron.oikoumene.engine.Oikoumene
-import com.lomicron.oikoumene.repository.api.GameFilesSettings
-import com.lomicron.oikoumene.repository.inmemory.InMemoryRepositoryFactory
+import com.lomicron.eu4.engine.Oikoumene
+import com.lomicron.eu4.repository.api.GameFilesSettings
+import com.lomicron.eu4.repository.inmemory.InMemoryRepositoryFactory
 import repository.inmemory.InMemoryReposSingleton
 
 class OnStartup() {

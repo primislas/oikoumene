@@ -1,7 +1,7 @@
 package services
 
+import com.lomicron.eu4.repository.api.map.ProvinceGroup
 import com.lomicron.oikoumene.repository.api.EntityGroup
-import com.lomicron.oikoumene.repository.api.map.ProvinceGroup
 
 case class ResProvinceGroup
 (override val value: AnyRef, development: Int = 0, override val entities: Seq[ResProvinceGroupEntity] = Seq.empty)

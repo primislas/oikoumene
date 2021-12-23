@@ -1,10 +1,13 @@
 package services
 
-import com.lomicron.oikoumene.model.politics.Tag
-import com.lomicron.oikoumene.repository.api.map.ProvinceSearchConf
-import com.lomicron.oikoumene.repository.api.politics.TagSearchConf
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.oikoumene.repository.api.search.{SearchDictionary, SearchResult}
+import com.lomicron.eu4.model.politics.Tag
+import com.lomicron.eu4.repository.api.map.ProvinceSearchConf
+import com.lomicron.eu4.repository.api.politics.TagSearchConf
+import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.eu4.repository.api.search.SearchDictionary
+import com.lomicron.oikoumene.repository.api.search
+import com.lomicron.oikoumene.repository.api.search.SearchResult
+
 import javax.inject.Inject
 
 class TagService @Inject
@@ -16,7 +19,7 @@ class TagService @Inject
     val sr = repos.tags.search(searchConf)
     val es = sr.entities.map(ResTagListEntity(_))
     val dict = if (searchConf.withDictionary) buildDictionary(searchConf, es) else SearchDictionary.empty
-    val res = SearchResult(sr.page, sr.size, sr.totalPages, sr.totalEntities, es, dict)
+    val res = search.SearchResult(sr.page, sr.size, sr.totalPages, sr.totalEntities, es, dict)
     val withProvinces = res.entities.map(tag => {
       val ps = repos.provinces.search(ProvinceSearchConf().copy(size = repos.provinces.size, owner = Option(tag.id))).entities
       val dev = ps.map(_.state.development).sum
@@ -27,7 +30,7 @@ class TagService @Inject
   }
 
   def getTag(id: String): Option[Tag] =
-    repos.tags.find(id).toOption
+    repos.tags.find(id)
 
   def buildDictionary(conf: TagSearchConf, entities: Seq[ResTagListEntity]): SearchDictionary = {
 

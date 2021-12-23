@@ -1,6 +1,6 @@
 package services
 
-import com.lomicron.oikoumene.model.provinces.Province
+import com.lomicron.eu4.model.provinces.Province
 
 case class ResProvinceGroupEntity
 (id: Int, name: String, owner: Option[String], development: Int = 0)

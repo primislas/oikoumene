@@ -1,16 +1,16 @@
 package repository.inmemory
 
-import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
-import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
-import com.lomicron.oikoumene.repository.api.government._
-import com.lomicron.oikoumene.repository.api.map._
-import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
-import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
-import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
-import com.lomicron.oikoumene.repository.api.{GameFilesSettings, RepositoryFactory}
-import com.lomicron.oikoumene.repository.fs.FileResourceRepository
-import com.lomicron.oikoumene.writers.{FileWriterFactory, ModSettings, WriterFactory}
+import com.lomicron.eu4.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
+import com.lomicron.eu4.repository.api.gfx.GFXRepository
+import com.lomicron.eu4.repository.api.government._
+import com.lomicron.eu4.repository.api.map._
+import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
+import com.lomicron.eu4.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
+import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
+import com.lomicron.eu4.repository.api.{GameFilesSettings, RepositoryFactory}
+import com.lomicron.eu4.repository.fs.FileResourceRepository
+import com.lomicron.eu4.writers.{FileWriterFactory, ModSettings, WriterFactory}
 
 case class InMemoryRepos() extends RepositoryFactory {
   val repos: RepositoryFactory = InMemoryReposSingleton.getRepos

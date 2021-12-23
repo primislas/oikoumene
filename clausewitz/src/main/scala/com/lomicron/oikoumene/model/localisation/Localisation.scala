@@ -1,6 +1,6 @@
 package com.lomicron.oikoumene.model.localisation
 
-import com.lomicron.oikoumene.service.NamingService
+import com.lomicron.eu4.service.NamingService
 import com.lomicron.utils.json.{FromJson, ToJson}
 
 case class Localisation(name: Option[String] = None, adjective: Option[String] = None) extends ToJson {
