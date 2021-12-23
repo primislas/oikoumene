@@ -1,7 +1,7 @@
 package com.lomicron.eu4.repository.api.resources
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, patchFieldValue}

@@ -2,9 +2,9 @@ package com.lomicron.eu4.parsers.trade
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.trade.{Price, TradeGood}
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.trade.TradeGoodRepository
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.json.JsonMapper._
 
 object TradeGoodParser {

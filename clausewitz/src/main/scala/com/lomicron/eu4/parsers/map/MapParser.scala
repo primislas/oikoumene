@@ -3,8 +3,9 @@ package com.lomicron.eu4.parsers.map
 import com.lomicron.eu4.model.map._
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.GeographicRepository
-import com.lomicron.eu4.repository.api.resources.{GameFile, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath

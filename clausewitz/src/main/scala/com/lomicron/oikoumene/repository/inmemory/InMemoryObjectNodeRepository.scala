@@ -1,7 +1,7 @@
 package com.lomicron.oikoumene.repository.inmemory
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
 
 import scala.collection.immutable.SortedMap

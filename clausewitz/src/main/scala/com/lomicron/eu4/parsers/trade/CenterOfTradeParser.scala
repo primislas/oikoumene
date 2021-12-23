@@ -1,9 +1,9 @@
 package com.lomicron.eu4.parsers.trade
 
 import com.lomicron.eu4.model.trade.CenterOfTrade
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.trade.CenterOfTradeRepository
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 
 object CenterOfTradeParser {
 

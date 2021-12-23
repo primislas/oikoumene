@@ -1,7 +1,7 @@
 package com.lomicron.eu4.parsers.politics
 
-import com.lomicron.eu4.repository.api.resources.GameFile
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 
 case class TagConf
 (

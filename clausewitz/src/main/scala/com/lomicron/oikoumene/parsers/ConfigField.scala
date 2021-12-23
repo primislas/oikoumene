@@ -1,8 +1,8 @@
-package com.lomicron.eu4.parsers
+package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
-import com.lomicron.eu4.parsers.ConfigField.ValueTypes
+import com.lomicron.oikoumene.parsers.ConfigField.ValueTypes
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.{JsonMapper, ToJson}
 import com.lomicron.utils.parsing.JsonParser
@@ -106,12 +106,12 @@ object ConfigField extends LazyLogging {
     if (hasColor && importsEntity)
       println("import com.lomicron.eu4.model.{Color, Entity}")
     else if (importsEntity)
-      println("import com.lomicron.api.model.Entity")
+      println("import com.lomicron.oikoumene.model.Entity")
     else if (hasColor)
-      println("import com.lomicron.api.model.Color")
+      println("import com.lomicron.oikoumene.model.Color")
     println("import com.lomicron.utils.json.JsonMapper.ObjectNodeEx")
 
-    if (hasLocalisation) println("import com.lomicron.api.model.localisation.Localisation")
+    if (hasLocalisation) println("import com.lomicron.oikoumene.model.localisation.Localisation")
 
     println("import com.lomicron.utils.json.FromJson")
     println()
@@ -130,7 +130,9 @@ object ConfigField extends LazyLogging {
     val firstFieldDefault = reordered.headOption.flatMap(_.defaultValue).getOrElse("")
     if (isEntity) println(") extends Entity {")
     else println(") {")
-    println(s"\t@JsonCreator def this() = this($firstFieldDefault)\n}")
+    println(s"\t@JsonCreator def this() = this($firstFieldDefault)")
+    println(s"\tdef withId(id: String): $name = copy(id = id)")
+    println("}")
 
     println("  def add(other: MapClassTemplate): MapClassTemplate =")
     println("    copy(modifier = MapClassTemplate.add(modifier, other.modifier))")
@@ -160,11 +162,11 @@ object ConfigField extends LazyLogging {
     if (hasColor && importsEntity)
       println("import com.lomicron.eu4.model.{Color, Entity}")
     else if (importsEntity)
-      println("import com.lomicron.api.model.Entity")
+      println("import com.lomicron.oikoumene.model.Entity")
     else if (hasColor)
-      println("import com.lomicron.api.model.Color")
+      println("import com.lomicron.oikoumene.model.Color")
 
-    if (hasLocalisation) println("import com.lomicron.api.model.localisation.Localisation")
+    if (hasLocalisation) println("import com.lomicron.oikoumene.model.localisation.Localisation")
 
     println("import com.lomicron.utils.json.FromJson")
     println()
@@ -181,7 +183,9 @@ object ConfigField extends LazyLogging {
     val firstFieldDefault = reordered.headOption.flatMap(_.defaultValue).getOrElse("")
     if (isEntity) println(") extends Entity {")
     else println(") {")
-    println(s"\t@JsonCreator def this() = this($firstFieldDefault)\n}")
+    println(s"\t@JsonCreator def this() = this($firstFieldDefault)")
+    println(s"\tdef withId(id: String): $name = copy(id = id)")
+    println("}")
 
     println()
     println(s"object $name extends FromJson[$name]")

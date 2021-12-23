@@ -3,12 +3,12 @@ package com.lomicron.eu4.parsers.provinces
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.map.TerrainMapColorConf
 import com.lomicron.eu4.model.provinces.Terrain
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields._
-import com.lomicron.eu4.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities}
-import com.lomicron.eu4.parsers.ConfigField
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.GeographicRepository
 import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.parsers.ConfigField
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, _}
 import com.typesafe.scalalogging.LazyLogging
 

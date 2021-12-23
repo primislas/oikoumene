@@ -3,12 +3,12 @@ package com.lomicron.eu4.parsers.government
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.eu4.model.government.{Government, LegacyGovernmentMapping}
 import com.lomicron.eu4.model.modifiers.Modifier
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.government.GovernmentRepository
 import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
 import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
 import com.lomicron.utils.json.JsonMapper.{JsonNodeEx, ObjectNodeEx, arrayNodeOf}
 

@@ -2,6 +2,7 @@ package com.lomicron.eu4.parsers
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.eu4.model.provinces.ProvinceHistory
+import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.toJsonNode

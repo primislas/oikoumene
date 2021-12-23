@@ -2,11 +2,11 @@ package com.lomicron.eu4.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ObjectNode, TextNode}
 import com.lomicron.eu4.model.provinces.ColonialRegion
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields._
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.ColonialRegionRepository
 import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.patchFieldValue

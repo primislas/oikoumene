@@ -2,7 +2,7 @@ package com.lomicron.oikoumene.model
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
 import com.lomicron.utils.json.FromJson
 import com.lomicron.utils.json.JsonMapper._
 
@@ -32,6 +32,7 @@ object Color extends FromJson[Color] {
   @JsonCreator def apply(n: JsonNode): Color = n match {
     case a: ArrayNode => apply(a)
     case o: ObjectNode => apply(o)
+    case t: TextNode => apply(t)
   }
 
   def apply(argb: Int): Color = {
@@ -53,6 +54,10 @@ object Color extends FromJson[Color] {
     val g = color.getInt("g").getOrElse(0)
     val b = color.getInt("b").getOrElse(0)
     Color(r, g, b)
+  }
+
+  def apply(color: TextNode): Color = {
+    Color()
   }
 
 }

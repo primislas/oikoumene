@@ -1,10 +1,10 @@
 package com.lomicron.eu4.parsers.government
 
 import com.lomicron.eu4.model.government.StateEdict
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.government.StateEdictRepository
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.typesafe.scalalogging.LazyLogging
 
 object StateEdictParser extends LazyLogging {

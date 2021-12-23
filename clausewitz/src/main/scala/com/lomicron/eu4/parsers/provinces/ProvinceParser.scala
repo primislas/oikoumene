@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.map.RouteTypes
 import com.lomicron.eu4.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.eu4.model.trade.TradeNode
-import com.lomicron.eu4.parsers.ClausewitzParser.{Fields, parse, parseHistory}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
-import com.lomicron.eu4.repository.api.resources.{GameFile, LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, booleanYes, toObjectNode}

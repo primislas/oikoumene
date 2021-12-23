@@ -2,10 +2,10 @@ package com.lomicron.eu4.parsers.government
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.government.IdeaGroup
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.government.IdeaGroupRepository
 import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper._
 

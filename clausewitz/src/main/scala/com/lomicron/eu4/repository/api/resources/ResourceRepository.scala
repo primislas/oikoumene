@@ -2,6 +2,7 @@ package com.lomicron.eu4.repository.api.resources
 
 import com.lomicron.eu4.parsers.politics.TagConf
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 
 trait ResourceRepository {
 

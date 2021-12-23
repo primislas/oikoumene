@@ -2,7 +2,7 @@ package com.lomicron.eu4.model.politics
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.eu4.model.modifiers.{ActiveModifier, Modifier}
-import com.lomicron.eu4.parsers.ClausewitzParser.startDate
+import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.FromJson

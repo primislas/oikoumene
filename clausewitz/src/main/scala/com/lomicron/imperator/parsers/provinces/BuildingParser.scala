@@ -1,20 +1,24 @@
 package com.lomicron.imperator.parsers.provinces
 
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.imperator.repository.api.{BuildingRepository, ProvinceRepository, RepositoryFactory}
+import com.lomicron.imperator.model.provinces.Building
+import com.lomicron.imperator.repository.api.{BuildingRepository, RepositoryFactory}
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.typesafe.scalalogging.LazyLogging
 
 object BuildingParser extends LazyLogging {
 
   def apply(repos: RepositoryFactory): BuildingRepository = {
-    val provFiles = repos.resources.getBuildings
-    val ps = ClausewitzParser
-      .parseFileFieldsAsEntities(provFiles)
+    val files = repos.resources.getBuildings
+    val es = ClausewitzParser
+      .parseFileFieldsAsEntities(files)
     //      .map(localisation.setLocalisation)
-    //      .map(parseTradeGood)
-    ConfigField.printCaseClass("Province", ps)
+    ConfigField.printCaseClass("Building", es)
 
-    repos.buildings
+    val repo = repos.buildings
+    es.map(Building.fromJson).foreach(repo.create)
+
+
+    repo
   }
 
 }

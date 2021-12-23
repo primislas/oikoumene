@@ -2,11 +2,12 @@ package com.lomicron.eu4.parsers.politics
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.politics.Tag
-import com.lomicron.eu4.parsers.ClausewitzParser.{Fields, parse}
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.politics.TagRepository
-import com.lomicron.eu4.repository.api.resources.{GameFile, LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse}
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, textNode}

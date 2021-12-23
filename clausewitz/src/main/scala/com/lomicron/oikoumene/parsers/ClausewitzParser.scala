@@ -1,12 +1,12 @@
-package com.lomicron.eu4.parsers
+package com.lomicron.oikoumene.parsers
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node._
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields.tradeGoods
-import com.lomicron.eu4.repository.api.resources.GameFile
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.tradeGoods
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper._
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, arrayNode, arrayNodeOf, arrayNodeOfVals, nullNode, objectNode}
 import com.lomicron.utils.parsing.JsonParser
 import com.lomicron.utils.parsing.scopes.{ObjectScope, ParsingError}
 import com.lomicron.utils.parsing.serialization.{DefaultDeserializer, Deserializer}

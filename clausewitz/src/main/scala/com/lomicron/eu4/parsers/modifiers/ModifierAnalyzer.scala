@@ -1,10 +1,10 @@
 package com.lomicron.eu4.parsers.modifiers
 
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.eu4.parsers.government.IdeaParser.parseIdeaGroup
 import com.lomicron.eu4.parsers.provinces.TerrainParser
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx}
 import com.lomicron.utils.parsing.JsonParser
 

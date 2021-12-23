@@ -1,10 +1,10 @@
 package com.lomicron.eu4.parsers.provinces
 
 import com.lomicron.eu4.model.map.PositionRecord
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.eu4.repository.api.map.GeographicRepository
 import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.eu4.repository.api.map.GeographicRepository
 import com.lomicron.eu4.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 
 object ProvincePositionsParser {
 

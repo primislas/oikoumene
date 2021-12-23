@@ -3,7 +3,7 @@ package com.lomicron.eu4.parsers.save
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{IntNode, ObjectNode, TextNode}
 import com.lomicron.eu4.model.save.GamestateSave
-import com.lomicron.eu4.parsers.ClausewitzParser
+import com.lomicron.oikoumene.parsers.ClausewitzParser
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, _}
 import com.lomicron.utils.parsing.tokenizer.Date
 import com.typesafe.scalalogging.LazyLogging

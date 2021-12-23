@@ -3,7 +3,7 @@ package com.lomicron.eu4.serializers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, ObjectNode}
 import com.lomicron.eu4.model.history.{HistEvent, HistState, History}
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.utils.json.JsonMapper._
 
 object ClausewitzSerializer {

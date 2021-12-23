@@ -2,7 +2,7 @@ package com.lomicron.eu4.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.eu4.model.modifiers.ActiveModifier
-import com.lomicron.eu4.parsers.ClausewitzParser.startDate
+import com.lomicron.oikoumene.parsers.ClausewitzParser.startDate
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.localisation.{Localisation, WithLocalisation}
 import com.lomicron.utils.json.FromJson

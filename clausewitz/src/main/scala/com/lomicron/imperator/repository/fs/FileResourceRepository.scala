@@ -2,7 +2,7 @@ package com.lomicron.imperator.repository.fs
 
 import com.lomicron.imperator.repository.api.ResourceRepository
 import com.lomicron.eu4.repository.api.GameFilesSettings
-import com.lomicron.eu4.repository.api.resources.GameFile
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
@@ -70,8 +70,10 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val eventModifiersDir = "common/event_modifiers"
   val staticModifiersDir = "common/static_modifiers"
 
-  private def readFile(path: String): String =
-    IO.readTextFile(path, StandardCharsets.ISO_8859_1)
+  private def readFile(path: String): String = {
+    // UTF-8-BOM - cleaning UP BOM symbol
+    IO.readTextFile(path, StandardCharsets.UTF_8).replace("\uFEFF", "")
+  }
 
   def readGameFile(gf: GameFile): GameFile = {
     val path = pathOf(gf)

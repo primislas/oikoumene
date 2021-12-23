@@ -1,6 +1,6 @@
 package com.lomicron.imperator.repository.api
 
-import com.lomicron.eu4.repository.api.resources.GameFile
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 
 trait ResourceRepository {
 

@@ -3,7 +3,7 @@ package com.lomicron.eu4.model.modifiers
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode}
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
 import com.typesafe.scalalogging.LazyLogging

@@ -1,4 +1,4 @@
-package com.lomicron.eu4.repository.api.resources
+package com.lomicron.oikoumene.repository.api.resources
 
 import java.nio.file.{Path, Paths}
 

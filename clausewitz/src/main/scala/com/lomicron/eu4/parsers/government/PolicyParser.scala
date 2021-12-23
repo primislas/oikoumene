@@ -2,10 +2,10 @@ package com.lomicron.eu4.parsers.government
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.government.Policy
-import com.lomicron.eu4.parsers.ClausewitzParser.Fields
-import com.lomicron.eu4.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.government.PolicyRepository
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, objectNode}
 import com.typesafe.scalalogging.LazyLogging
 

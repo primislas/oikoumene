@@ -1,6 +1,7 @@
 package com.lomicron.eu4.parsers
 
-import com.lomicron.eu4.parsers.ConfigField.ValueTypes
+import com.lomicron.oikoumene.parsers.ConfigField
+import com.lomicron.oikoumene.parsers.ConfigField.ValueTypes
 import com.lomicron.utils.json.JsonMapper
 import org.specs2.mutable.Specification
 

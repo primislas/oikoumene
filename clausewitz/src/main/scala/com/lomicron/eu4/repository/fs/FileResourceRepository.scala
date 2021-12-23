@@ -2,8 +2,9 @@ package com.lomicron.eu4.repository.fs
 
 import com.lomicron.eu4.parsers.politics.TagConf
 import com.lomicron.eu4.repository.api.GameFilesSettings
-import com.lomicron.eu4.repository.api.resources.{GameFile, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
