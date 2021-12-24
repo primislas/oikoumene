@@ -52,7 +52,7 @@ object Oikoumene extends LazyLogging {
     val tags = TagParser(repos)
     logger.info(s"Loaded ${tags.size} tags")
     val buildings = BuildingParser(repos)
-    logger.info(s"Loaded ${buildings.size} buildings")
+    logger.info(s"Loaded ${buildings.size} buildingIds")
     GeographyParser(repos)
     logger.info(s"Loaded geographical definitions")
 

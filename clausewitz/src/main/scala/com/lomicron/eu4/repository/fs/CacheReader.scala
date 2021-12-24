@@ -32,7 +32,7 @@ case class CacheReader(repos: RepositoryFactory) extends LazyLogging {
           readReligions()
           readCultures()
           readTrade()
-          // buildings
+          // buildingIds
           // ideas
           // casus belli
           // diplomacy

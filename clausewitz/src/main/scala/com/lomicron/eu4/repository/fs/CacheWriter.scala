@@ -18,7 +18,7 @@ case class CacheWriter(repos: RepositoryFactory) {
     storeCultures()
     storeTrade()
 //    storeLocalisation()
-    // buildings
+    // buildingIds
     // ideas
     // casus belli
     // diplomacy

@@ -51,7 +51,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val climateFile = "map/climate.txt"
   val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
-  val buildingsDir = "common/buildings"
+  val buildingsDir = "common/buildingIds"
 
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
