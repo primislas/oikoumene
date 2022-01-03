@@ -1,7 +1,7 @@
-package com.lomicron.eu4.repository.inmemory.map
+package com.lomicron.oikoumene.repository.inmemory.map
 
-import com.lomicron.eu4.model.provinces.Area
-import com.lomicron.eu4.repository.api.map.AreaRepository
+import com.lomicron.oikoumene.model.provinces.Area
+import com.lomicron.oikoumene.repository.api.map.AreaRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
 
 import scala.collection.mutable

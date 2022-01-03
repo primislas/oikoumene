@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.map.RouteTypes
 import com.lomicron.eu4.model.provinces.{Province, ProvinceGeography}
 import com.lomicron.eu4.model.trade.TradeNode
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.{BuildingRepository, GeographicRepository, MapRepository, ProvinceRepository}
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.model.Color
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseHistory}
+import com.lomicron.oikoumene.parsers.map.MapConfigParser._
 import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
@@ -17,21 +17,8 @@ import com.softwaremill.quicklens._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.parallel.CollectionConverters.seqIsParallelizable
-import scala.util.matching.Regex
 
 object ProvinceParser extends LazyLogging {
-
-  val provinceDefinitionPat: Regex =
-    "^(?<id>\\d+);(?<red>\\d+);(?<green>\\d+);(?<blue>\\d+);(?<comment>[^;]*)(?:;(?<tag>.*))?".r
-  val addBuildingField = "add_building"
-  val removeBuildingField = "remove_building"
-
-  case class Prov(id: Int, conf: ObjectNode) { self =>
-    def update(f: ObjectNode => ObjectNode): Prov = {
-      f(conf)
-      self
-    }
-  }
 
   def apply (repos: RepositoryFactory): ProvinceRepository = {
 
@@ -59,27 +46,6 @@ object ProvinceParser extends LazyLogging {
 
     provinces
   }
-
-  def parseProvinceDefinitions(definitions: Option[String]): Seq[Province] =
-    definitions
-      .map(_.linesIterator.toSeq)
-      .getOrElse(Seq.empty)
-      .flatMap(parseDefinition)
-
-  def parseDefinition(line: String): Option[Province] =
-    line match {
-      case provinceDefinitionPat(id, r, g, b, comment) =>
-        Some(Province(id.toInt, Color(r.toInt, g.toInt, b.toInt), comment))
-      case provinceDefinitionPat(id, r, g, b, comment, tag2) =>
-        Some(Province(id.toInt, Color(r.toInt, g.toInt, b.toInt), comment, tag2))
-      case _ => None
-    }
-
-  def addLocalisation(p: Prov, localisation: LocalisationRepository): Prov =
-    localisation
-      .fetchProvince(p.id)
-      .map(loc => p.update(_.setEx(Fields.localisation, loc)))
-      .getOrElse(p)
 
   def addHistory
   (

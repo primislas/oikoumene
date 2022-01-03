@@ -3,13 +3,16 @@ package com.lomicron.imperator.parsers.provinces
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.imperator.model.provinces.Province
-import com.lomicron.imperator.repository.api.{BuildingRepository, PopTypeRepository, ProvinceRepository, RepositoryFactory}
-import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.imperator.repository.api.{ProvinceRepository, RepositoryFactory}
+import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
+import com.lomicron.oikoumene.parsers.ConfigField
+import com.lomicron.oikoumene.parsers.map.MapConfigParser.{Prov, parseProvinceDefinitions}
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.json.JsonMapper
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, toObjectNode}
 import com.typesafe.scalalogging.LazyLogging
-import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
-import com.lomicron.utils.json.JsonMapper.JsonNodeEx
-import com.lomicron.utils.json.JsonMapper.ArrayNodeEx
+
+import scala.collection.parallel.CollectionConverters._
 
 object ProvinceSetupParser extends LazyLogging {
 
@@ -19,12 +22,15 @@ object ProvinceSetupParser extends LazyLogging {
     val buildings = BuildingParser(repos)
     val buildingIds = buildings.findAll.map(_.id)
 
-    val files = repos.resources.getProvinceSetup
-    val es = ClausewitzParser
-      .parseFileFieldsAsEntities(files)
+    val definitions = repos.resources.getProvinceDefinitions
+    val es = parseProvinceDefinitions(definitions)
+      .par
+      .flatMap(p => toObjectNode(p).map(o => Prov(p.id, o)))
+      .map(addLocalisation(_, repos.localisation))
+      .map(_.conf)
       .map(setPops(_, popTypeIds))
       .map(setBuildings(_, buildingIds))
-//      .map(localisation.setLocalisation)
+      .toList
     ConfigField.printCaseClass("Province", es)
 
     val repo = repos.provinces
@@ -32,6 +38,12 @@ object ProvinceSetupParser extends LazyLogging {
 
     repos.provinces
   }
+
+  def addLocalisation(p: Prov, localisation: LocalisationRepository): Prov =
+    localisation
+      .fetchProvince(p.id)
+      .map(loc => p.update(_.setEx(Fields.localisation, loc)))
+      .getOrElse(p)
 
   def setBuildings(province: ObjectNode, buildingIds: Seq[String]): ObjectNode = {
     val buildings = buildingIds
@@ -66,7 +78,7 @@ object ProvinceSetupParser extends LazyLogging {
       .groupBy(_.get("type").asText())
       .foldLeft(JsonMapper.objectNode)((acc, pop) => acc.setEx(pop._1, pop._2))
 
-    province.setEx("pops", pops);
+    province.setEx("pops", pops)
   }
 
 }

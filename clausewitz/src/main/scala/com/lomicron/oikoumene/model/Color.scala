@@ -50,11 +50,22 @@ object Color extends FromJson[Color] {
   }
 
   def apply(color: ObjectNode): Color = {
-    val r = color.getInt("r").getOrElse(0)
-    val g = color.getInt("g").getOrElse(0)
-    val b = color.getInt("b").getOrElse(0)
-    Color(r, g, b)
+    if (isHSV(color)) {
+      val h = color.getBigDecimal("r").getOrElse(BigDecimal(0))
+      val s = color.getBigDecimal("g").getOrElse(BigDecimal(0))
+      val v = color.getBigDecimal("b").getOrElse(BigDecimal(0))
+      // TODO HSV to RGB
+      Color(h.intValue, s.intValue, v.intValue)
+    } else {
+      val r = color.getInt("r").getOrElse(0)
+      val g = color.getInt("g").getOrElse(0)
+      val b = color.getInt("b").getOrElse(0)
+      Color(r, g, b)
+    }
   }
+
+  def isHSV(color: ObjectNode): Boolean =
+    color.has("h") && color.has("s") && color.has("v")
 
   def apply(color: TextNode): Color = {
     Color()

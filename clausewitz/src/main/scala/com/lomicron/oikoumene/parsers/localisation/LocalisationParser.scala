@@ -1,10 +1,9 @@
-package com.lomicron.eu4.parsers.localisation
+package com.lomicron.oikoumene.parsers.localisation
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
-import com.lomicron.utils.json.JsonMapper.{objectNode, patch}
 import com.lomicron.utils.collection.CollectionUtils.MapEx
+import com.lomicron.utils.json.JsonMapper.{objectNode, patch}
 
 import scala.util.matching.Regex
 
@@ -16,16 +15,6 @@ object LocalisationParser {
     "^(?<tag>[a-zA-Z]{3})_ADJ$".r
   val provNamePat: Regex =
     "^PROV(?<id>\\d+)$".r
-
-  def apply(repos: RepositoryFactory)
-  : Seq[LocalisationEntry] = {
-    val resources = repos.resources
-    val localisationEntries = resources
-      .getLocalisation(resources.SupportedLanguages.english)
-      .reverse
-    repos.localisations.upsertEntries(localisationEntries)
-    localisationEntries
-  }
 
   def parseTags(es: Seq[LocalisationEntry]): Map[String, ObjectNode] =
     parseNames(es, parseTagName)
@@ -57,6 +46,5 @@ object LocalisationParser {
       case provNamePat(id) => Some((id.toInt, objectNode.put("name", entry.text)))
       case _ => None
     }
-
 
 }

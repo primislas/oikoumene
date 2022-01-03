@@ -80,13 +80,17 @@ object MapParser extends LazyLogging {
 
   def parseRivers(r: ResourceRepository, g: GeographicRepository): Seq[River] = {
     val rivers = r.getRiversMap
-      .map(gf => fetchMap(gf.path))
       .map(parseRivers)
-      .getOrElse(Seq.empty)
-      .map(_.smooth)
-      .map(fitRiverCurves)
+      .toSeq.flatten
     g.map.createRivers(rivers)
     rivers
+  }
+
+  def parseRivers(riverFile: GameFile): Seq[River] = {
+    val map = fetchMap(riverFile.path)
+    parseRivers(map)
+      .map(_.smooth)
+      .map(fitRiverCurves)
   }
 
   def parseTerrainColors(r: ResourceRepository, g: GeographicRepository): Array[Color] = {

@@ -1,10 +1,8 @@
 package com.lomicron.eu4.tools
 
-import java.nio.file.{Path, Paths}
 import com.lomicron.eu4.engine.Oikoumene
 import com.lomicron.eu4.io.FileIO
 import com.lomicron.eu4.parsers.map.MapParser
-import com.lomicron.eu4.parsers.provinces.ProvinceParser
 import com.lomicron.eu4.parsers.save.SaveGameParser
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.resources.ResourceRepository
@@ -16,11 +14,13 @@ import com.lomicron.eu4.tools.model.SupportedGames
 import com.lomicron.eu4.tools.model.map.{BorderSvgJson, PolygonSvgJson}
 import com.lomicron.eu4.tools.model.metadata._
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.parsers.map.MapConfigParser
 import com.lomicron.utils.collection.CollectionUtils.{SeqEx, toOption}
 import com.lomicron.utils.json.JsonMapper.prettyPrint
 import com.softwaremill.quicklens._
 import com.typesafe.scalalogging.LazyLogging
 
+import java.nio.file.{Path, Paths}
 import scala.util.Try
 
 object ClausewitzMapBuilder extends LazyLogging {
@@ -279,7 +279,7 @@ object ClausewitzMapBuilder extends LazyLogging {
   def parseProvinceIds(repo: ResourceRepository, polygons: Seq[PolygonSvgJson], borders: Seq[BorderSvgJson])
   : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) = {
     val defsFile = repo.getProvinceDefinitions
-    val defs = ProvinceParser
+    val defs = MapConfigParser
       .parseProvinceDefinitions(defsFile)
       .toMapEx(p => p.color -> p)
 

@@ -1,6 +1,7 @@
 package com.lomicron.utils.parsing.scopes
 
-import com.fasterxml.jackson.databind.node._
+import com.fasterxml.jackson.databind.node.{TextNode, _}
+import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.parsing._
 import com.lomicron.utils.parsing.tokenizer._
 
@@ -25,7 +26,17 @@ case class AssignmentScope(parent: Option[ObjectScope],
     }
 
     value match {
-      case Some(v) => (parent.get.addField(key, v), parsedObject)
+      case Some(v) => v.textValue() match {
+        case "rgb" =>
+//          parent.get
+//            .addField(s"${key}__rgb", JsonMapper.objectNode)
+//            .nextScope(t)._1
+//            .nextScope(Equals)
+          (AssignmentScope(parent, s"${key}__RGB"), parsedObject)
+//          parent.get.addField("rgb", JsonParser.objectNode).nextScope(Equals)
+        case "hsv" => (AssignmentScope(parent, s"${key}__HSV"), parsedObject)
+        case _ => (parent.get.addField(key, v), parsedObject)
+      }
       case _ => addParsingError(t)
     }
   }

@@ -6,7 +6,7 @@ import com.lomicron.eu4.repository.api.government._
 import com.lomicron.eu4.repository.api.map._
 import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
 import com.lomicron.eu4.repository.api.politics._
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.eu4.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.eu4.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.eu4.repository.fs.{CacheReader, CacheWriter, FSGFXRepository, FileResourceRepository}
@@ -17,7 +17,10 @@ import com.lomicron.eu4.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.eu4.repository.inmemory.politics._
 import com.lomicron.eu4.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.eu4.writers.{FileWriterFactory, ModSettings, WriterFactory}
+import com.lomicron.oikoumene.repository.api.map.RegionRepository
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.oikoumene.repository.inmemory.InMemoryLocalisationRepository
+import com.lomicron.oikoumene.repository.inmemory.map.InMemoryRegionRepository
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   extends RepositoryFactory { self =>

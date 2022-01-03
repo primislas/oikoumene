@@ -31,15 +31,18 @@ object ProvinceTypes extends FromJson[ProvinceTypes] {
    * Settled province that has an owner.
    */
   val city = "city"
-  val sea = "sea"
-  val lake = "lake"
+  val uncolonized = "uncolonized"
   val random = "random"
   val wasteland = "wasteland"
-  val uncolonized = "uncolonized"
+  val impassable = "impassable"
+  val uninhabitable = "uninhabitable"
+  val sea = "sea"
+  val lake = "lake"
+  val river = "river"
   val elevatedLake = "elevated-lake"
 
   val empty: ProvinceTypes = ProvinceTypes()
 
-  val landTypes: Set[String] = ListSet(province, wasteland, random, uncolonized)
+  val landTypes: Set[String] = ListSet(province, uncolonized, random, uninhabitable, wasteland, impassable)
   val list: Set[String] = landTypes ++ Seq(sea, lake)
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.politics.Tag
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.politics.TagRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
-import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse, parseAndLogErrors}
+import com.lomicron.oikoumene.parsers.politics.TagConf
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.resources.GameFile
+import com.lomicron.oikoumene.repository.api.resources.{GameFile, LocalisationRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
 import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, textNode}
@@ -75,13 +76,7 @@ object TagParser extends LazyLogging {
     conf
       .country
       .map(resources.getResource)
-      .flatMap(fc => fc.content.flatMap(parse(_)))
-      .map(parsingRes => {
-        val errors = parsingRes._2
-        if (errors.nonEmpty)
-          logger.warn(s"Encountered errors parsing country configuration for tag '${conf.tag}': $errors")
-        parsingRes._1
-      })
+      .flatMap(fc => fc.content.flatMap(parseAndLogErrors))
       .map(o => o.setEx(Fields.idKey, textNode(conf.tag)))
       .map(ClausewitzParser.removeEmptyObjects)
       .getOrElse(JsonMapper.objectNode)

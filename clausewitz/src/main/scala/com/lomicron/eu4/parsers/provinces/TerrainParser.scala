@@ -7,8 +7,9 @@ import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{fieldsToObjects, parseFilesAsEntities}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.GeographicRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.parsers.ConfigField
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, _}
 import com.typesafe.scalalogging.LazyLogging
 

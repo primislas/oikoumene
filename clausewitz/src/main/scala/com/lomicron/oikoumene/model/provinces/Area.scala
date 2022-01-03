@@ -1,8 +1,8 @@
-package com.lomicron.eu4.model.provinces
+package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.oikoumene.model.localisation.Localisation
+import com.lomicron.oikoumene.model.{Color, Entity}
 import com.lomicron.utils.json.FromJson
 
 @JsonCreator

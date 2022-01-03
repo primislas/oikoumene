@@ -1,17 +1,13 @@
 package com.lomicron.eu4.parsers.provinces
 
-import com.lomicron.eu4.model.map.Adjacency
-import com.lomicron.eu4.repository.api.map.{GeographicRepository, MapRepository}
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.eu4.repository.api.map.{GeographicRepository, MapRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.parsers.map.AdjacencyParser
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.util.matching.Regex
-
-object GeographyParser extends LazyLogging {
-
-  val adjacencyPat: Regex =
-    "^(?<from>\\d+);(?<to>\\d+);(?<type>[a-zA-Z]*);(?<throuh>\\d+);-?(?<startX>\\d+);-?(?<startY>\\d+);-?(?<stopX>\\d+);-?(?<stopY>\\d+);(?<comment>.*)".r
+object GeographyParser extends LazyLogging with AdjacencyParser {
 
   def apply(repos: RepositoryFactory,
             evalEntityFields: Boolean = false)
@@ -42,18 +38,10 @@ object GeographyParser extends LazyLogging {
   def parseAdjacencies(files: ResourceRepository, map: MapRepository): MapRepository = {
     val as = files
       .getAdjacencies
-      .map(_.linesIterator.toList)
+      .map(parseAdjacencies)
       .getOrElse(Seq.empty)
-      .flatMap(parseAdjacency)
     map.updateAdjacencies(as)
   }
-
-  def parseAdjacency(line: String): Option[Adjacency] =
-    line match {
-      case adjacencyPat(from, to, aType, through, startX, startY, stopX, stopY, comment) =>
-        Some(Adjacency(from.toInt, to.toInt, aType, through.toInt, startX.toInt, startY.toInt, stopX.toInt, stopY.toInt, comment))
-      case _ => None
-    }
 
 
 }

@@ -1,6 +1,6 @@
-package com.lomicron.eu4.repository.api.map
+package com.lomicron.oikoumene.repository.api.map
 
-import com.lomicron.eu4.model.provinces.Area
+import com.lomicron.oikoumene.model.provinces.Area
 import com.lomicron.oikoumene.repository.api.AbstractRepository
 
 trait AreaRepository extends AbstractRepository[String, Area] {

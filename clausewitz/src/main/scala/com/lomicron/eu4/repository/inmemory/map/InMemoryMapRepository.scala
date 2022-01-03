@@ -3,6 +3,7 @@ package com.lomicron.eu4.repository.inmemory.map
 import com.lomicron.eu4.model.map._
 import com.lomicron.eu4.repository.api.map.{MapRepository, ProvinceRepository}
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.model.map.Adjacency
 import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 import com.lomicron.utils.collection.CollectionUtils.MapEx
 

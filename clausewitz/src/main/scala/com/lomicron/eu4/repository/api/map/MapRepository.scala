@@ -3,6 +3,7 @@ package com.lomicron.eu4.repository.api.map
 import com.lomicron.eu4.model.map._
 import com.lomicron.oikoumene.repository.api.AbstractRepository
 import com.lomicron.oikoumene.model.Color
+import com.lomicron.oikoumene.model.map.Adjacency
 
 trait MapRepository extends AbstractRepository[Color, Tile] {
 

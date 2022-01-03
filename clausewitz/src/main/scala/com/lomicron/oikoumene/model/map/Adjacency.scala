@@ -1,4 +1,4 @@
-package com.lomicron.eu4.model.map
+package com.lomicron.oikoumene.model.map
 
 case class Adjacency
 (

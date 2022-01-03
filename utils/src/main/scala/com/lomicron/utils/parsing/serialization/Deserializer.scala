@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.ObjectNodeEx
-import com.lomicron.utils.parsing.JsonParser.rootKey
+import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, ObjectNodeEx}
+import com.lomicron.utils.parsing.JsonParser.{objectNode, rootKey}
 import com.lomicron.utils.parsing.scopes.ObjectScope.arrayKey
 import com.lomicron.utils.parsing.scopes.ParsingError
 import com.typesafe.scalalogging.LazyLogging
@@ -83,6 +83,8 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
                                         errors: Seq[ParsingError] = Seq.empty)
   : (JsonNode, List[String], Seq[ParsingError]) = {
 
+    deserializeColors(o)
+
     val objFieldsToDeserialize = o.fields().asScala.to(Seq)
       .filter(arrayKey != _.getKey)
       .filter(_.getValue.isInstanceOf[ObjectNode])
@@ -136,6 +138,36 @@ class BaseDeserializer(settings: SerializationSettings = DefaultSettings.setting
 
       (o, path, errors ++ recErrs)
     }
+  }
+
+  def deserializeColors(node: ObjectNode): ObjectNode = {
+    val colorKeys = node.fieldSeq()
+    colorKeys
+      .filter(f => f.endsWith("__RGB"))
+      .foreach(k => {
+        val color = node.remove(k)
+        node.setEx(k.replace("__RGB", ""), color)
+      })
+    colorKeys
+      .filter(f => f.endsWith("__HSV"))
+      .foreach(k => {
+        node
+          .getObject(k)
+          .flatMap(_.getArray(arrayKey))
+          .map(_.toSeq)
+          .filter(_.length >= 3)
+          .map(hsv => objectNode
+              .setEx("h", hsv.head)
+              .setEx("s", hsv(1))
+              .setEx("v", hsv(2))
+          )
+          .foreach(color => {
+            node.remove(k)
+            node.setEx(k.replace("__HSV", ""), color)
+          })
+      })
+
+    node
   }
 
   protected def getArray(o: ObjectNode, path: List[String], errors: Seq[ParsingError] = Seq.empty): (JsonNode, List[String], Seq[ParsingError]) = {

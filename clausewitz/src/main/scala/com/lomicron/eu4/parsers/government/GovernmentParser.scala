@@ -6,9 +6,10 @@ import com.lomicron.eu4.model.modifiers.Modifier
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.government.GovernmentRepository
 import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
 import com.lomicron.utils.json.JsonMapper.{JsonNodeEx, ObjectNodeEx, arrayNodeOf}
 

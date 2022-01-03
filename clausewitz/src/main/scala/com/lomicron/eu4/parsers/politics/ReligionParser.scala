@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.eu4.model.politics.{Religion, ReligionGroup}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.politics.ReligionRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields.idKey
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper._
 import com.typesafe.scalalogging.LazyLogging

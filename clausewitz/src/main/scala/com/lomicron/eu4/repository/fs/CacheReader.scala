@@ -2,13 +2,13 @@ package com.lomicron.eu4.repository.fs
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-
 import com.lomicron.eu4.model.map.{ElevatedLake, MercatorMap, ProvincePositions, Route}
 import com.lomicron.eu4.model.politics._
 import com.lomicron.eu4.model.provinces._
 import com.lomicron.eu4.model.trade.{TradeGood, TradeNode}
-import com.lomicron.eu4.parsers.localisation.LocalisationParser
 import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.model.provinces.{Area, Region}
+import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
 import com.lomicron.utils.io.IO
 import com.lomicron.utils.json.JsonMapper
 import com.typesafe.scalalogging.LazyLogging
@@ -25,7 +25,8 @@ case class CacheReader(repos: RepositoryFactory) extends LazyLogging {
         .map(cache => {
           cacheDir = Paths.get(cache)
           logger.info("Loading cached data...")
-          LocalisationParser(repos)
+          // TODO is localisation parser required here?
+//          LocalisationParser(repos)
           readProvinces()
           readTags()
           readGeography()

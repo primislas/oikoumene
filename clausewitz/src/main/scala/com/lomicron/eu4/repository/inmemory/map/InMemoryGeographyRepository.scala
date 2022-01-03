@@ -1,6 +1,8 @@
 package com.lomicron.eu4.repository.inmemory.map
 
 import com.lomicron.eu4.repository.api.map._
+import com.lomicron.oikoumene.repository.api.map.{AreaRepository, RegionRepository}
+import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryAreaRepository, InMemoryRegionRepository}
 
 object InMemoryGeographyRepository
 extends GeographicRepository {

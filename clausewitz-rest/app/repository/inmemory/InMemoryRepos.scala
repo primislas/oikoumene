@@ -6,11 +6,13 @@ import com.lomicron.eu4.repository.api.government._
 import com.lomicron.eu4.repository.api.map._
 import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
 import com.lomicron.eu4.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.eu4.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.eu4.repository.api.{GameFilesSettings, RepositoryFactory}
 import com.lomicron.eu4.repository.fs.FileResourceRepository
 import com.lomicron.eu4.writers.{FileWriterFactory, ModSettings, WriterFactory}
+import com.lomicron.oikoumene.repository.api.map.RegionRepository
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 
 case class InMemoryRepos() extends RepositoryFactory {
   val repos: RepositoryFactory = InMemoryReposSingleton.getRepos

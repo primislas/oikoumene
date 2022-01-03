@@ -1,12 +1,13 @@
 package com.lomicron.eu4.parsers.provinces
 
 import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
-import com.lomicron.eu4.model.provinces.Area
 import com.lomicron.eu4.repository.api.RepositoryFactory
-import com.lomicron.eu4.repository.api.map.AreaRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
+import com.lomicron.oikoumene.model.provinces.Area
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.map.AreaRepository
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, objectNode, patchFieldValue}
 import com.lomicron.utils.parsing.scopes.ObjectScope
@@ -28,6 +29,7 @@ object AreaParser extends LazyLogging {
 
     val jsonNodes = files
       .getAreas
+      .flatMap(_.content)
       .map(ClausewitzParser.parse(_, BaseDeserializer))
       .map(o => {
         if (o._2.nonEmpty) logger.warn(s"Encountered ${o._2.size} errors while parsing areas: ${o._2}")

@@ -1,9 +1,9 @@
 package com.lomicron.eu4.repository.fs
 
-import com.lomicron.eu4.parsers.politics.TagConf
 import com.lomicron.eu4.repository.api.GameFilesSettings
 import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+import com.lomicron.oikoumene.parsers.politics.TagConf
 import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
@@ -257,14 +257,14 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getProvinceTypes: Option[GameFile] =
     readGameFile(provinceTypesFile)
 
-  override def getAreas: Option[String] =
-    readGameFileContent(areasFile)
-
   override def getProvincePositions: Option[String] =
     readGameFileContent(provincePositionsFile)
 
-  override def getRegions: Option[String] =
-    readGameFileContent(regionsFile)
+  override def getAreas: Option[GameFile] =
+    readGameFile(areasFile)
+
+  override def getRegions: Option[GameFile] =
+    readGameFile(regionsFile)
 
   override def getSuperregions: Option[String] =
     readGameFileContent(supperregionsFile)

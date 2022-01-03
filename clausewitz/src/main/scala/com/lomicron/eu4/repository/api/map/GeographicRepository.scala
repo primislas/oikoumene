@@ -1,6 +1,7 @@
 package com.lomicron.eu4.repository.api.map
 
 import com.lomicron.eu4.model.provinces.ProvinceTypes
+import com.lomicron.oikoumene.repository.api.map.{AreaRepository, RegionRepository}
 
 trait GeographicRepository { self =>
 

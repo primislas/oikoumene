@@ -104,7 +104,7 @@ object ConfigField extends LazyLogging {
     println("import com.fasterxml.jackson.annotation.JsonCreator")
 
     if (hasColor && importsEntity)
-      println("import com.lomicron.eu4.model.{Color, Entity}")
+      println("import com.lomicron.oikoumene.model.{Color, Entity}")
     else if (importsEntity)
       println("import com.lomicron.oikoumene.model.Entity")
     else if (hasColor)
@@ -160,7 +160,7 @@ object ConfigField extends LazyLogging {
     println("import com.fasterxml.jackson.annotation.JsonCreator")
 
     if (hasColor && importsEntity)
-      println("import com.lomicron.eu4.model.{Color, Entity}")
+      println("import com.lomicron.oikoumene.model.{Color, Entity}")
     else if (importsEntity)
       println("import com.lomicron.oikoumene.model.Entity")
     else if (hasColor)

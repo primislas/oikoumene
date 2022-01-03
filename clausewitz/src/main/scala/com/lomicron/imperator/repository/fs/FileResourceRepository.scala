@@ -2,10 +2,13 @@ package com.lomicron.imperator.repository.fs
 
 import com.lomicron.imperator.repository.api.ResourceRepository
 import com.lomicron.eu4.repository.api.GameFilesSettings
+import com.lomicron.oikoumene.model.localisation.LocalisationEntry
+import com.lomicron.oikoumene.parsers.politics.TagConf
 import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
 
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.parallel.CollectionConverters._
@@ -13,12 +16,17 @@ import scala.collection.parallel.CollectionConverters._
 case class FileResourceRepository(settings: GameFilesSettings)
   extends ResourceRepository {
 
-  val localisationDir = "localisation"
+  val localisationDir = "game/localization"
 
   val provinceSetupDir = "game/setup/provinces"
 
   val buildingsDir = "game/common/buildings"
   val popTypesDir = "game/common/pop_types"
+
+  val provinceMap = "game/map_data/provinces.png"
+  val riversMap = "game/map_data/rivers.png"
+
+  val countries = "game/setup/countries/countries.txt"
 
   val countryTagsDir = "common/country_tags"
   val countriesDir = "common/countries"
@@ -39,24 +47,22 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val policiesDir = "common/policies"
   val stateEdictsDir = "common/state_edicts"
 
-  val provinceDefinitionsFile = "map/definition.csv"
-  val adjacenciesFile = "map/adjacencies.csv"
-  val provinceTypesFile = "map/default.map"
+  val provinceDefinitionsFile = "game/map_data/definition.csv"
+  val adjacenciesFile = "game/map_data/adjacencies.csv"
+  val provinceTypesFile = "game/map_data/default.map"
   val provincePositionsFile = "map/positions.txt"
-  val areasFile = "map/area.txt"
-  val regionsFile = "map/region.txt"
+  val areasFile = "game/map_data/area.txt"
+  val regionsFile = "game/map_data/region.txt"
   val supperregionsFile = "map/superregion.txt"
   val continentsFile = "map/continent.txt"
   val colonialRegionsFile = "common/colonial_regions/00_colonial_regions.txt"
   val terrainFile = "map/terrain.txt"
-  val climateFile = "map/climate.txt"
+  val climateFile = "game/map_data/climate.txt"
   val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
 
-  val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
   val heightMap = "map/heightmap.bmp"
-  val riversMap = "map/rivers.bmp"
   def background(season: String): String = s"map/terrain/colormap_$season.dds"
 
   val culturesFile = "common/cultures/00_cultures.txt"
@@ -153,6 +159,21 @@ case class FileResourceRepository(settings: GameFilesSettings)
   def readSourceFiles(files: Seq[String]): Seq[GameFile] =
     files.flatMap(readGameFile)
 
+  def readFilesAndSubdirFilesFromDir(gf: GameFile): Seq[File] =
+    gf.path.map(readFilesAndSubdirFilesFromDir).getOrElse(Seq.empty)
+
+  def readFilesAndSubdirFilesFromDir(d: Path): Seq[File] = {
+    val fs = readAllFilesFromDir(d)
+    val isSubDir = fs.map(_.toFile).groupBy(_.isDirectory)
+    val subDirFiles = isSubDir.getOrElse(true, Seq.empty)
+      .map(_.toPath)
+      .flatMap(readAllFilesFromDir(_))
+      .map(_.toFile)
+      .filterNot(_.isDirectory)
+    val rootDirFiles = isSubDir.getOrElse(false, Seq.empty)
+    rootDirFiles ++ subDirFiles
+  }
+
   def pathOf(gf: GameFile): String =
     gf
       .path
@@ -165,10 +186,88 @@ case class FileResourceRepository(settings: GameFilesSettings)
     fileConf.copy(content = content)
   }
 
+  private def readGameFileContent(relPath: String): Option[String] =
+    readGameFile(relPath).flatMap(_.content)
+
+  override def getLocalisation(language: String)
+  : Seq[LocalisationEntry] = {
+    (settings.mods.map(Option(_)) :+ None)
+      .flatMap(readLocalisation(_, language))
+  }
+
+  def readLocalisation(mod: Option[String], language: String): Seq[LocalisationEntry] = {
+    val relPath = Paths.get(localisationDir, language).toString
+    mod
+      .flatMap(modPath(_, relPath))
+      .orElse(baseGame(relPath))
+      .map(readFilesAndSubdirFilesFromDir)
+      .getOrElse(Seq.empty)
+      .par
+      .map(_.toString)
+      .filter(_.matches(s".*_l_$language\\.yml$$"))
+      .map(IO.readTextFile(_, StandardCharsets.UTF_8))
+      .flatMap(_.linesIterator)
+      .flatMap(LocalisationEntry.fromString)
+      .seq
+  }
+
+
+
   override def getProvinceSetup: Seq[GameFile] = readDir(provinceSetupDir)
 
   override def getBuildings: Seq[GameFile] = readDir(buildingsDir)
   override def getPopTypes: Seq[GameFile] = readDir(popTypesDir)
+
+  override def getProvinceMap: Option[GameFile] = Option(filePath(provinceMap))
+  override def getRiversMap: Option[GameFile] = Option(filePath(riversMap))
+
+  override def getProvinceDefinitions: Option[String] =
+    readGameFileContent(provinceDefinitionsFile)
+
+  override def getAdjacencies: Option[String] =
+    readGameFileContent(adjacenciesFile)
+
+  override def getProvinceTypes: Option[GameFile] = ???
+
+  override def getProvincePositions: Option[String] = ???
+
+  override def getAreas: Option[GameFile] =
+    readGameFile(areasFile)
+
+  override def getRegions: Option[GameFile] =
+    readGameFile(regionsFile)
+
+  override def getSuperregions: Option[String] = ???
+
+  override def getContinents: Option[String] = ???
+
+  override def getColonialRegions: Option[String] = ???
+
+  override def getTerrain: Option[GameFile] = ???
+
+  override def getClimate: Option[String] = ???
+
+  override def getElevatedLakes: Seq[GameFile] = ???
+
+  override def getTerrainMap: Option[GameFile] = ???
+
+  override def getHeightMap: Option[GameFile] = ???
+
+  override def getBackground(season: String): Option[GameFile] = ???
+
+  override def isMapModded: Boolean = ???
+
+  override def getCountryTags: Option[GameFile] = readGameFile(countries)
+
+  override def getCountrySetup(filesByTag: Map[String, GameFile]): Seq[TagConf] =
+    filesByTag
+      .map(e => {
+        val (tag, tagConfFile) = e
+        val tagConfWithFullPath = filePath(tagConfFile.path.toString)
+        TagConf(tag, tagConfWithFullPath)
+      })
+      .toSeq
+
 }
 
 object FileResourceRepository {

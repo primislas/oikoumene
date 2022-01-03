@@ -6,9 +6,11 @@ import com.lomicron.eu4.repository.api.government._
 import com.lomicron.eu4.repository.api.map._
 import com.lomicron.eu4.repository.api.modifiers.ModifierRepository
 import com.lomicron.eu4.repository.api.politics._
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.eu4.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
 import com.lomicron.eu4.writers.WriterFactory
+import com.lomicron.oikoumene.repository.api.map.RegionRepository
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 
 trait RepositoryFactory {
 

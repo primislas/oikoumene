@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
 import com.lomicron.eu4.model.provinces.Continent
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.repository.api.map.ContinentRepository
-import com.lomicron.eu4.repository.api.resources.{LocalisationRepository, ResourceRepository}
+import com.lomicron.eu4.repository.api.resources.ResourceRepository
 import com.lomicron.oikoumene.parsers.ClausewitzParser.Fields._
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper.{objectNode, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging

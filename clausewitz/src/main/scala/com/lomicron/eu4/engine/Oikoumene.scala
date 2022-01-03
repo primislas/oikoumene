@@ -2,7 +2,7 @@ package com.lomicron.eu4.engine
 
 import com.lomicron.eu4.parsers.diplomacy.{CasusBelliParser, DiplomacyParser, WarGoalTypeParser, WarHistoryParser}
 import com.lomicron.eu4.parsers.government._
-import com.lomicron.eu4.parsers.localisation.LocalisationParser
+import com.lomicron.eu4.parsers.localisation.EU4LocalisationParser
 import com.lomicron.eu4.parsers.map.MapParser
 import com.lomicron.eu4.parsers.modifiers.ModifierParser
 import com.lomicron.eu4.parsers.politics._
@@ -44,7 +44,7 @@ object Oikoumene extends LazyLogging {
   def parseConfigs(repos: RepositoryFactory): RepositoryFactory = {
     logger.info("Parsing configs...")
 
-    val les = LocalisationParser(repos)
+    val les = EU4LocalisationParser(repos)
     logger.info(s"Loaded ${les.size} localisation entries")
 
     //    ModifierAnalyzer(repos)

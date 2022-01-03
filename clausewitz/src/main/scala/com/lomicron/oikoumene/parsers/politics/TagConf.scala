@@ -1,4 +1,4 @@
-package com.lomicron.eu4.parsers.politics
+package com.lomicron.oikoumene.parsers.politics
 
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.repository.api.resources.GameFile

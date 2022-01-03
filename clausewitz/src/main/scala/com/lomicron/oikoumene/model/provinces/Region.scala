@@ -1,4 +1,4 @@
-package com.lomicron.eu4.model.provinces
+package com.lomicron.oikoumene.model.provinces
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
