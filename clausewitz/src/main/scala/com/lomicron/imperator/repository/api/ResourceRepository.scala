@@ -9,6 +9,8 @@ trait ResourceRepository extends MapConfigResources {
   def getResource(fileConf: GameFile): GameFile
   def getLocalisation(language: String): Seq[LocalisationEntry]
 
+  def getGameSetup: Seq[GameFile]
+
   def getProvinceSetup: Seq[GameFile]
   def getBuildings: Seq[GameFile]
   def getPopTypes: Seq[GameFile]

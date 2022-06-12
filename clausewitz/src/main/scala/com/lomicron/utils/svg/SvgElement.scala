@@ -1,9 +1,10 @@
-package com.lomicron.eu4.service.svg
+package com.lomicron.utils.svg
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.geometry.Point2D
 
 import scala.collection.immutable.ListSet
+import scala.collection.mutable
 
 case class SvgElement
 (
@@ -67,7 +68,7 @@ case class SvgElement
 
   def toSvg: String = toStringBuilder.toString
 
-  def toStringBuilder: StringBuilder = {
+  def toStringBuilder: mutable.StringBuilder = {
     val attrs = Seq(
       id.map(i => s"""id="$i""""),
       svgClass,
@@ -102,7 +103,7 @@ case class SvgElement
       .flatten
       .mkString(" ")
 
-    val sb = new StringBuilder()
+    val sb = new mutable.StringBuilder()
     sb.append(s"<$tag")
     if (attrs.nonEmpty) sb.append(s" $attrs>")
     else sb.append(">")

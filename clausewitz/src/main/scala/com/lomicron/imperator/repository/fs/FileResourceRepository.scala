@@ -18,6 +18,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   val localisationDir = "game/localization"
 
+  val mainSetupDir = "game/setup/main"
   val provinceSetupDir = "game/setup/provinces"
 
   val buildingsDir = "game/common/buildings"
@@ -51,8 +52,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val adjacenciesFile = "game/map_data/adjacencies.csv"
   val provinceTypesFile = "game/map_data/default.map"
   val provincePositionsFile = "map/positions.txt"
-  val areasFile = "game/map_data/area.txt"
-  val regionsFile = "game/map_data/region.txt"
+  val areasFile = "game/map_data/areas.txt"
+  val regionsFile = "game/map_data/regions.txt"
   val supperregionsFile = "map/superregion.txt"
   val continentsFile = "map/continent.txt"
   val colonialRegionsFile = "common/colonial_regions/00_colonial_regions.txt"
@@ -212,6 +213,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   }
 
 
+  override def getGameSetup: Seq[GameFile] = readDir(mainSetupDir)
 
   override def getProvinceSetup: Seq[GameFile] = readDir(provinceSetupDir)
 
@@ -227,7 +229,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getAdjacencies: Option[String] =
     readGameFileContent(adjacenciesFile)
 
-  override def getProvinceTypes: Option[GameFile] = ???
+  override def getProvinceTypes: Option[GameFile] =
+    readGameFile(provinceTypesFile)
 
   override def getProvincePositions: Option[String] = ???
 

@@ -41,7 +41,7 @@ object TagParser extends LazyLogging {
     parsedTagNodes
       .par
       .map(Tag.fromJson)
-      .map(_.atStart)
+      .flatMap(_.atStart)
       .to(Seq)
       .foreach(tags.create)
 

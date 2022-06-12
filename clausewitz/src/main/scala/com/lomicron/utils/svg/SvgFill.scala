@@ -1,4 +1,4 @@
-package com.lomicron.eu4.service.svg
+package com.lomicron.utils.svg
 
 import com.lomicron.oikoumene.model.Color
 

@@ -1,5 +1,6 @@
 package com.lomicron.eu4.service.svg
 
+import com.lomicron.utils.svg.Svg
 import org.specs2.mutable.Specification
 
 class SvgSpec extends Specification {

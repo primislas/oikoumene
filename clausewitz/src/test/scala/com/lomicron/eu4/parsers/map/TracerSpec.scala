@@ -1,8 +1,8 @@
 package com.lomicron.eu4.parsers.map
 
 import com.lomicron.eu4.service.map.SvgMapService
-import com.lomicron.eu4.service.svg.Svg
 import com.lomicron.utils.geometry.SchneidersFitter
+import com.lomicron.utils.svg.Svg
 
 import java.awt.Point
 import javax.imageio.ImageIO

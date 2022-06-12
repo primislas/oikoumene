@@ -3,11 +3,12 @@ package services
 import com.lomicron.eu4.model.map.{MapModes, WorldMap}
 import com.lomicron.eu4.repository.api.RepositoryFactory
 import com.lomicron.eu4.service.map.{MapBuilderSettings, SvgMapService, SvgMapStyles}
-import com.lomicron.eu4.service.svg.{SvgElement, SvgElements, SvgTags}
 import com.lomicron.eu4.tools.map.MapBuilder
 import com.lomicron.eu4.tools.model.metadata.ProvinceMetadata
+
 import javax.inject.{Inject, Singleton}
 import com.lomicron.utils.collection.CollectionUtils.OptionEx
+import com.lomicron.utils.svg.{SvgElement, SvgElements, SvgTags}
 
 import scala.collection.immutable.ListMap
 

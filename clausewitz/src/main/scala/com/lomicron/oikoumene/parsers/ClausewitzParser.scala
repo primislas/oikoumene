@@ -332,6 +332,24 @@ object ClausewitzParser extends LazyLogging {
     case _ => false
   }
 
+  def merge(nodes: JsonNode): Option[ObjectNode] = nodes match {
+    case a: ArrayNode => Some(merge(a))
+    case o: ObjectNode => Some(o)
+    case _ => None
+  }
+
+  def merge(nodes: ArrayNode): ObjectNode = nodes.toSeq.flatMap(_.asObject) match {
+    case head :: Nil => head
+    case head :: tail => recMerge(head, tail)
+  }
+
+  @tailrec
+  private def recMerge(o: ObjectNode, remaining: Seq[ObjectNode]): ObjectNode =
+    if (remaining.isEmpty)
+      o
+    else
+      recMerge(mergeFields(o, remaining.head), remaining.drop(1))
+
   def mergeFields(target: ObjectNode, update: ObjectNode): ObjectNode = {
     update.fields.toSeq.foreach(e => mergeField(target, e))
     target

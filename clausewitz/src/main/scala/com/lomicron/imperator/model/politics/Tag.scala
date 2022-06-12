@@ -13,6 +13,7 @@ case class Tag
   localisation: Localisation = Localisation.empty,
   // hits = 598, isOptional = false, sample = [133,133,20]
   color: Color = Color.black,
+  state: Option[TagUpdate] = None,
   // hits = 590, isOptional = true, sample = ["Anderiton","Anicio","Bannaciacon","Bibracte","Bormo","Borvo","Briva","Gabales","Gergovia","Icioduron","Iciomagos","Mediocantos","Randosatis","Rigomagos","Rodumna","Ruessio","Segeta","Segodunon","Segusiaves","Sitillia","Tritullos","Ubrivon","Vellaves","Vorogio"]
   shipNames: Seq[String] = Seq.empty,
   // hits = 339, isOptional = true, sample = [255,223,0]
@@ -26,6 +27,7 @@ case class Tag
 ) extends Entity {
   @JsonCreator def this() = this(Entity.UNDEFINED)
   def withId(id: String): Tag = copy(id = id)
+  def withState(state: TagUpdate): Tag = copy(state = Some(state))
 }
 
 object Tag extends FromJson[Tag]

@@ -1,15 +1,20 @@
-package com.lomicron.eu4.service.map
+package com.lomicron.imperator.service.svg
 
-import com.lomicron.eu4.model.map._
-import com.lomicron.eu4.model.provinces.{Province, ProvinceTypes}
-import com.lomicron.eu4.repository.api.RepositoryFactory
-import com.lomicron.eu4.service.map.SvgMapStyles._
+import com.lomicron.eu4.model.map.{BorderTypes, ElevatedLake, MapModes, MercatorMap, River, RiverSegment}
+import com.lomicron.eu4.model.provinces.ProvinceTypes
+import com.lomicron.eu4.model.provinces.ProvinceTypes.{lake, sea}
+import com.lomicron.imperator.repository.api.RepositoryFactory
+import com.lomicron.eu4.service.map.{MapBuilderConstants, MapBuilderSettings, SvgMapSettings}
+import com.lomicron.imperator.model.map.WorldMap
+import com.lomicron.imperator.model.politics.Tag
+import com.lomicron.utils.svg.SvgElements._
+import com.lomicron.imperator.model.provinces.Province
+import com.lomicron.imperator.service.svg.SvgMapStyles._
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, toOption}
 import com.lomicron.utils.geometry.Geometry.halfPI
 import com.lomicron.utils.geometry._
-import com.lomicron.utils.svg.SvgElements._
-import com.lomicron.utils.svg._
+import com.lomicron.utils.svg.{Svg, SvgElement, SvgElements, SvgFill, SvgTags}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
@@ -46,7 +51,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
 
     val map = worldMap.mercator
     val precision: Int = settings.decimalPrecision
-    val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
+//    val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
     val style = SvgMapStyles.styleOf(settings, repos)
     val provinces = provinceSvg(map, settings.mapMode, precision)
     logger.info("Provinces: OK")
@@ -60,7 +65,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val worldSvg = Svg
       .svgHeader
       .copy(width = map.width, height = map.height)
-      .add(background)
+//      .add(background)
       .add(style)
       .add(provinces)
       .add(borders)
@@ -155,23 +160,19 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       case _ => None
     }
 
+  def ownerOf(p: Province): Option[Tag] = repos.tags.ownerOfProvince(p.id)
+
   def ownerColor(p: Province): Option[Color] =
-    p.state.owner.flatMap(repos.tags.find(_)).map(_.color)
+    ownerOf(p).map(_.color)
 
-  def tradeNodeColor(p: Province): Option[Color] =
-    p.geography.tradeNode
-      .flatMap(repos.tradeNodes.find(_))
-      .flatMap(_.color)
+  def tradeNodeColor(p: Province): Option[Color] = ???
 
-  def simpleTerrainColor(p: Province): Option[Color] =
-    p.geography.terrain
-      .flatMap(repos.geography.terrain.find(_))
-      .flatMap(_.color)
+  def simpleTerrainColor(p: Province): Option[Color] = ???
 
   def defaultColor(p: Province): Color =
     p.geography.`type`.map {
-      case ProvinceTypes.sea => oceanColor
-      case ProvinceTypes.lake => lakeColor
+      case sea => oceanColor
+      case lake => lakeColor
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
@@ -269,7 +270,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
         )
 
   def isLandBorder(a: Province, b: Province): Boolean =
-    a.isLand && b.isLand
+    a.geography.isLand && b.geography.isLand
 
   def isLandAreaBorder(a: Province, b: Province): Boolean =
     isLandBorder(a, b) && isAreaBorder(a, b)
@@ -278,19 +279,20 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     a.state.owner.isDefined || b.state.owner.isDefined
 
   def isSeaBorder(a: Province, b: Province): Boolean =
-    a.`type` == ProvinceTypes.sea && b.`type` == ProvinceTypes.sea
+    a.geography.typeIs(sea) && b.geography.typeIs(sea)
 
   def isSeaAreaBorder(a: Province, b: Province): Boolean =
     isSeaBorder(a, b) && isAreaBorder(a, b)
 
   def isSeaShoreBorder(a: Province, b: Province): Boolean =
-    (a.isLand && b.`type` == ProvinceTypes.sea) || (b.isLand && a.`type` == ProvinceTypes.sea)
+    (a.geography.isLand && b.geography.typeIs(sea)) ||
+      (b.geography.isLand && a.geography.typeIs(sea))
 
   def isLakeBorder(a: Province, b: Province): Boolean =
-    a.`type` == ProvinceTypes.lake && b.`type` == ProvinceTypes.lake
+    a.geography.typeIs(lake) && b.geography.typeIs(lake)
 
   def isLakeShoreBorder(a: Province, b: Province): Boolean =
-    (a.isLand && b.`type` == ProvinceTypes.lake) || (b.isLand && a.`type` == ProvinceTypes.lake)
+    (a.geography.isLand && b.geography.typeIs(lake)) || (b.geography.isLand && a.geography.typeIs(lake))
 
   def isAreaBorder(a: Province, b: Province): Boolean =
     (a.geography.area.isDefined || b.geography.area.isDefined) &&
@@ -353,17 +355,16 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       val curveLength = orderedBezier.head.distance(orderedBezier.last)
       val fontSizeLimit = maxFontSize(rotatedSegments)
 
-      //    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
-      //    if (oddNames.contains(name))
-      //      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+      val oddNames = Set("CARTHAGE", "MASSAESYLIA", "MAURETANIA")
+      if (oddNames.contains(name))
+        printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
 
       Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
     }
   }
 
   def mapName(provinces: Seq[Province]): String =
-    provinces.head.state.owner
-      .flatMap(repos.tags.find(_))
+    ownerOf(provinces.head)
       .flatMap(_.localisation.name)
       .map(_.toUpperCase)
       .getOrElse("UNDEFINED")
@@ -413,7 +414,8 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .flatMap(repos.provinces.findByColor(_))
       .groupBy(_.color.toInt)
       .flatMapValues(_.headOption)
-      .flatMapValues(_.state.owner)
+      .flatMapValues(ownerOf)
+      .mapValuesEx(_.id)
 
     val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
     Polygon.groupBordersIntoShapes(countryBorders)

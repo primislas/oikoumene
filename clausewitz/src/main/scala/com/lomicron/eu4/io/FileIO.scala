@@ -88,6 +88,9 @@ object FileIO {
       .getOrElse(Try())
 
   def write(f: File, content: String, charset: Charset): Try[Unit] = {
+    val dir = f.getParentFile
+    if (!dir.exists())
+      dir.mkdirs()
     val stream = new FileOutputStream(f)
     val streamWriter = new OutputStreamWriter(stream, charset)
     val bufferedWriter = new BufferedWriter(streamWriter)

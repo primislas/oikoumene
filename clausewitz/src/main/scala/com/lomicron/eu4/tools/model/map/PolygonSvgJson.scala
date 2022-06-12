@@ -1,9 +1,9 @@
 package com.lomicron.eu4.tools.model.map
 
-import com.lomicron.eu4.service.svg.Svg
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.Polygon
+import com.lomicron.utils.svg.Svg
 
 case class PolygonSvgJson
 (

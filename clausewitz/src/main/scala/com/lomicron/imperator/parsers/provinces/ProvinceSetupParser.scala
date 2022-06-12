@@ -53,6 +53,18 @@ object ProvinceSetupParser extends LazyLogging {
     province.setEx("buildings", buildings)
   }
 
+  def parseBuildings(province: ObjectNode): ObjectNode = {
+    val buildings = province
+      .fieldSeq()
+      .filter(_.endsWith("_building"))
+      .map(pt => pt -> province.remove(pt))
+      .foldLeft(JsonMapper.objectNode)((acc, t) => acc.setEx(t._1, t._2))
+    if (buildings.isEmpty())
+      province
+    else
+      province.setEx("buildings", buildings)
+  }
+
   def setPops(province: ObjectNode, popTypes: Seq[String]): ObjectNode = {
     def parsePops(pt: String): Seq[ObjectNode] =
       Option(province.get(pt))

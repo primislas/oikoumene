@@ -1,7 +1,8 @@
-package com.lomicron.eu4.service.map
+package com.lomicron.imperator.service.svg
 
 import com.lomicron.eu4.model.map.MapModes
-import com.lomicron.eu4.repository.api.RepositoryFactory
+import com.lomicron.eu4.service.map.MapBuilderSettings
+import com.lomicron.imperator.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.Point2D
@@ -128,21 +129,12 @@ object SvgMapStyles {
 
   def buildTagStyles(repos: RepositoryFactory): String =
     repos
-      .provinces
-      .findAll
-      .flatMap(_.state.owner)
-      .distinct
-      .flatMap(repos.tags.find(_))
+      .tags
+      .distinctProvinceOwners
       .map(tag => s".${tag.id} { fill:${Svg.colorToSvg(tag.color)} }")
       .mkString("\n")
 
-  def buildTerrainStyles(repos: RepositoryFactory): String =
-    repos
-      .geography
-      .terrain
-      .findAll
-      .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
-      .mkString("\n")
+  def buildTerrainStyles(repos: RepositoryFactory): String = ???
 
   def background(season: String, repos: RepositoryFactory): Seq[SvgElement] = {
     val mercator = repos.geography.map.mercator

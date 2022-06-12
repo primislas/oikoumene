@@ -4,7 +4,7 @@ import com.lomicron.eu4.model.politics.{Monarch, Tag, TagHistory, TagUpdate}
 import com.lomicron.eu4.model.provinces.Province
 import com.lomicron.eu4.mods.ModUtils._
 import com.lomicron.eu4.repository.api.RepositoryFactory
-import com.lomicron.eu4.repository.api.map.ProvinceSearchConf
+import com.lomicron.eu4.repository.api.map.{ProvinceRepository, ProvinceSearchConf}
 import com.lomicron.eu4.repository.api.politics.TagRepository
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.typesafe.scalalogging.LazyLogging
@@ -54,14 +54,9 @@ object IndependentRus extends LazyLogging {
     val provinces = repos.provinces
     val tags = repos.tags
 
-    val eastSlavicPs = provinces.search(ProvinceSearchConf.ofCultureGroup(eastSlavic).all).entities
-    val zaporizhia = findAreaProvinces(zaporizhiaArea, repos)
-    val muscovy = findProvincesByCore("MOS", provinces)
-    val penza = provinces.findByName("Penza").toSeq
+    val rus = rusProvinces(repos)
 
-    val rusProvinces = (eastSlavicPs ++ zaporizhia ++ muscovy ++ penza).distinct
-
-    val freedRusProvinces = rusProvinces
+    val freedRusProvinces = rus
       .map(minskProvinces)
       .map(turovProvinces)
       .map(ruthenianZaporizhia)
@@ -89,6 +84,16 @@ object IndependentRus extends LazyLogging {
         .map(provinceWithReligion(_, orthodox))
     provinces.update(lietuva)
     writeProvinces(repos, mod, freedRusProvinces ++ lietuva)
+  }
+
+  def rusProvinces(repos: RepositoryFactory): Seq[Province] = {
+    val provinces = repos.provinces
+    val eastSlavicPs = provinces.search(ProvinceSearchConf.ofCultureGroup(eastSlavic).all).entities
+    val zaporizhia = findAreaProvinces(zaporizhiaArea, repos)
+    val muscovy = findProvincesByCore("MOS", provinces)
+    val penza = provinces.findByName("Penza").toSeq
+
+    (eastSlavicPs ++ zaporizhia ++ muscovy ++ penza).distinct
   }
 
   def minskProvinces(p: Province): Province =
@@ -121,7 +126,7 @@ object IndependentRus extends LazyLogging {
     else p
 
   def lytvynSmolensk(p: Province): Province =
-    if (p.state.owner.contains("SMO"))
+    if (p.state.cores.contains("SMO"))
       provinceWithCulture(p, lytvyn)
     else p
 

@@ -1,4 +1,4 @@
-package com.lomicron.eu4.service.svg
+package com.lomicron.utils.svg
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
@@ -6,6 +6,7 @@ import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry.{BezierCurve, Point2D, Polyline, TPath}
 
 import java.text.DecimalFormat
+import scala.collection.mutable
 
 object Svg {
 
@@ -20,7 +21,7 @@ object Svg {
   def colorToSvg(c: Color) = s"rgb(${c.r},${c.g},${c.b})"
 
   def pointsToSvgPointsAttribute(ps: Seq[Point2D] = Seq.empty, precision: Int = 1): String = {
-    val sb = new StringBuilder()
+    val sb = new mutable.StringBuilder()
     sb.append(" points=\"")
     sb.append(ps.map(pointToSvg(_, precision = precision)).mkString(" "))
     sb.append("\"")
@@ -78,13 +79,14 @@ object Svg {
 
   def fromPolypath(pp: Polypath, precision: Int = 1): String = {
     pp match {
-      case h::t => (startPath(h, precision) +: t.map(continuePath(_, precision))).mkString(" ")
+      case h :: t => (startPath(h, precision) +: t.map(continuePath(_, precision))).mkString(" ")
       case Nil => ""
     }
   }
 
   def startPath(p: TPath, precision: Int = 1): String = {
     def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+
     p match {
       case pl: Polyline => pl.points.headOption.map(p => s"M ${psvg(p)} " + continuePath(pl, precision)).getOrElse("")
       case b: BezierCurve => s"M ${psvg(b.p1)} " + continuePath(b, precision)
@@ -93,6 +95,7 @@ object Svg {
 
   def continuePath(p: TPath, precision: Int = 1): String = {
     def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
+
     p match {
       case Polyline(points) => points.sliding(2, 1).flatMap(ps => toPath(ps.head, ps.last)).mkString(" ")
       case bc: BezierCurve => s"c ${psvg(bc.cp1 - bc.p1)}, ${psvg(bc.cp2 - bc.p1)}, ${psvg(bc.p2 - bc.p1)}"
