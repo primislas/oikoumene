@@ -27,6 +27,8 @@ case class Border
 
   def +(b: Border): Border = copy(points = points ++ b.points)
 
+  def *(coef: Double): Border = scale(coef)
+
   def identicalNeighbors(b: Border): Boolean =
     left == b.left && right == b.right
 
@@ -37,6 +39,12 @@ case class Border
   def reverse: Border = copy(points = points.reverse)
 
   def offset(diff: Point2D): Border = copy(points = points.map(_.offset(diff)))
+
+  def rotate(rotationCenter: Point2D, angle: Double): Border =
+    copy(points = points.map(_.rotate(rotationCenter, angle)))
+
+  def scale(coef: Double): Border =
+    copy(points = points.map(_ * coef))
 
   override def hashCode(): Int = {
     val leftIsSmaller =

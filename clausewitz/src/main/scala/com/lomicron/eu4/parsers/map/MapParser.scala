@@ -9,7 +9,7 @@ import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
-import com.lomicron.utils.geometry.{Border, Polygon, SchneidersFitter, Shape}
+import com.lomicron.utils.geometry.{Border, Geometry, Point2D, Polygon, SchneidersFitter, Shape}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.awt.image.{BufferedImage, IndexColorModel}
@@ -43,7 +43,48 @@ object MapParser extends LazyLogging {
     logger.info(s"Identified terrain of ${terrainByProv.size} provinces from terrain map")
 
     logger.info("Calculating map shapes...")
-    var shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
+
+    val topLeft = Point2D(2550, 1200)
+    val bottomRight = Point2D(4400, 0)
+
+    var shapes = provs
+      .map(parseProvinceShapes)
+      .getOrElse(Seq.empty)
+      .filter(_.borders.flatMap(_.points).exists(p => p.isBetween(topLeft, bottomRight)))
+    val scaleCoef = 1.530
+    val center = Point2D(2994, 1464)
+    val radius = 6400.0 / (2 * Math.PI)
+    shapes = shapes
+//      .map(s => {
+//        val modifiedBorders = s.borders.map(b => {
+//          val bsps = Geometry.fromBraunStereographic(b.points, center, radius)
+//          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
+//          b.copy(points = bps)
+//        })
+//        val modifiedClips = s.clip.map(p => {
+//          val bsps = Geometry.fromBraunStereographic(p.points, center, radius)
+//          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
+//          p.copy(points = bps)
+//        })
+//        s.copy(borders = modifiedBorders, clip = modifiedClips)
+//      })
+//      .map(_.rotate(5.0 * Math.PI / 180))
+//      .map(_.scale(scaleCoef))
+      .map(_.withPolygon)
+    val (x1, y1, x2, y2) = shapes
+      .foldLeft((6500.0 * scaleCoef, 0.0, 0.0, 2560.0 * scaleCoef))((acc, s) => {
+        var (topX, topY, bottomX, bottomY) = acc
+        s.borders.flatMap(_.points).foreach(p => {
+          if (p.x <= topX) topX = p.x
+          if (p.y >= topY) topY = p.y
+          if (p.x >= bottomX) bottomX = p.x
+          if (p.y <= bottomY) bottomY = p.y
+        })
+        (topX, topY, bottomX, bottomY)
+      })
+    val offset = Point2D(-x1, -y2)
+    shapes = shapes.map(_.offset(offset))
+
     logger.info(s"Identified ${shapes.size} map shapes")
     val allBorders = shapes.flatMap(_.borders)
     logger.info(s"Identified ${allBorders.size} border segments")
@@ -54,8 +95,10 @@ object MapParser extends LazyLogging {
     shapes = shapes.map(fitProvinceCurves(_, bconfigs))
     logger.info(s"Calculated province curvature")
 
-    val width = provs.map(_.getWidth).getOrElse(0)
-    val height = provs.map(_.getHeight).getOrElse(0)
+//    val width = provs.map(_.getWidth).getOrElse(0)
+//    val height = provs.map(_.getHeight).getOrElse(0)
+    val width = Math.ceil(x2 - x1).toInt
+    val height = Math.ceil(y1 - y2).toInt
     val mercator = MercatorMap(shapes, borders, rivers, width, height)
     g.map.updateMercator(mercator)
 

@@ -38,6 +38,31 @@ object Geometry {
     SphericalCoord(radius, polar, azimuth)
   }
 
+  def toAlbersEqualAreaConicProjection(ps: Seq[SphericalCoord], radius: Double): Seq[Point2D] = {
+    val lambda0 = PI * 10 / 180
+    val phi0 = PI * 30 / 180
+    val phi1 = PI * 43  / 180
+    val phi2 = PI * 62  / 180
+
+    val n = (sin(phi1) + sin(phi2)) / 2
+    val C = cos(phi1) * cos(phi1) + 2 * n * sin(phi1)
+    val rho0 = radius * sqrt(C - 2 * n * sin(phi0)) / n
+
+    ps.map(p => {
+//      val lambda = halfPI - p.polar
+      val lambda = p.azimuth
+      val theta = n * (lambda - lambda0)
+//      val phi = p.azimuth
+      val phi = halfPI - p.polar
+      val rho = radius * sqrt(C - 2 * n * sin(phi)) / n
+
+      val x = rho * sin(theta)
+      val y = - (rho0 - rho * cos(theta))
+
+      Point2D(x, y)
+    })
+  }
+
   def rotate(p: SphericalCoord, polarRotation: Double = 0, azimuthRotation: Double = 0): SphericalCoord = {
 
     val azimuthRot = toSphericalRange(p.azimuth + azimuthRotation)

@@ -38,6 +38,9 @@ case class Polygon
     copy(points = filtered)
   }
 
+  def scale(coef: Double): Polygon =
+    copy(points = points.map(_ * coef))
+
   def segments(segmentSize: Int = 5): Seq[PointSegment] = {
     def idSegment(p: Point2D): Double = (p.x / segmentSize).floor
 

@@ -64,6 +64,9 @@ case class Point2D(x: Double = 0, y: Double = 0) extends Rotatable[Point2D] { se
     Point2D(x / length, y / length)
   }
 
+  def isBetween(topLeft: Point2D, bottomRight: Point2D): Boolean =
+    x >= topLeft.x && x <= bottomRight.x && y <= topLeft.y && y >= bottomRight.y
+
 }
 
 object Point2D extends FromJson[Point2D] {

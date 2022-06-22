@@ -21,13 +21,13 @@ object MapBuilder extends LazyLogging {
   private val gameDir = "D:/Steam/steamapps/common/Europa Universalis IV"
   private val modsDir = FileResourceRepository.defaultModsDir
   private val saveGame = Paths.get(FileResourceRepository.defaultSaveDir, "autosave.eu4").toString
-  val mods = Seq("MEIOUandTaxes1")
+  val mods = Seq("typus")
 
   def main(args: Array[String]): Unit = {
     logger.info("Starting the known world...")
-    val cacheDir = Paths.get(modsDir, "map_rendering", "meiou").toString
-    val rebuildCache = true
-    val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods, cacheDir, rebuildCache))
+    val cacheDir = Paths.get(modsDir, "map_rendering", "typus").toString
+    val rebuildCache = false
+    val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods, None, rebuildCache))
     Oikoumene.loadConfigs(repos)
 //    val saveFile = FileIO.readSave(saveGame).get
 //    val saveGamestate = SaveGameParser(saveFile)
@@ -71,7 +71,7 @@ object MapBuilder extends LazyLogging {
       }
     */
 
-    mapService.worldSvg(world, mapSettings)
+    mapService.worldSvg(world, mapSettings.copy(includeRivers = false, includeNames = false))
   }
 
   def applySave(save: GamestateSave, repos: RepositoryFactory): RepositoryFactory = {
@@ -108,7 +108,7 @@ object MapBuilder extends LazyLogging {
 
   def writeMap(mapSvg: String): Unit = {
     val mpDirPath = Paths.get(modsDir, "map_rendering")
-    val fname = "mercator_political.svg"
+    val fname = "typus_political_europe_1.31.6.svg"
     FileIO.writeUTF(mpDirPath, fname, mapSvg)
     logger.info(s"Produced $fname")
   }

@@ -1,5 +1,12 @@
 package com.lomicron.utils.geometry
 
+/**
+  * Spherical coordinate.
+  *
+  * @param r original radius
+  * @param polar polar coordinate, latitude φ = π/2 - azimuth
+  * @param azimuth azimuth angle, longitude λ
+  */
 case class SphericalCoord
 (
   r: Double,

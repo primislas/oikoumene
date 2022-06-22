@@ -43,8 +43,23 @@ case class Shape
 
   def offset(diff: Point2D): Shape = {
     val obs = borders.map(_.offset(diff))
+    val ocs = clip.map(_.offset(diff))
     val op = polygon.map(_.offset(diff))
-    copy(borders = obs, polygon = op)
+    copy(borders = obs, clip = ocs, polygon = op)
+  }
+
+  def rotate(angle: Double, rotationCenter: Point2D = Point2D.ZERO): Shape = {
+    val rbs = borders.map(_.rotate(rotationCenter, angle))
+    val rcs = clip.map(_.rotate(rotationCenter, angle))
+    val rp = polygon.map(_.rotate(rotationCenter, angle))
+    copy(borders = rbs, clip = rcs, polygon = rp)
+  }
+
+  def scale(coef: Double): Shape = {
+    val sbs = borders.map(_.scale(coef))
+    val scs = clip.map(_.scale(coef))
+    val sp = polygon.map(_.scale(coef))
+    copy(borders = sbs, clip = scs, polygon = sp)
   }
 
   def isClipped: Boolean = clip.nonEmpty
