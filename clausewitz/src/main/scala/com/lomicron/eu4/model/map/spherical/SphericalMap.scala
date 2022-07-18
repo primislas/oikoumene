@@ -1,6 +1,6 @@
 package com.lomicron.eu4.model.map.spherical
 
-import com.lomicron.eu4.model.map.MercatorMap
+import com.lomicron.eu4.model.map.Map2DProjection
 import com.lomicron.utils.geometry._
 
 case class SphericalMap
@@ -22,34 +22,37 @@ case class SphericalMap
     SphericalMap(center, radius, rps, rbs, rrs)
   }
 
-  def project: MercatorMap = {
-    val mProvs = provinces.map(_.project(center)).filter(_.nonEmpty)
-    val mBorders = borders.map(_.project(center)).filter(_.nonEmpty)
-    val mRivers = rivers.map(_.project(center)).filter(_.nonEmpty)
-    val diameter = (radius * 2).ceil.toInt
-    MercatorMap(mProvs, mBorders, mRivers, diameter, diameter)
+  def project: Map2DProjection = {
+    // TODO patch
+//    val mProvs = provinces.map(_.project(center)).filter(_.nonEmpty)
+//    val mBorders = borders.map(_.project(center)).filter(_.nonEmpty)
+//    val mRivers = rivers.map(_.project(center)).filter(_.nonEmpty)
+//    val diameter = (radius * 2).ceil.toInt
+//    Map2DProjection(mProvs, mBorders, mRivers, diameter, diameter)
+    Map2DProjection()
   }
 
 }
 
 object SphericalMap {
 
-  def ofMercator(mercatorMap: MercatorMap): SphericalMap = {
-    val width = mercatorMap.width.toDouble
-    val height = mercatorMap.height.toDouble
-    val circumference = if (width > height) width else height
-    val radius = circumference / (2.0 * Math.PI)
-    val center = new Point2D(width / 2.0, height / 2.0)
-    val provinces = mercatorMap.provinces
-      .map(SphericalShape(_, center, radius))
-    val borders = mercatorMap.provinces.flatMap(_.borders).distinct
-      .map(SphericalBorder(_, center, radius))
-    val rivers = mercatorMap.rivers
-      .map(SphericalRiver(_, center, radius))
-
-    val cint = radius.ceil.toInt
-    val sphCenter = Point2D(cint, cint)
-    SphericalMap(sphCenter, radius, provinces, borders, rivers)
-  }
+  def ofMercator(mercatorMap: Map2DProjection): SphericalMap = ???
+//  {
+//    val width = mercatorMap.width.toDouble
+//    val height = mercatorMap.height.toDouble
+//    val circumference = if (width > height) width else height
+//    val radius = circumference / (2.0 * Math.PI)
+//    val center = new Point2D(width / 2.0, height / 2.0)
+//    val provinces = mercatorMap.provinces
+//      .map(SphericalShape(_, center, radius))
+//    val borders = mercatorMap.provinces.flatMap(_.borders).distinct
+//      .map(SphericalBorder(_, center, radius))
+//    val rivers = mercatorMap.rivers
+//      .map(SphericalRiver(_, center, radius))
+//
+//    val cint = radius.ceil.toInt
+//    val sphCenter = Point2D(cint, cint)
+//    SphericalMap(sphCenter, radius, provinces, borders, rivers)
+//  }
 
 }

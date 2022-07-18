@@ -2,7 +2,7 @@ package com.lomicron.eu4.repository.fs
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import com.lomicron.eu4.model.map.{ElevatedLake, MercatorMap, ProvincePositions, Route}
+import com.lomicron.eu4.model.map.{ElevatedLake, Map2DProjection, ProvincePositions, Route}
 import com.lomicron.eu4.model.politics._
 import com.lomicron.eu4.model.provinces._
 import com.lomicron.eu4.model.trade.{TradeGood, TradeNode}
@@ -78,7 +78,7 @@ case class CacheReader(repos: RepositoryFactory) extends LazyLogging {
     readAndUpdate[Seq[Terrain]](CacheConstants.terrain, es => g.terrain.update(es))
 
     val map = g.map
-    readAndUpdate[MercatorMap](CacheConstants.map, map.updateMercator)
+    readAndUpdate[Map2DProjection](CacheConstants.map, map.updateMercator)
     readAndUpdate[Seq[ProvincePositions]](CacheConstants.positions, es => map.updatePositions(es))
     readAndUpdate[Seq[Route]](CacheConstants.routes, es => map.updateRoutes(es))
     readAndUpdate[Seq[ElevatedLake]](CacheConstants.elevatedLakes, es => map.createLakes(es))

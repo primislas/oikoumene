@@ -1,6 +1,6 @@
 package com.lomicron.imperator.service.svg
 
-import com.lomicron.eu4.model.map.{BorderTypes, ElevatedLake, MapModes, MercatorMap, River, RiverSegment}
+import com.lomicron.eu4.model.map.{BorderTypes, ElevatedLake, MapModes, Map2DProjection, River, RiverSegment}
 import com.lomicron.eu4.model.provinces.ProvinceTypes
 import com.lomicron.eu4.model.provinces.ProvinceTypes.{lake, sea}
 import com.lomicron.imperator.repository.api.RepositoryFactory
@@ -98,7 +98,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .copy(path = Svg.fromPolypath(rs.path, precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
+  def provinceSvg(map: Map2DProjection, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
     val psByClass = map.provinces
       .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
@@ -171,12 +171,12 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
 
   def defaultColor(p: Province): Color =
     p.geography.`type`.map {
-      case sea => oceanColor
-      case lake => lakeColor
+      case `sea` => oceanColor
+      case `lake` => lakeColor
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
-  def borderSvg(mercatorMap: MercatorMap, precision: Int = defaultPrecision): SvgElement =
+  def borderSvg(mercatorMap: Map2DProjection, precision: Int = defaultPrecision): SvgElement =
     borderSvg(mercatorMap.borders, precision)
 
   def borderSvg(borders: Seq[Border], precision: Int): SvgElement = {

@@ -1,6 +1,7 @@
 package com.lomicron.eu4.service.map
 
 import com.lomicron.eu4.model.map.MapModes
+import com.lomicron.eu4.service.map.projections.ProjectionSettings
 
 case class MapBuilderSettings
 (
@@ -11,6 +12,8 @@ case class MapBuilderSettings
   includeRivers: Option[Boolean] = None,
   ownWastelands: Option[Boolean] = None,
   svgBackground: Option[String] = None,
+  sourceProjection: Option[ProjectionSettings] = None,
+  targetProjection: Option[ProjectionSettings] = None,
   decimalPrecision: Int = 1,
 ) {
   def withNames: Boolean = includeNames.contains(true)

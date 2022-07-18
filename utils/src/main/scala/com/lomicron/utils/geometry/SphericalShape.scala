@@ -8,6 +8,7 @@ case class SphericalShape
   groupId: Option[Int] = None,
   polygon: Option[SphericalPolygon] = None,
   clip: Seq[SphericalPolygon] = Seq.empty,
+  clipShapes: Seq[SphericalShape] = Seq.empty,
 ) {
 
   def rotate(polarRot: Double, azimuthRot: Double): SphericalShape =

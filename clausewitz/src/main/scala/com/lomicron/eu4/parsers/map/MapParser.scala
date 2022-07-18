@@ -10,9 +10,11 @@ import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry.{Border, Geometry, Point2D, Polygon, SchneidersFitter, Shape}
+import com.lomicron.utils.projections.{AlbersEqualConicalProjection, BraunStereographicProjection}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.awt.image.{BufferedImage, IndexColorModel}
+import java.lang.Math.PI
 import java.nio.file.{Path, Paths}
 import javax.imageio.ImageIO
 import scala.Function.tupled
@@ -51,24 +53,31 @@ object MapParser extends LazyLogging {
       .map(parseProvinceShapes)
       .getOrElse(Seq.empty)
       .filter(_.borders.flatMap(_.points).exists(p => p.isBetween(topLeft, bottomRight)))
-    val scaleCoef = 1.530
-    val center = Point2D(2994, 1464)
+    val scaleCoef = 1.0
+//    val scaleCoef = 1.530
+//    val center = Point2D(2994, 1464)
+    val primeMeridian = 2994
+    val equator = 1464
     val radius = 6400.0 / (2 * Math.PI)
     shapes = shapes
-//      .map(s => {
+      .map(s => {
+        val spherical = BraunStereographicProjection.toSpherical(s, equator, primeMeridian, radius)
+        AlbersEqualConicalProjection.from(spherical, PI * 10 / 180, PI * 30 / 180, PI * 43  / 180, PI * 62  / 180)
+//
 //        val modifiedBorders = s.borders.map(b => {
-//          val bsps = Geometry.fromBraunStereographic(b.points, center, radius)
-//          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
+//          val bsps = BraunStereographicProjection.toSpherical(b, equator, primeMeridian, radius)
+//          val bps = AlbersEqualConicalProjection.from(bsps.points, equator, primeMeridian, PI * 43  / 180, PI * 62  / 180)
+////          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
 //          b.copy(points = bps)
 //        })
-//        val modifiedClips = s.clip.map(p => {
-//          val bsps = Geometry.fromBraunStereographic(p.points, center, radius)
-//          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
+//        val modifiedClips = s.clipShapes.map(p => {
+//          val bsps = BraunStereographicProjection.toSpherical(p, equator, primeMeridian, radius)
+//          val bps = AlbersEqualConicalProjection.from(bsps.points, equator, primeMeridian, PI * 43  / 180, PI * 62  / 180)
 //          p.copy(points = bps)
 //        })
 //        s.copy(borders = modifiedBorders, clip = modifiedClips)
-//      })
-//      .map(_.rotate(5.0 * Math.PI / 180))
+      })
+      .map(_.rotate(5.0 * Math.PI / 180))
 //      .map(_.scale(scaleCoef))
       .map(_.withPolygon)
     val (x1, y1, x2, y2) = shapes
@@ -99,7 +108,7 @@ object MapParser extends LazyLogging {
 //    val height = provs.map(_.getHeight).getOrElse(0)
     val width = Math.ceil(x2 - x1).toInt
     val height = Math.ceil(y1 - y2).toInt
-    val mercator = MercatorMap(shapes, borders, rivers, width, height)
+    val mercator = Map2DProjection(shapes, borders, rivers, width, height)
     g.map.updateMercator(mercator)
 
     logger.info("Calculating map routes...")
@@ -327,15 +336,22 @@ object MapParser extends LazyLogging {
 
   def fitProvinceCurves(p: Shape, bconfigs: Map[Border, Border]): Shape = {
     val path = p.borders.flatMap(getBorderPath(_, bconfigs))
-    val clipPaths = p.clip.map(p => p.withPath(getPolygonPath(p, bconfigs))).filter(_.path.nonEmpty)
-    p.copy(path = path, clip = clipPaths)
+//    val clipPaths = p.clip
+//      .map(p => p.withPath(getPolygonPath(p, bconfigs))).filter(_.path.nonEmpty)
+    val clipPaths = p.clipShapes.map(s => s.borders.flatMap(getBorderPath(_, bconfigs)))
+    p.copy(path = path, clipPaths = clipPaths)
   }
 
   def getBorderPath(b: Border, bconfigs: Map[Border, Border]): Polypath = {
     val confPath = bconfigs.get(b).map(_.path).getOrElse(fit(b.points))
     if (confPath.isEmpty) Seq.empty
-    else if (confPath.head.points.head == b.points.head) confPath
-    else confPath.map(_.reverse).reverse
+    else if (confPath.head.points.head == b.points.head) {
+      confPath
+//      if (confPath.head.points.drop(1).head == b.points.drop(1).head)
+//        confPath
+//      else
+//        confPath.map(_.reverse).reverse
+    } else confPath.map(_.reverse).reverse
   }
 
   def getPolygonPath(p: Polygon, bconfigs: Map[Border, Border]): Polypath =

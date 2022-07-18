@@ -93,8 +93,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .copy(path = Svg.fromPolypath(rs.path, precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
+  def provinceSvg(map: Map2DProjection, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
     val psByClass = map.provinces
+      .filter(p => {
+        p.provId.exists(repos.provinces.find(_).exists(_.isLand))
+      })
       .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
 
@@ -112,15 +115,19 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
 
   def provinceToSvg(shape: Shape, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
     val polygon = shape.polygon.get
-    val elem = polygon
+    var elem = polygon
       .provinceId
       .map(classesOfProvince(_, mapMode))
       .map(defaultProvincePolygon(shape, precision).addClasses(_))
       .getOrElse(defaultProvincePolygon(shape, precision))
-    polygon
+    elem = polygon
       .provinceId
       .map(buildProvTooltip)
       .map(elem.addTitle)
+      .getOrElse(elem)
+    polygon
+      .provinceId
+      .map(setColor(_, mapMode, elem))
       .getOrElse(elem)
   }
 
@@ -132,10 +139,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       tag = SvgTags.PATH,
       id = shape.provId.map(_.toString),
     )
-    if (shape.clip.isEmpty) elem.copy(path = Svg.fromPolypath(shape.path, precision))
+    if (shape.clipPaths.isEmpty) elem.copy(path = Svg.fromPolypath(shape.path, precision))
     else {
-      val outer = Svg.fromPolypath(shape.path)
-      val inners = shape.clip.map(_.path).map(Svg.fromPolypath(_, precision))
+      val outer = Svg.fromPolypath(shape.path, precision)
+//      val inners = shape.clip.map(_.path).map(Svg.fromPolypath(_, precision))
+      val inners = shape.clipPaths.map(Svg.fromPolypath(_, precision))
       val path = (outer +: inners).mkString(" ")
       elem.copy(path = path, fillRule = "evenodd")
     }
@@ -147,11 +155,21 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .map(_.replaceAll("&", "&amp;"))
       .getOrElse("UNDEFINED PROV")
 
+  def setColor(pId: Int, mapMode: String, element: SvgElement): SvgElement = {
+    val resElem = for {
+      province <- repos.provinces.find(pId)
+      color <- mapModeColor(province, mapMode)
+    } yield element.copy(fill = SvgFill.apply(color))
+
+    resElem.getOrElse(element)
+  }
+
   def mapModeColor(p: Province, mapMode: String): Option[Color] =
     mapMode match {
       case MapModes.POLITICAL => ownerColor(p)
       case MapModes.TRADE_NODES => tradeNodeColor(p)
       case MapModes.SIMPLE_TERRAIN => simpleTerrainColor(p)
+      case MapModes.PROVINCE_SHAPES => p.color
       case _ => None
     }
 
@@ -175,7 +193,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       case _ => if (p.geography.isImpassable) wastelandColor else uncolonizedColor
     }.getOrElse(uncolonizedColor)
 
-  def borderSvg(mercatorMap: MercatorMap, precision: Int = defaultPrecision): SvgElement =
+  def borderSvg(mercatorMap: Map2DProjection, precision: Int = defaultPrecision): SvgElement =
     borderSvg(mercatorMap.borders, precision)
 
   def borderSvg(borders: Seq[Border], precision: Int): SvgElement = {

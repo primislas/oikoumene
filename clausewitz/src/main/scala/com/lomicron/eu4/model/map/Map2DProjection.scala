@@ -3,7 +3,7 @@ package com.lomicron.eu4.model.map
 import com.lomicron.eu4.model.map.spherical.SphericalMap
 import com.lomicron.utils.geometry._
 
-case class MercatorMap
+case class Map2DProjection
 (
   provinces: Seq[Shape] = Seq.empty,
   borders: Seq[Border] = Seq.empty,

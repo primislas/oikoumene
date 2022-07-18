@@ -25,7 +25,7 @@ case class InMemoryMapRepository()
   private var _adjacencies: Seq[Adjacency] = Seq.empty
   private var _tileRoutes: Seq[TileRoute] = Seq.empty
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
-  private var _mercator: MercatorMap = MercatorMap()
+  private var _mercator: Map2DProjection = Map2DProjection()
   private var _rivers: Seq[River] = Seq.empty
   private var _lakes: Seq[ElevatedLake] = Seq.empty
   private var _positions: Map[Int, ProvincePositions] = Map.empty
@@ -118,12 +118,12 @@ case class InMemoryMapRepository()
       .toList
   }
 
-  override def updateMercator(mercator: MercatorMap): MapRepository = {
+  override def updateMercator(mercator: Map2DProjection): MapRepository = {
     this._mercator = mercator
     this
   }
 
-  override def mercator: MercatorMap =
+  override def mercator: Map2DProjection =
     this._mercator
 
   override def createRivers(rivers: Seq[River]): MapRepository = {

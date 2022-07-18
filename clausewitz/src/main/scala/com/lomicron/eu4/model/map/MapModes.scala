@@ -7,6 +7,7 @@ object MapModes {
   val TERRAIN: String = "terrain"
   val POLITICAL: String = "political"
   val PROVINCE_OUTLINE: String = "province_outline"
+  val PROVINCE_SHAPES: String = "province_shapes"
   val SIMPLE_TERRAIN: String = "simple_terrain"
   val TRADE_NODES: String = "trade_nodes"
 
@@ -24,11 +25,14 @@ object MapModes {
 
   val provOutlinesSettings: MapBuilderSettings = MapBuilderSettings(mapMode = PROVINCE_OUTLINE)
 
+  val provShapesSettings: MapBuilderSettings = MapBuilderSettings(mapMode = PROVINCE_SHAPES)
+
   def defaultSettings(mode: String): Option[MapBuilderSettings] =
     mode match {
       case POLITICAL => politicalSettings
       case TERRAIN => terrainSettings
       case PROVINCE_OUTLINE => provOutlinesSettings
+      case PROVINCE_SHAPES => provShapesSettings
       case _ => None
     }
 
@@ -45,6 +49,7 @@ object MapModes {
         os.includeRivers.foreach(f => overridden = overridden.copy(includeRivers = f))
         os.ownWastelands.foreach(f => overridden = overridden.copy(ownWastelands = f))
         os.svgBackground.foreach(f => overridden = overridden.copy(svgBackground = f))
+        overridden = overridden.copy(decimalPrecision = os.decimalPrecision)
         overridden
       })
       .getOrElse(settings)

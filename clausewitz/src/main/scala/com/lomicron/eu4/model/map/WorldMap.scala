@@ -10,7 +10,7 @@ import com.softwaremill.quicklens._
 
 case class WorldMap
 (
-  mercator: MercatorMap,
+  mercator: Map2DProjection,
   private val repos: RepositoryFactory,
 ) {
 
@@ -23,7 +23,7 @@ case class WorldMap
       s
     })
 
-  def rotate(rotation: Option[SphericalCoord] = None): MercatorMap =
+  def rotate(rotation: Option[SphericalCoord] = None): Map2DProjection =
     rotation
       .map(getSphere.rotate)
       .getOrElse(getSphere)
@@ -126,7 +126,7 @@ object WorldMap {
     new WorldMap(withProvIds, repos)
   }
 
-  def addProvinceMeta(m: MercatorMap, repos: RepositoryFactory): MercatorMap = {
+  def addProvinceMeta(m: Map2DProjection, repos: RepositoryFactory): Map2DProjection = {
     val psByColor = repos.provinces.findAll.groupBy(_.color.toInt)
 
     val withProvIds = m.provinces

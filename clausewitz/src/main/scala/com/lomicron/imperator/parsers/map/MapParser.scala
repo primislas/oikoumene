@@ -1,6 +1,6 @@
 package com.lomicron.imperator.parsers.map
 
-import com.lomicron.eu4.model.map.MercatorMap
+import com.lomicron.eu4.model.map.Map2DProjection
 import com.lomicron.eu4.parsers.map.MapParser._
 import com.lomicron.imperator.repository.api.{GeographicRepository, RepositoryFactory}
 import com.lomicron.utils.collection.CollectionUtils.SeqEx
@@ -36,7 +36,7 @@ object MapParser extends LazyLogging {
 
     val width = provs.map(_.getWidth).getOrElse(0)
     val height = provs.map(_.getHeight).getOrElse(0)
-    val mercator = MercatorMap(shapes, borders, rivers, width, height)
+    val mercator = Map2DProjection(shapes, borders, rivers, width, height)
     g.map.updateMercator(mercator)
 
     logger.info("Calculating map routes...")

@@ -3,7 +3,7 @@ package com.lomicron.eu4.tools.map
 import java.nio.file.Paths
 import com.lomicron.eu4.engine.Oikoumene
 import com.lomicron.eu4.io.FileIO
-import com.lomicron.eu4.model.map.WorldMap
+import com.lomicron.eu4.model.map.{MapModes, WorldMap}
 import com.lomicron.eu4.model.politics.Tag
 import com.lomicron.eu4.model.save.GamestateSave
 import com.lomicron.eu4.model.save.tag.TagSave
@@ -29,9 +29,9 @@ object MapBuilder extends LazyLogging {
     val rebuildCache = false
     val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods, None, rebuildCache))
     Oikoumene.loadConfigs(repos)
-//    val saveFile = FileIO.readSave(saveGame).get
-//    val saveGamestate = SaveGameParser(saveFile)
-//    val mapSvg = buildMap(repos, Some(saveGamestate))
+    //    val saveFile = FileIO.readSave(saveGame).get
+    //    val saveGamestate = SaveGameParser(saveFile)
+    //    val mapSvg = buildMap(repos, Some(saveGamestate))
     val mapSvg = buildMap(repos)
     writeMap(mapSvg)
   }
@@ -71,7 +71,14 @@ object MapBuilder extends LazyLogging {
       }
     */
 
-    mapService.worldSvg(world, mapSettings.copy(includeRivers = false, includeNames = false))
+    val settings = mapSettings
+      .copy(
+        mapMode = MapModes.PROVINCE_SHAPES,
+        includeRivers = false,
+        includeNames = false,
+        decimalPrecision = 2,
+      )
+    mapService.worldSvg(world, settings)
   }
 
   def applySave(save: GamestateSave, repos: RepositoryFactory): RepositoryFactory = {
@@ -108,7 +115,7 @@ object MapBuilder extends LazyLogging {
 
   def writeMap(mapSvg: String): Unit = {
     val mpDirPath = Paths.get(modsDir, "map_rendering")
-    val fname = "typus_political_europe_1.31.6.svg"
+    val fname = "albers_provinces_europe_1.31.6.svg"
     FileIO.writeUTF(mpDirPath, fname, mapSvg)
     logger.info(s"Produced $fname")
   }

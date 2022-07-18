@@ -35,8 +35,8 @@ trait MapRepository extends AbstractRepository[Color, Tile] {
   def provinceRoutes(provId: Int): Seq[Route]
   def buildRoutes(provinces: ProvinceRepository): MapRepository
 
-  def updateMercator(mercator: MercatorMap): MapRepository
-  def mercator: MercatorMap
+  def updateMercator(mercator: Map2DProjection): MapRepository
+  def mercator: Map2DProjection
   def createRivers(rivers: Seq[River]): MapRepository
   def rivers: Seq[River]
   def createLakes(lakes: Seq[ElevatedLake]): MapRepository

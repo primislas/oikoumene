@@ -11,6 +11,8 @@ case class Shape
   polygon: Option[Polygon] = None,
   path: Seq[TPath] = Seq.empty,
   clip: Seq[Polygon] = Seq.empty,
+  clipShapes: Seq[Shape] = Seq.empty,
+  clipPaths: Seq[Seq[TPath]] = Seq.empty,
 ) extends Emptiable
 {
 
@@ -44,15 +46,17 @@ case class Shape
   def offset(diff: Point2D): Shape = {
     val obs = borders.map(_.offset(diff))
     val ocs = clip.map(_.offset(diff))
+    val ocss = clipShapes.map(_.offset(diff))
     val op = polygon.map(_.offset(diff))
-    copy(borders = obs, clip = ocs, polygon = op)
+    copy(borders = obs, clip = ocs, clipShapes = ocss, polygon = op)
   }
 
   def rotate(angle: Double, rotationCenter: Point2D = Point2D.ZERO): Shape = {
     val rbs = borders.map(_.rotate(rotationCenter, angle))
     val rcs = clip.map(_.rotate(rotationCenter, angle))
+    val rcss = clipShapes.map(_.rotate(angle, rotationCenter))
     val rp = polygon.map(_.rotate(rotationCenter, angle))
-    copy(borders = rbs, clip = rcs, polygon = rp)
+    copy(borders = rbs, clip = rcs, clipShapes = rcss, polygon = rp)
   }
 
   def scale(coef: Double): Shape = {
@@ -64,4 +68,39 @@ case class Shape
 
   def isClipped: Boolean = clip.nonEmpty
 
+}
+
+object Shape {
+
+  @scala.annotation.tailrec
+  def groupBordersIntoShapes(bs: Seq[Border], ss: Seq[Shape] = Seq.empty): Seq[Shape] = {
+    if (bs.isEmpty) ss
+    else bs match {
+      case Seq(h) => ss :+ Shape(Seq(h))
+      case h +: t =>
+        val startPoint = h.points.head
+        var currentPoint = h.points.last
+        var remainingBorders: Seq[Border] = t
+        var currentGroup = Seq(h)
+        while (currentPoint != startPoint && remainingBorders.nonEmpty && currentGroup.nonEmpty) {
+          val next = remainingBorders
+            .find(_.points.head == currentPoint)
+            .orElse(remainingBorders.find(_.points.last == currentPoint).map(_.reverse))
+          if (next.isDefined) {
+            val b = next.get
+            remainingBorders = remainingBorders
+              .filterNot(rb => (rb.points.head == currentPoint || rb.points.last == currentPoint) && rb.leftGroup == b.leftGroup && rb.rightGroup == b.rightGroup)
+            currentGroup = currentGroup :+ b
+            currentPoint = b.points.last
+          } else
+            currentGroup = Seq.empty
+        }
+
+        val parsedShape = if (currentPoint == startPoint)
+          Seq(Shape(currentGroup))
+        else Seq.empty
+
+        Shape.groupBordersIntoShapes(remainingBorders, ss ++ parsedShape)
+    }
+  }
 }
