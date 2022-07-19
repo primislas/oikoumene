@@ -114,19 +114,16 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   }
 
   def provinceToSvg(shape: Shape, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
-    val polygon = shape.polygon.get
-    var elem = polygon
-      .provinceId
+    val provId = shape.provId
+    var elem = provId
       .map(classesOfProvince(_, mapMode))
       .map(defaultProvincePolygon(shape, precision).addClasses(_))
       .getOrElse(defaultProvincePolygon(shape, precision))
-    elem = polygon
-      .provinceId
+    elem = provId
       .map(buildProvTooltip)
       .map(elem.addTitle)
       .getOrElse(elem)
-    polygon
-      .provinceId
+    provId
       .map(setColor(_, mapMode, elem))
       .getOrElse(elem)
   }
@@ -434,7 +431,9 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .flatMapValues(_.state.owner)
 
     val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
-    Polygon.groupBordersIntoShapes(countryBorders)
+    Shape
+      .groupBordersIntoShapes(countryBorders)
+      .flatMap(_.withPolygon.polygon)
   }
 
   def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {

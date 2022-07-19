@@ -61,7 +61,7 @@ case class SchneidersFitter
 
       /* 5 iterations */
       val isFitted = (0 to 4)
-        .toStream
+        .to(LazyList)
         .map(_ => {
           val bezier = generateBezier(first, last, uPrime, tan1, tan2)
           /* Find max deviation of points to fitted curve */

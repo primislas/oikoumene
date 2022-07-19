@@ -53,8 +53,8 @@ object Tracer extends LazyLogging {
       if (enclosedByOuterGroup.keySet.contains(s.groupId.get)) {
         val innerBs = enclosedByOuterGroup.getOrElse(s.groupId.get, Seq.empty)
         val (singleBorderShapes, multiBorders) = innerBs.partition(_.isClosed)
-        val clips = singleBorderShapes.flatMap(b => Shape(Seq(b)).withPolygon.polygon) ++ Polygon.groupBordersIntoShapes(multiBorders)
         val clipShapes = singleBorderShapes.map(b => Shape(Seq(b))) ++ Shape.groupBordersIntoShapes(multiBorders)
+        val clips = singleBorderShapes.flatMap(b => Shape(Seq(b)).withPolygon.polygon) ++ clipShapes.flatMap(_.withPolygon.polygon)
         s.copy(clip = clips, clipShapes = clipShapes)
       } else s
     })

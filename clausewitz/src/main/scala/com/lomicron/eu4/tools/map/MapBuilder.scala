@@ -73,7 +73,7 @@ object MapBuilder extends LazyLogging {
 
     val settings = mapSettings
       .copy(
-        mapMode = MapModes.PROVINCE_SHAPES,
+        mapMode = MapModes.PROVINCE_OUTLINE,
         includeRivers = false,
         includeNames = false,
         decimalPrecision = 2,
@@ -115,7 +115,7 @@ object MapBuilder extends LazyLogging {
 
   def writeMap(mapSvg: String): Unit = {
     val mpDirPath = Paths.get(modsDir, "map_rendering")
-    val fname = "albers_provinces_europe_1.31.6.svg"
+    val fname = "ad_hoc.svg"
     FileIO.writeUTF(mpDirPath, fname, mapSvg)
     logger.info(s"Produced $fname")
   }

@@ -9,7 +9,7 @@ import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
-import com.lomicron.utils.geometry.{Border, Geometry, Point2D, Polygon, SchneidersFitter, Shape}
+import com.lomicron.utils.geometry._
 import com.lomicron.utils.projections.{AlbersEqualConicalProjection, BraunStereographicProjection}
 import com.typesafe.scalalogging.LazyLogging
 
@@ -54,34 +54,17 @@ object MapParser extends LazyLogging {
       .getOrElse(Seq.empty)
       .filter(_.borders.flatMap(_.points).exists(p => p.isBetween(topLeft, bottomRight)))
     val scaleCoef = 1.0
-//    val scaleCoef = 1.530
-//    val center = Point2D(2994, 1464)
-    val primeMeridian = 2994
-    val equator = 1464
-    val radius = 6400.0 / (2 * Math.PI)
-    shapes = shapes
-      .map(s => {
-        val spherical = BraunStereographicProjection.toSpherical(s, equator, primeMeridian, radius)
-        AlbersEqualConicalProjection.from(spherical, PI * 10 / 180, PI * 30 / 180, PI * 43  / 180, PI * 62  / 180)
-//
-//        val modifiedBorders = s.borders.map(b => {
-//          val bsps = BraunStereographicProjection.toSpherical(b, equator, primeMeridian, radius)
-//          val bps = AlbersEqualConicalProjection.from(bsps.points, equator, primeMeridian, PI * 43  / 180, PI * 62  / 180)
-////          val bps = Geometry.toAlbersEqualAreaConicProjection(bsps, radius)
-//          b.copy(points = bps)
-//        })
-//        val modifiedClips = s.clipShapes.map(p => {
-//          val bsps = BraunStereographicProjection.toSpherical(p, equator, primeMeridian, radius)
-//          val bps = AlbersEqualConicalProjection.from(bsps.points, equator, primeMeridian, PI * 43  / 180, PI * 62  / 180)
-//          p.copy(points = bps)
-//        })
-//        s.copy(borders = modifiedBorders, clip = modifiedClips)
-      })
-      .map(_.rotate(5.0 * Math.PI / 180))
-//      .map(_.scale(scaleCoef))
-      .map(_.withPolygon)
+//    val scaleCoef = 940.0 / 210
+//    val primeMeridian = 2994
+//    val equator = 1464
+//    val radius = 6400.0 / (2 * Math.PI)
+//    shapes = shapes
+//      .map(s => {
+//        val spherical = BraunStereographicProjection.toSpherical(s, equator, primeMeridian, radius)
+//        AlbersEqualConicalProjection.from(spherical, PI * 10 / 180, PI * 30 / 180, PI * 43  / 180, PI * 62  / 180)
+//      })
     val (x1, y1, x2, y2) = shapes
-      .foldLeft((6500.0 * scaleCoef, 0.0, 0.0, 2560.0 * scaleCoef))((acc, s) => {
+      .foldLeft((6500.0 , 0.0, 0.0, 2560.0))((acc, s) => {
         var (topX, topY, bottomX, bottomY) = acc
         s.borders.flatMap(_.points).foreach(p => {
           if (p.x <= topX) topX = p.x
@@ -91,8 +74,8 @@ object MapParser extends LazyLogging {
         })
         (topX, topY, bottomX, bottomY)
       })
-    val offset = Point2D(-x1, -y2)
-    shapes = shapes.map(_.offset(offset))
+//    val offset = Point2D(-x1, -y2)
+//    shapes = shapes.map(_.offset(offset))
 
     logger.info(s"Identified ${shapes.size} map shapes")
     val allBorders = shapes.flatMap(_.borders)
@@ -106,9 +89,17 @@ object MapParser extends LazyLogging {
 
 //    val width = provs.map(_.getWidth).getOrElse(0)
 //    val height = provs.map(_.getHeight).getOrElse(0)
-    val width = Math.ceil(x2 - x1).toInt
-    val height = Math.ceil(y1 - y2).toInt
-    val mercator = Map2DProjection(shapes, borders, rivers, width, height)
+    val width = Math.ceil((x2 - x1) * scaleCoef).toInt
+    val height = Math.ceil((y1 - y2) * scaleCoef).toInt
+    val mercator = Map2DProjection(
+//      shapes.map(_.scale(scaleCoef)),
+//      borders.map(_.scale(scaleCoef)),
+      shapes,
+      borders,
+      rivers,
+      width,
+      height
+    )
     g.map.updateMercator(mercator)
 
     logger.info("Calculating map routes...")

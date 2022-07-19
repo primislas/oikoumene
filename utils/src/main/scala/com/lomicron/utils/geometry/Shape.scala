@@ -62,8 +62,11 @@ case class Shape
   def scale(coef: Double): Shape = {
     val sbs = borders.map(_.scale(coef))
     val scs = clip.map(_.scale(coef))
+    val scss = clipShapes.map(_.scale(coef))
     val sp = polygon.map(_.scale(coef))
-    copy(borders = sbs, clip = scs, polygon = sp)
+    val ps = path.map(_.scale(coef))
+    val cps = clipPaths.map(_.map(_.scale(coef)))
+    copy(borders = sbs, clip = scs, clipShapes = scss, polygon = sp, path = ps, clipPaths = cps)
   }
 
   def isClipped: Boolean = clip.nonEmpty
@@ -103,4 +106,5 @@ object Shape {
         Shape.groupBordersIntoShapes(remainingBorders, ss ++ parsedShape)
     }
   }
+
 }

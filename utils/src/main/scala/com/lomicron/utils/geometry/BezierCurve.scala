@@ -17,6 +17,7 @@ case class BezierCurve
 ) extends TPath {
   override def points: Seq[Point2D] = Seq(p1, cp1, cp2, p2)
   override def reverse: BezierCurve = copy(p2, cp2, cp1, p1)
+  override def scale(coef: Double): TPath = BezierCurve(points.map(_ * coef))
   def toArray: Array[Point2D] = points.toArray
 }
 

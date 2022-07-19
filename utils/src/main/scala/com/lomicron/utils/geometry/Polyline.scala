@@ -10,6 +10,7 @@ import com.lomicron.utils.json.JsonMapper
 @JsonDeserialize(using = classOf[PolylineDeserializer])
 case class Polyline(points: Seq[Point2D] = Seq.empty) extends TPath {
   override def reverse: Polyline = copy(points.reverse)
+  override def scale(coef: Double): Polyline = Polyline(points.map(_ * coef))
 }
 
 class PolylineSerializer extends JsonSerializer[Polyline] {

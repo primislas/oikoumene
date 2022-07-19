@@ -43,8 +43,9 @@ case class Border
   def rotate(rotationCenter: Point2D, angle: Double): Border =
     copy(points = points.map(_.rotate(rotationCenter, angle)))
 
-  def scale(coef: Double): Border =
-    copy(points = points.map(_ * coef))
+  def scale(coef: Double): Border = {
+    copy(points = points.map(_ * coef), path = path.map(_.scale(coef)))
+  }
 
   override def hashCode(): Int = {
     val leftIsSmaller =

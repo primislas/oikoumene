@@ -137,10 +137,10 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       tag = SvgTags.PATH,
       id = shape.provId.map(_.toString),
     )
-    if (shape.clip.isEmpty) elem.copy(path = Svg.fromPolypath(shape.path, precision))
+    if (shape.clipShapes.isEmpty) elem.copy(path = Svg.fromPolypath(shape.path, precision))
     else {
       val outer = Svg.fromPolypath(shape.path)
-      val inners = shape.clip.map(_.path).map(Svg.fromPolypath(_, precision))
+      val inners = shape.clipShapes.flatMap(_.map(s => Svg.fromPolypath(s.path, precision)))
       val path = (outer +: inners).mkString(" ")
       elem.copy(path = path, fillRule = "evenodd")
     }
@@ -418,7 +418,9 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .mapValuesEx(_.id)
 
     val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
-    Polygon.groupBordersIntoShapes(countryBorders)
+    Shape
+      .groupBordersIntoShapes(countryBorders)
+      .flatMap(_.withPolygon.polygon)
   }
 
   def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {

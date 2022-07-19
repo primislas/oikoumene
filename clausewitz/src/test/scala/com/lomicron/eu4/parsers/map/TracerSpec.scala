@@ -1,12 +1,11 @@
 package com.lomicron.eu4.parsers.map
 
-import com.lomicron.eu4.service.map.SvgMapService
 import com.lomicron.utils.geometry.SchneidersFitter
 import com.lomicron.utils.svg.Svg
+import org.specs2.mutable.Specification
 
 import java.awt.Point
 import javax.imageio.ImageIO
-import org.specs2.mutable.Specification
 
 class TracerSpec extends Specification {
 
@@ -53,7 +52,7 @@ class TracerSpec extends Specification {
       val shapes = Tracer.trace(img)
       shapes.size mustEqual 3
       shapes.flatMap(_.borders).distinct.size mustEqual 4
-      shapes.flatMap(_.clip).size mustEqual 1
+      shapes.flatMap(_.clipShapes).size mustEqual 1
     }
 
     "- cut nested shapes in Alaska" >> {
@@ -63,7 +62,7 @@ class TracerSpec extends Specification {
       shapes.size mustEqual 66
       shapes.flatMap(_.borders).size mustEqual 160
       // TODO used to be 38, verify if 40 is correct
-      shapes.flatMap(_.clip).size mustEqual 40
+      shapes.flatMap(_.clipShapes).size mustEqual 40
     }
 
     "- correctly identify distinct borders" >> {
@@ -80,7 +79,7 @@ class TracerSpec extends Specification {
       val shapes = Tracer.trace(img)
       shapes.size mustEqual 4
       shapes.flatMap(_.borders).distinct.size mustEqual 7
-      shapes.head.clip.size mustEqual 1
+      shapes.head.clipShapes.size mustEqual 1
     }
 
     "- correctly identify one pixel border edges" >> {
@@ -169,12 +168,10 @@ class TracerSpec extends Specification {
       val shapes = Tracer.trace(img)
       val s2 = shapes.drop(2).head
       val ps = SchneidersFitter.fit(s2.polygon.map(_.points).getOrElse(Seq.empty))
-      val svg = Svg.fromPolypath(ps)
       shapes.size mustEqual 3
-      shapes.flatMap(_.borders).distinct.size mustEqual 7
-      shapes.head.clip.size mustEqual 1
+      shapes.flatMap(_.borders).distinct.size mustEqual 3
+      shapes.head.clipShapes.size mustEqual 2
       ps.size mustEqual 2
-      svg mustEqual ""
     }
 
   }

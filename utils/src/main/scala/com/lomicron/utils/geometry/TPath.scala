@@ -12,6 +12,7 @@ import com.typesafe.scalalogging.LazyLogging
 trait TPath {
   def points: Seq[Point2D]
   def reverse: TPath
+  def scale(coef: Double): TPath
 }
 
 object TPath {
