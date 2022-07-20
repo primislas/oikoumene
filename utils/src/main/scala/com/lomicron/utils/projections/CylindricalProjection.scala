@@ -23,7 +23,7 @@ trait CylindricalProjection {
     val bs = s.borders.map(toSpherical(_, equator, primeMeridian, radius))
     val clipShapes = s.clipShapes.map(toSpherical(_, equator, primeMeridian, radius))
 
-    SphericalShape(bs, s.provColor, s.provId, s.groupId, clipShapes)
+    SphericalShape(bs, s.provColor, s.provId, clipShapes)
   }
 
   def toSpherical

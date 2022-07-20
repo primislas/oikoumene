@@ -24,19 +24,19 @@ object Tracer extends LazyLogging {
     clipShapes(shapes)
   }
 
-  def traceShapes(labeledImage: LabeledImage): Seq[Shape] =
+  def traceShapes(labeledImage: LabeledImage): Seq[ShapeGroupId] =
     labeledImage
       .regions
       .par
       .map(group => {
         val startingPoint = new Point(group.x, group.y)
         val tracer = Tracer(labeledImage.img, startingPoint, labeledImage.labels)
-        tracer.trace().copy(groupId = group.id)
+        ShapeGroupId(group.id, tracer.trace())
       })
       .seq
 
-  def clipShapes(ss: Seq[Shape]): Seq[Shape] = {
-    val bs = ss.flatMap(_.borders)
+  def clipShapes(shapesWithId: Seq[ShapeGroupId]): Seq[Shape] = {
+    val bs = shapesWithId.map(_.shape).flatMap(_.borders)
     val bsByStartPoint = bs.groupBy(_.points.head)
 
     def hasNoAntiBorder(b: Border): Boolean =
@@ -49,9 +49,11 @@ object Tracer extends LazyLogging {
       .filter(hasNoAntiBorder)
       .groupBy(_.leftGroup.get)
 
-    ss.map(s => {
-      if (enclosedByOuterGroup.keySet.contains(s.groupId.get)) {
-        val innerBs = enclosedByOuterGroup.getOrElse(s.groupId.get, Seq.empty)
+    shapesWithId.map(shapeWithId => {
+      val s = shapeWithId.shape
+      val groupId = shapeWithId.groupId
+      if (enclosedByOuterGroup.keySet.contains(groupId)) {
+        val innerBs = enclosedByOuterGroup.getOrElse(groupId, Seq.empty)
         val (singleBorderInners, multiBorderInners) = innerBs.partition(_.isClosed)
         val singleBorderShapes = singleBorderInners.map(b => Shape(Seq(b)))
         val multiBorderShapes = Shape.groupBordersIntoShapes(multiBorderInners)
@@ -162,3 +164,5 @@ case class Tracer(img: BufferedImage, p: Point, labels: Array[Array[Int]], d: Di
   }
 
 }
+
+case class ShapeGroupId(groupId: Int, shape: Shape)

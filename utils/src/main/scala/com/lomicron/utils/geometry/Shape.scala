@@ -7,7 +7,6 @@ case class Shape
   borders: Seq[Border] = Seq.empty,
   provColor: Option[Int] = None,
   provId: Option[Int] = None,
-  groupId: Option[Int] = None,
   path: Polypath = Seq.empty,
   clipShapes: Seq[Shape] = Seq.empty,
 ) {

@@ -5,7 +5,6 @@ case class SphericalShape
   borders: Seq[SphericalBorder] = Seq.empty,
   provColor: Option[Int] = None,
   provId: Option[Int] = None,
-  groupId: Option[Int] = None,
   clipShapes: Seq[SphericalShape] = Seq.empty,
 ) {
 

@@ -1,7 +1,6 @@
 package com.lomicron.eu4.parsers.map
 
-import com.lomicron.utils.geometry.{Polygon, SchneidersFitter}
-import com.lomicron.utils.svg.Svg
+import com.lomicron.utils.geometry.SchneidersFitter
 import org.specs2.mutable.Specification
 
 import java.awt.Point

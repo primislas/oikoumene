@@ -27,7 +27,7 @@ object AlbersEqualConicalProjection {
   ): Shape = {
     val borders = shape.borders.map(from(_, longitudeOfCenter, latitudeOfCenter, standardParallel1, standardParallel2))
     val clips = shape.clipShapes.map(from(_, longitudeOfCenter, latitudeOfCenter, standardParallel1, standardParallel2))
-    Shape(borders, shape.provColor, shape.provId, shape.groupId, clipShapes = clips)
+    Shape(borders, shape.provColor, shape.provId, clipShapes = clips)
   }
 
   /**
