@@ -23,7 +23,7 @@ object MapParser extends LazyLogging {
     logger.info("Parsing map provinces...")
     val provs = r.getProvinceMap.map(gf => fetchMap(gf.path))
     logger.info("Calculating map shapes...")
-    var shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty).map(_.withPolygon)
+    var shapes = provs.map(parseProvinceShapes).getOrElse(Seq.empty)
     logger.info(s"Identified ${shapes.size} map shapes")
     val allBorders = shapes.flatMap(_.borders)
     logger.info(s"Identified ${allBorders.size} border segments")

@@ -168,7 +168,7 @@ object ClausewitzMapBuilder extends LazyLogging {
         parseProvinceShapes(inputFile, settings.mapSettings.withBorders)
       else
         (
-          mercator.provinces.flatMap(_.polygon).map(PolygonSvgJson(_)),
+          mercator.provinces.map(PolygonSvgJson(_)),
           mercator.borders.map(BorderSvgJson(_))
         )
       val (psid, bsid) = parseProvinceIds(r, ps, bs)
@@ -262,8 +262,8 @@ object ClausewitzMapBuilder extends LazyLogging {
     logger.info(s"Loading $inputFile...")
     val img = MapParser.fetchMap(inputFile)
     logger.info("Parsing provinces...")
-    val shapes = MapParser.parseProvinceShapes(img).map(_.withPolygon)
-    val ps = shapes.flatMap(_.polygon).map(PolygonSvgJson(_))
+    val shapes = MapParser.parseProvinceShapes(img)
+    val ps = shapes.map(PolygonSvgJson(_))
     logger.info(s"Identified ${ps.length} provinces shapes")
 
     val bs =

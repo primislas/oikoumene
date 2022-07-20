@@ -1,6 +1,6 @@
 package com.lomicron.eu4.parsers.map
 
-import com.lomicron.utils.geometry.SchneidersFitter
+import com.lomicron.utils.geometry.{Polygon, SchneidersFitter}
 import com.lomicron.utils.svg.Svg
 import org.specs2.mutable.Specification
 
@@ -166,12 +166,12 @@ class TracerSpec extends Specification {
       val url = getClass.getClassLoader.getResource(norwayTest).toURI.toURL
       val img = ImageIO.read(url)
       val shapes = Tracer.trace(img)
-      val s2 = shapes.drop(2).head
-      val ps = SchneidersFitter.fit(s2.polygon.map(_.points).getOrElse(Seq.empty))
+      val s2 = shapes.drop(2).headOption
+      val pathSegments = SchneidersFitter.fit(s2.map(_.toPolygon).map(_.points).getOrElse(Seq.empty))
       shapes.size mustEqual 3
       shapes.flatMap(_.borders).distinct.size mustEqual 3
       shapes.head.clipShapes.size mustEqual 2
-      ps.size mustEqual 2
+      pathSegments.size mustEqual 4
     }
 
   }

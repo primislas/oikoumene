@@ -2,7 +2,7 @@ package com.lomicron.eu4.tools.model.map
 
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.utils.geometry.Polygon
+import com.lomicron.utils.geometry.{Polygon, Shape}
 import com.lomicron.utils.svg.Svg
 
 case class PolygonSvgJson
@@ -14,12 +14,18 @@ case class PolygonSvgJson
   classes: Seq[String] = Seq.empty,
 ) {
   def setId(id: Int): PolygonSvgJson = copy(color = None, provId = id)
+
   def addClasses(cs: Seq[String]): PolygonSvgJson = copy(classes = classes ++ cs)
 }
 
 object PolygonSvgJson {
+
+  def apply(shape: Shape): PolygonSvgJson =
+    apply(shape.toPolygon)
+
   def apply(p: Polygon): PolygonSvgJson = {
     val path = Svg.pointsToSvgLinearPath(p.points)
     PolygonSvgJson(Color(p.color), p.provinceId, path, p.clip.map(PolygonSvgJson(_).copy(color = None)))
   }
+
 }

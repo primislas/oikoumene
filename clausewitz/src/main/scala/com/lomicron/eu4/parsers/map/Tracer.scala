@@ -52,10 +52,11 @@ object Tracer extends LazyLogging {
     ss.map(s => {
       if (enclosedByOuterGroup.keySet.contains(s.groupId.get)) {
         val innerBs = enclosedByOuterGroup.getOrElse(s.groupId.get, Seq.empty)
-        val (singleBorderShapes, multiBorders) = innerBs.partition(_.isClosed)
-        val clipShapes = singleBorderShapes.map(b => Shape(Seq(b))) ++ Shape.groupBordersIntoShapes(multiBorders)
-        val clips = singleBorderShapes.flatMap(b => Shape(Seq(b)).withPolygon.polygon) ++ clipShapes.flatMap(_.withPolygon.polygon)
-        s.copy(clip = clips, clipShapes = clipShapes)
+        val (singleBorderInners, multiBorderInners) = innerBs.partition(_.isClosed)
+        val singleBorderShapes = singleBorderInners.map(b => Shape(Seq(b)))
+        val multiBorderShapes = Shape.groupBordersIntoShapes(multiBorderInners)
+        val clipShapes = singleBorderShapes ++ multiBorderShapes
+        s.copy(clipShapes = clipShapes)
       } else s
     })
   }
@@ -85,13 +86,9 @@ case class Tracer(img: BufferedImage, p: Point, labels: Array[Array[Int]], d: Di
 
     val color = colorOf(p)
     val shifted = outline.last +: outline.dropRight(1)
-    val cleaned = Geometry.clean(shifted)
-    val bps = cleaned.map(_.withRight(color))
+    val bps = Geometry.clean(shifted).map(_.withRight(color))
     val bs = Border.ofBorderPoints(bps, group)
-    val outlinePs = outline.map(_.p)
-    val cleanedOutlinePs = Geometry.cleanSameLinePoints(outlinePs)
-    val poly = Polygon(cleanedOutlinePs, color)
-    Shape(borders = bs, provColor = color, polygon = poly)
+    Shape(borders = bs, provColor = color)
   }
 
   def next(): Seq[BorderPoint] = {

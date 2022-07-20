@@ -433,7 +433,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
     Shape
       .groupBordersIntoShapes(countryBorders)
-      .flatMap(_.withPolygon.polygon)
+      .map(_.toPolygon)
   }
 
   def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {

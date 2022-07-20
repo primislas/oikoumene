@@ -6,12 +6,13 @@ case class SphericalShape
   provColor: Option[Int] = None,
   provId: Option[Int] = None,
   groupId: Option[Int] = None,
-  polygon: Option[SphericalPolygon] = None,
-  clip: Seq[SphericalPolygon] = Seq.empty,
   clipShapes: Seq[SphericalShape] = Seq.empty,
 ) {
 
   def rotate(polarRot: Double, azimuthRot: Double): SphericalShape =
-    copy(polygon = polygon.map(_.rotate(polarRot, azimuthRot)))
+    copy(
+      borders = borders.map(_.rotate(polarRot, azimuthRot)),
+      clipShapes = clipShapes.map(_.rotate(polarRot, azimuthRot))
+    )
 
 }

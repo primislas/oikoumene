@@ -10,11 +10,9 @@ import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
 import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry._
-import com.lomicron.utils.projections.{AlbersEqualConicalProjection, BraunStereographicProjection}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.awt.image.{BufferedImage, IndexColorModel}
-import java.lang.Math.PI
 import java.nio.file.{Path, Paths}
 import javax.imageio.ImageIO
 import scala.Function.tupled
@@ -327,10 +325,13 @@ object MapParser extends LazyLogging {
 
   def fitProvinceCurves(p: Shape, bconfigs: Map[Border, Border]): Shape = {
     val path = p.borders.flatMap(getBorderPath(_, bconfigs))
-//    val clipPaths = p.clip
-//      .map(p => p.withPath(getPolygonPath(p, bconfigs))).filter(_.path.nonEmpty)
-    val clipPaths = p.clipShapes.map(s => s.borders.flatMap(getBorderPath(_, bconfigs)))
-    p.copy(path = path, clipPaths = clipPaths)
+    val clipPaths = p
+      .clipShapes
+      .map(s => {
+        val path = s.borders.flatMap(getBorderPath(_, bconfigs))
+        s.copy(path = path)
+      })
+    p.copy(path = path, clipShapes = clipPaths)
   }
 
   def getBorderPath(b: Border, bconfigs: Map[Border, Border]): Polypath = {
@@ -338,6 +339,7 @@ object MapParser extends LazyLogging {
     if (confPath.isEmpty) Seq.empty
     else if (confPath.head.points.head == b.points.head) {
       confPath
+      // TODO better test for reversing below is required
 //      if (confPath.head.points.drop(1).head == b.points.drop(1).head)
 //        confPath
 //      else
