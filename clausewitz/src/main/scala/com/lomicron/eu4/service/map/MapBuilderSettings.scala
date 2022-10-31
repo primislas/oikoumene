@@ -7,6 +7,7 @@ case class MapBuilderSettings
 (
   svg: Option[String] = None,
   mapMode: String = MapModes.POLITICAL,
+  outputFile: Option[String] = None,
   includeBorders: Option[Boolean] = None,
   includeNames: Option[Boolean] = None,
   includeRivers: Option[Boolean] = None,

@@ -44,13 +44,13 @@ object MapParser extends LazyLogging {
 
     logger.info("Calculating map shapes...")
 
-    val topLeft = Point2D(2550, 1200)
-    val bottomRight = Point2D(4400, 0)
+//    val topLeft = Point2D(2550, 1200)
+//    val bottomRight = Point2D(4400, 0)
 
     var shapes = provs
       .map(parseProvinceShapes)
       .getOrElse(Seq.empty)
-      .filter(_.borders.flatMap(_.points).exists(p => p.isBetween(topLeft, bottomRight)))
+//      .filter(_.borders.flatMap(_.points).exists(p => p.isBetween(topLeft, bottomRight)))
     val scaleCoef = 1.0
 //    val scaleCoef = 940.0 / 210
 //    val primeMeridian = 2994
@@ -62,7 +62,7 @@ object MapParser extends LazyLogging {
 //        AlbersEqualConicalProjection.from(spherical, PI * 10 / 180, PI * 30 / 180, PI * 43  / 180, PI * 62  / 180)
 //      })
     val (x1, y1, x2, y2) = shapes
-      .foldLeft((6500.0 , 0.0, 0.0, 2560.0))((acc, s) => {
+      .foldLeft((Double.PositiveInfinity , 0.0, 0.0, Double.PositiveInfinity))((acc, s) => {
         var (topX, topY, bottomX, bottomY) = acc
         s.borders.flatMap(_.points).foreach(p => {
           if (p.x <= topX) topX = p.x
@@ -72,8 +72,8 @@ object MapParser extends LazyLogging {
         })
         (topX, topY, bottomX, bottomY)
       })
-//    val offset = Point2D(-x1, -y2)
-//    shapes = shapes.map(_.offset(offset))
+    val offset = Point2D(-x1, -y2)
+    shapes = shapes.map(_.offset(offset))
 
     logger.info(s"Identified ${shapes.size} map shapes")
     val allBorders = shapes.flatMap(_.borders)
