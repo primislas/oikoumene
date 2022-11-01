@@ -51,6 +51,8 @@ trait RepositoryFactory {
 
   def buildings: BuildingRepository
 
+  def units: UnitRepository
+
   def geography: GeographicRepository
 
   def regions: RegionRepository

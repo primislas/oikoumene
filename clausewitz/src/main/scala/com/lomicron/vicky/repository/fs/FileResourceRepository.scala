@@ -53,6 +53,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
   val buildingsFile = "common/buildings.txt"
+  val unitsDir = "units"
 
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
@@ -323,6 +324,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getBuildings: Seq[GameFile] =
     readGameFile(buildingsFile).toSeq
+
+  override def getUnits: Seq[GameFile] =
+    readDir(unitsDir)
 
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {

@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.repository.api.GameFilesSettings
 import com.lomicron.vicky.repository.inmemory.InMemoryRepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.vicky.parsers.{BuildingParser, InventionParser, LocalisationParser}
+import com.lomicron.vicky.parsers.{BuildingParser, InventionParser, LocalisationParser, UnitParser}
 import com.lomicron.vicky.parsers.politics.TagParser
 import com.lomicron.vicky.repository.api.RepositoryFactory
 
@@ -34,14 +34,18 @@ object Nineteen extends LazyLogging {
     logger.info(s"Loaded ${les.size} localisation entries")
 
     val doEvalEntityFields = true
+    val dontEvalEntityFields = false
 
-    val buildings = BuildingParser(repos, doEvalEntityFields)
+    val buildings = BuildingParser(repos, dontEvalEntityFields)
     logger.info(s"Loaded ${buildings.size} buildings")
 
-    val inventions = InventionParser(repos, doEvalEntityFields)
+    val inventions = InventionParser(repos, dontEvalEntityFields)
     logger.info(s"Loaded ${inventions.size} inventions")
 
-    val tags = TagParser(repos, doEvalEntityFields)
+    val units = UnitParser(repos, doEvalEntityFields)
+    logger.info(s"Loaded ${units.size} units")
+
+    val tags = TagParser(repos, dontEvalEntityFields)
     logger.info(s"Loaded ${tags.size} tags")
 
 

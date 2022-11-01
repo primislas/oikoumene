@@ -43,6 +43,8 @@ trait ResourceRepository {
   def getProvinceHistory: Map[Int, GameFile]
   def getBuildings: Seq[GameFile]
 
+  def getUnits: Seq[GameFile]
+
   def getProvinceTypes: Option[GameFile]
   def getProvincePositions: Option[String]
   def getAreas: Option[String]

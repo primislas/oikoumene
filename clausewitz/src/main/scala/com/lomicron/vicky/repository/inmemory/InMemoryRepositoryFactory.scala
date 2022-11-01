@@ -17,7 +17,7 @@ import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepo
 import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
-import com.lomicron.vicky.repository.api.{BuildingRepository, RepositoryFactory, ResourceRepository, TechnologyRepository}
+import com.lomicron.vicky.repository.api.{BuildingRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, UnitRepository}
 import com.lomicron.vicky.repository.fs.FileResourceRepository
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
@@ -48,6 +48,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
   private val provinceRepo: ProvinceRepository = InMemoryProvinceRepository()
   private val buildingRepo: BuildingRepository = InMemoryBuildingRepository
+  private val unitRepo: UnitRepository = InMemoryUnitRepository
   private val geographyRepo: GeographicRepository = InMemoryGeographyRepository
   private val regionRepo: RegionRepository = InMemoryRegionRepository
   private val superregionRepo: SuperRegionRepository = InMemorySuperRegionRepository
@@ -77,6 +78,8 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
 
   override def provinces: ProvinceRepository = provinceRepo
   override def buildings: BuildingRepository = buildingRepo
+
+  override def units: UnitRepository = unitRepo
   override def geography: GeographicRepository = geographyRepo
   override def regions: RegionRepository = regionRepo
   override def superregions: SuperRegionRepository = superregionRepo
