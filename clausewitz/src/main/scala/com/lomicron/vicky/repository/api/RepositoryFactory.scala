@@ -63,6 +63,8 @@ trait RepositoryFactory {
 
   def tradeGoods: TradeGoodRepository
 
+  def productionTypes: ProductionTypeRepository
+
   def tradeNodes: TradeNodeRepository
 
   def centersOfTrade: CenterOfTradeRepository

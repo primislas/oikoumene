@@ -4,11 +4,11 @@ import com.lomicron.oikoumene.repository.api.GameFilesSettings
 import com.lomicron.vicky.repository.inmemory.InMemoryRepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
 import com.lomicron.utils.collection.CollectionUtils.toOption
-import com.lomicron.vicky.parsers.{BuildingParser, InventionParser, LocalisationParser, PopTypeParser, TradeGoodParser, UnitParser}
+import com.lomicron.vicky.parsers.{BuildingParser, InventionParser, LocalisationParser, PopTypeParser, ProductionTypeParser, TradeGoodParser, UnitParser}
 import com.lomicron.vicky.parsers.politics.TagParser
 import com.lomicron.vicky.repository.api.RepositoryFactory
 
-object Nineteen extends LazyLogging {
+object AgeOfIndustry extends LazyLogging {
 
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
@@ -38,6 +38,9 @@ object Nineteen extends LazyLogging {
 
     val tradeGoods = TradeGoodParser(repos, dontEvalEntityFields)
     logger.info(s"Loaded ${tradeGoods.size} buildings")
+
+    val productionTypes = ProductionTypeParser(repos, doEvalEntityFields)
+    logger.info(s"Loaded ${productionTypes.size} production types")
 
     val buildings = BuildingParser(repos, dontEvalEntityFields)
     logger.info(s"Loaded ${buildings.size} buildings")

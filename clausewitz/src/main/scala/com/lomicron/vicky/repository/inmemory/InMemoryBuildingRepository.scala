@@ -1,7 +1,7 @@
 package com.lomicron.vicky.repository.inmemory
 
 import com.lomicron.oikoumene.repository.inmemory.InMemoryEntityRepository
-import com.lomicron.vicky.model.Building
+import com.lomicron.vicky.model.production.Building
 import com.lomicron.vicky.repository.api.BuildingRepository
 
 object InMemoryBuildingRepository

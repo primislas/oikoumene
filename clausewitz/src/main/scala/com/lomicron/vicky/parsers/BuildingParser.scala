@@ -2,7 +2,7 @@ package com.lomicron.vicky.parsers
 
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
-import com.lomicron.vicky.model.Building
+import com.lomicron.vicky.model.production.Building
 import com.lomicron.vicky.repository.api.{BuildingRepository, RepositoryFactory, ResourceRepository}
 import com.typesafe.scalalogging.LazyLogging
 

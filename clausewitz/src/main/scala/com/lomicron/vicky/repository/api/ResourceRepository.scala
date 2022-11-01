@@ -78,6 +78,7 @@ trait ResourceRepository {
   def getStateEdicts: Seq[GameFile]
 
   def getTradeGoods: Seq[GameFile]
+  def getProductionTypes: Seq[GameFile]
   def getPrices: Seq[GameFile]
   def getTradeNodes: Seq[GameFile]
   def getCentersOfTrade: Seq[GameFile]

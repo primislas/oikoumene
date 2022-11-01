@@ -17,7 +17,7 @@ import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepo
 import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
-import com.lomicron.vicky.repository.api.{BuildingRepository, PopTypeRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, TradeGoodRepository, UnitRepository}
+import com.lomicron.vicky.repository.api.{BuildingRepository, PopTypeRepository, ProductionTypeRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, TradeGoodRepository, UnitRepository}
 import com.lomicron.vicky.repository.fs.FileResourceRepository
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
@@ -55,6 +55,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val superregionRepo: SuperRegionRepository = InMemorySuperRegionRepository
 
   private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository
+  private val productionTypeRepository: ProductionTypeRepository = InMemoryProductionTypeRepository
   private val tradeNodeRepository: TradeNodeRepository = InMemoryTradeNodeRepository()
   private val centerOfTradeRepository: CenterOfTradeRepository = InMemoryCenterOfTradeRepository()
 
@@ -94,6 +95,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   override def warGoalTypes: WarGoalTypeRepository = warGoalTypesRepo
 
   override def tradeGoods: TradeGoodRepository = tradeGoodRepository
+  override def productionTypes: ProductionTypeRepository = productionTypeRepository
   override def tradeNodes: TradeNodeRepository = tradeNodeRepository
   override def centersOfTrade: CenterOfTradeRepository = centerOfTradeRepository
 

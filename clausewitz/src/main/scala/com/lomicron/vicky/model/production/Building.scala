@@ -1,4 +1,4 @@
-package com.lomicron.vicky.model
+package com.lomicron.vicky.model.production
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.lomicron.oikoumene.model.Entity
