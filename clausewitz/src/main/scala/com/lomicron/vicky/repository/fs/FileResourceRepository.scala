@@ -1,11 +1,12 @@
-package com.lomicron.oikoumene.repository.fs
+package com.lomicron.vicky.repository.fs
 
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.oikoumene.parsers.politics.TagFileConf
 import com.lomicron.oikoumene.repository.api.GameFilesSettings
-import com.lomicron.oikoumene.repository.api.resources.{GameFile, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.io.IO
+import com.lomicron.vicky.repository.api.ResourceRepository
 
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -18,7 +19,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   val localisationDir = "localisation"
 
-  val countryTagsDir = "common/country_tags"
+  val countriesConfFile = "common/countries.txt"
   val countriesDir = "common/countries"
   val countryHistoryDir = "history/countries"
   val rulerPersonalitiesDir = "common/ruler_personalities"
@@ -33,6 +34,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val governmentReformsDir = "common/government_reforms"
   val technologyDir = "common/technologies"
   val techGroupFile = "common/technology.txt"
+  val inventionsDir = "inventions"
   val ideasDir = "common/ideas"
   val policiesDir = "common/policies"
   val stateEdictsDir = "common/state_edicts"
@@ -50,7 +52,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val climateFile = "map/climate.txt"
   val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
-  val buildingsDir = "common/buildings"
+  val buildingsFile = "common/buildings.txt"
 
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
@@ -69,11 +71,16 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val eventModifiersDir = "common/event_modifiers"
   val staticModifiersDir = "common/static_modifiers"
 
+  val localisationPattern: Regex =
+    "^\\s*(?<key>\\w+);(?<text>[^;]*);.*".r
+
   private def readFile(path: String): String =
     IO.readTextFile(path, StandardCharsets.ISO_8859_1)
 
   def readGameFile(gf: GameFile): GameFile = {
     val path = pathOf(gf)
+    if (path.endsWith("true"))
+      println()
     val content = readFile(path)
     gf.withContent(content)
   }
@@ -91,7 +98,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   }
 
   override def getCountryTags: Seq[GameFile] =
-    readDir(countryTagsDir)
+    readGameFile(countriesConfFile).toSeq
 
   override def getCountries(filesByTags: Map[String, GameFile]): Map[String, GameFile] =
     filesByTags
@@ -231,12 +238,17 @@ case class FileResourceRepository(settings: GameFilesSettings)
       .getOrElse(Seq.empty)
       .par
       .map(_.toString)
-      .filter(_.matches(s".*_l_$language\\.yml$$"))
-      .map(IO.readTextFile(_, StandardCharsets.UTF_8))
+      .map(IO.readTextFile(_, StandardCharsets.ISO_8859_1))
       .flatMap(_.linesIterator)
-      .flatMap(LocalisationEntry.fromString)
+      .flatMap(parseLocalisation)
       .seq
   }
+
+  def parseLocalisation(line: String): Option[LocalisationEntry] =
+    line match {
+      case localisationPattern(key, text) => Some(LocalisationEntry(key, 1, text))
+      case _ => None
+    }
 
   def readFilesAndSubdirFilesFromDir(gf: GameFile): Seq[File] =
     gf.path.map(readFilesAndSubdirFilesFromDir).getOrElse(Seq.empty)
@@ -310,7 +322,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
     getProvinceHistoryResources.mapValuesEx(readGameFile)
 
   override def getBuildings: Seq[GameFile] =
-    readDir(buildingsDir)
+    readGameFile(buildingsFile).toSeq
 
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {
@@ -341,6 +353,10 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getTechGroupConfig: Option[String] =
     readGameFileContent(techGroupFile)
+
+
+  override def getInventions: Seq[GameFile] =
+    readDir(inventionsDir)
 
   override def getIdeas: Seq[GameFile] =
     readDir(ideasDir)

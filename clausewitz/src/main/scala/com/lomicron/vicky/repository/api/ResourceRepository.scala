@@ -1,7 +1,8 @@
-package com.lomicron.oikoumene.repository.api.resources
+package com.lomicron.vicky.repository.api
 
 import com.lomicron.oikoumene.model.localisation.LocalisationEntry
 import com.lomicron.oikoumene.parsers.politics.TagFileConf
+import com.lomicron.oikoumene.repository.api.resources.GameFile
 
 trait ResourceRepository {
 
@@ -67,6 +68,7 @@ trait ResourceRepository {
   def getGovernmentReforms: Seq[GameFile]
   def getTechnologies: Seq[GameFile]
   def getTechGroupConfig: Option[String]
+  def getInventions: Seq[GameFile]
   def getIdeas: Seq[GameFile]
   def getPolicies: Seq[GameFile]
   def getStateEdicts: Seq[GameFile]

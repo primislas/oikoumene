@@ -1,15 +1,16 @@
-package com.lomicron.oikoumene.parsers.politics
+package com.lomicron.vicky.parsers.politics
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.parsers.ClausewitzParser.{Fields, parse}
+import com.lomicron.oikoumene.parsers.politics.TagFileConf
 import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
-import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.oikoumene.repository.api.politics.TagRepository
-import com.lomicron.oikoumene.repository.api.resources.{GameFile, LocalisationRepository, ResourceRepository}
+import com.lomicron.oikoumene.repository.api.resources.{GameFile, LocalisationRepository}
 import com.lomicron.utils.collection.CollectionUtils._
 import com.lomicron.utils.json.JsonMapper
-import com.lomicron.utils.json.JsonMapper.{ArrayNodeEx, JsonNodeEx, ObjectNodeEx, textNode}
+import com.lomicron.utils.json.JsonMapper.{JsonNodeEx, ObjectNodeEx, textNode}
+import com.lomicron.vicky.repository.api.{RepositoryFactory, ResourceRepository}
 import com.typesafe.scalalogging.LazyLogging
 
 import java.nio.file.Paths
@@ -50,7 +51,7 @@ object TagParser extends LazyLogging {
     files
       .getCountryTags
       .flatMap(fc => fc.content.map(ClausewitzParser.parse).map(_._1))
-      .flatMap(obj => obj.fields.toStream.map(e => (e.getKey, e.getValue.asText)))
+      .flatMap(obj => obj.fields.toStream.filter(_.getValue.isTextual).map(e => (e.getKey, e.getValue.asText)))
       .map(kv => (kv._1, historyGameFile(kv._2)))
       .foldLeft(TreeMap[String, GameFile]())(_ + _)
 
@@ -105,22 +106,12 @@ object TagParser extends LazyLogging {
   }
 
   def printClassDefinitions(tags: Seq[ObjectNode]): Unit = {
-    val tagEvents = tags.flatMap(_.getArray("history")).flatMap(_.toSeq).flatMap(_.asObject)
-    val monarchs = tagEvents.flatMap(_.getObject("monarch"))
-    val queens = tagEvents.flatMap(_.getObject("queen"))
-    val heirs = tagEvents.flatMap(_.getObject("heir"))
-    val leaders = tagEvents.flatMap(_.getObject("leader"))
-    val countryModifiers = tagEvents.flatMap(_.getObject("add_country_modifier"))
-    val rulerModifiers = tagEvents.flatMap(_.getObject("add_ruler_modifier"))
-    val priceModifiers = tagEvents.flatMap(_.getObject("change_price"))
+    val histories = tags.flatMap(_.getSeq("history")).flatMap(_.asObject)
+    val tagEvents = histories.flatMap(_.getObject("init"))
+      .concat(histories.flatMap(_.getSeq("events")).flatMap(_.asObject))
+    val parties = tags.flatMap(_.getSeq("party")).flatMap(_.asObject)
     ConfigField.printCaseClass("TagUpdate", tagEvents)
-    ConfigField.printCaseClass("Monarch", monarchs)
-    ConfigField.printCaseClass("Queen", queens)
-    ConfigField.printCaseClass("Heir", heirs)
-    ConfigField.printCaseClass("Leader", leaders)
-    ConfigField.printCaseClass("CountryModifier", countryModifiers)
-    ConfigField.printCaseClass("RulerModifier", rulerModifiers)
-    ConfigField.printCaseClass("PriceModifier", priceModifiers)
+    ConfigField.printCaseClass("Party", parties)
     ConfigField.printCaseClass("Tag", tags)
   }
 

@@ -6,6 +6,7 @@ import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, 
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.jdk.javaapi.CollectionConverters
 import scala.util.matching.Regex
 
 object GeographyParser extends LazyLogging {
@@ -43,6 +44,7 @@ object GeographyParser extends LazyLogging {
     val as = files
       .getAdjacencies
       .map(_.lines.toList)
+      .map(CollectionConverters.asScala(_).toSeq)
       .getOrElse(Seq.empty)
       .flatMap(parseAdjacency)
     map.updateAdjacencies(as)

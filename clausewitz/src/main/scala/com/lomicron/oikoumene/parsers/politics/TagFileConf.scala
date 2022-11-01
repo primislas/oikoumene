@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers.politics
 import com.lomicron.oikoumene.model.localisation.Localisation
 import com.lomicron.oikoumene.repository.api.resources.GameFile
 
-case class TagConf
+case class TagFileConf
 (
   tag: String,
   country: Option[GameFile] = None,
