@@ -8,16 +8,16 @@ import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, Province
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
-import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
+import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.repository.inmemory.InMemoryLocalisationRepository
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
 import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository, InMemoryPolicyRepository, InMemoryStateEdictRepository, InMemoryTechGroupRepository}
 import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryGeographyRepository, InMemoryProvinceRepository, InMemoryRegionRepository, InMemorySuperRegionRepository}
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
-import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeGoodRepository, InMemoryTradeNodeRepository}
+import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
-import com.lomicron.vicky.repository.api.{BuildingRepository, PopTypeRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, UnitRepository}
+import com.lomicron.vicky.repository.api.{BuildingRepository, PopTypeRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, TradeGoodRepository, UnitRepository}
 import com.lomicron.vicky.repository.fs.FileResourceRepository
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
@@ -54,7 +54,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val regionRepo: RegionRepository = InMemoryRegionRepository
   private val superregionRepo: SuperRegionRepository = InMemorySuperRegionRepository
 
-  private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository()
+  private val tradeGoodRepository: TradeGoodRepository = InMemoryTradeGoodRepository
   private val tradeNodeRepository: TradeNodeRepository = InMemoryTradeNodeRepository()
   private val centerOfTradeRepository: CenterOfTradeRepository = InMemoryCenterOfTradeRepository()
 

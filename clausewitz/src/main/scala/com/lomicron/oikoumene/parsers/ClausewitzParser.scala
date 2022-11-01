@@ -14,6 +14,7 @@ import com.lomicron.utils.parsing.tokenizer.{Date, Tokenizer}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.annotation.tailrec
+import scala.util.matching.Regex
 
 object ClausewitzParser extends LazyLogging {
 
@@ -46,6 +47,9 @@ object ClausewitzParser extends LazyLogging {
     val allow = "allow"
     val aiWillDo = "ai_will_do"
   }
+
+  val fileNamePattern: Regex =
+    "(?:.*[\\\\/])?(?<fileName>[^.\\\\/]*)\\.\\w+".r
 
   val empty: (ObjectNode, Seq[ParsingError]) =
     (JsonParser.objectNode, Seq.empty)
@@ -151,7 +155,18 @@ object ClausewitzParser extends LazyLogging {
     parseFiles(filesByName, o => Seq(o))
 
   def parseFilesAsEntities(files: Seq[GameFile]): Seq[ObjectNode] =
-    files.flatMap(parseFile)
+    files
+      .flatMap(parseFile)
+      .map(pf =>
+        pf
+          .getString(Fields.sourceFile)
+          .map {
+            case fileNamePattern(fname) => fname
+            case fname => fname
+          }
+          .map(pf.setEx(Fields.idKey, _))
+          .getOrElse(pf)
+      )
 
   def parseFileFieldsAsEntities(files: Seq[GameFile]): Seq[ObjectNode] =
     files.flatMap(parseFileFieldsAsEntities)

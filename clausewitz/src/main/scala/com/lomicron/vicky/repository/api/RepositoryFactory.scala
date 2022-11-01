@@ -8,7 +8,7 @@ import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, Province
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
-import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeGoodRepository, TradeNodeRepository}
+import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, TradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
 
 trait RepositoryFactory {

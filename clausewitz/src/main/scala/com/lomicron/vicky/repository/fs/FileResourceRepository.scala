@@ -65,7 +65,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val culturesFile = "common/cultures/00_cultures.txt"
   val religionsDir = "common/religions"
 
-  val tradeGoodsDir = "common/tradegoods"
+  val tradeGoodsFile = "common/goods.txt"
   val pricesDir = "common/prices"
   val tradeNodesDir = "common/tradenodes"
   val centersOfTradeDir = "common/centers_of_trade"
@@ -376,7 +376,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
     readDir(stateEdictsDir)
 
   override def getTradeGoods: Seq[GameFile] =
-    readDir(tradeGoodsDir)
+    readGameFile(tradeGoodsFile).toSeq
 
   override def getPrices: Seq[GameFile] =
     readDir(pricesDir)
