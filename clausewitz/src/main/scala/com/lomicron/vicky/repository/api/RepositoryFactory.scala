@@ -53,6 +53,8 @@ trait RepositoryFactory {
 
   def units: UnitRepository
 
+  def popTypes: PopTypeRepository
+
   def geography: GeographicRepository
 
   def regions: RegionRepository

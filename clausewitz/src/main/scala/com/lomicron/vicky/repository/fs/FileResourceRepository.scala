@@ -54,6 +54,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val provinceHistoryDir = "history/provinces"
   val buildingsFile = "common/buildings.txt"
   val unitsDir = "units"
+  val popTypesDir = "poptypes"
 
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
@@ -327,6 +328,9 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   override def getUnits: Seq[GameFile] =
     readDir(unitsDir)
+
+  override def getPopTypes: Seq[GameFile] =
+    readDir(popTypesDir)
 
   private def idFromProvHistFileName(filename: String): Option[Int] =
     filename match {

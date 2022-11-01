@@ -45,6 +45,8 @@ trait ResourceRepository {
 
   def getUnits: Seq[GameFile]
 
+  def getPopTypes: Seq[GameFile]
+
   def getProvinceTypes: Option[GameFile]
   def getProvincePositions: Option[String]
   def getAreas: Option[String]
