@@ -1,0 +1,28 @@
+package com.lomicron.vicky.parsers.map
+
+import com.lomicron.oikoumene.model.provinces.ProvinceTypes
+import com.lomicron.oikoumene.parsers.{ClausewitzParser, ConfigField}
+import com.lomicron.vicky.repository.api.{GeographicRepository, RepositoryFactory, ResourceRepository}
+
+object ProvinceTypeParser {
+
+  def apply(repos: RepositoryFactory,
+            evalEntityFields: Boolean = false)
+  : GeographicRepository = apply(repos.resources, repos.geography, evalEntityFields)
+
+  def apply
+  (files: ResourceRepository,
+   geography: GeographicRepository,
+   evalEntityFields: Boolean): GeographicRepository = {
+
+    val provinceTypes = files.getProvinceTypes.toSeq // default.map
+    val types = ClausewitzParser.parseFilesAsEntities(provinceTypes)
+
+    if (evalEntityFields)
+      ConfigField.printCaseClass("ProvinceTypes", types)
+
+    val parsedTypes = types.headOption.map(ProvinceTypes.fromJson).getOrElse(ProvinceTypes.empty)
+    geography.provinceTypes(parsedTypes)
+  }
+
+}

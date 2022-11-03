@@ -52,6 +52,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
   val climateFile = "map/climate.txt"
   val elevatedLakesDir = "map/lakes"
   val provinceHistoryDir = "history/provinces"
+  val popHistoryDir = "history/pops/1836.1.1"
   val buildingsFile = "common/buildings.txt"
   val unitsDir = "units"
   val popTypesDir = "poptypes"
@@ -169,6 +170,13 @@ case class FileResourceRepository(settings: GameFilesSettings)
     val relDir = relDirPath.toString
     settings.modDir.map(Paths.get(_, mod, relPath)).filter(Files.exists(_)).map(p => GameFile.of(p, relDir, mod))
   }
+
+  private def relativePathOf(path: String) =
+    settings.gameDir
+      .map(gd => path.replace(gd, ""))
+      .orElse(settings.modDir.map(md => path.replace(md, "")))
+      .map(_.drop(1))
+      .getOrElse(path)
 
   private def filePath(relPath: String): GameFile =
     fromMod(relPath).getOrElse(baseGame(relPath))
@@ -317,12 +325,19 @@ case class FileResourceRepository(settings: GameFilesSettings)
   def getProvinceHistoryResources: Map[Int, GameFile] =
     dirFiles(provinceHistoryDir)
       .reverse
+      .flatMap(readFilesAndSubdirFilesFromDir)
+      .map(_.toString)
+      .map(relativePathOf)
+      .flatMap(readGameFile)
       .flatMap(gf => idFromProvHistFileName(gf.name).map(id => id -> gf))
       .distinctBy(_._1)
       .toMap
 
   override def getProvinceHistory: Map[Int, GameFile] =
     getProvinceHistoryResources.mapValuesEx(readGameFile)
+
+  override def getPopHistory: Seq[GameFile] =
+    readDir(popHistoryDir)
 
   override def getBuildings: Seq[GameFile] =
     readGameFile(buildingsFile).toSeq

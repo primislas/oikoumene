@@ -41,6 +41,7 @@ trait ResourceRepository {
   def getAdjacencies: Option[String]
   def getProvinceHistoryResources: Map[Int, GameFile]
   def getProvinceHistory: Map[Int, GameFile]
+  def getPopHistory: Seq[GameFile]
   def getBuildings: Seq[GameFile]
 
   def getUnits: Seq[GameFile]

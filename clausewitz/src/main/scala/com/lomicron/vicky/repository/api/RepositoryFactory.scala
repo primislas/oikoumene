@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.repository.api.GameFilesSettings
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government.{GovernmentReformRepository, GovernmentRepository, IdeaGroupRepository, PolicyRepository, StateEdictRepository}
-import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, ProvinceRepository, RegionRepository, SuperRegionRepository}
+import com.lomicron.oikoumene.repository.api.map.{RegionRepository, SuperRegionRepository}
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics.{CultureRepository, ReligionRepository, RulerPersonalityRepository, TagRepository}
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository

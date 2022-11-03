@@ -30,7 +30,12 @@ case class RiverSegment
     }
   }
 
-  def offset(diff: Point2D): RiverSegment = copy(points = points.map(_.offset(diff)))
+  def offset(diff: Point2D): RiverSegment =
+    copy(points = points.map(_.offset(diff)))
+
+  def reflectY(height: Double): RiverSegment =
+    copy(points = points.map(_.reflectY(height)))
+      .copy(path = path.map(_.reflectY(height)))
 
   @scala.annotation.tailrec
   private def recSmooth(p: Point2D, d: Direction, ps: Seq[Point2D], smoothed: Seq[Point2D]): Seq[Point2D] = {

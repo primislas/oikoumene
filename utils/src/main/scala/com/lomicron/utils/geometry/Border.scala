@@ -38,6 +38,8 @@ case class Border
 
   def offset(diff: Point2D): Border = copy(points = points.map(_.offset(diff)))
 
+  def reflectY(height: Double): Border = copy(points = points.map(_.reflectY(height)))
+
   override def hashCode(): Int = {
     val leftIsSmaller =
       if (left.isEmpty) true

@@ -46,6 +46,7 @@ object ClausewitzParser extends LazyLogging {
     val potential = "potential"
     val allow = "allow"
     val aiWillDo = "ai_will_do"
+    val pops = "pops"
   }
 
   val fileNamePattern: Regex =

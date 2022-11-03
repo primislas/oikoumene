@@ -29,4 +29,7 @@ extends Emptiable
 
   def offset(diff: Point2D): River = copy(path = path.map(_.offset(diff)))
 
+  def reflectY(height: Double): River =
+    copy(path = path.map(_.reflectY(height)))
+
 }

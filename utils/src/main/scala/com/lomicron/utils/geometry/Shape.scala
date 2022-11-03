@@ -47,6 +47,13 @@ case class Shape
     copy(borders = obs, polygon = op)
   }
 
+  def reflectY(height: Double): Shape = {
+    val bs = borders.map(_.reflectY(height))
+    val p = polygon.map(_.reflectY(height))
+    val cs = clip.map(_.reflectY(height))
+    copy(borders = bs, polygon = p, clip = cs)
+  }
+
   def isClipped: Boolean = clip.nonEmpty
 
 }

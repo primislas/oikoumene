@@ -4,7 +4,7 @@ import com.lomicron.oikoumene.repository.api.GameFilesSettings
 import com.lomicron.oikoumene.repository.api.diplomacy.{CasusBelliRepository, DiplomacyRepository, WarGoalTypeRepository, WarHistoryRepository}
 import com.lomicron.oikoumene.repository.api.gfx.GFXRepository
 import com.lomicron.oikoumene.repository.api.government._
-import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, ProvinceRepository, RegionRepository, SuperRegionRepository}
+import com.lomicron.oikoumene.repository.api.map.{RegionRepository, SuperRegionRepository}
 import com.lomicron.oikoumene.repository.api.modifiers.ModifierRepository
 import com.lomicron.oikoumene.repository.api.politics._
 import com.lomicron.oikoumene.repository.api.resources.LocalisationRepository
@@ -12,12 +12,12 @@ import com.lomicron.oikoumene.repository.api.trade.{CenterOfTradeRepository, Tra
 import com.lomicron.oikoumene.repository.inmemory.InMemoryLocalisationRepository
 import com.lomicron.oikoumene.repository.inmemory.diplomacy.{InMemoryCasusBelliRepository, InMemoryDiplomacyRepository, InMemoryWarGoalTypeRepository, InMemoryWarRepository}
 import com.lomicron.oikoumene.repository.inmemory.government.{InMemoryGovernmentReformRepository, InMemoryGovernmentRepository, InMemoryIdeaGroupRepository, InMemoryPolicyRepository, InMemoryStateEdictRepository, InMemoryTechGroupRepository}
-import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryGeographyRepository, InMemoryProvinceRepository, InMemoryRegionRepository, InMemorySuperRegionRepository}
+import com.lomicron.oikoumene.repository.inmemory.map.{InMemoryRegionRepository, InMemorySuperRegionRepository}
 import com.lomicron.oikoumene.repository.inmemory.modifiers.InMemoryModifierRepository
 import com.lomicron.oikoumene.repository.inmemory.politics._
 import com.lomicron.oikoumene.repository.inmemory.trade.{InMemoryCenterOfTradeRepository, InMemoryTradeNodeRepository}
 import com.lomicron.oikoumene.writers.WriterFactory
-import com.lomicron.vicky.repository.api.{BuildingRepository, PopTypeRepository, ProductionTypeRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, TradeGoodRepository, UnitRepository}
+import com.lomicron.vicky.repository.api.{BuildingRepository, GeographicRepository, PopTypeRepository, ProductionTypeRepository, ProvinceRepository, RepositoryFactory, ResourceRepository, TechnologyRepository, TradeGoodRepository, UnitRepository}
 import com.lomicron.vicky.repository.fs.FileResourceRepository
 
 case class InMemoryRepositoryFactory(settings: GameFilesSettings)
@@ -46,7 +46,7 @@ case class InMemoryRepositoryFactory(settings: GameFilesSettings)
   private val warGoalTypesRepo: WarGoalTypeRepository = InMemoryWarGoalTypeRepository()
   private val cbTypesRepo: CasusBelliRepository = InMemoryCasusBelliRepository()
 
-  private val provinceRepo: ProvinceRepository = InMemoryProvinceRepository()
+  private val provinceRepo: ProvinceRepository = InMemoryProvinceRepository
   private val buildingRepo: BuildingRepository = InMemoryBuildingRepository
   private val unitRepo: UnitRepository = InMemoryUnitRepository
   private val popTypeRepo: PopTypeRepository = InMemoryPopTypeRepository
