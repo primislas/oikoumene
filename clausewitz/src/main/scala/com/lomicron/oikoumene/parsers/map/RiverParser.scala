@@ -2,19 +2,20 @@ package com.lomicron.oikoumene.parsers.map
 
 import java.awt.Point
 import java.awt.image.BufferedImage
-
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map.{River, RiverSegment}
 import com.lomicron.oikoumene.parsers.map.MapParser.getRGB
 import com.lomicron.utils.geometry.Point2D
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.collection.immutable.ListSet
+
 object RiverParser {
 
   import RiverTypes._
 
-  val riverColors = Set(SOURCE, FLOW_IN, FLOW_OUT, NARROWEST, NARROW, WIDE, WIDEST)
-  val waterColors = Set(NARROWEST, NARROW, WIDE, WIDEST)
+  val riverColors = Set(SOURCE, FLOW_IN, FLOW_OUT) ++ RIVER
+  val waterColors = RIVER
   val edgeColors = Set(SOURCE, FLOW_IN, FLOW_OUT)
   val nonRiverColors = Set(LAND, SEA)
 
@@ -168,9 +169,16 @@ object RiverTypes {
   val FLOW_IN: Int = Color(255, 0, 0).toInt
   val FLOW_OUT: Int = Color(255, 252).toInt
   val NARROWEST: Int = Color(0, 225, 255).toInt
-  val NARROW: Int = Color(0, 200, 255).toInt
-  val WIDE: Int = Color(0, 100, 255).toInt
-  val WIDEST: Int = Color(0, 0, 200).toInt
+
+  val RIVER: ListSet[Int] = ListSet(
+    Color(0, 250, 255).toInt,
+    Color(0, 200, 255).toInt,
+    Color(0, 100, 255).toInt,
+    Color(0, 0, 255).toInt,
+    Color(0, 0, 150).toInt,
+    Color(0, 0, 100).toInt,
+  )
+
   val SEA: Int = Color(122, 122, 122).toInt
   val LAND: Int = Color(255, 255, 255).toInt
   val END: Int = Color().toInt
@@ -179,10 +187,7 @@ object RiverTypes {
     case SOURCE => Some(SOURCE)
     case FLOW_IN => Some(FLOW_IN)
     case FLOW_OUT => Some(FLOW_OUT)
-    case NARROWEST => Some(NARROWEST)
-    case NARROW => Some(NARROW)
-    case WIDE => Some(WIDE)
-    case WIDEST => Some(WIDEST)
+    case r if RIVER.contains(r) => Some(r)
     case _ => None
   }
 

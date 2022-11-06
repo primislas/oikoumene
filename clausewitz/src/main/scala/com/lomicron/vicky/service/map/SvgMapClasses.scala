@@ -5,6 +5,8 @@ import com.lomicron.oikoumene.model.provinces.ProvinceTypes
 import com.lomicron.oikoumene.parsers.map.RiverTypes
 import com.lomicron.vicky.model.province.Province
 
+import scala.math.BigDecimal.RoundingMode
+
 object SvgMapClasses {
   val PROVINCE_GROUP = "province-group"
   val PROVINCE: String = ProvinceTypes.province
@@ -49,11 +51,19 @@ object SvgMapClasses {
 
   }
 
-  def ofRiver(rs: RiverSegment): String = rs.width match {
-    case RiverTypes.NARROW => RIVER_NARROW
-    case RiverTypes.WIDE => RIVER_WIDE
-    case RiverTypes.WIDEST => RIVER_WIDEST
-    case _ => RIVER_NARROWEST
+  def ofRiver(rs: RiverSegment): String = {
+    val riverColor = rs.width
+    if (RiverTypes.RIVER.contains(rs.width)) {
+      val i = RiverTypes.RIVER.toSeq.indexOf(riverColor) + 1
+      val factor = 4 / BigDecimal(RiverTypes.RIVER.size)
+      (factor * i).setScale(0, RoundingMode.UP).toInt match {
+        case 4 => RIVER_WIDEST
+        case 3 => RIVER_WIDE
+        case 2 => RIVER_NARROW
+        case _ => RIVER_NARROWEST
+      }
+    } else
+      RIVER_NARROWEST
   }
 
 }
