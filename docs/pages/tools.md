@@ -79,7 +79,7 @@ currently the only supported engine is eu4:
 > -svg eu4
 * --background|-bg <season> - use this flag to add terrain and water backgrounds to your map, 
 default season is **summer**, backgrounds are only added if the map is deemed to have been unmodified
-> bg winter
+> -bg winter
 * --map-mode|-mode <map_mode> - use this toggle to select map mode, default map mode is **political**,
 currently supported map modes are: political, province_outline (use this to generate an "empty" map)
 > -mode province_outline

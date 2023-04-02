@@ -402,7 +402,7 @@ case class TagSave
   // hits = 55, isOptional = true, sample = ["AAC","HAB"]
   gaveAccess: Seq[String] = Seq.empty,
   // hits = 54, isOptional = true, sample = "1640.8.16"
-  wartax: Option[Date] = None,
+  wartax: Option[JsonNode] = None,
   // hits = 49, isOptional = true, sample = "1551.8.1"
   lastMigration: Option[Date] = None,
   // hits = 48, isOptional = true, sample = 3
