@@ -8,6 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.matching.Regex
 
+//noinspection ScalaWeakerAccess
 object GeographyParser extends LazyLogging {
 
   val adjacencyPat: Regex =
@@ -42,7 +43,7 @@ object GeographyParser extends LazyLogging {
   def parseAdjacencies(files: ResourceRepository, map: MapRepository): MapRepository = {
     val as = files
       .getAdjacencies
-      .map(_.lines.toList)
+      .map(_.linesIterator.toSeq)
       .getOrElse(Seq.empty)
       .flatMap(parseAdjacency)
     map.updateAdjacencies(as)
