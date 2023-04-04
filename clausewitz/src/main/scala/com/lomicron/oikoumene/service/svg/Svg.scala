@@ -5,8 +5,11 @@ import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry.{BezierCurve, Point2D, Polyline, TPath}
 
-import java.text.DecimalFormat
+import java.text.{DecimalFormat, DecimalFormatSymbols}
+import java.util.Locale
+import scala.annotation.unused
 
+//noinspection ScalaWeakerAccess
 object Svg {
 
   val svgHeader: SvgElement = SvgElement(
@@ -20,7 +23,7 @@ object Svg {
   def colorToSvg(c: Color) = s"rgb(${c.r},${c.g},${c.b})"
 
   def pointsToSvgPointsAttribute(ps: Seq[Point2D] = Seq.empty, precision: Int = 1): String = {
-    val sb = StringBuilder.newBuilder
+    val sb = new StringBuilder()
     sb.append(" points=\"")
     sb.append(ps.map(pointToSvg(_, precision = precision)).mkString(" "))
     sb.append("\"")
@@ -63,6 +66,7 @@ object Svg {
     }
   }
 
+  @unused
   def pointsToCubicPath(ps: Seq[Point2D], precision: Int = 1): String = {
     def psvg(p: Point2D): String = pointToSvg(p, " ", precision)
 
@@ -225,9 +229,10 @@ object Svg {
   private def dySvg(p1: Point2D, p2: Point2D, precision: Int = 1): String =
     doubleToSvg(p2.dy(p1), precision)
 
-  val df = new DecimalFormat("#.#")
-  val df2 = new DecimalFormat("#.##")
-  val df3 = new DecimalFormat("#.###")
+  private val formatSymbols = new DecimalFormatSymbols(Locale.US)
+  val df = new DecimalFormat("#.#", formatSymbols)
+  val df2 = new DecimalFormat("#.##", formatSymbols)
+  val df3 = new DecimalFormat("#.###", formatSymbols)
 
   def precisionFormat(precision: Int): DecimalFormat = precision match {
     case 1 => df
