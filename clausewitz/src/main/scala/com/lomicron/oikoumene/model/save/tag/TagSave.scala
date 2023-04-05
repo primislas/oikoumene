@@ -474,7 +474,7 @@ case class TagSave
   // hits = 20, isOptional = true, sample = {"name":"Palatine-Bavarian Nationalist War","value":1.000,"date":"1749.1.15"}
   effectiveScoreImpact: Option[JsonNode] = None,
   // hits = 20, isOptional = true, sample = "SCA"
-  previousCountryTags: Option[String] = None,
+  previousCountryTags: Seq[String] = Seq.empty,
   // hits = 19, isOptional = true, sample = ["DAN"]
   historicalFriends: Seq[String] = Seq.empty,
   // hits = 19, isOptional = true, sample = ["incident_neo_confucianism","incident_wokou","incident_ikko_shu","incident_spread_of_christianity","incident_nanban","incident_firearms"]
