@@ -95,7 +95,9 @@ object FileIO {
   }
 
   def readSave(filePath: String): Option[String] =
-    IO.readZipFile(filePath, saveGamestateFile, defaultCharset)
+    Try(IO.readZipFile(filePath, saveGamestateFile, defaultCharset))
+      .orElse(Try(IO.readTextFile(filePath, defaultCharset)).map(Some(_)))
+      .getOrElse(Option.empty)
 
   def clearDir(dir: String): Option[File] =
     Option(dir)
