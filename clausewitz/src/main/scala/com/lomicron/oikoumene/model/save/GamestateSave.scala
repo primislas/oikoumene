@@ -99,7 +99,7 @@ case class GamestateSave
   // hits = 1, isOptional = false, sample = "France"
   revolutionTargetOriginalName: String = Entity.UNDEFINED,
   // hits = 1, isOptional = false, sample = {"province":803,"name":"brazilian_province"}
-  savedEventTarget: ArrayNode = JsonMapper.arrayNode,
+  savedEventTarget: Seq[ObjectNode] = Seq.empty,
   // hits = 1, isOptional = false, sample = {"ledger_data":[{"name":"LVA"},{"name":"K31"},{"name":"GBR","data":{"1570":1407,"1571":1426,"1572":1444,"1573":1464,"1574":1483,"1575":1501,"1576":1519,"1577":1536,"1578":1549,"1579":1559,"1580":1567,"1581":1575,"1582":1583,"1583":1596,"1584":1610,"1585":1623,"1586":1636,"1587":1650,"1588":1665,"1589":1682,"1590":1702,"1591":1724,"1592":1745,"1593":1767,"1594":1789,"1595":1810,"1596":1831,"1597":1853,"1598":1875,"1599":1898,"1600":1921,"1601":1946,"1602":1971,"1603":1996,"1604":2021,"1605":2045,
   scoreStatistics: ObjectNode = JsonMapper.objectNode,
   // hits = 1, isOptional = false, sample = 2
