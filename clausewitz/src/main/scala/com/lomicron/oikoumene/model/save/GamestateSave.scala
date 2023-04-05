@@ -11,7 +11,7 @@ import com.lomicron.utils.parsing.tokenizer.Date
 case class GamestateSave
 (
   // hits = 1, isOptional = false, sample = {"id":549015,"type":4713}
-  id: ObjectNode = JsonMapper.objectNode,
+  id: Seq[ObjectNode] = Seq.empty,
   // hits = 1, isOptional = false, sample = false
   achievementOk: Boolean = true,
   // hits = 1, isOptional = false, sample = {"SHL":{"advisor":[{"id":68079,"type":51},{"id":68305,"type":51},{"id":68817,"type":51},{"id":68833,"type":51},{"id":68879,"type":51},{"id":69024,"type":51},{"id":69037,"type":51}]},"SCA":{"advisor":[{"id":67290,"type":51},{"id":67797,"type":51},{"id":68244,"type":51},{"id":68445,"type":51},{"id":68463,"type":51},{"id":68486,"type":51},{"id":68665,"type":51},{"id":68838,"type":51},{"id":68998,"type":51}]},"KNI":{"advisor":[{"id":67961,"type":51},{"id":67965,"type":51},{"id":67971,"type":51},{"id
