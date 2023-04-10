@@ -39,7 +39,7 @@ object MapModes {
     val settings = defaultSettings(mode).getOrElse(provOutlinesSettings)
     overrides
       .map(os => {
-        var overridden = settings
+        var overridden = settings.copy(groupByTag = os.groupByTag)
         os.includeBorders.foreach(f => overridden = overridden.copy(includeBorders = f))
         os.includeNames.foreach(f => overridden = overridden.copy(includeNames = f))
         os.includeRivers.foreach(f => overridden = overridden.copy(includeRivers = f))

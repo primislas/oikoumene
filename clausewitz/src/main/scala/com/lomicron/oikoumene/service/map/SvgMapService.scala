@@ -13,6 +13,7 @@ import com.lomicron.utils.geometry._
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.commons.math3.fitting.WeightedObservedPoint
 
+import java.lang.Integer.parseInt
 import java.lang.Math.PI
 import scala.collection.immutable.ListSet
 
@@ -48,7 +49,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val precision: Int = settings.decimalPrecision
     val background = settings.svgBackground.map(SvgMapStyles.background(_, repos)).getOrElse(Seq.empty)
     val style = SvgMapStyles.styleOf(settings, repos)
-    val provinces = provinceSvg(map, settings.mapMode, precision)
+    val provinces = provinceSvg(map, settings.mapMode, precision, settings.groupByTag)
     logger.info("Provinces: OK")
     val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(map.rivers, precision)).toSeq
     logger.info("Rivers: OK")
@@ -93,7 +94,19 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .copy(path = Svg.fromPolypath(rs.path, precision))
       .addClass(SvgMapClasses.ofRiver(rs))
 
-  def provinceSvg(map: MercatorMap, mapMode: String, precision: Int = defaultPrecision): SvgElement = {
+  def provinceSvg
+  (
+    map: MercatorMap,
+    mapMode: String,
+    precision: Int = defaultPrecision,
+    groupByTag: Boolean = false
+  ): SvgElement = {
+
+    val ownersById: Map[String, Option[String]] = if (groupByTag)
+      repos.provinces.findAll.map(p => (p.id.toString, p.state.owner)).toMap
+    else
+      Map.empty
+
     val psByClass = map.provinces
       .map(provinceToSvg(_, mapMode, precision))
       .groupBy(_.classes.head)
@@ -101,8 +114,25 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val groupsByClass = ProvinceTypes.list
       .map(t => {
         val ps = psByClass.getOrElse(t, Seq.empty)
-        val children = ps.map(p => p.copy(classes = p.classes.drop(1)))
-        group.copy(id = t, classes = ListSet(t), children = children)
+        val children = ps.map(_.dropFirstClass).sortBy(_.id.map(parseInt))
+        val provTypeGroup = group.copy(id = t, classes = ListSet(t))
+
+        if (groupByTag && t == ProvinceTypes.province) {
+          val ownerGroups = children
+            .groupBy(elem => elem.id.flatMap(ownersById.get))
+            .map { case (ownerOpt, elems) =>
+              val children = elems.map(_.dropFirstClass)
+              ownerOpt.flatten
+                .map(owner => group.copy(id = owner).addClass(owner))
+                .getOrElse(group)
+                .copy(children = children)
+            }
+            .toSeq
+            .sorted
+            .reverse
+          provTypeGroup.copy(children = ownerGroups)
+        } else
+          provTypeGroup.copy(children = children)
       })
       .toSeq
       .filter(_.children.nonEmpty)

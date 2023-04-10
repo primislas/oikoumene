@@ -46,7 +46,7 @@ case class SvgElement
   children: Seq[SvgElement] = Seq.empty,
   path: Option[String] = Option.empty,
 
-) {
+) extends Ordered[SvgElement] {
 
   def add(e: SvgElement): SvgElement =
     copy(children = children :+ e)
@@ -64,6 +64,9 @@ case class SvgElement
 
   def addTitle(t: String): SvgElement =
     add(SvgElements.title.copy(customContent = Option(t)))
+
+  def dropFirstClass: SvgElement =
+    copy(classes = classes.drop(1))
 
   def toSvg: String = toStringBuilder.toString
 
@@ -120,5 +123,16 @@ case class SvgElement
 
   private def svgClass: Option[String] =
     Option(classes).filter(_.nonEmpty).map(cs => s"""class="${cs.mkString(" ")}"""")
+
+  override def compare(that: SvgElement): Int = {
+    val childAmtDiff = children.map(_.id).distinct.size - that.children.map(_.id).distinct.size
+    if (childAmtDiff != 0)
+      childAmtDiff
+    else {
+      if (id.isEmpty) -1
+      else if (that.id.isEmpty) 1
+      else id.flatMap(thisId => that.id.map(thatId => thisId.compare(thatId))).getOrElse(0)
+    }
+  }
 
 }

@@ -10,6 +10,7 @@ case class MapBuilderSettings
   includeNames: Option[Boolean] = None,
   includeRivers: Option[Boolean] = None,
   ownWastelands: Option[Boolean] = None,
+  groupByTag: Boolean = false,
   svgBackground: Option[String] = None,
   decimalPrecision: Int = 1,
 ) {

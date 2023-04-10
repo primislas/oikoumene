@@ -75,6 +75,7 @@ object ClausewitzMapBuilder extends LazyLogging {
         |             [--svg|-svg eu4]
         |             [--mode|-mode political|terrain|province_outline]
         |             [--background|-bg autumn|winter|spring|summer]
+        |             [--group-by-tag|-grtag]
         |
         |e.g.
         |simply parse provinces.bmp into svg shape and border jsons (add "-meta eu4" to parse additional metadata to jsons)
@@ -93,7 +94,7 @@ object ClausewitzMapBuilder extends LazyLogging {
   def parseArgs(args: Array[String]): CLMapBuilderSettings = parseArgs(args.toList)
 
   @scala.annotation.tailrec
-  def parseArgs(args: List[String] = List.empty, settings: CLMapBuilderSettings = CLMapBuilderSettings()): CLMapBuilderSettings =
+  def parseArgs(args: List[String] = List.empty, settings: CLMapBuilderSettings = CLMapBuilderSettings()): CLMapBuilderSettings = {
     args match {
       case "-h" :: _ | "--help" :: _ => settings.copy(isHelp = true)
       case "-i" :: inputFile :: tail =>
@@ -153,11 +154,15 @@ object ClausewitzMapBuilder extends LazyLogging {
         parseArgs(tail, settings.modify(_.mapSettings.svgBackground).setTo(season))
       case "--background" :: season :: tail =>
         parseArgs(tail, settings.modify(_.mapSettings.svgBackground).setTo(season))
-
+      case "--group-by-tag" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.groupByTag).setTo(true))
+      case "-grtag" :: tail =>
+        parseArgs(tail, settings.modify(_.mapSettings.groupByTag).setTo(true))
 
       case Nil => settings
       case _ => parseArgs(args.drop(1), settings)
     }
+  }
 
   def generateMapOutlines(settings: CLMapBuilderSettings, repo: RepositoryFactory)
   : (Seq[PolygonSvgJson], Seq[BorderSvgJson]) = {
