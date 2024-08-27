@@ -1,5 +1,6 @@
 package com.lomicron.oikoumene.engine
 
+import com.lomicron.oikoumene.mods.{FracturedAustria, FracturedEngland, FracturedFrance, FracturedSpain, IndependentBalkans, IndependentRus}
 import com.lomicron.oikoumene.parsers.diplomacy.{CasusBelliParser, DiplomacyParser, WarGoalTypeParser, WarHistoryParser}
 import com.lomicron.oikoumene.parsers.government._
 import com.lomicron.oikoumene.parsers.localisation.LocalisationParser
@@ -21,9 +22,17 @@ object Oikoumene extends LazyLogging {
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
 
-    val gameDir = "D:\\Steam\\steamapps\\common\\Europa Universalis IV"
-    val repos = InMemoryRepositoryFactory(GameFilesSettings(gameDir))
+    val gameDir = "G:\\Steam\\steamapps\\common\\Europa Universalis IV"
+    val modDir = "C:\\Users\\konst\\Documents\\Paradox Interactive\\Europa Universalis IV\\mod"
+    val repos = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modDir))
     loadConfigs(repos)
+//    IndependentRus(repos)
+//    IndependentBalkans(repos)
+    FracturedFrance(repos)
+    FracturedAustria(repos)
+    FracturedEngland(repos)
+    FracturedSpain(repos)
+
 
     logger.info("Bye")
   }

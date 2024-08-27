@@ -31,7 +31,16 @@ object ReligionParser extends LazyLogging {
       .parseFileFieldsAsEntities(relFiles)
       .map(parseReligions)
     val groups = groupsAndRels.map(_._1).map(localisation.setLocalisation)
+      .map(group => {
+        if (group.get("crusade_name").isArray)
+          group.getArray("crusade_name").flatMap(_.toSeq.lastOption)
+            .map(name => group.setEx("crusade_name", name))
+            .getOrElse(group)
+        else
+          group
+      })
     val religions = groupsAndRels.flatMap(_._2).map(localisation.setLocalisation)
+      .map(ClausewitzParser.removeEmptyObjects)
 
     if (evalEntityFields) {
       ConfigField.printCaseClass("ReligionGroup", groups)

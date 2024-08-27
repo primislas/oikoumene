@@ -82,6 +82,8 @@ case class Tracer(img: BufferedImage, p: Point, labels: Array[Array[Int]], d: Di
       lastP = appended.lastOption
     } while (!(startingPoint == currentPoint && startingDirection == currentDirection))
 
+    outline = outline.map(_ * 5)
+
     val color = colorOf(p)
     val shifted = outline.last +: outline.dropRight(1)
     val cleaned = Geometry.clean(shifted)

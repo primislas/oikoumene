@@ -39,6 +39,9 @@ case class WorldMap
       .values.toList
       .flatMap(provinceGroups)
 
+  def provinces: Seq[Province] =
+    repos.provinces.findAll
+
   def provinceGroups(ps: Seq[Province]): Seq[Seq[Province]] = {
     val routes = repos.geography.map.routes
 

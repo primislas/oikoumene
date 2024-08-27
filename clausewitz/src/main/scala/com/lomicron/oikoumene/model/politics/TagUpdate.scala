@@ -13,7 +13,7 @@ case class TagUpdate
   // hits = 13270, isOptional = true, sample = {"year":1730,"month":1,"day":1}
   override val date: Option[Date] = None,
 
-  @JsonProperty("if") condition: Option[TagCondition] = None,
+  @JsonProperty("if") condition: Option[Seq[TagCondition]] = None,
 
   // hits = 796, isOptional = true, sample = "east_african"
   technologyGroup: Option[String] = None,
@@ -52,7 +52,7 @@ case class TagUpdate
   // hits = 38, isOptional = true, sample = "well_advised_personality"
   addHeirPersonality: Option[Seq[String]] = None,
   // hits = 19, isOptional = true, sample = "charismatic_negotiator_personality"
-  addQueenPersonality: Option[String] = None,
+  addQueenPersonality: Option[Seq[String]] = None,
   // hits = 310, isOptional = true, sample = true
   clearScriptedPersonalities: Option[Boolean] = None,
 

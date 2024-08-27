@@ -138,7 +138,7 @@ object MapParser extends LazyLogging {
         m1
       })
       .toMap
-      .mapValuesEx(pColors => Color(pColors.maxBy(_._2)._2))
+      .mapValuesEx(pColors => Color(pColors.maxBy(_._2)._1))
       .mapKeys(Color(_))
   }
 

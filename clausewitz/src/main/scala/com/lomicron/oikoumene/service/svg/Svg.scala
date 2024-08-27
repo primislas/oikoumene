@@ -193,20 +193,20 @@ object Svg {
   /**
     * Short names have to be adjusted to look more readable and compact in SVG.
     *
-    * @param tl   text length
+    * @param textLenght   text length
     * @param name adjust name
-    * @param fs   font size
+    * @param fontSize   font size
     * @return text length adjusted to character count
     */
-  def adjustNameLengthToTextLength(tl: Double, name: String, fs: Double): Double =
+  def adjustNameLengthToTextLength(textLenght: Double, name: String, fontSize: Double): Double =
     if (name.length < 2) 0.0
     else if (name.length < 7) {
       val realTextLength = effectiveTextLength(name)
       val coeff = 1.0 - (7.0 - realTextLength) * 0.05
-      val adjustedLength = tl * coeff
-      val minFontLength = fs / 2 * realTextLength
+      val adjustedLength = textLenght * coeff
+      val minFontLength = fontSize / 2 * realTextLength
       if (adjustedLength > minFontLength) adjustedLength else minFontLength
-    } else tl
+    } else textLenght
 
   def effectiveTextLength(t: String): Double =
     t.map(c => if (c == 'I') 0.5 else if (c == 'M' || c == 'W') 1.5 else 1.0).sum

@@ -8,7 +8,7 @@ import com.lomicron.oikoumene.repository.api.map.RegionRepository
 import com.lomicron.oikoumene.repository.api.resources.{LocalisationRepository, ResourceRepository}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
 import com.lomicron.utils.collection.CollectionUtils._
-import com.lomicron.utils.json.JsonMapper.patchFieldValue
+import com.lomicron.utils.json.JsonMapper.{ObjectNodeEx, arrayNode, patchFieldValue}
 import com.typesafe.scalalogging.LazyLogging
 
 object RegionParser extends LazyLogging {
@@ -40,6 +40,10 @@ object RegionParser extends LazyLogging {
         n.isInstanceOf[ObjectNode]
       })
       .mapValuesEx(_.asInstanceOf[ObjectNode])
+      .mapValuesEx(region => {
+        val areas = region.getArray("areas").getOrElse(arrayNode)
+        region.set[ObjectNode]("areas", areas)
+      })
       .mapKVtoValue((id, region) => patchFieldValue(region, idKey, TextNode.valueOf(id)))
       .mapKVtoValue(localisation.findAndSetAsLocName)
       .values.toSeq

@@ -120,6 +120,14 @@ object ClausewitzParser extends LazyLogging {
             event.setEx(tradeGoods, actualGood)
           })
         }
+        // cleaning up
+        if (event.has("hre")) {
+          // it is a bug, shouldn't be reported twice
+          event.getArray("hre").foreach(a => {
+            val actualGood = a.get(a.size() - 1)
+            event.setEx("hre", actualGood)
+          })
+        }
 
         event
       })

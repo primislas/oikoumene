@@ -53,20 +53,23 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     logger.info("Provinces: OK")
     val rivers = settings.includeRivers.filter(identity).map(_ => riverSvg(map.rivers, precision)).toSeq
     logger.info("Rivers: OK")
-    val names = settings.includeNames.filter(_.booleanValue()).toSeq.map(_ => nameSvg(worldMap))
-    logger.info("Names: OK")
-    val borders = settings.includeBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
+    val tagNames = settings.includeTagNames.filter(_.booleanValue()).toSeq.map(_ => tagNameSvg(worldMap))
+    logger.info("Tag names: OK")
+    val provinceNames = settings.includeProvinceNames.filter(_.booleanValue()).toString.map(_ => provinceNameSvg(worldMap))
+    logger.info("Province names: OK")
+    val borders = settings.includeTagBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
     logger.info("Borders: OK")
 
     val worldSvg = Svg
       .svgHeader
-      .copy(width = map.width, height = map.height)
+      .copy(width = map.width * 5, height = map.height * 5)
       .add(background)
       .add(style)
       .add(provinces)
       .add(borders)
       .add(rivers)
-      .add(names)
+      .add(tagNames)
+      .add(provinceNames)
 
     worldSvg.toSvg
   }
@@ -337,7 +340,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .add(svgLakes)
   }
 
-  def nameSvg(worldMap: WorldMap): SvgElement = {
+  def tagNameSvg(worldMap: WorldMap): SvgElement = {
     val names = worldMap
       .ownerGroups
       .zipWithIndex
@@ -349,6 +352,13 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     group.copy(id = "tag-names").add(names)
   }
 
+  def provinceNameSvg(worldMap: WorldMap): SvgElement = {
+    val names = worldMap
+      .provinces
+      .flatMap(p => provinceGroupName(worldMap, Seq(p), p.name.getOrElse(s"pn${p.id}"), provinceName))
+    group.copy(id = "province-names").add(names)
+  }
+
   private def textLength(e: SvgElement): Double =
     e.flatMap(_.children.headOption)
       .flatMap(se => se.fontSize)
@@ -356,9 +366,17 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .map(_.toDouble)
       .getOrElse(0.0)
 
-  def provinceGroupName(worldMap: WorldMap, group: Seq[Province], groupId: String): Seq[SvgElement] = {
+  def provinceGroupName
+  (
+    worldMap: WorldMap,
+    group: Seq[Province],
+    groupId: String,
+    nameExtractor: Seq[Province] => String = tagName
+  ): Seq[SvgElement] = {
     val height = worldMap.mercator.height
-    val name = mapName(group)
+    val name = nameExtractor(group)
+    if (name == "STAYAGOZHAR")
+      println()
 
     val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
     if (polygons.isEmpty) {
@@ -366,7 +384,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       Seq.empty
     } else {
 
-      val ps = Geometry.approximateBorder(polygons)
+      val ps = Geometry.approximateBorder(polygons, 1)
       val c = Geometry.centroid(ps)
       val o = Geometry.findOrientation(ps, c)
 
@@ -383,20 +401,26 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       val curveLength = orderedBezier.head.distance(orderedBezier.last)
       val fontSizeLimit = maxFontSize(rotatedSegments)
 
-      //    val oddNames = Set("ENGLAND", "PEGU", "BALUCHISTAN", "MUSCOVY", "WALLACHIA", "DENMARK", "OTOMI", "PIMA", "TUNIS")
-      //    if (oddNames.contains(name))
-      //      printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+//      val oddNames = Set("STAYAGOZHAR", "NISARGAN")
+//      if (oddNames.contains(name))
+//        printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
 
       Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
     }
   }
 
-  def mapName(provinces: Seq[Province]): String =
+  def tagName(provinces: Seq[Province]): String =
     provinces.head.state.owner
       .flatMap(repos.tags.find(_).toOption)
       .flatMap(_.localisation.name)
       .map(_.toUpperCase)
       .getOrElse("UNDEFINED")
+
+  def provinceName(provinces: Seq[Province]): String =
+    provinces.headOption
+      .flatMap(_.name)
+      .map(_.toUpperCase)
+      .getOrElse("")
 
   def quadCurveToBezier
   (
@@ -445,8 +469,11 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .flatMapValues(_.headOption)
       .flatMapValues(_.state.owner)
 
-    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
-    Polygon.groupBordersIntoShapes(countryBorders)
+    // TODO: province names
+//    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
+//    Polygon.groupBordersIntoShapes(countryBorders)
+//
+    Polygon.groupBordersIntoShapes(borders)
   }
 
   def toWeightedCentroidPolyline(segments: Seq[PointSegment]): Seq[WeightedObservedPoint] = {

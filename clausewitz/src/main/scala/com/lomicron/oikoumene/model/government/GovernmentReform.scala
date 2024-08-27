@@ -45,7 +45,7 @@ case class GovernmentReform
   // hits = 60, isOptional = true, sample = [{"blocked_call_diet":true},{"blocked_call_diet":true}]
   customAttributes: Seq[ObjectNode] = Seq.empty,
   // hits = 59, isOptional = true, sample = {"technology_group":"nomad_group"}
-  nationDesignerTrigger: Option[TagCondition] = None,
+  nationDesignerTrigger: Option[Seq[TagCondition]] = None,
   // hits = 48, isOptional = true, sample = {"NOT":{"is_lesser_in_union":true}}
   trigger: Option[TagCondition] = None,
   // hits = 39, isOptional = true, sample = 0
@@ -73,7 +73,7 @@ case class GovernmentReform
   // hits = 11, isOptional = true, sample = true
   maintainDynasty: Option[Boolean] = None,
   // hits = 11, isOptional = true, sample = {"if":{"limit":{"has_country_modifier":"look_up_purbias_upgraded"},"remove_country_modifier":"look_up_purbias_upgraded","add_country_modifier":{"name":"look_up_purbias","duration":-1}}}
-  removedEffect: Option[TagUpdate] = None,
+  removedEffect: Seq[TagUpdate] = Seq.empty,
   // hits = 10, isOptional = true, sample = false
   boostIncome: Option[Boolean] = None,
   // hits = 8, isOptional = true, sample = true

@@ -293,7 +293,7 @@ object TagState extends FromJson[TagState] {
       nextF(update.leader, (s, v: Seq[Leader]) => s.addLeaders(v)),
       nextF(update.addRulerPersonality, (s, v: Seq[String]) => s.addRulerPersonalities(v)),
       nextF(update.addRulerModifier, (s, v: Seq[RulerModifier]) => s.addRulerModifier(v)),
-      nextF(update.addQueenPersonality, (s, v: String) => s.addQueenPersonality(v)),
+      nextF(update.addQueenPersonality, (s, v: Seq[String]) => s.addQueenPersonalities(v)),
       nextF(update.addHeirPersonality, (s, v: Seq[String]) => s.addHeirPersonalities(v)),
       nextF(update.clearScriptedPersonalities, (s, v: Boolean) => if (v) s.clearPersonalities() else s),
 

@@ -60,7 +60,7 @@ class MapService @Inject
   }
 
   def names: Seq[Map[String, Any]] =
-    service.nameSvg(world).children
+    service.tagNameSvg(world).children
       .grouped(2)
       .map(name => {
         val path = name.head

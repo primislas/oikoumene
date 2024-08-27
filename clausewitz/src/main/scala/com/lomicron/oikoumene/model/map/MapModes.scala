@@ -10,25 +10,33 @@ object MapModes {
   val SIMPLE_TERRAIN: String = "simple_terrain"
   val TRADE_NODES: String = "trade_nodes"
 
-  val politicalSettings: MapBuilderSettings =
+  private val politicalSettings: MapBuilderSettings =
     MapBuilderSettings(
       mapMode = POLITICAL,
       includeRivers = true,
-      includeBorders = true,
-      includeNames = true,
+      includeTagBorders = true,
+      includeTagNames = true,
       ownWastelands = true,
       svgBackground = Seasons.SUMMER,
     )
 
-  val terrainSettings: MapBuilderSettings = politicalSettings.copy(mapMode = TERRAIN)
+  private val terrainSettings: MapBuilderSettings = politicalSettings.copy(mapMode = TERRAIN)
 
-  val provOutlinesSettings: MapBuilderSettings = MapBuilderSettings(mapMode = PROVINCE_OUTLINE)
+  private val provOutlinesSettings: MapBuilderSettings = MapBuilderSettings(mapMode = PROVINCE_OUTLINE)
 
-  def defaultSettings(mode: String): Option[MapBuilderSettings] =
+  private val simpleTerrainSettings: MapBuilderSettings =
+    MapBuilderSettings(
+      mapMode = SIMPLE_TERRAIN,
+      includeRivers = true,
+      includeProvinceNames = true,
+    )
+
+  private def defaultSettings(mode: String): Option[MapBuilderSettings] =
     mode match {
       case POLITICAL => politicalSettings
       case TERRAIN => terrainSettings
       case PROVINCE_OUTLINE => provOutlinesSettings
+      case SIMPLE_TERRAIN => simpleTerrainSettings
       case _ => None
     }
 
@@ -40,8 +48,9 @@ object MapModes {
     overrides
       .map(os => {
         var overridden = settings.copy(groupByTag = os.groupByTag)
-        os.includeBorders.foreach(f => overridden = overridden.copy(includeBorders = f))
-        os.includeNames.foreach(f => overridden = overridden.copy(includeNames = f))
+        os.includeTagBorders.foreach(f => overridden = overridden.copy(includeTagBorders = f))
+        os.includeTagNames.foreach(f => overridden = overridden.copy(includeTagNames = f))
+        os.includeProvinceNames.foreach(f => overridden = overridden.copy(includeProvinceNames = f))
         os.includeRivers.foreach(f => overridden = overridden.copy(includeRivers = f))
         os.ownWastelands.foreach(f => overridden = overridden.copy(ownWastelands = f))
         os.svgBackground.foreach(f => overridden = overridden.copy(svgBackground = f))

@@ -48,7 +48,7 @@ object IndependentBalkans extends LazyLogging {
     val transylvaniaTag = ModUtils.findTagByName("Transylvania", repos)
       .map(ModUtils.tagWithReligion(_, "orthodox")).get
 
-    val modDir = "balkans"
+    val modDir = "balkans_1.36"
     repos.tags.update(transylvaniaTag)
     provinces.update(freedBalkanProvinces)
     ModUtils.writeProvinces(repos, modDir, freedBalkanProvinces)

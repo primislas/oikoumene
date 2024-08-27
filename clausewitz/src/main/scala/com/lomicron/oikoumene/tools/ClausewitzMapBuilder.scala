@@ -139,13 +139,13 @@ object ClausewitzMapBuilder extends LazyLogging {
       case "--no-wastelands" :: tail =>
         parseArgs(tail, settings.modify(_.mapSettings.ownWastelands).setTo(false))
       case "-nn" :: tail =>
-        parseArgs(tail, settings.modify(_.mapSettings.includeNames).setTo(false))
+        parseArgs(tail, settings.modify(_.mapSettings.includeTagNames).setTo(false))
       case "--no-names" :: tail =>
-        parseArgs(tail, settings.modify(_.mapSettings.includeNames).setTo(false))
+        parseArgs(tail, settings.modify(_.mapSettings.includeTagNames).setTo(false))
       case "-nb" :: tail =>
-        parseArgs(tail, settings.modify(_.mapSettings.includeBorders).setTo(false))
+        parseArgs(tail, settings.modify(_.mapSettings.includeTagBorders).setTo(false))
       case "--no-borders" :: tail =>
-        parseArgs(tail, settings.modify(_.mapSettings.includeBorders).setTo(false))
+        parseArgs(tail, settings.modify(_.mapSettings.includeTagBorders).setTo(false))
       case "-svg" :: engine :: tail =>
         parseArgs(tail, settings.modify(_.mapSettings.svg).setTo(engine))
       case "--svg" :: engine :: tail =>
@@ -171,7 +171,7 @@ object ClausewitzMapBuilder extends LazyLogging {
       val inputFile = getProvincesBmp(r)
       val mercator = repo.geography.map.mercator
       val (ps, bs) = if (mercator.borders.isEmpty)
-        parseProvinceShapes(inputFile, settings.mapSettings.withBorders)
+        parseProvinceShapes(inputFile, settings.mapSettings.withTagBorders)
       else
         (
           mercator.provinces.flatMap(_.polygon).map(PolygonSvgJson(_)),
@@ -328,7 +328,7 @@ object ClausewitzMapBuilder extends LazyLogging {
     writeMetadata(settings, polygons, "polygons", mapPolygonsJson)
 
   def writeBorders(settings: CLMapBuilderSettings, borders: Seq[BorderSvgJson]): Unit =
-    if (settings.mapSettings.withBorders)
+    if (settings.mapSettings.withTagBorders)
       writeMetadata(settings, borders, "borders", bordersJson)
 
   def writeMetadata[T](settings: CLMapBuilderSettings, es: Seq[T], key: String, filename: String): Unit = {

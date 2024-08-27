@@ -11,4 +11,6 @@ case class BorderPoint
 
   def withRight(c: Int): BorderPoint = copy(r = Option(c))
 
+  def *(scale: Double): BorderPoint = copy(p = p * scale)
+
 }

@@ -122,6 +122,26 @@ object ProvinceParser extends LazyLogging {
         if (a.nonEmpty) init.setEx("is_city", a.last)
         else init.remove("is_city")
       })
+      init
+        .getArray("capital")
+        .map(_.toSeq)
+        .flatMap(_.lastOption)
+        .foreach(n => init.setEx("capital", n))
+      init
+        .getArray("trade_goods")
+        .map(_.toSeq)
+        .flatMap(_.lastOption)
+        .foreach(n => init.setEx("trade_goods", n))
+      init
+        .getArray("owner")
+        .map(_.toSeq)
+        .flatMap(_.lastOption)
+        .foreach(n => init.setEx("owner", n))
+      init
+        .getArray("hre")
+        .map(_.toSeq)
+        .flatMap(_.lastOption)
+        .foreach(n => init.setEx("hre", n))
     })
     update
   }

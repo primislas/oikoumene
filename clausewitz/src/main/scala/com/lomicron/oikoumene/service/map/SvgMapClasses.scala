@@ -30,7 +30,7 @@ object SvgMapClasses {
     val provSettlementStatus = isCity.orElse(isUncolonized).orElse(isWasteland)
     val coloredMode = mapMode match {
       case MapModes.POLITICAL => p.state.owner
-      case MapModes.SIMPLE_TERRAIN => p.geography.terrain
+      case MapModes.SIMPLE_TERRAIN => p.geography.terrain.orElse(Some(p.`type`))
       case MapModes.TRADE_NODES => p.geography.tradeNode
       case _ => None
     }

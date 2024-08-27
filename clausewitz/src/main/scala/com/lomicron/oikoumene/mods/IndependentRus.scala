@@ -12,7 +12,7 @@ import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.parsing.tokenizer.Date
 
 object IndependentRus extends LazyLogging {
-  val mod = "rus"
+  val mod = "rus_1.36"
   val eastSlavic = "east_slavic"
   val ruthenian = "ruthenian"
   val lytvyn = "byelorussian"
@@ -46,7 +46,13 @@ object IndependentRus extends LazyLogging {
     "Penza" -> "QAS",
     "Alatyr" -> "QAS",
     "Chelm" -> "VOL",
-    "Kharkov" -> "CHR",
+    "Pereyaslav" -> "KIE",
+    "Lubnie" -> "KIE",
+    "Poltava" -> "KIE",
+    "Kharkov" -> "KIE",
+    "Mazyr" -> "CHR",
+    "Trubchevsk" -> "CHR",
+    "Bryansk" -> "CHR",
   )
   val muscovitePs = Set("Ryazan", "Pronsk", "Tula", "Oka")
 
@@ -65,11 +71,11 @@ object IndependentRus extends LazyLogging {
       .map(minskProvinces)
       .map(turovProvinces)
       .map(ruthenianZaporizhia)
-      .map(manualOwner)
       .map(freeSubjugated)
       .map(ruthenianSivershchyna)
       .map(lytvynSmolensk)
       .map(muscoviteRyazan)
+      .map(manualOwner)
       .filterNot(p => p.state.owner.exists(rusSubjugators.contains))
 
     val freedTags = freedRusProvinces.flatMap(_.history.init.owner).distinct

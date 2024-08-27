@@ -1,11 +1,10 @@
 package com.lomicron.oikoumene.tools.map
 
 import java.nio.file.Paths
-
 import com.lomicron.oikoumene.engine.Oikoumene
 import com.lomicron.oikoumene.io.FileIO
 import com.lomicron.oikoumene.model.localisation.Localisation
-import com.lomicron.oikoumene.model.map.WorldMap
+import com.lomicron.oikoumene.model.map.{MapModes, WorldMap}
 import com.lomicron.oikoumene.model.politics.Tag
 import com.lomicron.oikoumene.model.save.GamestateSave
 import com.lomicron.oikoumene.model.save.tag.TagSave
@@ -19,21 +18,21 @@ import com.typesafe.scalalogging.LazyLogging
 
 object MapBuilder extends LazyLogging {
 
-  private val gameDir = "D:/Steam/steamapps/common/Europa Universalis IV"
+  private val gameDir = "G:/SteamLibrary/steamapps/common/Europa Universalis IV"
   private val modsDir = FileResourceRepository.defaultModsDir
   private val saveGame = Paths.get(FileResourceRepository.defaultSaveDir, "autosave.eu4").toString
-  val mods = Seq("MEIOUandTaxes1")
+  val mods = Seq("anbennar")
 
   def main(args: Array[String]) {
     logger.info("Starting the known world...")
-    val cacheDir = Paths.get(modsDir, "map_rendering", "meiou").toString
+    val cacheDir = Paths.get(modsDir, "map_rendering", "anbennar").toString
     val rebuildCache = true
     val repos: RepositoryFactory = InMemoryRepositoryFactory(GameFilesSettings(gameDir, modsDir, mods, cacheDir, rebuildCache))
     Oikoumene.loadConfigs(repos)
 //    val saveFile = FileIO.readSave(saveGame).get
 //    val saveGamestate = SaveGameParser(saveFile)
 //    val mapSvg = buildMap(repos, Some(saveGamestate))
-    val mapSvg = buildMap(repos)
+    val mapSvg = buildMap(repos, MapBuilderSettings(mapMode = MapModes.SIMPLE_TERRAIN, includeRivers = false, includeTagBorders = true))
     writeMap(mapSvg)
   }
 

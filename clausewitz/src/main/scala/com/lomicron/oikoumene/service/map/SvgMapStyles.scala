@@ -65,7 +65,7 @@ object SvgMapStyles {
        |  font-weight: bold;
        |  opacity: 0.9;
        |}
-       |.tn-tiny { stroke-width: 0; }
+       |.tn-tiny { stroke-width: 1; }
        |""".stripMargin
 
   val politicalProvinceStyle: String =
@@ -93,6 +93,28 @@ object SvgMapStyles {
        |  fill: none;
        |}
        |""".stripMargin
+  val simpleTerrainProvinceStyle: String =
+    s""".province { stroke-width:0; fill:none; opacity:0.7; }
+       |.ocean { fill:rgb(255,255,255); }
+       |.inland-ocean { fill:rgb(0,0,200); }
+       |.glacier { fill:rgb(235,235,235); }
+       |.farmlands { fill:rgb(179,255,64); }
+       |.forest { fill:rgb(18,74,9); }
+       |.hills { fill:rgb(113,176,151); }
+       |.woods { fill:rgb(41,155,22); }
+       |.mountain { fill:rgb(105,24,4); }
+       |.impassable-mountains { fill:rgb(128,128,128); }
+       |.grasslands { fill:rgb(90,235,27); }
+       |.jungle { fill:rgb(98,163,18); }
+       |.marsh { fill:rgb(13,189,130); }
+       |.desert { fill:rgb(242,242,111); }
+       |.coastal-desert { fill:rgb(255,211,110); }
+       |.coastline { fill:rgb(49,175,191); }
+       |.drylands { fill:rgb(232,172,102); }
+       |.highlands { fill:rgb(176,129,21); }
+       |.savannah { fill:rgb(248,199,23); }
+       |.steppe { fill:rgb(147,200,83); }
+       |""".stripMargin
 
   val politicalMapStyle: SvgElement = SvgElement(
     tag = SvgTags.STYLE,
@@ -107,15 +129,20 @@ object SvgMapStyles {
 
   def styleOf(settings: MapBuilderSettings, repos: RepositoryFactory): SvgElement = {
     var style = SvgElements.style
-    if (settings.withNames) style = style.addContent(nameStyle)
+    if (settings.withNames || settings.withProvinceNames) style = style.addContent(nameStyle)
     val provStyle = settings.mapMode match {
       case MapModes.PROVINCE_OUTLINE => outlineProvinceStyle
       case MapModes.TERRAIN => terrainProvinceStyle
+      case MapModes.SIMPLE_TERRAIN =>
+        s""".uncolonized { fill:${Svg.colorToSvg(uncolonizedColor)}; }
+        |.sea { fill:${Svg.colorToSvg(oceanColor)}; }
+        |.lake { fill:${Svg.colorToSvg(lakeColor)}; }
+        |.elevated-lake { fill:${Svg.colorToSvg(lakeColor)}; }""".stripMargin
       case _ => politicalProvinceStyle
     }
     style = style.addContent(provStyle)
     if (settings.withRivers) style = style.addContent(riverStyle)
-    if (settings.withBorders) style = style.addContent(borderStyle)
+    if (settings.withTagBorders) style = style.addContent(borderStyle)
 
     val modeStyle = settings.mapMode match {
       case MapModes.POLITICAL => buildTagStyles(repos)

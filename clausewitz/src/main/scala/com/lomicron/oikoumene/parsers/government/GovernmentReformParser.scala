@@ -42,6 +42,11 @@ object GovernmentReformParser {
       .map(_.toSeq)
       .flatMap(_.lastOption)
       .foreach(n => o.setEx("lock_level_when_selected", n))
+    o
+      .getArray("effect")
+      .map(_.toSeq)
+      .flatMap(_.lastOption)
+      .foreach(n => o.setEx("effect", n))
     ClausewitzParser.removeEmptyObjects(o)
   }
 
