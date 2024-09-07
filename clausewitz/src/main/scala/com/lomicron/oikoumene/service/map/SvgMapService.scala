@@ -55,7 +55,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     logger.info("Rivers: OK")
     val tagNames = settings.includeTagNames.filter(_.booleanValue()).toSeq.map(_ => tagNameSvg(worldMap))
     logger.info("Tag names: OK")
-    val provinceNames = settings.includeProvinceNames.filter(_.booleanValue()).toString.map(_ => provinceNameSvg(worldMap))
+    val provinceNames = settings.includeProvinceNames.filter(_.booleanValue()).toSeq.map(_ => provinceNameSvg(worldMap))
     logger.info("Province names: OK")
     val borders = settings.includeTagBorders.filter(_.booleanValue()).toSeq.map(_ => borderSvg(map, precision))
     logger.info("Borders: OK")
@@ -75,8 +75,18 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   }
 
   def riverSvg(rs: Seq[River], precision: Int = defaultPrecision): SvgElement = {
+    val riverColorWeights: Map[Int, Int] = rs.flatMap(_.path).map(_.color)
+      .distinct
+      .sortWith{ case (i1, i2) =>
+        val c1 = Color(i1)
+        val c2 = Color(i2)
+        c1.r * c1.r + c1.g * c1.g + c1.b * c1.b > c2.r * c2.r + c2.g * c2.g + c2.b * c2.b
+      }
+      .zipWithIndex
+      .toMap
+
     val rsByClass = rs
-      .flatMap(riverToSvg(_, precision))
+      .flatMap(riverToSvg(_, riverColorWeights, precision))
       .groupBy(_.classes.head)
       .mapKVtoValue((t, rs) =>
         group
@@ -89,13 +99,16 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     riverGroup.add(rsByClass)
   }
 
-  def riverToSvg(r: River, precision: Int = defaultPrecision): Seq[SvgElement] =
-    r.path.map(riverSegmentToSvg(_, precision))
+  def riverToSvg(r: River, riverColorWeights: Map[Int, Int] = Map.empty, precision: Int = defaultPrecision): Seq[SvgElement] =
+    r.path.map(riverSegmentToSvg(_, riverColorWeights, precision))
 
-  def riverSegmentToSvg(rs: RiverSegment, precision: Int = defaultPrecision): SvgElement =
+  def riverSegmentToSvg(rs: RiverSegment, riverColorWeights: Map[Int, Int], precision: Int = defaultPrecision): SvgElement = {
+    val colorIndex = riverColorWeights.getOrElse(rs.color, 0)
+    val riverClass = f"river-${colorIndex + 1}"
     path
       .copy(path = Svg.fromPolypath(rs.path, precision))
-      .addClass(SvgMapClasses.ofRiver(rs))
+      .addClass(riverClass)
+  }
 
   def provinceSvg
   (
@@ -375,37 +388,41 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   ): Seq[SvgElement] = {
     val height = worldMap.mercator.height
     val name = nameExtractor(group)
-    if (name == "STAYAGOZHAR")
+    if (name == "ANBENNAR1634")
       println()
 
-    val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
-    if (polygons.isEmpty) {
-      // possible in case of mods, where certain vanilla provinces do not exist on the map
+    if (name.isEmpty)
       Seq.empty
-    } else {
+    else {
+      val polygons = provinceShapes(worldMap, group).map(_.reflectY(height))
+      if (polygons.isEmpty) {
+        // possible in case of mods, where certain vanilla provinces do not exist on the map
+        Seq.empty
+      } else {
 
-      val ps = Geometry.approximateBorder(polygons, 1)
-      val c = Geometry.centroid(ps)
-      val o = Geometry.findOrientation(ps, c)
+        val ps = Geometry.approximateBorder(polygons, 1)
+        val c = Geometry.centroid(ps)
+        val o = Geometry.findOrientation(ps, c)
 
-      // rotating shapes so that they are 'parallel' to x axis
-      // (according to identified orientation)
-      // for further analysis
-      val rotation = if (o == 0.0 || o == PI) 0.0 else if (o > halfPI) PI - o else -o
-      val rotatedShapes = rotate(polygons, c, rotation)
-      val rotatedSegments = rotatedShapes.flatMap(_.segments())
+        // rotating shapes so that they are 'parallel' to x axis
+        // (according to identified orientation)
+        // for further analysis
+        val rotation = if (o == 0.0 || o == PI) 0.0 else if (o > halfPI) PI - o else -o
+        val rotatedShapes = rotate(polygons, c, rotation)
+        val rotatedSegments = rotatedShapes.flatMap(_.segments())
 
-      val namePolyline = toWeightedCentroidPolyline(rotatedSegments)
-      val curve = Geometry.weightedFit(namePolyline)
-      val orderedBezier = quadCurveToBezier(namePolyline, curve, c, rotation, height)
-      val curveLength = orderedBezier.head.distance(orderedBezier.last)
-      val fontSizeLimit = maxFontSize(rotatedSegments)
+        val namePolyline = toWeightedCentroidPolyline(rotatedSegments)
+        val curve = Geometry.weightedFit(namePolyline)
+        val orderedBezier = quadCurveToBezier(namePolyline, curve, c, rotation, height)
+        val curveLength = orderedBezier.head.distance(orderedBezier.last)
+        val fontSizeLimit = maxFontSize(rotatedSegments)
 
-//      val oddNames = Set("STAYAGOZHAR", "NISARGAN")
-//      if (oddNames.contains(name))
-//        printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
+        //      val oddNames = Set("STAYAGOZHAR", "NISARGAN")
+        //      if (oddNames.contains(name))
+        //        printFittingMeta(c, o, rotation, height, ps, rotatedSegments, orderedBezier)
 
-      Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
+        Svg.textPath(groupId, orderedBezier, name, curveLength, fontSizeLimit)
+      }
     }
   }
 
@@ -470,9 +487,9 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .flatMapValues(_.state.owner)
 
     // TODO: province names
-//    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
-//    Polygon.groupBordersIntoShapes(countryBorders)
-//
+    //    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))
+    //    Polygon.groupBordersIntoShapes(countryBorders)
+    //
     Polygon.groupBordersIntoShapes(borders)
   }
 

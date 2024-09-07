@@ -162,9 +162,13 @@ object Svg {
       .copy(dominantBaseline = "middle")
       .addClass("tn")
       .add(textPath)
-    val tinyText = if (font < 10.0) text.addClass("tn-tiny") else text
-
-    Seq(path, tinyText)
+//    val tinyText = if (font < 10.0) text.addClass("tn-tiny") else text
+//
+//    Seq(path, tinyText)
+    if (font < 10.0)
+      Seq.empty
+    else
+        Seq(path, text)
   }
 
   def textPathCurveOffset(curve: Seq[Point2D], fontSize: Double): Seq[Point2D] = {

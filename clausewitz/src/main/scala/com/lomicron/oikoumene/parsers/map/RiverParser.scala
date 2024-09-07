@@ -13,10 +13,11 @@ object RiverParser {
 
   import RiverTypes._
 
-  val riverColors = Set(SOURCE, FLOW_IN, FLOW_OUT, NARROWEST, NARROW, WIDE, WIDEST)
-  val waterColors = Set(NARROWEST, NARROW, WIDE, WIDEST)
-  val edgeColors = Set(SOURCE, FLOW_IN, FLOW_OUT)
-  val nonRiverColors = Set(LAND, SEA)
+  val riverColors: Set[Int] = Set(SOURCE, FLOW_IN, FLOW_OUT, NARROWEST, NARROW, WIDE, WIDEST)
+  val waterColors: Set[Int] = Set(NARROWEST, NARROW, WIDE, WIDEST)
+  val edgeColors: Set[Int] = Set(SOURCE, FLOW_IN, FLOW_OUT)
+  val nonRiverColors: Set[Int] = Set(LAND, SEA)
+  val nonRiverWaterColors: Set[Int] = edgeColors ++ nonRiverColors
 
   def trace(img: BufferedImage): Seq[River] = RiverParser(img).trace
 
@@ -72,7 +73,9 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
       .filter(isRiver)
       .exists(isUntracedPoint(_, traced))
 
-  def isRiver(p: Point): Boolean = riverColors.contains(colorOf(p))
+  def isRiver(p: Point): Boolean =
+    !nonRiverWaterColors.contains(colorOf(p))
+//    riverColors.contains(colorOf(p))
 
   def isUntracedPoint(p: Point, traced: Array[Array[Boolean]]): Boolean = !traced(p.x)(p.y)
 
@@ -114,7 +117,9 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
     val ss = parseRiverPoints(ps.drop(1), sourceType)
     val sourceSegment = ss.headOption
       .map(s => s.copy(points = Point2D(source) +: s.points))
-    val segments = (sourceSegment.toSeq ++ ss.drop(1)).filter(_.nonEmpty)
+    val segments = (sourceSegment.toSeq ++ ss.drop(1))
+      .filter(_.nonEmpty)
+//      .map(s => s.copy(points = s.points.map(_ * 5.0)))
 
     River(segments)
   }
@@ -169,8 +174,8 @@ object RiverTypes {
   val FLOW_OUT: Int = Color(255, 252).toInt
   val NARROWEST: Int = Color(0, 225, 255).toInt
   val NARROW: Int = Color(0, 200, 255).toInt
-  val WIDE: Int = Color(0, 100, 255).toInt
-  val WIDEST: Int = Color(0, 0, 200).toInt
+  val WIDE: Int = Color(0, 150, 255).toInt
+  val WIDEST: Int = Color(0, 0, 255).toInt
   val SEA: Int = Color(122, 122, 122).toInt
   val LAND: Int = Color(255, 255, 255).toInt
   val END: Int = Color().toInt

@@ -8,14 +8,14 @@ import java.awt.Point
 case class RiverSegment
 (
   source: Int,
-  width: Int,
+  color: Int,
   points: Seq[Point2D] = Seq.empty,
   path: Seq[TPath] = Seq.empty
 ) {
 
   def isEmpty: Boolean = points.isEmpty
   def nonEmpty: Boolean = points.nonEmpty
-  def reverse: RiverSegment = RiverSegment(width, source, points.reverse)
+  def reverse: RiverSegment = RiverSegment(color, source, points.reverse)
   def withStartingPoint(p: Point): RiverSegment = copy(points = Point2D(p) +: points)
   def withPath(path: Seq[TPath]): RiverSegment = copy(path = path)
 

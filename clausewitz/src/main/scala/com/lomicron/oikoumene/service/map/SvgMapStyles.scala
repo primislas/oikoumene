@@ -1,8 +1,9 @@
 package com.lomicron.oikoumene.service.map
 
 import com.lomicron.oikoumene.model.Color
-import com.lomicron.oikoumene.model.map.MapModes
+import com.lomicron.oikoumene.model.map.{MapModes, River}
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
+import com.lomicron.oikoumene.service.svg.Svg.doubleToSvg
 import com.lomicron.oikoumene.service.svg.{Svg, SvgElement, SvgElements, SvgFill, SvgTags}
 import com.lomicron.utils.collection.CollectionUtils.toOption
 import com.lomicron.utils.geometry.Point2D
@@ -27,7 +28,7 @@ object SvgMapStyles {
        |  fill:none;
        |  stroke-linecap:round;
        |  stroke-linejoin:round;
-       |  opacity:0.3;
+       |  opacity:0.8;
        |}
        |.river-narrowest { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:1; }
        |.river-narrow { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:1.7; }
@@ -141,7 +142,7 @@ object SvgMapStyles {
       case _ => politicalProvinceStyle
     }
     style = style.addContent(provStyle)
-    if (settings.withRivers) style = style.addContent(riverStyle)
+    if (settings.withRivers) style = style.addContent(buildRiverStyles(repos.geography.map.rivers))
     if (settings.withTagBorders) style = style.addContent(borderStyle)
 
     val modeStyle = settings.mapMode match {
@@ -170,6 +171,33 @@ object SvgMapStyles {
       .findAll
       .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
       .mkString("\n")
+
+  def buildRiverStyles(rivers: Seq[River]): String = {
+    val totalRiverTypes = rivers.flatMap(_.path).map(_.color).distinct.size
+
+    val minRiverWidth = 1.0
+    val maxRiverWidth = 3.0
+    val scale = 5.0
+
+    val totalColors = if (totalRiverTypes > 1) totalRiverTypes - 1 else 1
+    val riverClasses = Range(0, totalRiverTypes)
+      .map(i => {
+        var width = i * (maxRiverWidth - minRiverWidth) / totalColors + minRiverWidth
+        width = width * scale
+        val formattedWidth = doubleToSvg(width)
+        val className = f"river-${i + 1}"
+        f".$className { stroke:${Svg.colorToSvg(riverColor)}; stroke-width:$formattedWidth; }"
+      })
+      .mkString("\n")
+    s""".river {
+       |  fill:none;
+       |  stroke-linecap:round;
+       |  stroke-linejoin:round;
+       |  opacity:0.8;
+       |}\n"""
+      .stripMargin
+      .concat(riverClasses)
+  }
 
   def background(season: String, repos: RepositoryFactory): Seq[SvgElement] = {
     val mercator = repos.geography.map.mercator

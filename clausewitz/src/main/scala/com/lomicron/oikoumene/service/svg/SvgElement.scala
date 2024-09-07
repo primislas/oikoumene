@@ -60,7 +60,7 @@ case class SvgElement
 
   def clearClasses: SvgElement = copy(classes = ListSet.empty)
 
-  def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat(c)).orElse(Option(c)))
+  def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat("\n").concat(c)).orElse(Option(c)))
 
   def addTitle(t: String): SvgElement =
     add(SvgElements.title.copy(customContent = Option(t)))

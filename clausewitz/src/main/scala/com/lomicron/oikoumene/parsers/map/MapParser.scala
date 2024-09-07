@@ -273,7 +273,15 @@ object MapParser extends LazyLogging {
   }
 
   def fitRiverCurves(r: River): River = {
-    val segs = r.path.map(seg => seg.withPath(SchneidersFitter.fit(seg.points)))
+    val segs = r.path
+      .map(seg => seg.copy(points = seg.points.map(_ * 5.0)))
+      .map(seg => seg.withPath(SchneidersFitter.fit(seg.points, 7.5)))
+      .filter(seg => {
+        if (seg.path.exists(path => path.points.exists(p => p.x.isNaN || p.y.isNaN)))
+          false
+        else
+          true
+      })
     r.copy(path = segs)
   }
 

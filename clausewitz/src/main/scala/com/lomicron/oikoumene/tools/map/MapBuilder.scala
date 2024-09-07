@@ -32,7 +32,7 @@ object MapBuilder extends LazyLogging {
 //    val saveFile = FileIO.readSave(saveGame).get
 //    val saveGamestate = SaveGameParser(saveFile)
 //    val mapSvg = buildMap(repos, Some(saveGamestate))
-    val mapSvg = buildMap(repos, MapBuilderSettings(mapMode = MapModes.SIMPLE_TERRAIN, includeRivers = false, includeTagBorders = true))
+    val mapSvg = buildMap(repos, MapBuilderSettings(mapMode = MapModes.SIMPLE_TERRAIN, includeRivers = true, includeTagBorders = true))
     writeMap(mapSvg)
   }
 

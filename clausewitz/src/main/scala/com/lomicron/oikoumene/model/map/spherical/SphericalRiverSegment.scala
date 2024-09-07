@@ -19,7 +19,7 @@ object SphericalRiverSegment {
   def apply(riverSegment: RiverSegment, center: Point2D, radius: Double): SphericalRiverSegment =
     SphericalRiverSegment(
       riverSegment.source,
-      riverSegment.width,
+      riverSegment.color,
       Geometry.fromMercator(riverSegment.points, center, radius)
     )
 }

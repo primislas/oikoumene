@@ -48,7 +48,7 @@ object SvgMapClasses {
 
   }
 
-  def ofRiver(rs: RiverSegment): String = rs.width match {
+  def ofRiver(rs: RiverSegment): String = rs.color match {
     case RiverTypes.NARROW => RIVER_NARROW
     case RiverTypes.WIDE => RIVER_WIDE
     case RiverTypes.WIDEST => RIVER_WIDEST
