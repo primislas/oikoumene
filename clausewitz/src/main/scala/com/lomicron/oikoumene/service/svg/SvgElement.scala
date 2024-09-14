@@ -11,7 +11,7 @@ case class SvgElement
   id: Option[String] = Option.empty,
   width: Option[Int] = Option.empty,
   height: Option[Int] = Option.empty,
-  classes: ListSet[String] = ListSet.empty,
+  classes: Seq[String] = Seq.empty,
   href: Option[String] = Option.empty,
   fill: Option[SvgFill] = Option.empty,
   fillRule: Option[String] = Option.empty,
@@ -54,11 +54,11 @@ case class SvgElement
   def add(es: Seq[SvgElement] = Seq.empty): SvgElement =
     copy(children = children ++ es)
 
-  def addClass(c: String): SvgElement = copy(classes = classes + c)
+  def addClass(c: String): SvgElement = copy(classes = classes :+ c)
 
   def addClasses(cs: Seq[String]): SvgElement = copy(classes = classes ++ cs)
 
-  def clearClasses: SvgElement = copy(classes = ListSet.empty)
+  def clearClasses: SvgElement = copy(classes = Seq.empty)
 
   def addContent(c: String): SvgElement = copy(customContent = customContent.map(_.concat("\n").concat(c)).orElse(Option(c)))
 

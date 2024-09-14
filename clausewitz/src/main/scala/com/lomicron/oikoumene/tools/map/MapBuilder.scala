@@ -109,7 +109,7 @@ object MapBuilder extends LazyLogging {
 
   def writeMap(mapSvg: String): Unit = {
     val mpDirPath = Paths.get(modsDir, "map_rendering")
-    val fname = "mercator_political.svg"
+    val fname = "anbennar_simple-terrain_scale-5.0_smoothing-30.0.svg"
     FileIO.writeUTF(mpDirPath, fname, mapSvg)
     logger.info(s"Produced $fname")
   }

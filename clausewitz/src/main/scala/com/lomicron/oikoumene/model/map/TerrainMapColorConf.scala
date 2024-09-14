@@ -9,11 +9,12 @@ case class TerrainMapColorConf
 (
   id: String,
   @JsonProperty("type") terrainType: String,
-  @JsonProperty("color") colorIndex: Int = 0,
-  @JsonProperty("rgbColor") color: Option[Color] = None,
+  @JsonProperty("color") colorIndex: Seq[Int] = Seq.empty,
+  @JsonProperty("rgbColor") color: Seq[Color] = Seq.empty,
 ) {
 
-  def withColor(c: Color): TerrainMapColorConf = copy(color = Option(c))
+  def withColor(c: Color): TerrainMapColorConf = copy(color = Seq(c))
+  def withColor(cs: Seq[Color]): TerrainMapColorConf = copy(color = cs)
 
 }
 

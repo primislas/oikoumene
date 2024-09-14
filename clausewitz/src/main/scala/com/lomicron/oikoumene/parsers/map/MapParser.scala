@@ -3,7 +3,7 @@ package com.lomicron.oikoumene.parsers.map
 import com.lomicron.oikoumene.model.Color
 import com.lomicron.oikoumene.model.map._
 import com.lomicron.oikoumene.repository.api.RepositoryFactory
-import com.lomicron.oikoumene.repository.api.map.GeographicRepository
+import com.lomicron.oikoumene.repository.api.map.{GeographicRepository, MapRepository}
 import com.lomicron.oikoumene.repository.api.resources.{GameFile, ResourceRepository}
 import com.lomicron.utils.collection.CollectionUtils.{MapEx, SeqEx}
 import com.lomicron.utils.geometry.SchneidersFitter.fit
@@ -11,8 +11,9 @@ import com.lomicron.utils.geometry.TPath.Polypath
 import com.lomicron.utils.geometry.{Border, Polygon, SchneidersFitter, Shape}
 import com.typesafe.scalalogging.LazyLogging
 
+import java.awt.{Image, RenderingHints}
 import java.awt.image.{BufferedImage, IndexColorModel}
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Files, Path, Paths}
 import javax.imageio.ImageIO
 import scala.Function.tupled
 import scala.collection.parallel.CollectionConverters._
@@ -20,6 +21,9 @@ import scala.collection.parallel.immutable.ParSeq
 import scala.util.Try
 
 object MapParser extends LazyLogging {
+
+  private val fittingError = 1.5
+  private val fittingScale = 20.0
 
   def apply(repos: RepositoryFactory): GeographicRepository =
     MapParser.parseMap(repos)
@@ -34,7 +38,8 @@ object MapParser extends LazyLogging {
 
     logger.info("Parsing terrain...")
     val terrainColors = parseTerrainColors(r, g)
-    logger.info(s"Identified terrain ${terrainColors.length} colors")
+    val treeTerrainColors = parseTreeTerrainColors(r, g)
+    logger.info(s"Identified ${terrainColors.length} terrain colors, ${treeTerrainColors.length} tree terrain colors")
 
     logger.info("Parsing map provinces...")
     val provs = r.getProvinceMap.map(gf => fetchMap(gf.path))
@@ -95,75 +100,104 @@ object MapParser extends LazyLogging {
     colors.getOrElse(Array.empty)
   }
 
+  def parseTreeTerrainColors(r: ResourceRepository, g: GeographicRepository): Array[Color] = {
+    val treeMap = r.getTreeMap.map(fetchMap)
+    val colors = treeMap.map(parseTerrainColors).map(cs => cs.map(Color(_)))
+    colors.foreach(colors => g.map.rebuildTreeTerrainColors(colors))
+    colors.getOrElse(Array.empty)
+  }
+
   def parseProvinceTerrain
   (
     provinces: Option[BufferedImage],
     r : ResourceRepository,
     g: GeographicRepository
-  ): Map[Color, Color] = {
-    val terrainByProvOpt = for {
+  ): Map[Color, String] = {
+    val provTerrains = for {
       provs <- provinces
       terrain <- r.getTerrainMap.map(fetchMap)
-    } yield parseMapProvinceTerrain(provs, terrain)
-    val terrainByProv = terrainByProvOpt.getOrElse(Map.empty)
+      trees <- r.getTreeMap.map(fetchMap)
+      rivers <- r.getRiversMap.map(fetchMap)
+    } yield parseMapProvinceTerrain(g.map, provs, terrain, trees, rivers)
 
-    g.map.setTerrainProvinceColors(terrainByProv)
-    terrainByProv
-  }
-
-  def parseMapProvinceTerrain
-  (
-    provinces: BufferedImage,
-    terrain: BufferedImage
-  ): Map[Color, Color] = {
-    parallelizeImage(provinces)
-      .map(parseMapProvinceTerrain(provinces, terrain, _))
-      .reduce((m1, m2) => {
-        m2.foreach(e => {
-          val (pColor, pTerrain2) = e
-          val updatedTerrain = m1
-            .get(pColor)
-            .map(pTerrain1 => {
-              pTerrain2
-                .foreach(e => {
-                  val (tColor2, tColorCount2) = e
-                  val tColorCount = pTerrain1.getOrElse(tColor2, 0) + tColorCount2
-                  pTerrain1 += (tColor2 -> tColorCount)
-                })
-              pTerrain1
-            })
-            .getOrElse(pTerrain2)
-          m1 += (pColor -> updatedTerrain)
-        })
-        m1
+    Seq(Color(31,161,79))
+      .foreach(color => {
+        val iColor = color.toInt
+        val provPixels = provTerrains.getOrElse(Seq.empty).filter(_.provColor == iColor)
+        val reduced = provPixels.reduce(_ + _)
+        println(f"$color -> $reduced")
       })
-      .toMap
-      .mapValuesEx(pColors => Color(pColors.maxBy(_._2)._1))
+
+    val terrainTypeByProvColor = provTerrains.getOrElse(Seq.empty)
+      .groupBy(_.provColor)
       .mapKeys(Color(_))
+      .mapValuesEx(_.reduce(_ + _))
+      .flatMapValues(_.terrainType)
+    g.map.setProvinceTerrainTypes(terrainTypeByProvColor)
+
+    terrainTypeByProvColor
   }
 
   def parseMapProvinceTerrain
   (
+    mapRepo: MapRepository,
     provinces: BufferedImage,
     terrain: BufferedImage,
+    trees: BufferedImage,
+    rivers: BufferedImage,
+  ): Seq[ProvTerrain] = {
+    parallelizeImage(provinces)
+      .flatMap(parseMapProvinceTerrain(mapRepo, provinces, terrain, trees, rivers, _))
+      .toList
+  }
+
+  def parseMapProvinceTerrain
+  (
+    mapRepo: MapRepository,
+    provinces: BufferedImage,
+    terrain: BufferedImage,
+    trees: BufferedImage,
+    rivers: BufferedImage,
     yRange: (Int, Int)
-  ): collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = {
-    val terrainColorsByProv: collection.mutable.Map[Int, collection.mutable.Map[Int, Int]] = collection.mutable.Map.empty
-    for {
+  ): Seq[ProvTerrain] = {
+//    val scaledTreeImg = trees.getScaledInstance(provinces.getWidth, provinces.getHeight, Image.SCALE_DEFAULT)
+
+    // Create a buffered image with transparency
+    val (w, h) = (provinces.getWidth, provinces.getHeight)
+    val scaledTrees = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+
+    // Draw the image on to the buffered image
+    val bGr = scaledTrees.createGraphics()
+    bGr.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+    bGr.drawImage(trees, 0, 0, w, h, null)
+    bGr.dispose()
+    ImageIO.write(scaledTrees, "bmp", Paths.get("upscaled_trees.bmp").toFile)
+
+    val treeXFactor = trees.getWidth.toDouble / terrain.getWidth
+    val treeYFactor = trees.getHeight.toDouble / terrain.getHeight
+    val excludedRiverColors = Set(Color(0, 200, 255), Color(0, 100, 255), Color(0, 0, 200), Color(0, 150, 255))
+      .map(_.toInt)
+
+    val provTerrains = for {
       x <- 0 until provinces.getWidth
       y <- yRange._1 until yRange._2
-    } {
+    } yield {
       for {
         provColor <- getRGB(provinces, x, y)
         terrainColor <- getRGB(terrain, x, y)
-      } {
-        val provTerrain = terrainColorsByProv.getOrElse(provColor, collection.mutable.Map.empty)
-        val tCount = provTerrain.getOrElse(terrainColor, 0) + 1
-        provTerrain += (terrainColor -> tCount)
-        terrainColorsByProv += (provColor -> provTerrain)
+//        treeColor <- getRGB(trees, (treeXFactor * x).toInt, (treeYFactor * y).toInt)
+        treeColor <- getRGB(scaledTrees,x, y)
+//        riverColor <- getRGB(rivers, x, y) if !excludedRiverColors.contains(riverColor)
+      } yield {
+        val terrainTypes = mapRepo
+          .treeTerrainTypeOfTreeColor(treeColor)
+          .orElse(mapRepo.terrainTypeOfTerrainColor(terrainColor))
+          .map(_ -> 1)
+          .toMap
+        ProvTerrain(provColor, terrainTypes)
       }
     }
-    terrainColorsByProv
+    provTerrains.flatten
   }
 
   /**
@@ -268,14 +302,14 @@ object MapParser extends LazyLogging {
     ImageIO.read(path.toFile)
 
   def fitBorderCurves(b: Border): Border = {
-    val path = SchneidersFitter.fit(b.points)
+    val path = SchneidersFitter.fit(b.points, fittingError * fittingScale)
     b.withPath(path)
   }
 
   def fitRiverCurves(r: River): River = {
     val segs = r.path
       .map(seg => seg.copy(points = seg.points.map(_ * 5.0)))
-      .map(seg => seg.withPath(SchneidersFitter.fit(seg.points, 7.5)))
+      .map(seg => seg.withPath(SchneidersFitter.fit(seg.points, fittingError * fittingScale)))
       .filter(seg => {
         if (seg.path.exists(path => path.points.exists(p => p.x.isNaN || p.y.isNaN)))
           false
@@ -292,7 +326,7 @@ object MapParser extends LazyLogging {
   }
 
   def getBorderPath(b: Border, bconfigs: Map[Border, Border]): Polypath = {
-    val confPath = bconfigs.get(b).map(_.path).getOrElse(fit(b.points))
+    val confPath = bconfigs.get(b).map(_.path).getOrElse(fit(b.points, fittingError * fittingScale))
     if (confPath.isEmpty) Seq.empty
     else if (confPath.head.points.head == b.points.head) confPath
     else confPath.map(_.reverse).reverse
@@ -301,4 +335,27 @@ object MapParser extends LazyLogging {
   def getPolygonPath(p: Polygon, bconfigs: Map[Border, Border]): Polypath =
     getBorderPath(Border(p.points :+ p.points.head), bconfigs)
 
+}
+
+case class ProvTerrain(provColor: Int, terrain: Map[String, Int] = Map.empty, trees: Map[String, Int] = Map.empty) {
+  def +(other: ProvTerrain): ProvTerrain = {
+    val mergedTerrain = addMaps(terrain, other.terrain)
+    val mergedTrees = addMaps(trees, other.trees)
+    ProvTerrain(provColor, mergedTerrain, mergedTrees)
+  }
+
+  def terrainType: Option[String] =
+    (trees.toSeq ++ terrain.toSeq)
+      .sortBy(_._2)
+      .lastOption
+      .map(_._1)
+
+  private def addMaps(m1: Map[String, Int], m2: Map[String, Int]): Map[String, Int] =
+    (m1.keySet ++ m2.keySet)
+      .map(terrainType => {
+        val count1 = m1.getOrElse(terrainType, 0)
+        val count2 = m2.getOrElse(terrainType, 0)
+        (terrainType, count1 + count2)
+      })
+      .toMap
 }

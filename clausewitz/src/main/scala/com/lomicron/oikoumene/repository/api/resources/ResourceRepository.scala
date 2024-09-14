@@ -54,6 +54,7 @@ trait ResourceRepository {
   def getElevatedLakes: Seq[GameFile]
   def getProvinceMap: Option[GameFile]
   def getTerrainMap: Option[GameFile]
+  def getTreeMap: Option[GameFile]
   def getHeightMap: Option[GameFile]
   def getRiversMap: Option[GameFile]
   def getBackground(season: String): Option[GameFile]

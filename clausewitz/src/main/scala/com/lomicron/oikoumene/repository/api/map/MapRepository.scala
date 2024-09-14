@@ -7,23 +7,29 @@ import com.lomicron.oikoumene.repository.api.AbstractRepository
 trait MapRepository extends AbstractRepository[Color, Tile] {
 
   def setTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository
+  def setTreeTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository
   def setTerrainMapColors(terrainColors: Array[Color]): MapRepository
   /**
     * @param terrainProvColors terrain color mapped to province color
     * @return updated repository
     */
-  def setTerrainProvinceColors(terrainProvColors: Map[Color, Color]): MapRepository
+  def setProvinceTerrainTypes(terrainProvColors: Map[Color, String]): MapRepository
   def rebuildTerrainColors(terrainColors: Array[Color]): MapRepository
+  def rebuildTreeTerrainColors(treeTerrainColors: Array[Color]): MapRepository
+  def terrainTypeOfTerrainColor(argb: Int): Option[String]
+  def terrainTypeOfTerrainColor(color: Color): Option[String]
+  def treeTerrainTypeOfTreeColor(argb: Int): Option[String]
+  def treeTerrainTypeOfTreeColor(color: Color): Option[String]
   /**
     * @param argb province color
     * @return terrain id
     */
-  def terrainMapType(argb: Int): Option[String]
+  def terrainMapTypeOfProvince(argb: Int): Option[String]
   /**
     * @param color province color
     * @return terrain id
     */
-  def terrainMapType(color: Color): Option[String]
+  def terrainMapTypeOfProvince(color: Color): Option[String]
 
   def updateAdjacencies(as: Seq[Adjacency]): MapRepository
   def adjacencies: Seq[Adjacency]

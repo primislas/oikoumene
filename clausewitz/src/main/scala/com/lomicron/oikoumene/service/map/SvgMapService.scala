@@ -15,23 +15,24 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint
 
 import java.lang.Integer.parseInt
 import java.lang.Math.PI
-import scala.collection.immutable.ListSet
+import scala.collection.immutable.{ListMap, ListSet}
 
 case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = SvgMapSettings.default) extends LazyLogging {
   private val defaultPrecision: Int = settings.pointDecimalPrecision
 
   val provinceGroup: SvgElement = group.copy(
     id = SvgMapClasses.PROVINCE_GROUP,
-    classes = ListSet(SvgMapClasses.PROVINCE)
+    classes = Seq(SvgMapClasses.PROVINCE)
   )
   val riverGroup: SvgElement = group.copy(
     id = SvgMapClasses.RIVER_GROUP,
-    classes = ListSet(SvgMapClasses.RIVER),
+    classes = Seq(SvgMapClasses.RIVER),
   )
   val borderGroup: SvgElement = group.copy(
     id = SvgMapClasses.BORDER_GROUP,
-    classes = ListSet(SvgMapClasses.BORDER)
+    classes = Seq(SvgMapClasses.BORDER)
   )
+  private val scale: Double = 5.0
 
   def worldSvg
   (
@@ -83,7 +84,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
         c1.r * c1.r + c1.g * c1.g + c1.b * c1.b > c2.r * c2.r + c2.g * c2.g + c2.b * c2.b
       }
       .zipWithIndex
-      .toMap
+      .to(ListMap)
 
     val rsByClass = rs
       .flatMap(riverToSvg(_, riverColorWeights, precision))
@@ -131,7 +132,7 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
       .map(t => {
         val ps = psByClass.getOrElse(t, Seq.empty)
         val children = ps.map(_.dropFirstClass).sortBy(_.id.map(parseInt))
-        val provTypeGroup = group.copy(id = t, classes = ListSet(t))
+        val provTypeGroup = group.copy(id = t, classes = Seq(t))
 
         if (groupByTag && t == ProvinceTypes.province) {
           val ownerGroups = children
@@ -228,8 +229,8 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val bordsByClass = borders.map(borderSvg(_, precision)).groupBy(_.classes.head)
 
     def bordsOfType(t: String): SvgElement = {
-      val bs = bordsByClass.getOrElse(t, Seq.empty).map(_.copy(classes = ListSet.empty))
-      group.copy(id = t, classes = ListSet(t), children = bs)
+      val bs = bordsByClass.getOrElse(t, Seq.empty).map(_.copy(classes = Seq.empty))
+      group.copy(id = t, classes = Seq(t), children = bs)
     }
 
     val mapBorders = bordsOfType(BorderTypes.MAP_BORDER)
@@ -237,24 +238,24 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val countries = bordsOfType(BorderTypes.COUNTRY)
     val landAreas = bordsOfType(BorderTypes.LAND_AREA)
     val landBorders = bordsOfType(BorderTypes.LAND)
-      .copy(id = "border-land-default", classes = ListSet.empty)
+      .copy(id = "border-land-default", classes = Seq.empty)
     val countryShores = bordsOfType(BorderTypes.COUNTRY_SHORE)
     val seaShores = bordsOfType(BorderTypes.SEA_SHORE)
     val lakeShores = bordsOfType(BorderTypes.LAKE_SHORE)
 
     val seaAreas = bordsOfType(BorderTypes.SEA_AREA)
     val seaBorders = bordsOfType(BorderTypes.SEA)
-      .copy(id = "border-sea-default", classes = ListSet.empty)
+      .copy(id = "border-sea-default", classes = Seq.empty)
     val lakes = bordsOfType(BorderTypes.LAKE)
 
     val land = group.copy(
       id = BorderTypes.LAND,
-      classes = ListSet(BorderTypes.LAND),
+      classes = Seq(BorderTypes.LAND),
       children = Seq(countries, countryShores, landAreas, landBorders, seaShores, lakeShores)
     )
     val seas = group.copy(
       id = BorderTypes.SEA,
-      classes = ListSet(BorderTypes.SEA),
+      classes = Seq(BorderTypes.SEA),
       children = Seq(seaAreas, seaBorders, lakes)
     )
 
@@ -368,6 +369,9 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
   def provinceNameSvg(worldMap: WorldMap): SvgElement = {
     val names = worldMap
       .provinces
+      .filterNot(_.isSea)
+      .filterNot(_.geography.isImpassable)
+      .filterNot(_.localisation.name.exists(_.startsWith("Anbennar")))
       .flatMap(p => provinceGroupName(worldMap, Seq(p), p.name.getOrElse(s"pn${p.id}"), provinceName))
     group.copy(id = "province-names").add(names)
   }
@@ -479,12 +483,12 @@ case class SvgMapService(repos: RepositoryFactory, settings: SvgMapSettings = Sv
     val borders = worldMap.mercator.provinces
       .filter(_.provId.exists(ids.contains))
       .flatMap(_.borders)
-    val provColors = borders.flatMap(b => Seq(b.left, b.right).flatten(_.toSeq)).toSet
-    val ownersByColor = provColors
-      .flatMap(repos.provinces.findByColor(_))
-      .groupBy(_.color.toInt)
-      .flatMapValues(_.headOption)
-      .flatMapValues(_.state.owner)
+//    val provColors = borders.flatMap(b => Seq(b.left, b.right).flatten(_.toSeq)).toSet
+//    val ownersByColor = provColors
+//      .flatMap(repos.provinces.findByColor(_))
+//      .groupBy(_.color.toInt)
+//      .flatMapValues(_.headOption)
+//      .flatMapValues(_.state.owner)
 
     // TODO: province names
     //    val countryBorders = borders.filter(b => b.left.flatMap(ownersByColor.get) != b.right.flatMap(ownersByColor.get))

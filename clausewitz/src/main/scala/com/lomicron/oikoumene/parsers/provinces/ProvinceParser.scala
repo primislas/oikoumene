@@ -216,7 +216,7 @@ object ProvinceParser extends LazyLogging {
   }
 
   def terrainMapTypeOf(p: Province, m: MapRepository): Option[String] =
-    m.terrainMapType(p.color)
+    m.terrainMapTypeOfProvince(p.color)
 
   def addPolitics
   (provinceRepo: ProvinceRepository, repos: RepositoryFactory)

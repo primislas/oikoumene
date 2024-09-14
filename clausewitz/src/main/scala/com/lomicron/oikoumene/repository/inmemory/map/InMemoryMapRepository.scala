@@ -7,7 +7,6 @@ import com.lomicron.oikoumene.repository.inmemory.InMemoryCrudRepository
 import com.lomicron.utils.collection.CollectionUtils.MapEx
 
 import scala.collection.immutable.SortedMap
-import scala.util.Try
 
 case class InMemoryMapRepository()
   extends InMemoryCrudRepository[Color, Tile](t => Option(t.color))
@@ -18,9 +17,13 @@ case class InMemoryMapRepository()
   override def findNames(keys: Seq[Color]): SortedMap[Color, String] = SortedMap.empty
 
   private var terrainById: Map[String, TerrainMapColorConf] = Map.empty
-  private var terrainByColor: Map[Color, TerrainMapColorConf] = Map.empty
-  private var terrainProvColors: Map[Color, Color] = Map.empty
+  private var terrainByTerrainMapColor: Map[Color, TerrainMapColorConf] = Map.empty
+  private var provinceTerrainTypes: Map[Color, String] = Map.empty
   private var terrainColors: Array[Color] = Array.empty
+  private var treeTerrainById: Map[String, TerrainMapColorConf] = Map.empty
+  private var treeTerrainByTreeMapColor: Map[Color, TerrainMapColorConf] = Map.empty
+  private var treeTerrainProvColors: Map[Color, Color] = Map.empty
+  private var treeTerrainColors: Array[Color] = Array.empty
   private var _adjacencies: Seq[Adjacency] = Seq.empty
   private var _tileRoutes: Seq[TileRoute] = Seq.empty
   private var routesByProvId: Map[Int, Seq[Route]] = Map.empty
@@ -34,32 +37,64 @@ case class InMemoryMapRepository()
     this
   }
 
+  override def setTreeTerrainMapColorConf(mapTerrain: Seq[TerrainMapColorConf]): MapRepository = {
+    this.treeTerrainById = mapTerrain.map(mt => (mt.id, mt)).toMap
+    this
+  }
+
   override def setTerrainMapColors(terrainColors: Array[Color]): MapRepository = {
     this.terrainColors = terrainColors
     this
   }
 
-  override def setTerrainProvinceColors(terrainProvColors: Map[Color, Color]): MapRepository = {
-    this.terrainProvColors = terrainProvColors
+  override def setProvinceTerrainTypes(terrainProvColors: Map[Color, String]): MapRepository = {
+    this.provinceTerrainTypes = terrainProvColors
     this
   }
 
   override def rebuildTerrainColors(terrainColors: Array[Color] = this.terrainColors): MapRepository = {
     this.terrainColors = terrainColors
     this.terrainById = this.terrainById
-      .mapValuesEx(mt => Try(this.terrainColors(mt.colorIndex)).map(mt.withColor).getOrElse(mt))
-    terrainByColor = this.terrainById.values.filter(_.color.isDefined).map(t => (t.color.get, t)).toMap
+      .mapValuesEx(terrainConfig => {
+        val colors = terrainConfig.colorIndex
+          .filter(_ >= 0)
+          .filter(_ < terrainColors.length)
+          .map(terrainColors(_))
+        terrainConfig.withColor(colors)
+      })
+    terrainByTerrainMapColor = this.terrainById.values.flatMap(t => t.color.map(c => c -> t)).toMap
     this
   }
 
-  override def terrainMapType(argb: Int): Option[String] =
-    terrainMapType(Color(argb))
+  override def rebuildTreeTerrainColors(treeTerrainColors: Array[Color] = this.terrainColors): MapRepository = {
+    this.treeTerrainColors = treeTerrainColors
+    this.treeTerrainById = this.treeTerrainById
+      .mapValuesEx(mt => {
+        val colors = mt.colorIndex
+          .filter(_ >= 0)
+          .filter(_ < treeTerrainColors.length)
+          .map(treeTerrainColors(_))
+        mt.withColor(colors)
+      })
+    treeTerrainByTreeMapColor = this.treeTerrainById.values.flatMap(t => t.color.map(c => c -> t)).toMap
+    this
+  }
 
-  override def terrainMapType(color: Color): Option[String] =
-    this.terrainProvColors
+  override def terrainTypeOfTerrainColor(argb: Int): Option[String] =
+    terrainTypeOfTerrainColor(Color(argb))
+  override def terrainTypeOfTerrainColor(color: Color): Option[String] =
+    this.terrainByTerrainMapColor.get(color).map(_.terrainType)
+  override def treeTerrainTypeOfTreeColor(argb: Int): Option[String] =
+    treeTerrainTypeOfTreeColor(Color(argb))
+  override def treeTerrainTypeOfTreeColor(color: Color): Option[String] =
+    this.treeTerrainByTreeMapColor.get(color).map(_.terrainType)
+
+  override def terrainMapTypeOfProvince(argb: Int): Option[String] =
+    terrainMapTypeOfProvince(Color(argb))
+
+  override def terrainMapTypeOfProvince(color: Color): Option[String] =
+    this.provinceTerrainTypes
       .get(color)
-      .flatMap(terrainByColor.get)
-      .map(_.terrainType)
 
   override def updateAdjacencies(as: Seq[Adjacency]): MapRepository = {
     this._adjacencies = as

@@ -54,6 +54,7 @@ case class FileResourceRepository(settings: GameFilesSettings)
 
   val provinceMap = "map/provinces.bmp"
   val terrainMap = "map/terrain.bmp"
+  val treeMap = "map/trees.bmp"
   val heightMap = "map/heightmap.bmp"
   val riversMap = "map/rivers.bmp"
   def background(season: String): String = s"map/terrain/colormap_$season.dds"
@@ -286,6 +287,8 @@ case class FileResourceRepository(settings: GameFilesSettings)
   override def getProvinceMap: Option[GameFile] = Option(filePath(provinceMap))
 
   override def getTerrainMap: Option[GameFile] = Option(filePath(terrainMap))
+
+  override def getTreeMap: Option[GameFile] = Option(filePath(treeMap))
 
   override def getHeightMap: Option[GameFile] = Option(filePath(heightMap))
 

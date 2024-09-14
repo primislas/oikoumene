@@ -20,6 +20,8 @@ object RiverParser {
   val nonRiverWaterColors: Set[Int] = edgeColors ++ nonRiverColors
 
   def trace(img: BufferedImage): Seq[River] = RiverParser(img).trace
+  def isRiver(color: Int): Boolean =
+    !nonRiverWaterColors.contains(color)
 
 }
 
@@ -74,8 +76,7 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
       .exists(isUntracedPoint(_, traced))
 
   def isRiver(p: Point): Boolean =
-    !nonRiverWaterColors.contains(colorOf(p))
-//    riverColors.contains(colorOf(p))
+    RiverParser.isRiver(colorOf(p))
 
   def isUntracedPoint(p: Point, traced: Array[Array[Boolean]]): Boolean = !traced(p.x)(p.y)
 
@@ -113,12 +114,13 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
 
     val source = ps.head
     val sourceType = colorOf(ps.head)
+    if (edgeColors.contains(sourceType))
+      println()
 
     val ss = parseRiverPoints(ps.drop(1), sourceType)
     val sourceSegment = ss.headOption
       .map(s => s.copy(points = Point2D(source) +: s.points))
-    val segments = (sourceSegment.toSeq ++ ss.drop(1))
-      .filter(_.nonEmpty)
+    val segments = (sourceSegment.toSeq ++ ss.drop(1)).filter(_.nonEmpty)
 //      .map(s => s.copy(points = s.points.map(_ * 5.0)))
 
     River(segments)
@@ -136,14 +138,20 @@ case class RiverParser(img: BufferedImage) extends BitmapWalker with LazyLogging
       var segmentPs = ps.takeWhile(colorOf(_) == segmentType)
       val untracedPs = ps.drop(segmentPs.size)
       untracedPs.headOption.foreach(p => segmentPs = segmentPs :+ p)
+      if (segmentType == Color(255, 0, 0).toInt)
+        println()
       val segment = RiverSegment.ofIntPoints(prevType, segmentType, segmentPs)
+      if (segment.color == Color(255, 0, 0).toInt)
+        println()
+      if (nonRiverWaterColors.contains(segmentType))
+        println()
       parseRiverPoints(untracedPs, segmentType, segments :+ segment)
     }
 
   }
 
   def nextRiverPoint(p: Point, d: Direction): Option[Direction] =
-    d.directionsForward() find (neighborColor(p, _).exists(waterColors.contains))
+    d.directionsForward() find (neighborColor(p, _).exists(!nonRiverWaterColors.contains(_)))
 
   def typeOf(p: Point, c: Int): Option[Int] = {
     if (edgeColors.contains(c)) c match {

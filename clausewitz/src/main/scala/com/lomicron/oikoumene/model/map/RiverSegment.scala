@@ -15,7 +15,7 @@ case class RiverSegment
 
   def isEmpty: Boolean = points.isEmpty
   def nonEmpty: Boolean = points.nonEmpty
-  def reverse: RiverSegment = RiverSegment(color, source, points.reverse)
+  def reverse: RiverSegment = RiverSegment(source, color, points.reverse)
   def withStartingPoint(p: Point): RiverSegment = copy(points = Point2D(p) +: points)
   def withPath(path: Seq[TPath]): RiverSegment = copy(path = path)
 
@@ -72,7 +72,7 @@ case class RiverSegment
 
 object RiverSegment {
 
-  def ofIntPoints(source: Int, width: Int, points: Seq[Point] = Seq.empty): RiverSegment =
-    new RiverSegment(source, width, points.map(Point2D(_)))
+  def ofIntPoints(source: Int, color: Int, points: Seq[Point] = Seq.empty): RiverSegment =
+    new RiverSegment(source, color, points.map(Point2D(_)))
 
 }

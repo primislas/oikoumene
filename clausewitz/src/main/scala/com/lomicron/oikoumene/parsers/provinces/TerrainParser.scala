@@ -47,12 +47,19 @@ object TerrainParser extends LazyLogging {
       .map(localisation.setLocalisation)
       .map(parseModifiers)
 
+    val treeCategories = cs
+      .flatMap(_.getObject(treeKey))
+      .flatMap(parseTreeMapConf)
+
     if (evalEntityFields)
       ConfigField.printCaseClass("Terrain", terrainCategories)
 
     terrainCategories.map(Terrain.fromJson).foreach(geography.terrain.create)
     val colorConfs = terrainColorConfs.map(TerrainMapColorConf.fromJson)
     geography.map.setTerrainMapColorConf(colorConfs)
+
+    val treeColorConfs = treeCategories.map(TerrainMapColorConf.fromJson)
+    geography.map.setTreeTerrainMapColorConf(treeColorConfs)
 
     geography
   }
@@ -68,6 +75,10 @@ object TerrainParser extends LazyLogging {
 
   private def parseTerrainMapConf(o: ObjectNode): Seq[ObjectNode] =
     fieldsToObjects(o, idKey).map(parseTerrainMapConfColor)
+
+  private def parseTreeMapConf(o: ObjectNode): Seq[ObjectNode] =
+    fieldsToObjects(o, idKey)
+      .map(obj => obj.setEx("type", obj.get("terrain")))
 
   private def parseTerrainMapConfColor(conf: ObjectNode): ObjectNode =
     conf

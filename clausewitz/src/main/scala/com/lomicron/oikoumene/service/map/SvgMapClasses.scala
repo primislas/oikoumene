@@ -36,7 +36,9 @@ object SvgMapClasses {
     }
 
     mapMode match {
-      case MapModes.SIMPLE_TERRAIN =>Seq(Some(p.`type`), coloredMode).flatten
+      case MapModes.SIMPLE_TERRAIN =>
+        val pType = Some(p.`type`)
+        Seq(pType, coloredMode, pType.filter(_ == ProvinceTypes.wasteland)).flatten
       case _ =>
         val head =
           if (p.`type` == ProvinceTypes.wasteland || p.`type` == ProvinceTypes.uncolonized)

@@ -171,6 +171,7 @@ object SvgMapStyles {
       .findAll
       .flatMap(t => t.color.map(c => s".${t.id} { fill:${Svg.colorToSvg(c)} }"))
       .mkString("\n")
+      .appendedAll("\n.wasteland { fill:rgb(80,80,80) }\n")
 
   def buildRiverStyles(rivers: Seq[River]): String = {
     val totalRiverTypes = rivers.flatMap(_.path).map(_.color).distinct.size

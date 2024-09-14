@@ -41,6 +41,7 @@ object ClausewitzParser extends LazyLogging {
     val terrainCategoriesKey = "categories"
     val terrainProvincesKey = "terrain_override"
     val terrainKey = "terrain"
+    val treeKey = "tree"
     val modifier = "modifier"
     val potential = "potential"
     val allow = "allow"
